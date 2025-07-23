@@ -1,8 +1,8 @@
 {
   "project": "DC",
   "host": "www.adobe.com",
-  "previewHost": "main--dc--adobecom.aem.page",
-  "liveHost": "main--dc--adobecom.aem.live",
+  "editUrlLabel": "Document Authoring",
+  "editUrlPattern": "https://da.live/edit#/{{org}}/{{site}}{{pathname}}",
   "trustedHosts": ["milo.adobe.com", "main--milo--adobecom.hlx.page"],
   "plugins": [
     {
