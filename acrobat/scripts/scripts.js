@@ -420,7 +420,7 @@ replaceDotMedia(document);
  * ------------------------------------------------------------
  */
 
-(async function loadPage() {
+async function loadPage() {
   // Fast track the widget
   const widgetBlock = document.querySelector('[class*="dc-converter-widget"]');
   const mobileAppBlock = document.querySelector('[class*="mobile-widget"]');
@@ -537,4 +537,12 @@ replaceDotMedia(document);
     const { default: initTooltips } = await import('./tooltips.js');
     initTooltips();
   }
+}
+
+loadPage();
+
+(async function loadDa() {
+  if (!new URL(window.location.href).searchParams.get('dapreview')) return;
+  // eslint-disable-next-line import/no-unresolved
+  import('https://da.live/scripts/dapreview.js').then(({ default: daPreview }) => daPreview(loadPage));
 }());
