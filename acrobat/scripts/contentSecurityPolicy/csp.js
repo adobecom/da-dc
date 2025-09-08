@@ -11,6 +11,10 @@ const STAGE_ENVS = [
   'main--dc--adobecom.aem.page',
   'main--dc--adobecom.aem.live',
   'stage--dc--adobecom.aem.page',
+  'main--da-dc--adobecom.aem.live',
+  'stage--da-dc--adobecom.aem.live',
+  'main--da-dc--adobecom.aem.page',
+  'stage--da-dc--adobecom.aem.page',
 ];
 
 async function getCspEnv() {
