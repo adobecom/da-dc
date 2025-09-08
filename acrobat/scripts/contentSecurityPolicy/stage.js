@@ -85,6 +85,7 @@ const formAction = [
   'www.adobe.com',
   'www.facebook.com/tr/',
   'www.stage.adobe.com',
+  '*.adobelogin.com/',
   ';',
 ];
 
