@@ -79,6 +79,7 @@ const formAction = [
   '*.adobelogin.com',
   'helpx.adobe.com',
   'www.facebook.com/tr/',
+  '*.adobelogin.com/',
   ';',
 ];
 
