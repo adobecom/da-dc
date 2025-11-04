@@ -132,7 +132,7 @@ describe.skip('Test scripts', () => {
       await require('../../acrobat/scripts/scripts.js');
       await delay(100);
       const config = await getConfig();
-      expect(config.miloLibs).toEqual('https://main--milo--adobecom.hlx.live/libs');
+      expect(config.miloLibs).toEqual('https://main--milo--adobecom.aem.live/libs');
     });
   });
 

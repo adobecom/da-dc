@@ -160,7 +160,6 @@ const LANGUAGE_BASED_PATHS = [
   'news.adobe.com',
 ];
 const DEFAULT_LANG = 'en';
-export const SLD = PAGE_URL.hostname.includes('.aem.') ? 'aem' : 'hlx';
 
 const PROMO_PARAM = 'promo';
 let isMartechLoaded = false;
@@ -179,8 +178,7 @@ export function getEnv(conf) {
 
   if (host.includes('localhost')) return { ...ENVS.local, consumer: conf.local };
   /* c8 ignore start */
-  if (host.includes(`${SLD}.page`)
-    || host.includes(`${SLD}.live`)
+  if (host.includes('.aem.live')
     || host.includes('stage.adobe')
     || host.includes('corp.adobe')
     || host.includes('graybox.adobe')) {
@@ -303,7 +301,7 @@ export const [setConfig, updateConfig, getConfig] = (() => {
         console.log('Invalid or missing locale:', e);
       }
       config.locale.contentRoot = `${origin}${config.locale.prefix}${config.contentRoot ?? ''}`;
-      config.useDotHtml = !PAGE_URL.origin.includes(`.${SLD}.`)
+      config.useDotHtml = !PAGE_URL.origin.includes('.aem.live')
         && (conf.useDotHtml ?? PAGE_URL.pathname.endsWith('.html'));
       config.entitlements = handleEntitlements;
       config.consumerEntitlements = conf.entitlements || [];
@@ -341,7 +339,7 @@ export const getFederatedContentRoot = () => {
 
   federatedContentRoot = isAllowedOrigin ? origin : 'https://www.adobe.com';
 
-  if (origin.includes('localhost') || origin.includes(`.${SLD}.`)) {
+  if (origin.includes('localhost') || origin.includes('.aem.live')) {
     federatedContentRoot = `https://main--federal--adobecom.aem.${origin.endsWith('.live') ? 'live' : 'page'}`;
   }
 
