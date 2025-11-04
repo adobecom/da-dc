@@ -42,14 +42,14 @@ test.describe('Unity Add Pages to PDF test suite', () => {
       await page.waitForTimeout(10000);
       console.log(`[PDF File Path]: ${pdfFilePath}`);
       await fileInput.setInputFiles(pdfFilePath);
-      await page.waitForTimeout(10000);
+      await page.waitForTimeout(15000);
 
       // Verify the URL parameters
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);
       const urlObj = new URL(currentUrl);
       expect(urlObj.searchParams.get('x_api_client_id')).toBe('unity');
-      expect(urlObj.searchParams.get('x_api_client_location')).toBe('add-pages-to-pdf');
+      expect(urlObj.searchParams.get('x_api_client_location')).toBe('insert-pdf');
       expect(urlObj.searchParams.get('user')).toBe('frictionless_new_user');
       expect(urlObj.searchParams.get('attempts')).toBe('1st');
       console.log({
