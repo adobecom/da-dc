@@ -1,7 +1,7 @@
 import path from 'path';
 import { expect, test } from '@playwright/test';
-import { features } from './addpagestopdfs.spec.js';
-import AddPagesToPdf from './addpagestopdfs.page.js';
+import { features } from './add-pages-to-pdfs.spec.js';
+import AddPagesToPdf from './add-pages-to-pdfs.page.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../../assets/1-PDF-add-pages-to-pdf.pdf');
 
