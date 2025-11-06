@@ -4,7 +4,7 @@ module.exports = {
     {
       tcid: '0',
       name: '@extract-pdf-pages',
-      path: '/acrobat/online/test/extract-pdf-pages',
+      path: '/drafts/nala/acrobat/online/test/extract-pdf-pages',
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Extract PDF pages',

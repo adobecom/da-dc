@@ -4,7 +4,7 @@ module.exports = {
     {
       tcid: '0',
       name: '@merge-pdf',
-      path: '/acrobat/online/test/merge-pdf',
+      path: '/drafts/nala/acrobat/online/test/merge-pdf',
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Merge PDF files',

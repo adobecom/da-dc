@@ -4,7 +4,7 @@ module.exports = {
     {
       tcid: '0',
       name: '@delete-pdf-pages',
-      path: '/acrobat/online/test/delete-pdf-pages',
+      path: '/drafts/nala/acrobat/online/test/delete-pdf-pages',
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Delete PDF pages',

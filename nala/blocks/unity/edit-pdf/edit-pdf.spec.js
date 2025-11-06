@@ -4,7 +4,7 @@ module.exports = {
     {
       tcid: '0',
       name: '@edit-pdf',
-      path: '/acrobat/online/test/pdf-editor',
+      path: '/drafts/nala/acrobat/online/test/pdf-editor',
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Edit a PDF',

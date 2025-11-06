@@ -4,7 +4,7 @@ module.exports = {
     {
       tcid: '0',
       name: '@protect-pdf',
-      path: '/acrobat/online/test/protect-pdf',
+      path: '/drafts/nala/acrobat/online/test/password-protect-pdf',
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Password protect a PDF',

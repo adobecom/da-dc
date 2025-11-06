@@ -4,7 +4,7 @@ module.exports = {
     {
       tcid: '0',
       name: '@add-pdf-page-numbers',
-      path: '/acrobat/online/test/add-pdf-page-numbers',
+      path: '/drafts/nala/acrobat/online/test/add-pdf-page-numbers',
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Add page numbers to a PDF',

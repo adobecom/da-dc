@@ -4,7 +4,7 @@ module.exports = {
     {
       tcid: '0',
       name: '@jpg-to-pdf',
-      path: '/acrobat/online/test/jpg-to-pdf',
+      path: '/drafts/nala/acrobat/online/test/jpg-to-pdf',
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'JPG to PDF Converter',

@@ -4,7 +4,7 @@ module.exports = {
     {
       tcid: '0',
       name: '@excel-to-pdf',
-      path: '/acrobat/online/test/excel-to-pdf',
+      path: '/drafts/nala/acrobat/online/test/excel-to-pdf',
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Excel to PDF converter',

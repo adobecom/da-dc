@@ -4,7 +4,7 @@ module.exports = {
     {
       tcid: '0',
       name: '@crop-pdf',
-      path: '/acrobat/online/test/crop-pdf',
+      path: '/drafts/nala/acrobat/online/test/crop-pdf',
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Crop PDF pages',

@@ -1,47 +1,47 @@
 import path from 'path';
 import { expect, test } from '@playwright/test';
-import { features } from './protect-pdf.spec.js';
-import ProtectPdf from './protect-pdf.page.js';
+import { features } from './pdf-to-excel.spec.js';
+import PdfToExcel from './pdf-to-excel.page.js';
 
-const protectPdfFilePath = path.resolve(__dirname, '../../../assets/1-PDF-protect-pdf.pdf');
+const pdfToExcelFilePath = path.resolve(__dirname, '../../../assets/1-PDF-pdf-to-excel.pdf');
 
-let protectPdf;
+let pdfToExcel;
 
 const unityLibs = process.env.UNITY_LIBS || '';
 
-test.describe('Unity Password protect PDF files test suite', () => {
+test.describe('Unity Convert PDF to Excel test suite', () => {
   test.beforeEach(async ({ page }) => {
-    protectPdf = new ProtectPdf(page);
+    pdfToExcel = new PdfToExcel(page);
   });
 
-  // Test 0 : Password protect PDF files
+  // Test 0 : Convert PDF to Excel
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 
-    await test.step('step-1: Go to Password protect PDF files test page', async () => {
+    await test.step('step-1: Go to Convert PDF to Excel test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
       await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveURL(`${baseURL}${features[0].path}${unityLibs}`);
     });
 
-    await test.step('step-2: Verify Password protect PDF files content/specs', async () => {
-      await expect(await protectPdf.widget).toBeVisible();
-      await expect(await protectPdf.dropZone).toBeVisible();
-      await expect(await protectPdf.verbImage).toBeVisible();
-      await expect(await protectPdf.acrobatIcon).toBeVisible();
-      const actualText = await protectPdf.verbHeader.textContent();
+    await test.step('step-2: Verify Convert PDF to Excel content/specs', async () => {
+      await expect(await pdfToExcel.widget).toBeVisible();
+      await expect(await pdfToExcel.dropZone).toBeVisible();
+      await expect(await pdfToExcel.verbImage).toBeVisible();
+      await expect(await pdfToExcel.acrobatIcon).toBeVisible();
+      const actualText = await pdfToExcel.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-        await expect(await protectPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(await protectPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(await pdfToExcel.verbTitle).toContainText(data.verbTitle);
+      await expect(await pdfToExcel.verbCopy).toContainText(data.verbCopy);
     });
 
-    await test.step('step-3: Upload a PDF file to protect', async () => {
+    await test.step('step-3: Upload a PDF file to convert to Excel', async () => {
       // upload and wait for some page change indicator (like a new element or URL change)
       const fileInput = page.locator('input[type="file"]#file-upload');
       await page.waitForTimeout(10000);
-      console.log(`[PDF File Path]: ${protectPdfFilePath}`);
-      await fileInput.setInputFiles(protectPdfFilePath);
+      console.log(`[PDF File Path]: ${pdfToExcelFilePath}`);
+      await fileInput.setInputFiles(pdfToExcelFilePath);
       await page.waitForTimeout(15000);
 
       // Verify the URL parameters
@@ -49,7 +49,7 @@ test.describe('Unity Password protect PDF files test suite', () => {
       console.log(`[Post-upload URL]: ${currentUrl}`);
       const urlObj = new URL(currentUrl);
       expect(urlObj.searchParams.get('x_api_client_id')).toBe('unity');
-      expect(urlObj.searchParams.get('x_api_client_location')).toBe('protect-pdf');
+      expect(urlObj.searchParams.get('x_api_client_location')).toBe('pdf-to-excel');
       expect(urlObj.searchParams.get('user')).toBe('frictionless_new_user');
       expect(urlObj.searchParams.get('attempts')).toBe('1st');
       console.log({

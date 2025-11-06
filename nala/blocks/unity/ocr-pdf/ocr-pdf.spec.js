@@ -4,7 +4,7 @@ module.exports = {
     {
       tcid: '0',
       name: '@ocr-pdf',
-      path: '/acrobat/online/test/ocr-pdf',
+      path: '/drafts/nala/acrobat/online/test/ocr-pdf',
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'OCR a PDF',
