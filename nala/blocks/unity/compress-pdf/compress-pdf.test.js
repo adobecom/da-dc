@@ -32,7 +32,7 @@ test.describe('Unity Compress PDF test suite', () => {
       await expect(await compressPdf.acrobatIcon).toBeVisible();
       const actualText = await compressPdf.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-        await expect(await compressPdf.verbTitle).toContainText(data.verbTitle);
+      await expect(await compressPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await compressPdf.verbCopy).toContainText(data.verbCopy);
     });
 
