@@ -32,7 +32,7 @@ test.describe('Unity JPG to PDF converter test suite', () => {
       await expect(await jpgToPdf.acrobatIcon).toBeVisible();
       const actualText = await jpgToPdf.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-        await expect(await jpgToPdf.verbTitle).toContainText(data.verbTitle);
+      await expect(await jpgToPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await jpgToPdf.verbCopy).toContainText(data.verbCopy);
     });
 

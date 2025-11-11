@@ -33,7 +33,7 @@ test.describe('Unity Merge PDF files test suite', () => {
       await expect(await mergePdf.acrobatIcon).toBeVisible();
       const actualText = await mergePdf.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-        await expect(await mergePdf.verbTitle).toContainText(data.verbTitle);
+      await expect(await mergePdf.verbTitle).toContainText(data.verbTitle);
       await expect(await mergePdf.verbCopy).toContainText(data.verbCopy);
     });
 

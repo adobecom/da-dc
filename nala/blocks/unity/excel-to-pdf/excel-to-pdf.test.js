@@ -32,7 +32,7 @@ test.describe('Unity Excel to PDF converter test suite', () => {
       await expect(await excelToPdf.acrobatIcon).toBeVisible();
       const actualText = await excelToPdf.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-        await expect(await excelToPdf.verbTitle).toContainText(data.verbTitle);
+      await expect(await excelToPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await excelToPdf.verbCopy).toContainText(data.verbCopy);
     });
 

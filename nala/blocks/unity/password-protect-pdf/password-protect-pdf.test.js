@@ -32,7 +32,7 @@ test.describe('Unity Password protect PDF files test suite', () => {
       await expect(await protectPdf.acrobatIcon).toBeVisible();
       const actualText = await protectPdf.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-        await expect(await protectPdf.verbTitle).toContainText(data.verbTitle);
+      await expect(await protectPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await protectPdf.verbCopy).toContainText(data.verbCopy);
     });
 

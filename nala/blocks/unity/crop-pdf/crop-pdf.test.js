@@ -32,7 +32,7 @@ test.describe('Unity Crop PDF test suite', () => {
       await expect(await cropPdf.acrobatIcon).toBeVisible();
       const actualText = await cropPdf.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-        await expect(await cropPdf.verbTitle).toContainText(data.verbTitle);
+      await expect(await cropPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await cropPdf.verbCopy).toContainText(data.verbCopy);
     });
 

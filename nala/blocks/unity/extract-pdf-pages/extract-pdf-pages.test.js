@@ -32,7 +32,7 @@ test.describe('Unity Extract PDF pages test suite', () => {
       await expect(await extractPdfPages.acrobatIcon).toBeVisible();
       const actualText = await extractPdfPages.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-        await expect(await extractPdfPages.verbTitle).toContainText(data.verbTitle);
+      await expect(await extractPdfPages.verbTitle).toContainText(data.verbTitle);
       await expect(await extractPdfPages.verbCopy).toContainText(data.verbCopy);
     });
 

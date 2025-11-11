@@ -32,7 +32,7 @@ test.describe('Unity Delete PDF pages test suite', () => {
       await expect(await deletePdfPages.acrobatIcon).toBeVisible();
       const actualText = await deletePdfPages.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-        await expect(await deletePdfPages.verbTitle).toContainText(data.verbTitle);
+      await expect(await deletePdfPages.verbTitle).toContainText(data.verbTitle);
       await expect(await deletePdfPages.verbCopy).toContainText(data.verbCopy);
     });
 

@@ -32,7 +32,7 @@ test.describe('Unity OCR PDF files test suite', () => {
       await expect(await ocrPdf.acrobatIcon).toBeVisible();
       const actualText = await ocrPdf.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-        await expect(await ocrPdf.verbTitle).toContainText(data.verbTitle);
+      await expect(await ocrPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await ocrPdf.verbCopy).toContainText(data.verbCopy);
     });
 
