@@ -8,7 +8,7 @@ module.exports = {
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Chat with your PDF',
-        verbCopy: 'Ask questions, get answers, and chat with your PDF using our AI chat feature.',
+        verbCopy: 'Ask your PDF questions and get trusted document insights with Acrobat AI Assistant.Drag and drop one or more PDF, DOCX, PPTX, TXT, or RTF files.',
       },
       tags: '@ai-chat-pdf @smoke @regression @unity',
     },

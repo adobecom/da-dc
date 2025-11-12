@@ -99,7 +99,8 @@ function getUnityLibs(prodLibs = '/unitylibs') {
   // eslint-disable-next-line compat/compat
   const branch = new URLSearchParams(search).get('unitylibs') || 'main';
   if (branch === 'main' && hostname === 'www.stage.adobe.com') return prodLibs;
-  return `https://${branch}${branch.includes('--') ? '' : '--unity--adobecom'}.aem.live/unitylibs`;
+  const env = hostname.includes('.aem.') ? 'aem' : 'hlx';
+  return `https://${branch}${branch.includes('--') ? '' : '--unity--adobecom'}.${env}.live/unitylibs`;
 }
 
 export default async function init(el) {

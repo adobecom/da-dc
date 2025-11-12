@@ -8,7 +8,7 @@ export default class AcrobatWidget {
     this.dropZone = this.widget.locator('#drop-zone');
     this.verbRow = this.widget.locator('.verb-row').nth(0);
     this.verbHeader = this.verbRow.locator('.verb-heading');
-    this.verbCopy = this.verbRow.locator('.verb-copy');
+    this.verbCopy = this.verbRow.locator('.verb-copy').nth(0);
     this.acrobatIcon = this.verbRow.locator('.acrobat-icon svg');
     this.verbTitle = this.verbRow.locator('.verb-title');
     this.verbImage = this.widget.locator('.verb-image');
