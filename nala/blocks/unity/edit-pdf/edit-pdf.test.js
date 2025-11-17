@@ -48,7 +48,7 @@ test.describe('Unity Edit PDF files test suite', () => {
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);
       const urlObj = new URL(currentUrl);
-      expect(urlObj.searchParams.get('x_api_client_id')).toBe('adobe_com');
+      expect(urlObj.searchParams.get('x_api_client_id')).toBe('unity');
       expect(urlObj.searchParams.get('x_api_client_location')).toBe('add_comment');
       expect(urlObj.searchParams.get('user')).toBe('frictionless_new_user');
       expect(urlObj.searchParams.get('attempts')).toBe('1st');
