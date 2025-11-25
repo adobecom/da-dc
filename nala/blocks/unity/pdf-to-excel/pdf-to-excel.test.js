@@ -39,7 +39,7 @@ test.describe('Unity Convert PDF to Excel test suite', () => {
     await test.step('step-3: Upload a PDF file to convert to Excel', async () => {
       // upload and wait for some page change indicator (like a new element or URL change)
       const fileInput = page.locator('input[type="file"]#file-upload');
-      await page.waitForTimeout(10000);
+      await page.waitForTimeout(15000);
       console.log(`[PDF File Path]: ${pdfToExcelFilePath}`);
       await fileInput.setInputFiles(pdfToExcelFilePath);
       await page.waitForTimeout(15000);

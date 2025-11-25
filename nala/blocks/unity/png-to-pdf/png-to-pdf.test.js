@@ -39,7 +39,7 @@ test.describe('Unity Convert PNG to PDF test suite', () => {
     await test.step('step-3: Upload a PNG file to convert to PDF', async () => {
       // upload and wait for some page change indicator (like a new element or URL change)
       const fileInput = page.locator('input[type="file"]#file-upload');
-      await page.waitForTimeout(10000);
+      await page.waitForTimeout(15000);
       console.log(`[PNG File Path]: ${pngToPdfFilePath}`);
       await fileInput.setInputFiles(pngToPdfFilePath);
       await page.waitForTimeout(15000);
