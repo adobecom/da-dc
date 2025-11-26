@@ -39,10 +39,10 @@ test.describe('Unity Convert PPT to PDF test suite', () => {
     await test.step('step-3: Upload a PPT file to convert to PDF', async () => {
       // upload and wait for some page change indicator (like a new element or URL change)
       const fileInput = page.locator('input[type="file"]#file-upload');
-      await page.waitForTimeout(15000);
+      await page.waitForTimeout(12000);
       console.log(`[PPT File Path]: ${pptToPdfFilePath}`);
       await fileInput.setInputFiles(pptToPdfFilePath);
-      await page.waitForTimeout(15000);
+      await page.waitForTimeout(12000);
 
       // Verify the URL parameters
       const currentUrl = page.url();

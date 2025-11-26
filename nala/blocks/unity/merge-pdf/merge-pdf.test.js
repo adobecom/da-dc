@@ -40,7 +40,7 @@ test.describe('Unity Merge PDF files test suite', () => {
     await test.step('step-3: Upload two PDF files to merge', async () => {
       // upload and wait for some page change indicator (like a new element or URL change)
       const fileInput = page.locator('input[type="file"]#file-upload');
-      await page.waitForTimeout(15000);
+      await page.waitForTimeout(12000);
       console.log(`[PDF File Path 1]: ${mergePdfFilePath1}`);
       console.log(`[PDF File Path 2]: ${mergePdfFilePath2}`);
       await fileInput.setInputFiles([mergePdfFilePath1, mergePdfFilePath2]);

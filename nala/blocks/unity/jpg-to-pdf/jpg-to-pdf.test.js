@@ -39,10 +39,10 @@ test.describe('Unity JPG to PDF converter test suite', () => {
     await test.step('step-3: Upload a JPG file to convert to PDF', async () => {
       // upload and wait for some page change indicator (like a new element or URL change)
       const fileInput = page.locator('input[type="file"]#file-upload');
-      await page.waitForTimeout(15000);
+      await page.waitForTimeout(12000);
       console.log(`[JPG File Path]: ${jpgToPdfFilePath}`);
       await fileInput.setInputFiles(jpgToPdfFilePath);
-      await page.waitForTimeout(15000);
+      await page.waitForTimeout(12000);
 
       // Verify the URL parameters
       const currentUrl = page.url();

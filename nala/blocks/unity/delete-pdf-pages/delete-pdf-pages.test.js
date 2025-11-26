@@ -39,10 +39,10 @@ test.describe('Unity Delete PDF pages test suite', () => {
     await test.step('step-3: Upload a PDF file to delete pages', async () => {
       // upload and wait for some page change indicator (like a new element or URL change)
       const fileInput = page.locator('input[type="file"]#file-upload');
-      await page.waitForTimeout(15000);
+      await page.waitForTimeout(12000);
       console.log(`[PDF File Path]: ${deletePdfFilePath}`);
       await fileInput.setInputFiles(deletePdfFilePath);
-      await page.waitForTimeout(15000);
+      await page.waitForTimeout(12000);
 
       // Verify the URL parameters
       const currentUrl = page.url();
