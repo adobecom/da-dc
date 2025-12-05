@@ -747,12 +747,17 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 }
 
-@media only screen and (min-width: 600px) and (max-width: 1199px) {
+@media screen and (min-width: 600px) and (max-width: 1199px) {
   .verb-widget .milo-tooltip.top::before {
     left: 50%;
     transform: translateX(-50%) translateY(-100%);
     margin-left: 0;
-    max-width: min(140px, calc(100vw - 40px));
+    max-width: calc(100vw - 40px);
+    width: auto;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   .verb-widget .milo-tooltip.top::after {
