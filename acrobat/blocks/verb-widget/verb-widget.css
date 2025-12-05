@@ -747,19 +747,29 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 }
 
-/* Fix tooltip overflow on tablets only */
 @media (min-width: 600px) and (max-width: 1199px) {
-  .verb-widget .milo-tooltip.top::before {
+  .verb-widget .milo-tooltip:hover::before,
+  .verb-widget .milo-tooltip:focus::before,
+  .verb-widget .milo-tooltip:active::before {
     left: 50%;
+    right: auto;
+    top: -6px;
     transform: translateX(-50%) translateY(-100%);
     margin-left: 0;
+    margin-bottom: 15px;
     max-width: min(140px, calc(100vw - 40px));
   }
 
-  .verb-widget .milo-tooltip.top::after {
+  .verb-widget .milo-tooltip:hover::after,
+  .verb-widget .milo-tooltip:focus::after,
+  .verb-widget .milo-tooltip:active::after {
     left: 50%;
+    right: auto;
+    top: 2px;
     transform: translateX(-50%) translateY(-50%);
     margin-left: 0;
+    border: 8px solid #0469E3;
+    border-color: #0469E3 transparent transparent;
   }
 }
 
