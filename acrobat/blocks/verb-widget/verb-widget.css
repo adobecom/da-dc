@@ -747,12 +747,9 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 }
 
-@media (min-width: 600px) and (max-width: 1199px) {
-  .verb-widget .milo-tooltip:hover::before,
-  .verb-widget .milo-tooltip:focus::before,
-  .verb-widget .milo-tooltip:active::before {
+@media only screen and (min-width: 600px) and (max-width: 1199px) {
+  .verb-widget .milo-tooltip::before {
     left: 50%;
-    right: auto;
     top: -6px;
     transform: translateX(-50%) translateY(-100%);
     margin-left: 0;
@@ -760,11 +757,8 @@ html[dir="rtl"] .verb-cta .upload-icon {
     max-width: min(140px, calc(100vw - 40px));
   }
 
-  .verb-widget .milo-tooltip:hover::after,
-  .verb-widget .milo-tooltip:focus::after,
-  .verb-widget .milo-tooltip:active::after {
+  .verb-widget .milo-tooltip::after {
     left: 50%;
-    right: auto;
     top: 2px;
     transform: translateX(-50%) translateY(-50%);
     margin-left: 0;
