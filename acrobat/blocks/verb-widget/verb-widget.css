@@ -663,6 +663,12 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 }
 
+@media screen and (min-width: 768px) and (max-width: 1199px) {
+  .verb-footer {
+    align-items: start;
+  }
+}
+
 .verb-widget .mobile.milo-tooltip.top::before {
   transform: translateX(-7%) translateY(-100%) !important;
 }

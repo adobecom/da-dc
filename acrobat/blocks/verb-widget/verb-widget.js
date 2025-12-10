@@ -828,6 +828,9 @@ export default async function init(element) {
 
     if (isMobile && !isTablet) {
       widgetImage.after(widgetImage);
+    }
+    
+    if (isMobile || isTablet) {
       iconSecurity.remove(iconSecurity);
       footer.prepend(infoIcon);
     }
