@@ -753,23 +753,3 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 }
 
-@media screen and (min-width: 600px) and (max-width: 1199px) {
-  .verb-widget .milo-tooltip.top::before {
-    left: 50%;
-    transform: translateX(-50%) translateY(-100%);
-    margin-left: 0;
-    max-width: calc(100vw - 40px);
-    width: auto;
-    white-space: normal;
-    word-wrap: break-word;
-    word-break: break-word;
-    overflow-wrap: break-word;
-  }
-
-  .verb-widget .milo-tooltip.top::after {
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    margin-left: 0;
-  }
-}
-
