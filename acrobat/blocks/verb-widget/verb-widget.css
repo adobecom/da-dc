@@ -669,7 +669,8 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 }
 
-.verb-widget .mobile.milo-tooltip.top::before {
+.verb-widget .mobile.milo-tooltip.top::before,
+.verb-widget .tablet.milo-tooltip.top::before {
   transform: translateX(-7%) translateY(-100%) !important;
 }
 

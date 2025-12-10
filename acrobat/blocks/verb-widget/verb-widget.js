@@ -767,6 +767,7 @@ export default async function init(element) {
     infoIcon.classList.add('mobile');
   } else if (isTablet) {
     widget.classList.add('tablet');
+    infoIcon.classList.add('tablet');
   }
 
   widgetLeft.append(widgetHeader, widgetHeading, errorState);
