@@ -1,22 +1,14 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable import/no-extraneous-dependencies, no-console */
-
 const { execSync } = require('child_process');
 const { isBranchURLValid } = require('../libs/baseurl.js');
 
-// Dynamically load PROJECT, ORG, BASE_URLS
-let PROJECT; let ORG; let BASE_URLS; let
-  getBranchUrl;
-try {
-  ({ PROJECT, ORG, BASE_URLS } = require('../libs/config.js'));
-  ({ getBranchUrl } = require('../libs/constants.js'));
-} catch {
-  ({ DEFAULT_REPO: PROJECT, DEFAULT_ORG: ORG, BASE_URLS, getBranchUrl } = require('../libs/constants.js'));
-}
+const MAIN_BRANCH_LIVE_URL = 'https://main--da-dc--adobecom.aem.live';
+const STAGE_BRANCH_URL = 'https://stage--da-dc--adobecom.aem.live';
 
 async function getGitHubPRBranchLiveUrl() {
+  // get the pr number and branch name
   const prReference = process.env.GITHUB_REF;
   const prHeadReference = process.env.GITHUB_HEAD_REF;
+  const prBaseBranch = process.env.GITHUB_BASE_REF || 'stage';
 
   const prNumber = prReference.startsWith('refs/pull/')
     ? prReference.split('/')[2]
@@ -26,20 +18,19 @@ async function getGitHubPRBranchLiveUrl() {
     ? prHeadReference.replace(/\//g, '-')
     : prReference.split('/')[2].replace(/\//g, '-');
 
+  process.env.UNITY_LIBS = `?unitylibs=${prBranch}`;
+
+  // get the org and repo
   const repository = process.env.GITHUB_REPOSITORY;
   const repoParts = repository.split('/');
   const toRepoOrg = repoParts[0];
   const toRepoName = repoParts[1];
 
+  // Get the org and repo from the environment variables
   const prFromOrg = process.env.prOrg || toRepoOrg;
   const prFromRepoName = process.env.prRepo || toRepoName;
 
-  let prBranchLiveUrl;
-  if (prBranch === 'main') {
-    prBranchLiveUrl = BASE_URLS.main;
-  } else {
-    prBranchLiveUrl = `https://${prBranch}--${prFromRepoName}--${prFromOrg}.aem.live`;
-  }
+  const prBranchLiveUrl = `https://${prBaseBranch}--da-dc--${prFromOrg}.aem.live`;
 
   try {
     if (await isBranchURLValid(prBranchLiveUrl)) {
@@ -54,57 +45,92 @@ async function getGitHubPRBranchLiveUrl() {
     console.info('PR From REPO  : ', prFromRepoName);
     console.info('PR Branch(U)  : ', prBranch);
     console.info('PR Number     : ', prNumber || 'Auto-PR');
-    console.info('PR Branch live url : ', prBranchLiveUrl);
+    console.info('PR From Branch live url : ', prBranchLiveUrl);
   } catch (err) {
     console.error(`Error => Error in setting PR Branch test URL : ${prBranchLiveUrl}`);
-    console.info(`Note: PR branch test url ${prBranchLiveUrl} is not valid, Exiting test execution.`);
+    console.info(`Note: PR branch test url  ${prBranchLiveUrl} is not valid, Exiting test execution.`);
+    process.exit(1);
+  }
+}
+
+async function getGitHubMiloLibsBranchLiveUrl() {
+  const repository = process.env.GITHUB_REPOSITORY;
+  const prBranchLiveUrl = process.env.PR_BRANCH_MILOLIBS_LIVE_URL;
+  const miloLibs = process.env.MILO_LIBS;
+
+  try {
+    if (await isBranchURLValid(prBranchLiveUrl)) {
+      process.env.PR_BRANCH_LIVE_URL = prBranchLiveUrl;
+    }
+    console.info('PR Repository : ', repository);
+    console.info('PR Branch live url : ', prBranchLiveUrl);
+    console.info('Milo Libs : ', miloLibs);
+  } catch (err) {
+    console.error(
+      `Error => Error in setting PR Branch test URL : ${prBranchLiveUrl}`,
+    );
+    console.info(
+      `Note: PR branch test url  ${prBranchLiveUrl} is not valid, Exiting test execution.`,
+    );
     process.exit(1);
   }
 }
 
 async function getCircleCIBranchLiveUrl() {
-  const stageBranchLiveUrl = BASE_URLS.stage;
+  const stageBranchLiveUrl = STAGE_BRANCH_URL;
+
   try {
     if (await isBranchURLValid(stageBranchLiveUrl)) {
       process.env.PR_BRANCH_LIVE_URL = stageBranchLiveUrl;
     }
     console.info('Stage Branch Live URL : ', stageBranchLiveUrl);
   } catch (err) {
-    console.error('Error => Error in setting Stage Branch test URL : ', stageBranchLiveUrl);
+    console.error(
+      'Error => Error in setting Stage Branch test URL : ',
+      stageBranchLiveUrl,
+    );
+    console.info(
+      'Note: Stage branch test url is not valid, Exiting test execution.',
+    );
     process.exit(1);
   }
 }
 
-async function getLocalNonGitBranchLiveUrl() {
-  const localTestLiveUrl = process.env.LOCAL_TEST_LIVE_URL || BASE_URLS.local;
-  console.info(`✅ Using Non-Git Local Test URL: ${localTestLiveUrl}`);
-  process.env.PR_BRANCH_LIVE_URL = localTestLiveUrl;
-}
-
 async function getLocalBranchLiveUrl() {
+  let localTestLiveUrl;
   try {
     const localGitRootDir = execSync('git rev-parse --show-toplevel', { encoding: 'utf-8' }).trim();
-    const gitRemoteOriginUrl = execSync('git config --get remote.origin.url', {
-      cwd: localGitRootDir,
-      encoding: 'utf-8',
-    }).trim();
 
-    const match = gitRemoteOriginUrl.match(/github\.com\/(.*?)\/(.*?)\.git/);
-    if (match) {
-      const [localOrg, localRepo] = match.slice(1, 3);
-      const localBranch = execSync('git rev-parse --abbrev-ref HEAD', {
-        cwd: localGitRootDir,
-        encoding: 'utf-8',
-      }).trim();
-      const localTestLiveUrl = process.env.LOCAL_TEST_LIVE_URL || BASE_URLS.local;
-      console.info(`✅ Git ORG: ${localOrg}, REPO: ${localRepo}, Branch: ${localBranch}`);
-      console.info(`✅ Local Test Live URL: ${localTestLiveUrl}`);
-      process.env.PR_BRANCH_LIVE_URL = localTestLiveUrl;
-      return;
+    if (localGitRootDir) {
+      const gitRemoteOriginUrl = execSync(
+        'git config --get remote.origin.url',
+        { cwd: localGitRootDir, encoding: 'utf-8' },
+      ).trim();
+      const match = gitRemoteOriginUrl.match(/github\.com\/(.*?)\/(.*?)\.git/);
+
+      if (match) {
+        const [localOrg, localRepo] = match.slice(1, 3);
+        const localBranch = execSync('git rev-parse --abbrev-ref HEAD', {
+          cwd: localGitRootDir,
+          encoding: 'utf-8',
+        }).trim();
+        localTestLiveUrl = process.env.LOCAL_TEST_LIVE_URL || MAIN_BRANCH_LIVE_URL;
+        if (await isBranchURLValid(localTestLiveUrl)) {
+          console.info('Git ORG      : ', localOrg);
+          console.info('Git REPO     : ', localRepo);
+          console.info('Local Branch : ', localBranch);
+          console.info('Local Test Live URL    : ', localTestLiveUrl);
+        }
+      }
     }
-  } catch (err) {
-    console.info('⚠️ Git not detected, falling back to non-Git local flow.');
-    await getLocalNonGitBranchLiveUrl();
+  } catch (error) {
+    console.error(
+      `Error => Error in setting local test URL : ${localTestLiveUrl}\n`,
+    );
+    console.info(
+      'Note: Local or branch test url is not valid, Exiting test execution.\n',
+    );
+    process.exit(1);
   }
 }
 
@@ -113,7 +139,12 @@ async function globalSetup() {
 
   if (process.env.GITHUB_ACTIONS === 'true') {
     console.info('---- Running Nala Tests in the GitHub environment ----\n');
-    await getGitHubPRBranchLiveUrl();
+
+    if (process.env.MILO_LIBS_RUN === 'true') {
+      await getGitHubMiloLibsBranchLiveUrl();
+    } else {
+      await getGitHubPRBranchLiveUrl();
+    }
   } else if (process.env.CIRCLECI) {
     console.info('---- Running Nala Tests in the CircleCI environment ----\n');
     await getCircleCIBranchLiveUrl();
