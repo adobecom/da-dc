@@ -75,3 +75,4 @@ jobs:
         run: |
           sudo sed -i "/${{ github.event.inputs.hostsHack }}/d" /etc/hosts
           cat /etc/hosts
+          
