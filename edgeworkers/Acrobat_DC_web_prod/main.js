@@ -177,6 +177,7 @@ export async function responseProvider(request) {
     inlineStyles(dcStyles, miloStyles, verbWidgetStyles, unityWorkflow, prerenderTop);
 
     const csp = contentSecurityPolicy(isProd, scriptHashes);
+    const acrobat = isProd ? 'https://acrobat.adobe.com' : 'https://stage.acrobat.adobe.com';
     const adobeid = isProd ? 'https://adobeid-na1.services.adobe.com' : 'https://adobeid-na1-stg1.services.adobe.com';
 
     let headerLink = [
