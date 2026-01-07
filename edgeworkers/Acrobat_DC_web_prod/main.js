@@ -165,7 +165,7 @@ export async function responseProvider(request) {
       miloStyles,
       verbWidgetStyles
     ] = await Promise.all([
-      fetchFrictionlessPageAndInlineSnippet(),
+      fetchFrictionlessPage(),
       fetchResource('/acrobat/scripts/scripts.js'),
       fetchResource('/acrobat/blocks/dc-converter-widget/dc-converter-widget.js'),
       fetchResource('/acrobat/styles/styles.css'),
