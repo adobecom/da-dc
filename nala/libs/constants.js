@@ -1,6 +1,6 @@
 // nala/libs/constants.js
 
-const DEFAULT_REPO = 'milo';
+const DEFAULT_REPO = 'da-dc';
 const DEFAULT_ORG = 'adobecom';
 
 // Default fallback BASE_URLS (not project-specific)
