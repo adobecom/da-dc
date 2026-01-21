@@ -84,7 +84,8 @@ export async function responseProvider(request) {
   };
 
   const fetchResource = async path => {
-    const response = await httpRequest(origin + path);
+    const url = path.startsWith('http') ? path : origin + path;
+    const response = await httpRequest(url);
     if (response.ok) {
       return response.text();
     }
@@ -192,6 +193,7 @@ export async function responseProvider(request) {
   };
 
   try {
+    const miloBaseUrl = isProd ? 'https://www.adobe.com' : 'https://www.stage.adobe.com';
     const [
       [responseStream, responseHeaders, dcCoreVersion, mobileWidget, unityWorkflow],
       scripts,
@@ -204,7 +206,7 @@ export async function responseProvider(request) {
       fetchResource('/acrobat/scripts/scripts.js'),
       fetchResource('/acrobat/blocks/dc-converter-widget/dc-converter-widget.js'),
       fetchResource('/acrobat/styles/styles.css'),
-      fetchResource('/libs/styles/styles.css'),
+      fetchResource(`${miloBaseUrl}/libs/styles/styles.css`),
       fetchResource('/acrobat/blocks/verb-widget/verb-widget.css')
     ]);
 
@@ -220,7 +222,8 @@ export async function responseProvider(request) {
         `<${adobeid}>;rel="preconnect"`,
         '<https://assets.adobedtm.com>;rel="preconnect"',
         '<https://use.typekit.net>;rel="preconnect"',
-        `</libs/deps/imslib.min.js>;rel="preload";as="script"`,
+        `<${miloBaseUrl}>;rel="preconnect"`,
+        `<${miloBaseUrl}/libs/deps/imslib.min.js>;rel="preload";as="script"`,
     ];
     if (unityWorkflow) {
       headerLink = [...headerLink,
@@ -229,8 +232,8 @@ export async function responseProvider(request) {
         `</acrobat/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
         `</acrobat/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `<${miloBaseUrl}/libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `<${miloBaseUrl}/libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
       ];
     } else if (!(mobileWidget && request.device.isMobile)) {
