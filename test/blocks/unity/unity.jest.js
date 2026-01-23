@@ -84,4 +84,42 @@ describe('Unity block', () => {
 
     expect(mockWorkflowInit).not.toHaveBeenCalled();
   });
+
+  it('initialize with acrobat.adobe.com domain', async () => {
+    delete window.location;
+    window.location = new URL('https://acrobat.adobe.com/acrobat/online/sign-pdf.html');
+
+    window.browser = { ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' };
+
+    const block = document.querySelector('.verb-widget');
+    await init(block);
+
+    expect(mockWorkflowInit).toHaveBeenCalledWith(
+      block,
+      'acrobat',
+      'https://www.adobe.com/unitylibs', // Expected full URL
+      'v2',
+      'us',
+      'en',
+    );
+  });
+
+  it('initialize with stage.acrobat.adobe.com domain', async () => {
+    delete window.location;
+    window.location = new URL('https://stage.acrobat.adobe.com/acrobat/online/sign-pdf.html');
+
+    window.browser = { ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' };
+
+    const block = document.querySelector('.verb-widget');
+    await init(block);
+
+    expect(mockWorkflowInit).toHaveBeenCalledWith(
+      block,
+      'acrobat',
+      'https://www.stage.adobe.com/unitylibs', // Expected full stage URL
+      'v2',
+      'us',
+      'en',
+    );
+  });
 });
