@@ -4,7 +4,7 @@ import { readFile, sendKeys } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import { waitForElement } from '../../helpers/waitfor.js';
 
-const { default: init } = await import('../../../acrobat/blocks/rnr/rnr.js');
+const { default: init } = await import('../../../dc-shared/blocks/rnr/rnr.js');
 
 describe('rnr - Ratings and reviews', () => {
   beforeEach(async () => {

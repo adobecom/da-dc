@@ -2,7 +2,7 @@ import { readFile, sendKeys } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import { waitForElement } from '../../helpers/waitfor.js';
 
-const { default: init } = await import('../../../acrobat/blocks/interactive-marquee/interactive-marquee.js');
+const { default: init } = await import('../../../dc-shared/blocks/interactive-marquee/interactive-marquee.js');
 
 document.body.innerHTML = await readFile({ path: './mocks/body.html' });
 

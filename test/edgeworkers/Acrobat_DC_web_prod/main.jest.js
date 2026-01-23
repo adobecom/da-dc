@@ -38,9 +38,9 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         } else {
           response = new HttpResponseMiloStyles();
         }
-      } else if (path.includes('/acrobat/styles/styles.css')) {
+      } else if (path.includes('/dc-shared/styles/styles.css')) {
         response = new HttpResponseStyles();
-      } else if (path.includes('/acrobat/blocks/verb-widget/verb-widget.css')) {
+      } else if (path.includes('/dc-shared/blocks/verb-widget/verb-widget.css')) {
         response = new HttpResponseVerbWidgetStyles();        
       } else {
         response = new HttpResponse404();
@@ -68,11 +68,11 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
       expect(response.headers).not.toHaveProperty('vary');
       expect(fetches).toEqual([
         'https://www.adobe.com/acrobat/online/pdf-to-ppt.html',
-        'https://www.adobe.com/acrobat/scripts/scripts.js',
-        'https://www.adobe.com/acrobat/blocks/dc-converter-widget/dc-converter-widget.js',
-        'https://www.adobe.com/acrobat/styles/styles.css',
+        'https://www.adobe.com/dc-shared/scripts/scripts.js',
+        'https://www.adobe.com/dc-shared/blocks/dc-converter-widget/dc-converter-widget.js',
+        'https://www.adobe.com/dc-shared/styles/styles.css',
         'https://www.adobe.com/libs/styles/styles.css',
-        'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
+        'https://www.adobe.com/dc-shared/blocks/verb-widget/verb-widget.css',
         'https://www.adobe.com/dc/dc-generate-cache/dc-hosted-1.0/pdf-to-ppt-en-us.html'
       ]);
     });
@@ -87,11 +87,11 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
       expect(response.headers['header-to-keep']).toEqual('keep');
       expect(fetches).toEqual([
         'https://www.adobe.com/jp/acrobat/online/pdf-to-ppt.html',
-        'https://www.adobe.com/acrobat/scripts/scripts.js',
-        'https://www.adobe.com/acrobat/blocks/dc-converter-widget/dc-converter-widget.js',
-        'https://www.adobe.com/acrobat/styles/styles.css',
+        'https://www.adobe.com/dc-shared/scripts/scripts.js',
+        'https://www.adobe.com/dc-shared/blocks/dc-converter-widget/dc-converter-widget.js',
+        'https://www.adobe.com/dc-shared/styles/styles.css',
         'https://www.adobe.com/libs/styles/styles.css',
-        'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
+        'https://www.adobe.com/dc-shared/blocks/verb-widget/verb-widget.css',
         'https://www.adobe.com/dc/dc-generate-cache/dc-hosted-1.0/pdf-to-ppt-ja-jp.html'
       ]);
     });
@@ -108,11 +108,11 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
       expect(response.headers).not.toHaveProperty('vary');
       expect(fetches).toEqual([
         'https://www.adobe.com/acrobat/online/pdf-to-ppt.html',
-        'https://www.adobe.com/acrobat/scripts/scripts.js',
-        'https://www.adobe.com/acrobat/blocks/dc-converter-widget/dc-converter-widget.js',
-        'https://www.adobe.com/acrobat/styles/styles.css',
+        'https://www.adobe.com/dc-shared/scripts/scripts.js',
+        'https://www.adobe.com/dc-shared/blocks/dc-converter-widget/dc-converter-widget.js',
+        'https://www.adobe.com/dc-shared/styles/styles.css',
         'https://www.adobe.com/libs/styles/styles.css',
-        'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
+        'https://www.adobe.com/dc-shared/blocks/verb-widget/verb-widget.css',
       ]);
     });
   });

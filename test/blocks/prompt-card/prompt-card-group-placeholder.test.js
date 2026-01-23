@@ -12,7 +12,7 @@ describe('prompt-cards in a section using the group feature', () => {
     window.fetch.returns(Promise.resolve(res));
     document.head.innerHTML = await readFile({ path: './mocks/head.html' });
     document.body.innerHTML = await readFile({ path: './mocks/body-group-placeholder.html' });
-    await import('../../../acrobat/scripts/scripts.js');
+    await import('../../../dc-shared/scripts/scripts.js');
     await waitForElement('.prompt-blade');
   });
 

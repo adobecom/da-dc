@@ -7,7 +7,7 @@ import path from 'path';
 import fs from 'fs';
 import { userEvent } from '@testing-library/user-event';
 import { delay } from '../../helpers/waitfor.js';
-//import init from '../../../acrobat/blocks/acom-widget/acom-widget.js';
+//import init from '../../../dc-shared/blocks/acom-widget/acom-widget.js';
 
 const mockfetch = jest.fn(() => Promise.resolve({
   json: () => Promise.resolve({

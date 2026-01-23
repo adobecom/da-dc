@@ -158,7 +158,7 @@ function addLocale(locale) {
 }
 
 // Add project-wide styles here.
-const STYLES = '/acrobat/styles/styles.css';
+const STYLES = '/dc-shared/styles/styles.css';
 
 // Use '/libs' if your live site maps '/libs' to milo's origin.
 const LIBS = '/libs';
@@ -266,7 +266,7 @@ const locales = {
 
 // Add any config options.
 const CONFIG = {
-  codeRoot: '/acrobat',
+  codeRoot: '/dc-shared',
   contentRoot: '/dc-shared',
   imsClientId: 'acrobatmiloguest',
   commerce: { checkoutClientId: 'doc_cloud' },

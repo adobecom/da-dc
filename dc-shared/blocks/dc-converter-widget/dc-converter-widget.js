@@ -354,7 +354,7 @@ export default async function init(element) {
       dropZone.style.pointerEvents = 'none';
       dropZone.parentElement.style.border = 'none';
       document.querySelector('h1').parentElement.appendChild(hTwo);
-      dropZone.innerHTML = '<img src="/acrobat/img/icons/error.svg"><p>We apologize for the inconvenience. We are working hard to make the service available. Please check back shortly.</p>';
+      dropZone.innerHTML = '<img src="/dc-shared/img/icons/error.svg"><p>We apologize for the inconvenience. We are working hard to make the service available. Please check back shortly.</p>';
       document.querySelector('div[class*="DropZoneFooter__dropzoneFooter"]').innerHTML = '';
     }
     const { cause, message, name, type } = err.detail?.wrappedException || {};

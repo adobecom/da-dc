@@ -12,7 +12,7 @@ describe('prompt-cards view all feature', () => {
     window.fetch.returns(Promise.resolve(res));
     document.head.innerHTML = await readFile({ path: './mocks/head.html' });
     document.body.innerHTML = await readFile({ path: './mocks/body-json-more-less.html' });
-    await import('../../../acrobat/scripts/scripts.js');
+    await import('../../../dc-shared/scripts/scripts.js');
     await delay(500);
     await new Promise((resolve) => requestAnimationFrame(resolve));
   });

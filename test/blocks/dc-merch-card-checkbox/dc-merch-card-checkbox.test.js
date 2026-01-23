@@ -2,7 +2,7 @@ import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import { waitForElement } from '../../helpers/waitfor.js';
 
-const { default: init } = await import('../../../acrobat/blocks/dc-merch-card-checkbox/dc-merch-card-checkbox.js');
+const { default: init } = await import('../../../dc-shared/blocks/dc-merch-card-checkbox/dc-merch-card-checkbox.js');
 
 document.body.innerHTML = await readFile({ path: './mocks/body.html' });
 document.head.innerHTML = await readFile({ path: './mocks/head.html' });

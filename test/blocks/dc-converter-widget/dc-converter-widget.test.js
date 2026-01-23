@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import { delay } from '../../helpers/waitfor.js';
 
 const { default: init } = await import(
-  '../../../acrobat/blocks/dc-converter-widget/dc-converter-widget.js'
+  '../../../dc-shared/blocks/dc-converter-widget/dc-converter-widget.js'
 );
 
 describe('dc-converter-widget block', () => {

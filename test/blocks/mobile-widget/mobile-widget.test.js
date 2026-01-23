@@ -1,7 +1,7 @@
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 
-const { default: init } = await import('../../../acrobat/blocks/mobile-widget/mobile-widget.js');
+const { default: init } = await import('../../../dc-shared/blocks/mobile-widget/mobile-widget.js');
 
 describe('Mobile widget', () => {
   it('is complete', async () => {

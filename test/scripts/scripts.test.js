@@ -42,7 +42,7 @@ describe('Test replace dot media', () => {
   });
 
   it('With scripts should be null', async () => {
-    await import('../../acrobat/scripts/scripts.js');
+    await import('../../dc-shared/scripts/scripts.js');
     expect(document.querySelector('img[src*="./media_"]')).to.be.null;
   });
 });

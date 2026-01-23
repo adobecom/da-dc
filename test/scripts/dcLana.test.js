@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
 import { expect } from '@esm-bundle/chai';
-import lanaLogging from '../../acrobat/scripts/dcLana.js';
+import lanaLogging from '../../dc-shared/scripts/dcLana.js';
 
 describe('Test dcLana script', async () => {
   let clock;

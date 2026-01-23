@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import ContentSecurityPolicy from '../../../acrobat/scripts/contentSecurityPolicy/csp';
+import ContentSecurityPolicy from '../../../dc-shared/scripts/contentSecurityPolicy/csp';
 
 describe('Test ContentSecurityPolicy', () => {
   let hostnameGetter;

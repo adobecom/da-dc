@@ -39,7 +39,7 @@ function copyPrompt(cfg, a11yActionUpdate) {
 
 function createBlock(el, cfg, a11yActionUpdate) {
   const element = el || createTag('div', { class: 'prompt-card' });
-  cfg.icon = cfg.icon || '/acrobat/img/icons/aichat.svg';
+  cfg.icon = cfg.icon || '/dc-shared/img/icons/aichat.svg';
   cfg.button = cfg.button || getPlaceHolder('Copy');
   cfg.toast = cfg.toast || getPlaceHolder('Copied to clipboard');
   const blade = createTag('div', {

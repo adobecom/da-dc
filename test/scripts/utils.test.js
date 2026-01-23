@@ -1,6 +1,6 @@
 /* eslint-disable compat/compat */
 import { expect } from '@esm-bundle/chai';
-import { setLibs } from '../../acrobat/scripts/utils.js';
+import { setLibs } from '../../dc-shared/scripts/utils.js';
 
 describe('Test utils.js', () => {
   it('tests setLibs with hlx domain', () => {

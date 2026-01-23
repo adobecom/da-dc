@@ -1,6 +1,6 @@
 import { expect } from '@esm-bundle/chai';
 
-const { default: ContentSecurityPolicy } = await import('../../../acrobat/scripts/contentSecurityPolicy/csp.js');
+const { default: ContentSecurityPolicy } = await import('../../../dc-shared/scripts/contentSecurityPolicy/csp.js');
 
 describe('contentSecurityPolicy csp', () => {
   it('handles securitypolicyviolation event', async () => {

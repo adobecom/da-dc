@@ -3,7 +3,7 @@ import { expect } from '@esm-bundle/chai';
 describe('block list', () => {
   let blocks;
   beforeEach(async () => {
-    const blockListImport = await import('../../../acrobat/blocks/list.js');
+    const blockListImport = await import('../../../dc-shared/blocks/list.js');
     blocks = blockListImport.default;
   });
   it('should contain expected block names', () => {

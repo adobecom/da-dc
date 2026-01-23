@@ -591,7 +591,7 @@ function initControls(element) {
 
 // Preload icons
 function preloadIcons() {
-  const icons = ['/acrobat/img/icons/star-outline.svg', '/acrobat/img/icons/star-filled.svg'];
+  const icons = ['/dc-shared/img/icons/star-outline.svg', '/dc-shared/img/icons/star-filled.svg'];
   for (const iconPath of icons) {
     const img = new Image();
     img.src = iconPath;

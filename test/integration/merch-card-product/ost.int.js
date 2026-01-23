@@ -20,7 +20,7 @@ describe('ost', function () {
     document.head.innerHTML = await readFile({ path: '../mocks/head.html' });
     document.body.innerHTML = await readFile({ path: './mocks/body_ost.html' });
     await setViewport({ width: 200, height: 50 });
-    await import('../../../acrobat/scripts/scripts.js');
+    await import('../../../dc-shared/scripts/scripts.js');
     await waitFor(() => document.querySelector('.placeholder-resolved'), 10000, 1000);
     await delay(1000);
   });

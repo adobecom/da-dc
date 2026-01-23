@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import geoPhoneNumber from '../../acrobat/scripts/geo-phoneNumber';
+import geoPhoneNumber from '../../dc-shared/scripts/geo-phoneNumber';
 
 // Mocking fetch API
 window.fetch = jest.fn((url) => {

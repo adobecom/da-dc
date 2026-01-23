@@ -16,7 +16,7 @@ describe('Unity block', () => {
   let init;
 
   beforeAll(async () => {
-    const module = await import('../../../acrobat/blocks/unity/unity.js');
+    const module = await import('../../../dc-shared/blocks/unity/unity.js');
     init = module.default;
   });
 

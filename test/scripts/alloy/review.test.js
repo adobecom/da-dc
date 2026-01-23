@@ -2,7 +2,7 @@ import { expect } from '@esm-bundle/chai';
 import * as sinon from 'sinon';
 
 const { default: init } = await import(
-    '../../../acrobat/scripts/alloy/review'
+    '../../../dc-shared/scripts/alloy/review'
 );
 
 describe('Alloy review', () => {

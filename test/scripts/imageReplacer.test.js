@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import replacePlaceholdersWithImages from '../../acrobat/scripts/imageReplacer.js';
+import replacePlaceholdersWithImages from '../../dc-shared/scripts/imageReplacer.js';
 
 describe('replacePlaceholdersWithImages', () => {
   let documentElement;

@@ -17,7 +17,7 @@ describe('accordian-desktop', function () {
     document.head.innerHTML = await readFile({ path: '../mocks/head.html' });
     document.body.innerHTML = await readFile({ path: './mocks/body.html' });
     await setViewport({ width: 1000, height: 600 });
-    await import('../../../acrobat/scripts/scripts.js');
+    await import('../../../dc-shared/scripts/scripts.js');
     await waitFor(() => document.querySelector('.accordion-container'), 5000, 1000);
   });
 

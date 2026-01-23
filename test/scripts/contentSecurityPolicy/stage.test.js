@@ -9,4 +9,4 @@ const {
   scriptSrc,
   styleSrc,
   workerSrc,
-} = await import('../../../acrobat/scripts/contentSecurityPolicy/stage');
+} = await import('../../../dc-shared/scripts/contentSecurityPolicy/stage');

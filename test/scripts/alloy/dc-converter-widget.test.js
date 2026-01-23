@@ -2,7 +2,7 @@ import { expect } from '@esm-bundle/chai';
 import * as sinon from 'sinon';
 
 const { default: init } = await import(
-  '../../../acrobat/scripts/alloy/dc-converter-widget'
+  '../../../dc-shared/scripts/alloy/dc-converter-widget'
 );
 
 describe('Alloy dc-converter-widget', () => {

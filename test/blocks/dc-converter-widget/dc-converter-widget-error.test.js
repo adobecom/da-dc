@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import { delay } from '../../helpers/waitfor.js';
 
 const { default: init } = await import(
-  '../../../acrobat/blocks/dc-converter-widget/dc-converter-widget.js'
+  '../../../dc-shared/blocks/dc-converter-widget/dc-converter-widget.js'
 );
 
 describe('dc-converter-widget block', () => {
@@ -34,7 +34,7 @@ describe('dc-converter-widget block', () => {
     expect(loggedMessage).to.include('type=undefined');
     expect(loggedMessage).to.include('name=TypeError');
     expect(loggedMessage).to.include('message=Cannot read properties of null (reading \'upload\')');
-    expect(loggedMessage).to.include('at http://localhost:2000/acrobat/blocks/dc-converter-widget/dc-converter-widget.js:314:32');
+    expect(loggedMessage).to.include('at http://localhost:2000/dc-shared/blocks/dc-converter-widget/dc-converter-widget.js:314:32');
     expect(loggedMessage).to.include('errorStringBasic=TypeError: Cannot read properties of null (reading \'upload\')');
   });
 });

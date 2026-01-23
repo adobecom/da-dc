@@ -3,7 +3,7 @@ import { expect } from '@esm-bundle/chai';
 describe('verb redirection map', () => {
   let verbRedirMap;
   beforeEach(async () => {
-    const verbRedirMapImport = await import('../../../acrobat/scripts/maps/verbRedirMap.js');
+    const verbRedirMapImport = await import('../../../dc-shared/scripts/maps/verbRedirMap.js');
     verbRedirMap = verbRedirMapImport.default;
   });
   it('should return valid redirection for known verbs', () => {

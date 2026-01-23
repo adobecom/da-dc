@@ -21,7 +21,7 @@ describe('dc-converter-widget', () => {
   });
 
   it('loads rearrange-pdf widget 404', async () => {
-    const { default: init } = await import('../../../acrobat/blocks/dc-converter-widget/dc-converter-widget.js');
+    const { default: init } = await import('../../../dc-shared/blocks/dc-converter-widget/dc-converter-widget.js');
     window.fetch = jest.fn(() => Promise.resolve({
       status: 404,
       text: () => Promise.resolve('Not Found'),

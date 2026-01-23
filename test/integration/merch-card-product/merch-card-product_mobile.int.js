@@ -19,7 +19,7 @@ describe('merch_cards_product_mobile', function () {
     document.head.innerHTML = await readFile({ path: '../mocks/head.html' });
     document.body.innerHTML = await readFile({ path: './mocks/body.html' });
     await setViewport({ width: 600, height: 940 });
-    await import('../../../acrobat/scripts/scripts.js');
+    await import('../../../dc-shared/scripts/scripts.js');
     await waitFor(() => document.querySelector('.placeholder-resolved'), 10000, 1000);
     const price = await waitForElement('.placeholder-resolved');
     console.log(price.textContent);

@@ -3,7 +3,7 @@ import { expect } from '@esm-bundle/chai';
 describe('locale map', () => {
   let localeMap;
   beforeEach(async () => {
-    const localeMapImport = await import('../../../acrobat/scripts/maps/localeMap.js');
+    const localeMapImport = await import('../../../dc-shared/scripts/maps/localeMap.js');
     localeMap = localeMapImport.default;
   });
   it('should return valid locale for known keys', () => {

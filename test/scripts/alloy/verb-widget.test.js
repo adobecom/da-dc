@@ -2,7 +2,7 @@ import { expect } from '@esm-bundle/chai';
 import * as sinon from 'sinon';
 
 const { default: init, sendAnalyticsToSplunk } = await import(
-  '../../../acrobat/scripts/alloy/verb-widget'
+  '../../../dc-shared/scripts/alloy/verb-widget'
 );
 
 describe('Alloy verb-widget', () => {

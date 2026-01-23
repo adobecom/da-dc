@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
-import { setLibs } from '../../../acrobat/scripts/utils.js';
+import { setLibs } from '../../../dc-shared/scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
 const { setConfig } = await import(`${miloLibs}/utils/utils.js`);
@@ -16,7 +16,7 @@ describe('Susi-light', async () => {
     window.adobeid = { client_id: 'test', redirect_uri: 'https://www.adobe.com' };
     const block = document.querySelector('.susi-light');
     const { default: init } = await import(
-      '../../../acrobat/blocks/susi-light/susi-light.js'
+      '../../../dc-shared/blocks/susi-light/susi-light.js'
     );
     init(block);
   });

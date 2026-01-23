@@ -17,7 +17,7 @@ describe('media_mobile', function () {
     document.head.innerHTML = await readFile({ path: '../mocks/head.html' });
     document.body.innerHTML = await readFile({ path: './mocks/body.html' });
     await setViewport({ width: 500, height: 600 });
-    await import('../../../acrobat/scripts/scripts.js');
+    await import('../../../dc-shared/scripts/scripts.js');
     await waitFor(() => document.querySelector('.media.qr-code'), 5000, 1000);
   });
 

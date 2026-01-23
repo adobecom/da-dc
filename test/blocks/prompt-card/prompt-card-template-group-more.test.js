@@ -8,7 +8,7 @@ describe('prompt-cards using the template and group features', () => {
   before(async () => {
     document.head.innerHTML = await readFile({ path: './mocks/head.html' });
     document.body.innerHTML = await readFile({ path: './mocks/body-template-group-more.html' });
-    await import('../../../acrobat/scripts/scripts.js');
+    await import('../../../dc-shared/scripts/scripts.js');
     await delay(500);
     await new Promise((resolve) => requestAnimationFrame(resolve));
   });

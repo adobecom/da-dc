@@ -29,7 +29,7 @@ describe('Tooltips Module', () => {
   before(async () => {
     document.head.innerHTML = await readFile({ path: './mocks/tooltips.head.html' });
     clock = sinon.useFakeTimers();
-    tooltipsModule = await import('../../acrobat/scripts/tooltips.js');
+    tooltipsModule = await import('../../dc-shared/scripts/tooltips.js');
   });
 
   afterEach(() => {

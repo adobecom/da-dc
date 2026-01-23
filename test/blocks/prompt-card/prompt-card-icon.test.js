@@ -5,7 +5,7 @@ import sinon from 'sinon';
 const head = await readFile({ path: './mocks/head-block.html' });
 
 const { default: init } = await import(
-  '../../../acrobat/blocks/prompt-card/prompt-card.js'
+  '../../../dc-shared/blocks/prompt-card/prompt-card.js'
 );
 
 describe('prompt-card block', () => {

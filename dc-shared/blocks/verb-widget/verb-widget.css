@@ -429,7 +429,7 @@ html[dir="rtl"] .verb-cta .upload-icon {
 
 .verb-errorIcon::after {
   content: '';
-  background-image: url('/acrobat/img/icons/ui/alert.svg');
+  background-image: url('/dc-shared/img/icons/ui/alert.svg');
   background-repeat: no-repeat;
   display: flex;
   align-items: center;

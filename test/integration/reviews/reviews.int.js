@@ -43,7 +43,7 @@ describe('reviews', function () {
 
     document.head.innerHTML = await readFile({ path: '../mocks/head.html' });
     await setViewport({ width: 600, height: 1200 });
-    await import('../../../acrobat/scripts/scripts.js');
+    await import('../../../dc-shared/scripts/scripts.js');
     await delay(1000);
     const conf = getConfig();
     setConfig({ ...conf, env: { name: 'prod' } });

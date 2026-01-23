@@ -10,7 +10,7 @@ document.body.innerHTML = await readFile({
   path: './mocks/frictionless.body.html',
 });
 
-const { default: init } = await import('../../acrobat/scripts/frictionless');
+const { default: init } = await import('../../dc-shared/scripts/frictionless');
 
 describe('frictionless script', () => {
   let clock;
@@ -119,7 +119,7 @@ describe('frictionless script', () => {
     document.body.innerHTML = await readFile({
       path: './mocks/frictionless.body.html',
     });
-    const { default: initEdge } = await import('../../acrobat/scripts/frictionless');
+    const { default: initEdge } = await import('../../dc-shared/scripts/frictionless');
     initEdge('pdf-to-ppt');
     clock.tick(1100);
     const form = document.querySelector('.review');

@@ -4,7 +4,7 @@ import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 
 const { default: init } = await import(
-  '../../../acrobat/blocks/verb-widget/verb-widget.js'
+  '../../../dc-shared/blocks/verb-widget/verb-widget.js'
 );
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
 
@@ -15,7 +15,7 @@ describe('verb-widget block', () => {
   beforeEach(async () => {
     sinon.stub(window, 'fetch');
     window.fetch.callsFake((x) => {
-      if (x.endsWith('/acrobat/blocks/verb-widget/icons/fillsign.svg')) {
+      if (x.endsWith('/dc-shared/blocks/verb-widget/icons/fillsign.svg')) {
         return Promise.resolve({
           ok: false,
           json: () => Promise.resolve({}),

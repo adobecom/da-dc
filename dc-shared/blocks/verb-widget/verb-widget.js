@@ -489,7 +489,7 @@ const ICONS = {
 
 async function loadSvg(iconName) {
   try {
-    const response = await fetch(`/acrobat/blocks/verb-widget/icons/${iconName}.svg`);
+    const response = await fetch(`/dc-shared/blocks/verb-widget/icons/${iconName}.svg`);
     if (!response.ok) throw new Error(`Failed to load SVG: ${response.statusText}`);
     const text = await response.text();
     return text;

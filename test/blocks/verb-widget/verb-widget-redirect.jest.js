@@ -58,7 +58,7 @@ describe('acom-widget block', () => {
     delete window.location;
     window.location = new URL('https://localhost/acrobat/online/ai-chat-pdf.html?redirect=off');
 
-    const blockModule = await import('../../../acrobat/blocks/acom-widget/acom-widget.js');
+    const blockModule = await import('../../../dc-shared/blocks/acom-widget/acom-widget.js');
 
     const block = document.querySelector('.acom-widget');
     await blockModule.default(block);

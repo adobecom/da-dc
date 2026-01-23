@@ -6,7 +6,7 @@ describe('prompt-cards in a section', () => {
   before(async () => {
     document.head.innerHTML = await readFile({ path: './mocks/head.html' });
     document.body.innerHTML = await readFile({ path: './mocks/body-section.html' });
-    await import('../../../acrobat/scripts/scripts.js');
+    await import('../../../dc-shared/scripts/scripts.js');
     await waitForElement('.prompt-blade');
   });
 
