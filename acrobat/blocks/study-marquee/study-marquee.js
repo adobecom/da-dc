@@ -1,4 +1,4 @@
-import { setLibs, isOldBrowser } from '../../scripts/utils.js';
+import { setLibs, isOldBrowser, loadPlaceholders } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
 const { createTag, getConfig } = await import(`${miloLibs}/utils/utils.js`);
@@ -21,6 +21,17 @@ const ICONS = {
   CLOSE_ICON: '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_15746_2423)"><g clip-path="url(#clip1_15746_2423)"><path fill-rule="evenodd" clip-rule="evenodd" d="M17.2381 15.9994L19.6944 13.5434C19.8586 13.3793 19.9509 13.1566 19.9509 12.9245C19.951 12.6923 19.8588 12.4696 19.6946 12.3054C19.5305 12.1412 19.3078 12.0489 19.0757 12.0488C18.8435 12.0488 18.6208 12.141 18.4566 12.3051L16.0002 14.7615L13.5435 12.3051C13.3793 12.141 13.1566 12.0489 12.9245 12.049C12.6923 12.0491 12.4697 12.1414 12.3057 12.3056C12.1416 12.4698 12.0495 12.6925 12.0496 12.9246C12.0497 13.1568 12.142 13.3794 12.3062 13.5434L14.7622 15.9994L12.3062 18.4555C12.1427 18.6197 12.051 18.8421 12.0512 19.0738C12.0515 19.3055 12.1436 19.5277 12.3074 19.6916C12.4711 19.8556 12.6933 19.9478 12.925 19.9482C13.1567 19.9486 13.3791 19.8571 13.5435 19.6938L16.0002 17.2374L18.4566 19.6938C18.6208 19.8579 18.8435 19.9501 19.0756 19.9501C19.3078 19.95 19.5305 19.8577 19.6946 19.6935C19.8588 19.5293 19.9509 19.3066 19.9509 19.0745C19.9509 18.8423 19.8586 18.6196 19.6944 18.4555L17.2381 15.9994Z" fill="white"/></g></g><defs><clipPath id="clip0_15746_2423"><rect width="8" height="8" fill="white" transform="translate(12 12)"/></clipPath><clipPath id="clip1_15746_2423"><rect width="8" height="8" fill="white" transform="translate(12 12)"/></clipPath></defs></svg>',
 };
 
+// Verb configuration
+const LIMITS = {
+  'quiz-maker': {
+    maxFileSize: 52428800, // 50 MB
+    acceptedFiles: ['.pdf'],
+    maxNumFiles: 100,
+    multipleFiles: true,
+    uploadType: 'multifile-only',
+  },
+};
+
 function createSvgElement(iconName) {
   const svgString = ICONS[iconName];
   if (!svgString) {
@@ -35,6 +46,12 @@ function createSvgElement(iconName) {
   const svgDoc = parser.parseFromString(svgString, 'image/svg+xml');
   return svgDoc.documentElement;
 }
+
+// Get CTA text based on verb uploadType
+const getCTA = (verb) => {
+  const verbConfig = LIMITS[verb];
+  return window.mph?.[`verb-widget-cta-${verbConfig?.uploadType}`] || window.mph?.['verb-widget-cta'] || '';
+};
 
 // Redirect functions for signed-in users
 function getEnv() {
@@ -270,6 +287,12 @@ export default async function init(element) {
     return;
   }
 
+  // Initialize window.mph if it doesn't exist
+  window.mph = window.mph || {};
+
+  // Load all placeholders at once (without prefix to avoid multiple fetches)
+  await loadPlaceholders();
+
   // Get VERB from element classList (same as verb-widget.js)
   const VERB = element.classList[1];
 
@@ -360,7 +383,7 @@ export default async function init(element) {
   
   // Find heading and media INSIDE foreground (exactly like marquee)
   const headline = foreground.querySelector('h1, h2, h3, h4, h5, h6');
-  const heading = headline?.textContent?.trim() || 'Quiz Maker';
+  const heading = headline?.textContent?.trim() || '';
   const text = headline?.closest('div');
   if (text) {
     text.classList.add('text');
@@ -397,9 +420,14 @@ export default async function init(element) {
   // Create heading
   const headingEl = createTag('h1', { class: 'study-marquee-heading' }, heading);
   
-  // Create description copy
-  const copy1 = createTag('p', { class: 'study-marquee-copy' }, window.mph?.[`studyspace-${VERB}-copy`] || 'An AI study buddy that transforms notes, PDFs, and links into quizzes.');
-  const copy2 = createTag('p', { class: 'study-marquee-copy study-marquee-copy-sub' }, window.mph?.[`studyspace-${VERB}-copy-sub`] || 'Free • No download required • 1M+ happy students');
+  // Create description copy (mobile-specific if available on mobile/tablet)
+  const isMobileOrTablet = window.innerWidth < 1200;
+  const copy1Text = (isMobileOrTablet && window.mph?.['study-marquee-quiz-maker-mobile-copy']) 
+    || window.mph?.[`study-marquee-${VERB}-copy`] || '';
+  const copy2Text = (isMobileOrTablet && window.mph?.['study-marquee-quiz-maker-mobile-sub-copy']) 
+    || window.mph?.[`study-marquee-${VERB}-sub-copy`] || '';
+  const copy1 = createTag('p', { class: 'study-marquee-copy' }, copy1Text);
+  const copy2 = createTag('p', { class: 'study-marquee-copy study-marquee-copy-sub' }, copy2Text);
   
   // Create dropzone container (dashed border area)
   // Note: This is a container, not an interactive control - the button inside handles interaction
@@ -409,10 +437,11 @@ export default async function init(element) {
   });
   
   // Create CTA button with upload icon
+  const ctaButtonLabel = getCTA(VERB);
   const ctaButton = createTag('button', { 
     class: 'study-marquee-cta',
     type: 'button',
-    'aria-label': window.mph?.['verb-widget-cta'] || 'Select a file'
+    ...(ctaButtonLabel && { 'aria-label': ctaButtonLabel })
   });
   const uploadIconSvg = createSvgElement('UPLOAD_ICON');
   if (uploadIconSvg) {
@@ -420,17 +449,17 @@ export default async function init(element) {
     uploadIconSvg.setAttribute('aria-hidden', 'true');
     ctaButton.appendChild(uploadIconSvg);
   }
-  const ctaLabel = createTag('span', { class: 'study-marquee-cta-label' }, window.mph?.['verb-widget-cta'] || 'Select a file');
+  const ctaLabel = createTag('span', { class: 'study-marquee-cta-label' }, ctaButtonLabel);
   ctaButton.appendChild(ctaLabel);
   
   // Create "Or drag and drop here" text
-  const dragText = createTag('p', { class: 'study-marquee-drag' }, window.mph?.[`studyspace-${VERB}-drag`] || 'Or drag and drop here');
+  const dragText = createTag('p', { class: 'study-marquee-drag' }, window.mph?.[`study-widget-${VERB}-dragndrop-text`] || '');
   
   // Create file limit text with ID for aria-describedby
   const fileLimitText = createTag('p', { 
     class: 'study-marquee-file-limit',
     id: 'file-upload-description'
-  }, window.mph?.[`studyspace-${VERB}-file-limit`] || 'File must be PDF and up to 50MB');
+  }, window.mph?.[`study-widget-${VERB}-file-limit`] || '');
   
   // Hidden file input with proper label association
   const fileInput = createTag('input', {
@@ -457,11 +486,7 @@ export default async function init(element) {
     class: 'study-marquee-errorIcon',
     'aria-hidden': 'true'
   });
-  const errorCloseBtn = createTag('button', { 
-    class: 'study-marquee-errorBtn',
-    type: 'button',
-    'aria-label': window.mph?.[`studyspace-${VERB}-error-close`] || 'Close error message'
-  });
+  const errorCloseBtn = createTag('div', { class: 'study-marquee-errorBtn' });
   const closeIconSvg = createSvgElement('CLOSE_ICON');
   if (closeIconSvg) {
     closeIconSvg.classList.add('close-icon', 'error');
@@ -478,32 +503,34 @@ export default async function init(element) {
   
   // Set up URLs for legal links
   const { locale } = getConfig();
-  const ppURL = (window.mph && window.mph['verb-widget-privacy-policy-url']) || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
-  const touURL = (window.mph && window.mph['verb-widget-terms-of-use-url']) || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
+  const ppURL = window.mph?.['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
+  const touURL = window.mph?.['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
   
-  // Create legal text with default content
-  const defaultLegalText = (window.mph && window.mph['study-space-legal']) || 'Your file will be securely handled by Adobe servers and deleted unless you sign in to save it. By using this service, you agree to the Adobe Terms of Use and acknowledge the Privacy Policy.';
-  const legalText = createTag('p', { class: 'study-marquee-legal' }, defaultLegalText);
+  // Create legal text
+  const legalText = createTag('p', { class: 'study-marquee-legal' }, window.mph?.['study-marquee-legal-text'] || '');
   
-  // Add links to legal text
-  const createLegalLink = (text, url) => `<a class="study-marquee-legal-url" target="_blank" href="${url}">${text}</a>`;
-  
-  const legalLinks = [
-    ['Terms of Use', touURL],
-    ['Privacy Policy', ppURL],
-  ];
-  
-  legalText.innerHTML = legalLinks.reduce((html, [text, url]) => {
-    return html.replace(text, createLegalLink(text, url));
-  }, legalText.textContent);
+  // Add links to legal text (only if legal text exists)
+  if (legalText.textContent) {
+    const createLegalLink = (text, url) => `<a class="study-marquee-legal-url" target="_blank" href="${url}">${text}</a>`;
+    
+    const legalLinks = [
+      ['Terms of Use', touURL],
+      ['Privacy Policy', ppURL],
+    ];
+    
+    legalText.innerHTML = legalLinks.reduce((html, [text, url]) => {
+      return url ? html.replace(text, createLegalLink(text, url)) : html;
+    }, legalText.textContent);
+  }
   
   // Add info icon with tooltip (hide on mobile, show on tablet and desktop)
+  const tooltipContent = window.mph?.['verb-widget-tool-tip'] || '';
   const infoIcon = createTag('button', {
-    class: 'info-icon milo-tooltip',
+    class: 'info-icon milo-tooltip top',
     type: 'button',
-    'aria-label': window.mph?.['verb-widget-tool-tip'] || 'Files security information',
+    ...(tooltipContent && { 'aria-label': tooltipContent }),
     'aria-describedby': 'info-tooltip-text',
-    'data-tooltip': window.mph?.['verb-widget-tool-tip'] || 'Files are securely processed and deleted after use',
+    ...(tooltipContent && { 'data-tooltip': tooltipContent }),
   });
   const infoIconSvg = createSvgElement('INFO_ICON');
   if (infoIconSvg) {
@@ -514,7 +541,7 @@ export default async function init(element) {
   const tooltipText = createTag('span', {
     id: 'info-tooltip-text',
     class: 'hide'
-  }, window.mph?.['verb-widget-tool-tip'] || 'Files are securely processed and deleted after use');
+  }, tooltipContent);
   infoIcon.appendChild(tooltipText);
   
   // Add legal text to footer, and info icon only if not mobile
