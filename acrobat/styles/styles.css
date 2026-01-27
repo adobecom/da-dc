@@ -848,3 +848,47 @@ a[href*="susi"] {
 .how-to .how-to-heading {
   word-break: break-word;
 }
+
+:root:has(meta[name="theme"][content="studyspace"]) {
+  .text-block [class*="heading-"] {
+    line-height: 1;
+    font-weight: 900;
+    font-size: 36px;
+    font-family: "Adobe Clean Black", var(--body-font-family);
+  }
+
+  .text-block [class*="body-"] {
+    line-height: 1.5;
+    font-weight: 400;
+    font-size: 20px;
+  }
+
+  @media screen and (min-width: 600px) and (max-width: 1199px) {
+    .text-block [class*="heading-"] {
+      line-height: 0.98;
+      font-weight: 800;
+      font-size: 42px;
+    }
+
+    .text-block [class*="body-"] {
+      font-size: 24px;
+    }
+  }
+  @media screen and (min-width: 1200px) {
+    .text-block [class*="heading-"] {
+      line-height: 0.98;
+      font-weight: 900;
+      font-size: 64px;
+    }
+
+    .text-block [class*="body-"] {
+      font-size: 24px;
+    }
+ }
+
+ .editorial-card [class*="heading-"] {
+  font-family: "Adobe Clean ExtraBold", var(--body-font-family);
+  font-weight: 800;
+  line-height: 1.25;
+ }
+}
