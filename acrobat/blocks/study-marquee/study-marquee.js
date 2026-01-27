@@ -343,17 +343,11 @@ export default async function init(element) {
   const copy1 = createTag('p', { class: 'study-marquee-copy' }, window.mph?.[`studyspace-${VERB}-copy`] || 'An AI study buddy that transforms notes, PDFs, and links into quizzes.');
   const copy2 = createTag('p', { class: 'study-marquee-copy study-marquee-copy-sub' }, window.mph?.[`studyspace-${VERB}-copy-sub`] || 'Free • No download required • 1M+ happy students');
   
-  // Create dropzone container (dashed border area) with accessibility
-  // Using existing drag placeholder for aria-label (simpler, reuses existing content)
-  const dropzoneAriaLabel = window.mph?.[`studyspace-${VERB}-drag`] || 'Or drag and drop here';
-  
+  // Create dropzone container (dashed border area)
+  // Note: This is a container, not an interactive control - the button inside handles interaction
   const dropzone = createTag('div', { 
     class: 'study-marquee-dropzone', 
-    id: 'drop-zone',
-    role: 'button',
-    tabindex: '0',
-    'aria-label': dropzoneAriaLabel,
-    'aria-describedby': 'file-upload-description'
+    id: 'drop-zone'
   });
   
   // Create CTA button with upload icon
@@ -507,9 +501,6 @@ export default async function init(element) {
       errorState.classList.add('study-marquee-error');
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
-      // Update dropzone aria-describedby to include error message for accessibility
-      dropzone.setAttribute('aria-describedby', 'file-upload-description error-message');
-      dropzone.setAttribute('aria-invalid', 'true');
     }
     if (logToLana) {
       window.lana?.log(
@@ -522,9 +513,6 @@ export default async function init(element) {
       errorState.classList.remove('study-marquee-error');
       errorState.classList.add('hide');
       errorStateText.textContent = '';
-      // Remove error from aria-describedby
-      dropzone.setAttribute('aria-describedby', 'file-upload-description');
-      dropzone.removeAttribute('aria-invalid');
     }, 5000);
   }
   
@@ -537,20 +525,13 @@ export default async function init(element) {
     }
   };
   
-  // Click handler for dropzone
+  // Click handler for dropzone (convenience - clicking anywhere opens file dialog)
   dropzone.addEventListener('click', (e) => {
-    if (e.srcElement.classList.value.includes('error')) { return; }
+    // Don't trigger if clicking on the button itself (it has its own handler)
+    // or if there's an error showing
+    if (e.target.tagName === 'BUTTON' || e.target.closest('button')) { return; }
+    if (e.target.classList.value.includes('error') || e.target.closest('.error')) { return; }
     fileInput.click();
-  });
-  
-  // Keyboard navigation for dropzone (Enter and Space keys)
-  dropzone.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      if (!e.srcElement.classList.value.includes('error')) {
-        fileInput.click();
-      }
-    }
   });
   
   // Drag and drop handlers for dropzone

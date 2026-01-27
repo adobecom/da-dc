@@ -65,7 +65,8 @@
 .study-marquee .foreground {
   position: relative;
   z-index: 1;
-  max-width: 1400px;
+  max-width: var(--grid-container-width);
+  min-width: var(--grid-container-width);
   margin: 0 auto;
 }
 
@@ -94,7 +95,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
-    gap: clamp(40px, 5vw, 100px);
+    gap: 100px;
   }
 }
 
@@ -444,12 +445,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-@media screen and (min-width: 1200px) {
-  .study-marquee-media {
-    width: 100%;
-  }
 }
 
 .study-marquee-media .asset {
