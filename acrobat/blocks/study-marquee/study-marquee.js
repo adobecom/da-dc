@@ -211,7 +211,7 @@ window.addEventListener('analyticsLoad', async ({ detail }) => {
     || sendAnalyticsToSplunk === stubSend
   ) {
     window.lana?.log(
-      'Analytics failed to initialize correctly: some methods remain no-ops on study-widget block',
+      'Analytics failed to initialize correctly: some methods remain no-ops on study-marquee block',
       lanaOptions,
     );
   }
@@ -316,13 +316,13 @@ export default async function init(element) {
   }
   
   // Create main container
-  const container = createTag('div', { class: 'study-widget-container' });
-  const row = createTag('div', { class: 'study-widget-row' });
-  const leftCol = createTag('div', { class: 'study-widget-col study-widget-col-left' });
-  const rightCol = createTag('div', { class: 'study-widget-col study-widget-col-right' });
+  const container = createTag('div', { class: 'study-marquee-container' });
+  const row = createTag('div', { class: 'study-marquee-row' });
+  const leftCol = createTag('div', { class: 'study-marquee-col study-marquee-col-left' });
+  const rightCol = createTag('div', { class: 'study-marquee-col study-marquee-col-right' });
   
   // Create header with Acrobat icon and "Adobe StudySpace" text
-  const header = createTag('div', { class: 'study-widget-header' });
+  const header = createTag('div', { class: 'study-marquee-header' });
   const iconWrapper = createTag('div', { class: 'acrobat-icon' });
   const widgetIconSvg = createSvgElement('WIDGET_ICON');
   if (widgetIconSvg) {
@@ -330,25 +330,25 @@ export default async function init(element) {
     widgetIconSvg.setAttribute('aria-hidden', 'true');
     iconWrapper.appendChild(widgetIconSvg);
   }
-  const title = createTag('div', { class: 'study-widget-title' });
+  const title = createTag('div', { class: 'study-marquee-title' });
   const adobeText = createTag('span', { class: 'adobe-red' }, 'Adobe');
   const studySpaceText = createTag('span', {}, ' StudySpace');
   title.append(adobeText, studySpaceText);
   header.append(iconWrapper, title);
   
   // Create heading
-  const headingEl = createTag('h1', { class: 'study-widget-heading' }, heading);
+  const headingEl = createTag('h1', { class: 'study-marquee-heading' }, heading);
   
   // Create description copy
-  const copy1 = createTag('p', { class: 'study-widget-copy' }, window.mph?.[`studyspace-${VERB}-copy`] || 'An AI study buddy that transforms notes, PDFs, and links into quizzes.');
-  const copy2 = createTag('p', { class: 'study-widget-copy study-widget-copy-sub' }, window.mph?.[`studyspace-${VERB}-copy-sub`] || 'Free • No download required • 1M+ happy students');
+  const copy1 = createTag('p', { class: 'study-marquee-copy' }, window.mph?.[`studyspace-${VERB}-copy`] || 'An AI study buddy that transforms notes, PDFs, and links into quizzes.');
+  const copy2 = createTag('p', { class: 'study-marquee-copy study-marquee-copy-sub' }, window.mph?.[`studyspace-${VERB}-copy-sub`] || 'Free • No download required • 1M+ happy students');
   
   // Create dropzone container (dashed border area) with accessibility
   // Using existing drag placeholder for aria-label (simpler, reuses existing content)
   const dropzoneAriaLabel = window.mph?.[`studyspace-${VERB}-drag`] || 'Or drag and drop here';
   
   const dropzone = createTag('div', { 
-    class: 'study-widget-dropzone', 
+    class: 'study-marquee-dropzone', 
     id: 'drop-zone',
     role: 'button',
     tabindex: '0',
@@ -358,7 +358,7 @@ export default async function init(element) {
   
   // Create CTA button with upload icon
   const ctaButton = createTag('button', { 
-    class: 'study-widget-cta',
+    class: 'study-marquee-cta',
     type: 'button',
     'aria-label': window.mph?.['verb-widget-cta'] || 'Select a file'
   });
@@ -368,15 +368,15 @@ export default async function init(element) {
     uploadIconSvg.setAttribute('aria-hidden', 'true');
     ctaButton.appendChild(uploadIconSvg);
   }
-  const ctaLabel = createTag('span', { class: 'study-widget-cta-label' }, window.mph?.['verb-widget-cta'] || 'Select a file');
+  const ctaLabel = createTag('span', { class: 'study-marquee-cta-label' }, window.mph?.['verb-widget-cta'] || 'Select a file');
   ctaButton.appendChild(ctaLabel);
   
   // Create "Or drag and drop here" text
-  const dragText = createTag('p', { class: 'study-widget-drag' }, window.mph?.[`studyspace-${VERB}-drag`] || 'Or drag and drop here');
+  const dragText = createTag('p', { class: 'study-marquee-drag' }, window.mph?.[`studyspace-${VERB}-drag`] || 'Or drag and drop here');
   
   // Create file limit text with ID for aria-describedby
   const fileLimitText = createTag('p', { 
-    class: 'study-widget-file-limit',
+    class: 'study-marquee-file-limit',
     id: 'file-upload-description'
   }, window.mph?.[`studyspace-${VERB}-file-limit`] || 'File must be PDF and up to 50MB');
   
@@ -398,15 +398,15 @@ export default async function init(element) {
     'aria-atomic': 'true'
   });
   const errorStateText = createTag('p', { 
-    class: 'study-widget-errorText',
+    class: 'study-marquee-errorText',
     id: 'error-message'
   });
   const errorIcon = createTag('div', { 
-    class: 'study-widget-errorIcon',
+    class: 'study-marquee-errorIcon',
     'aria-hidden': 'true'
   });
   const errorCloseBtn = createTag('button', { 
-    class: 'study-widget-errorBtn',
+    class: 'study-marquee-errorBtn',
     type: 'button',
     'aria-label': window.mph?.[`studyspace-${VERB}-error-close`] || 'Close error message'
   });
@@ -419,8 +419,8 @@ export default async function init(element) {
   errorState.append(errorIcon, errorStateText, errorCloseBtn);
   
   // Create footer with legal text and info icon
-  const footer = createTag('div', { class: 'study-widget-footer' });
-  const legalText = createTag('p', { class: 'study-widget-legal' }, window.mph?.['study-space-legal'] || 'Your file will be securely handled by Adobe servers and deleted unless you sign in to save it.');
+  const footer = createTag('div', { class: 'study-marquee-footer' });
+  const legalText = createTag('p', { class: 'study-marquee-legal' }, window.mph?.['study-space-legal'] || 'Your file will be securely handled by Adobe servers and deleted unless you sign in to save it.');
   
   // Add info icon with tooltip
   const infoIcon = createTag('button', {
@@ -452,7 +452,7 @@ export default async function init(element) {
   
   // Create media area in right column
   if (media) {
-    const mediaWrapper = createTag('div', { class: 'study-widget-media' });
+    const mediaWrapper = createTag('div', { class: 'study-marquee-media' });
     // Move all content from media div into wrapper
     while (media.firstChild) {
       mediaWrapper.appendChild(media.firstChild);
@@ -504,7 +504,7 @@ export default async function init(element) {
     
     if (message) {
       setDraggingClass(false);
-      errorState.classList.add('study-widget-error');
+      errorState.classList.add('study-marquee-error');
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
       // Update dropzone aria-describedby to include error message for accessibility
@@ -519,7 +519,7 @@ export default async function init(element) {
     }
 
     setTimeout(() => {
-      errorState.classList.remove('study-widget-error');
+      errorState.classList.remove('study-marquee-error');
       errorState.classList.add('hide');
       errorStateText.textContent = '';
       // Remove error from aria-describedby
@@ -655,7 +655,7 @@ export default async function init(element) {
 
   // Error close button
   errorCloseBtn.addEventListener('click', () => {
-    errorState.classList.remove('study-widget-error');
+    errorState.classList.remove('study-marquee-error');
     errorState.classList.add('hide');
   });
 
