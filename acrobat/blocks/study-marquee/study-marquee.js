@@ -1,7 +1,7 @@
 import { setLibs, isOldBrowser } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
-const { createTag } = await import(`${miloLibs}/utils/utils.js`);
+const { createTag, getConfig } = await import(`${miloLibs}/utils/utils.js`);
 const { decorateBlockBg } = await import(`${miloLibs}/utils/decorate.js`);
 
 // Constants
@@ -60,6 +60,21 @@ function redDirLink(verb) {
 
 function redDir(verb) {
   window.location.href = redDirLink(verb);
+}
+
+function isMobileDevice() {
+  const ua = navigator.userAgent.toLowerCase();
+  const isMobileUA = /android|iphone|ipod|blackberry|windows phone/i.test(ua);
+  return isMobileUA;
+}
+
+function isTabletDevice() {
+  const ua = navigator.userAgent.toLowerCase();
+  const isIPadOS = navigator.userAgent.includes('Mac')
+    && 'ontouchend' in document
+    && !/iphone|ipod/i.test(ua);
+  const isTabletUA = /ipad|android(?!.*mobile)/i.test(ua);
+  return isIPadOS || isTabletUA;
 }
 
 function getSplunkEndpoint() {
@@ -413,10 +428,33 @@ export default async function init(element) {
   errorState.append(errorIcon, errorStateText, errorCloseBtn);
   
   // Create footer with legal text and info icon
-  const footer = createTag('div', { class: 'study-marquee-footer' });
-  const legalText = createTag('p', { class: 'study-marquee-legal' }, window.mph?.['study-space-legal'] || 'Your file will be securely handled by Adobe servers and deleted unless you sign in to save it.');
+  const isMobile = isMobileDevice();
+  const isTablet = isTabletDevice();
   
-  // Add info icon with tooltip
+  const footer = createTag('div', { class: 'study-marquee-footer' });
+  
+  // Set up URLs for legal links
+  const { locale } = getConfig();
+  const ppURL = (window.mph && window.mph['verb-widget-privacy-policy-url']) || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
+  const touURL = (window.mph && window.mph['verb-widget-terms-of-use-url']) || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
+  
+  // Create legal text with default content
+  const defaultLegalText = (window.mph && window.mph['study-space-legal']) || 'Your file will be securely handled by Adobe servers and deleted unless you sign in to save it. By using this service, you agree to the Adobe Terms of Use and acknowledge the Privacy Policy.';
+  const legalText = createTag('p', { class: 'study-marquee-legal' }, defaultLegalText);
+  
+  // Add links to legal text
+  const createLegalLink = (text, url) => `<a class="study-marquee-legal-url" target="_blank" href="${url}">${text}</a>`;
+  
+  const legalLinks = [
+    ['Terms of Use', touURL],
+    ['Privacy Policy', ppURL],
+  ];
+  
+  legalText.innerHTML = legalLinks.reduce((html, [text, url]) => {
+    return html.replace(text, createLegalLink(text, url));
+  }, legalText.textContent);
+  
+  // Add info icon with tooltip (hide on mobile, show on tablet and desktop)
   const infoIcon = createTag('button', {
     class: 'info-icon milo-tooltip',
     type: 'button',
@@ -436,7 +474,11 @@ export default async function init(element) {
   }, window.mph?.['verb-widget-tool-tip'] || 'Files are securely processed and deleted after use');
   infoIcon.appendChild(tooltipText);
   
-  footer.append(legalText, infoIcon);
+  // Add legal text to footer, and info icon only if not mobile
+  footer.append(legalText);
+  if (!isMobile || isTablet) {
+    footer.append(infoIcon);
+  }
   
   // Assemble dropzone
   dropzone.append(ctaButton, dragText, fileLimitText);
