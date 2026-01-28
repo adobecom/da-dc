@@ -96,7 +96,7 @@ export const localeMap = {
 function getUnityLibs(prodLibs = '/unitylibs') {
   const { hostname, search } = window.location;
   if (hostname === 'acrobat.adobe.com') return 'https://www.adobe.com/unitylibs';
-  if (hostname === 'stage.acrobat.adobe.com') return 'https://www.stage.adobe.com/unitylibs';  
+  if (hostname === 'stage.acrobat.adobe.com' && !(new URLSearchParams(search).get('unitylibs'))) return 'https://www.stage.adobe.com/unitylibs';
   if (!/\.hlx\.|\.aem\.|local|stage/.test(hostname)) return prodLibs;
   // eslint-disable-next-line compat/compat
   const branch = new URLSearchParams(search).get('unitylibs') || 'main';
