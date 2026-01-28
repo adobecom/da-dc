@@ -310,6 +310,7 @@ const CONFIG = {
   locales,
   // geoRouting: 'on',
   prodDomains: ['www.adobe.com', 'acrobat.adobe.com', 'business.adobe.com', 'helpx.adobe.com'],
+  clientEnv: window.location.hostname === 'stage.acrobat.adobe.com' ? 'stage' : null,
   stageDomainsMap: {
     '--dc--adobecom.(hlx|aem).page': {
       'www.adobe.com': 'www.stage.adobe.com',
