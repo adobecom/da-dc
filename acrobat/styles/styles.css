@@ -854,7 +854,8 @@ a[href*="susi"] {
     line-height: 1;
     font-weight: 900;
     font-size: 36px;
-    font-family: "Adobe Clean Black", var(--body-font-family);
+    font-family: "Adobe Clean ExtraBold", var(--body-font-family);
+    letter-spacing: -0.04em;
   }
 
   .text-block [class*="body-"] {
@@ -890,5 +891,14 @@ a[href*="susi"] {
   font-family: "Adobe Clean ExtraBold", var(--body-font-family);
   font-weight: 800;
   line-height: 1.25;
+  letter-spacing: -0.03em;
+ }
+
+ .icon-block [class*="heading-"] {
+  font-family: "Adobe Clean ExtraBold", var(--body-font-family);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
  }
 }
