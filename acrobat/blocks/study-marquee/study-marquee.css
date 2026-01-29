@@ -704,6 +704,10 @@
     gap: 14px;
   }
 
+  .study-marquee-drag {
+    display: none;
+  }
+
   .study-marquee-cta {
     font-size: 16px;
     padding: 11px 22px;
