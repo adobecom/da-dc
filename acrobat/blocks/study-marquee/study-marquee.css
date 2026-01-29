@@ -125,7 +125,7 @@
 /* Main heading */
 .study-marquee-heading {
   font-family: "Adobe Clean Black", var(--body-font-family);
-  font-size: 48px;
+  font-size: 44px;
   line-height: 1.1;
   font-weight: 900;
   color: inherit;
@@ -778,7 +778,7 @@
   }
 
   .study-marquee-heading {
-    font-size: clamp(60px, 6vw, 96px);
+    font-size: 96px;
   }
 
   .study-marquee-dropzone {
@@ -845,19 +845,7 @@
     color: var(--link-hover-color);
   }
 }
-
-/* Mobile - smaller screens */
-@media screen and (max-width: 899px) {
-  .study-marquee-heading {
-    font-size: 48px;
-  }
-}
-
-/* Small mobile */
 @media screen and (max-width: 599px) {
-  .study-marquee-heading {
-    font-size: 36px;
-  }
   
   .study-marquee-dropzone {
     padding: 32px 24px;
