@@ -1,14 +1,8 @@
 :root {
-  /* Study Marquee Variables */
   --study-marquee-padding: 40px 16px;
   --study-marquee-gap: 32px;
-  
-  /* Link colors */
-  --consonant-link-color: #1473E6;
-  --consonant-link-color-hover: #0D66D0;
 }
 
-/* Main block container - Dark by default */
 .study-marquee {
   position: relative;
   padding: var(--study-marquee-padding);
@@ -21,18 +15,15 @@
   min-height: 560px;
 }
 
-/* Light mode variants */
 .study-marquee.light,
 .study-marquee.mobile-light {
   color: #000000;
 }
 
-/* Dark mode explicit (for clarity, but default) */
 .study-marquee.mobile-dark {
   color: var(--color-white);
 }
 
-/* Background handling like marquee */
 .study-marquee .background {
   position: absolute;
   top: 0;
@@ -58,13 +49,11 @@
   margin: 0 auto;
 }
 
-/* Main container - NO border, clean layout */
 .study-marquee-container {
   width: 100%;
   overflow: hidden;
 }
 
-/* Two column row */
 .study-marquee-row {
   display: flex;
   flex-direction: column;
@@ -72,7 +61,6 @@
   align-items: flex-start;
 }
 
-/* Left column - content */
 .study-marquee-col-left {
   display: flex;
   flex-direction: column;
@@ -82,7 +70,6 @@
   overflow-wrap: break-word;
 }
 
-/* Right column - media */
 .study-marquee-col-right {
   flex-shrink: 0;
   width: 100%;
@@ -91,7 +78,6 @@
   align-items: center;
 }
 
-/* Header with logo and title */
 .study-marquee-header {
   display: flex;
   align-items: center;
@@ -122,7 +108,6 @@
   color: #EB1000;
 }
 
-/* Main heading */
 .study-marquee-heading {
   font-family: "Adobe Clean Black", var(--body-font-family);
   font-size: 44px;
@@ -136,13 +121,11 @@
   letter-spacing: -0.045em;
 }
 
-/* Light mode heading - use dark text for contrast */
 .study-marquee.light .study-marquee-heading,
 .study-marquee.mobile-light .study-marquee-heading {
   color: #000000;
 }
 
-/* Body copy */
 .study-marquee-copy {
   font-size: 20px;
   font-style: normal;
@@ -163,7 +146,6 @@
   opacity: 0.8;
 }
 
-/* Light mode copy - use darker text */
 .study-marquee.light .study-marquee-copy,
 .study-marquee.mobile-light .study-marquee-copy {
   color: #000000;
@@ -176,7 +158,6 @@
   opacity: 1;
 }
 
-/* Drop zone container - dashed border area */
 .study-marquee-dropzone {
   border: 1.043px dashed #8F8F8F;
   border-radius: 24px;
@@ -195,7 +176,6 @@
   margin-bottom: 8px;
 }
 
-/* Light mode dropzone */
 .study-marquee.light .study-marquee-dropzone,
 .study-marquee.mobile-light .study-marquee-dropzone,
 .study-marquee.tablet-light .study-marquee-dropzone,
@@ -211,7 +191,6 @@
   background: #4D4D4D;
 }
 
-/* Light mode hover */
 .study-marquee.light .study-marquee-dropzone:hover,
 .study-marquee.mobile-light .study-marquee-dropzone:hover,
 .study-marquee.tablet-light .study-marquee-dropzone:hover,
@@ -226,7 +205,6 @@
   border-style: solid;
 }
 
-/* Entire block drag state - when dragging over the block */
 .study-marquee.dragging-block {
   outline: 3px dashed #1473E6;
   outline-offset: -6px;
@@ -250,7 +228,6 @@
   border-style: solid;
 }
 
-/* CTA Button */
 .study-marquee-cta {
   display: inline-flex;
   align-items: center;
@@ -281,7 +258,6 @@
   justify-content: center;
 }
 
-/* Drag and drop text */
 .study-marquee-drag {
   font-size: 16px;
   line-height: 1.5;
@@ -290,7 +266,6 @@
   text-align: center;
 }
 
-/* Light mode drag text */
 .study-marquee.light .study-marquee-drag,
 .study-marquee.mobile-light .study-marquee-drag,
 .study-marquee.tablet-light .study-marquee-drag,
@@ -298,7 +273,6 @@
   color: #000000;
 }
 
-/* File limit text */
 .study-marquee-file-limit {
   font-size: 14px;
   line-height: 1.5;
@@ -307,7 +281,6 @@
   text-align: center;
 }
 
-/* Light mode file limit text */
 .study-marquee.light .study-marquee-file-limit,
 .study-marquee.mobile-light .study-marquee-file-limit,
 .study-marquee.tablet-light .study-marquee-file-limit,
@@ -315,7 +288,6 @@
   color: #000000;
 }
 
-/* Media container - maintains 1:1 aspect ratio */
 .study-marquee-media {
   width: 100%;
   aspect-ratio: 1;
@@ -374,7 +346,6 @@
   object-fit: cover;
 }
 
-/* Footer with legal text */
 .study-marquee-footer {
   display: flex;
   align-items: flex-start;
@@ -397,7 +368,6 @@
   flex: 1;
 }
 
-/* Light mode legal text */
 .study-marquee.light .study-marquee-legal,
 .study-marquee.mobile-light .study-marquee-legal,
 .study-marquee.tablet-light .study-marquee-legal,
@@ -414,7 +384,6 @@
   color: var(--consonant-link-color-hover);
 }
 
-/* Light mode links */
 .study-marquee.light .study-marquee-legal a,
 .study-marquee.mobile-light .study-marquee-legal a,
 .study-marquee.tablet-light .study-marquee-legal a,
@@ -430,7 +399,6 @@
   opacity: 1;
 }
 
-/* Info icon with tooltip */
 .info-icon {
   display: flex;
   align-items: center;
@@ -457,7 +425,6 @@
   height: 18px;
 }
 
-/* Dark mode - white info icon */
 .study-marquee .info-icon svg,
 .study-marquee.dark .info-icon svg,
 .study-marquee.mobile-dark .info-icon svg,
@@ -466,7 +433,6 @@
   filter: brightness(0) invert(1);
 }
 
-/* Light mode - keep default dark color */
 .study-marquee.light .info-icon svg,
 .study-marquee.mobile-light .info-icon svg,
 .study-marquee.tablet-light .info-icon svg,
@@ -474,7 +440,6 @@
   filter: none;
 }
 
-/* Tooltip styles - matching verb-widget with mobile/tablet overflow fix */
 .study-marquee .milo-tooltip {
   position: relative;
   text-decoration: none;
@@ -557,7 +522,6 @@
   }
 }
 
-/* Hide file input */
 .hide {
   position: absolute;
   width: 1px;
@@ -570,7 +534,6 @@
   border: 0;
 }
 
-/* Error state */
 .study-marquee .error {
   display: none;
   opacity: 0;
@@ -627,11 +590,6 @@
   fill: #D7373F;
 }
 
-/* =================================================================
-   MEDIA QUERIES - Consolidated
-   ================================================================= */
-
-/* Tablet and smaller mobile */
 @media screen and (min-width: 600px) {
   .study-marquee.tablet-light {
     color: #000000;
@@ -672,7 +630,6 @@
   }
 }
 
-/* Tablet only (600px - 1199px) */
 @media screen and (min-width: 600px) and (max-width: 1199px) {
   .study-marquee-row {
     gap: 40px;
@@ -730,7 +687,6 @@
   }
 }
 
-/* Medium screens */
 @media screen and (min-width: 900px) {
   :root {
     --study-marquee-padding: 80px 40px;
@@ -738,7 +694,6 @@
   }
 }
 
-/* Mobile and Tablet - prevent tooltip from being cut off at right edge */
 @media screen and (max-width: 1199px) {
   .study-marquee .milo-tooltip.top::before {
     left: auto;
@@ -754,7 +709,6 @@
   }
 }
 
-/* Desktop (1200px+) */
 @media screen and (min-width: 1200px) {
   :root {
     --study-marquee-padding: 80px;
@@ -854,8 +808,7 @@
     color: var(--link-hover-color);
   }
 }
-@media screen and (max-width: 599px) {
-  
+@media screen and (max-width: 600px) {
   .study-marquee-dropzone {
     padding: 32px 24px;
   }
