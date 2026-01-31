@@ -84,14 +84,14 @@
   gap: 12px;
 }
 
-.acrobat-icon {
+.study-marquee .acrobat-icon {
   display: inline-flex;
   width: 24px;
   height: 24px;
   flex-shrink: 0;
 }
 
-.acrobat-icon svg {
+.study-marquee .acrobat-icon svg {
   width: 100%;
   height: 100%;
 }
@@ -399,7 +399,7 @@
   opacity: 1;
 }
 
-.info-icon {
+.study-marquee .info-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -416,11 +416,11 @@
   outline: none;
 }
 
-.info-icon:hover {
+.study-marquee .info-icon:hover {
   opacity: 0.8;
 }
 
-.info-icon svg {
+.study-marquee .info-icon svg {
   width: 18px;
   height: 18px;
 }
@@ -522,7 +522,7 @@
   }
 }
 
-.hide {
+.study-marquee .hide {
   position: absolute;
   width: 1px;
   height: 1px;

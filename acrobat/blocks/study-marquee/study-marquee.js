@@ -388,11 +388,12 @@ export default async function init(element) {
   }, window.mph?.[`study-widget-${VERB}-file-limit`] || '');
   const fileInput = createTag('input', {
     type: 'file',
+    accept: LIMITS[VERB]?.acceptedFiles,
     id: 'file-upload',
     class: 'hide',
     'aria-hidden': 'true',
-    accept: '.pdf',
-    'aria-describedby': 'file-upload-description'
+    'aria-describedby': 'file-upload-description',
+    ...(LIMITS[VERB]?.multipleFiles && { multiple: '' }),
   });
   const errorState = createTag('div', { 
     class: 'error hide',
