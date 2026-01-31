@@ -18,7 +18,7 @@ const ICONS = {
   CLOSE_ICON: '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_15746_2423)"><g clip-path="url(#clip1_15746_2423)"><path fill-rule="evenodd" clip-rule="evenodd" d="M17.2381 15.9994L19.6944 13.5434C19.8586 13.3793 19.9509 13.1566 19.9509 12.9245C19.951 12.6923 19.8588 12.4696 19.6946 12.3054C19.5305 12.1412 19.3078 12.0489 19.0757 12.0488C18.8435 12.0488 18.6208 12.141 18.4566 12.3051L16.0002 14.7615L13.5435 12.3051C13.3793 12.141 13.1566 12.0489 12.9245 12.049C12.6923 12.0491 12.4697 12.1414 12.3057 12.3056C12.1416 12.4698 12.0495 12.6925 12.0496 12.9246C12.0497 13.1568 12.142 13.3794 12.3062 13.5434L14.7622 15.9994L12.3062 18.4555C12.1427 18.6197 12.051 18.8421 12.0512 19.0738C12.0515 19.3055 12.1436 19.5277 12.3074 19.6916C12.4711 19.8556 12.6933 19.9478 12.925 19.9482C13.1567 19.9486 13.3791 19.8571 13.5435 19.6938L16.0002 17.2374L18.4566 19.6938C18.6208 19.8579 18.8435 19.9501 19.0756 19.9501C19.3078 19.95 19.5305 19.8577 19.6946 19.6935C19.8588 19.5293 19.9509 19.3066 19.9509 19.0745C19.9509 18.8423 19.8586 18.6196 19.6944 18.4555L17.2381 15.9994Z" fill="white"/></g></g><defs><clipPath id="clip0_15746_2423"><rect width="8" height="8" fill="white" transform="translate(12 12)"/></clipPath><clipPath id="clip1_15746_2423"><rect width="8" height="8" fill="white" transform="translate(12 12)"/></clipPath></defs></svg>',
 };
 
-const LIMITS = {
+export const LIMITS = {
   'quiz-maker': {
     maxFileSize: 52428800,
     acceptedFiles: ['.pdf'],
@@ -520,33 +520,13 @@ export default async function init(element) {
       dropzone.classList.remove('dragging');
     }
   };
+  ctaButton.addEventListener('click', () => {
+    fileInput.click();
+  });
   dropzone.addEventListener('click', (e) => {
     if (e.target.tagName === 'BUTTON' || e.target.closest('button')) { return; }
     if (e.target.classList.value.includes('error') || e.target.closest('.error')) { return; }
     fileInput.click();
-  });
-  dropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    setDraggingClass(true);
-  });
-  dropzone.addEventListener('dragleave', (e) => {
-    if (!dropzone.contains(e.relatedTarget)) {
-      setDraggingClass(false);
-    }
-  });
-  dropzone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    setDraggingClass(false);
-    const { dataTransfer: { files } } = e;
-    if (files.length > 0) {
-      noOfFiles = files.length;
-      element.dispatchEvent(new CustomEvent('unity:track-analytics', {
-        detail: {
-          event: 'drop',
-          data: { userAttempts },
-        },
-      }));
-    }
   });
   element.addEventListener('dragover', (e) => {
     e.preventDefault();
