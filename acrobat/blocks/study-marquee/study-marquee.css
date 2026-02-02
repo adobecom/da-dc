@@ -9,6 +9,8 @@
   overflow: hidden;
   color: var(--color-white);
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .study-marquee.signed-in {
@@ -26,11 +28,7 @@
 
 .study-marquee .background {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
+  inset: 0;
 }
 
 .study-marquee .background img,
@@ -42,7 +40,6 @@
 }
 
 .study-marquee .foreground {
-  z-index: 1;
   max-width: var(--grid-container-width);
   min-width: var(--grid-container-width);
   margin: 0 auto;
