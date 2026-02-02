@@ -42,7 +42,6 @@
 }
 
 .study-marquee .foreground {
-  position: relative;
   z-index: 1;
   max-width: var(--grid-container-width);
   min-width: var(--grid-container-width);
@@ -540,7 +539,7 @@
   max-width: 435px;
   color: white;
   position: absolute;
-  top: 90px;
+  top: 60px;
   transform: translate(-50%, -50%);
   left: 50%;
   font-size: 14px;
@@ -813,6 +812,39 @@
   }
 }
 @media screen and (max-width: 600px) {
+  .study-marquee-error {
+    max-width: calc(100% - 32px);
+    top: 50px;
+    padding: 6px;
+  }
+
+  .study-marquee-errorText {
+    font-size: 12px;
+    max-width: none;
+    padding-right: 12px;
+    margin-right: 6px;
+    margin-left: 6px;
+    min-width: auto;
+  }
+
+  .study-marquee-errorIcon {
+    width: 16px;
+    height: 16px;
+    margin-left: 6px;
+    margin-right: 2px;
+    margin-top: 5px;
+  }
+
+  .study-marquee-errorIcon::after {
+    width: 16px;
+    height: 16px;
+  }
+
+  .study-marquee-errorBtn {
+    width: 28px;
+    height: 28px;
+  }
+
   .study-marquee-dropzone {
     padding: 32px 24px;
   }
