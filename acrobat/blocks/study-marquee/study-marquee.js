@@ -457,7 +457,7 @@ export default async function init(element) {
     footer.append(infoIcon);
   }
   dropzone.append(ctaButton, dragText, fileLimitText);
-  leftCol.append(header, headingEl, copy1, copy2, errorState, dropzone, fileInput, footer);
+  leftCol.append(header, headingEl, copy1, copy2, dropzone, fileInput, footer);
   if (media) {
     const mediaWrapper = createTag('div', { class: 'study-marquee-media' });
     while (media.firstChild) {
@@ -469,6 +469,7 @@ export default async function init(element) {
   container.appendChild(row);
   foreground.innerHTML = '';
   foreground.append(container);
+  element.append(errorState);
   
   function handleAnalyticsEvent(
     eventName,
