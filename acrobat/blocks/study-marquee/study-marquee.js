@@ -126,14 +126,6 @@ const setUser = () => {
   localStorage.setItem('unity.user', 'true');
 };
 
-function runWhenDocumentIsReady(callback) {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', callback);
-  } else {
-    callback();
-  }
-}
-
 const redirectReady = new CustomEvent('DCUnity:RedirectReady');
 
 let exitFlag = true;
@@ -277,12 +269,9 @@ export default async function init(element) {
   // Initialize analytics - track attempts for analytics data (no UI changes based on attempts)
   const userAttempts = getVerbKey(`${VERB}_attempts`);
   let noOfFiles = null;
+  
   function mergeData(eventData = {}) {
     return { ...eventData, noOfFiles };
-  }
-  function getLocale() {
-    const currLocale = getConfig().locale?.prefix.replace('/', '');
-    return currLocale || 'en-us';
   }
   const initializePingService = async () => {
     try {
@@ -315,6 +304,17 @@ export default async function init(element) {
       );
     }
   };
+  function runWhenDocumentIsReady(callback) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', callback);
+    } else {
+      callback();
+    }
+  }
+  function getLocale() {
+    const currLocale = getConfig().locale?.prefix.replace('/', '');
+    return currLocale || 'en-us';
+  }
   runWhenDocumentIsReady(() => {
     initializePingService();
     window.dispatchEvent(new CustomEvent('analyticsLoad', {
@@ -469,7 +469,7 @@ export default async function init(element) {
   container.appendChild(row);
   foreground.innerHTML = '';
   foreground.append(container);
-  let uploadingStartTime = null;
+  
   function handleAnalyticsEvent(
     eventName,
     metadata = {},
@@ -480,22 +480,48 @@ export default async function init(element) {
     if (!canSendDataToSplunk) return;
     window.analytics.sendAnalyticsToSplunk(eventName, VERB, metadata, getSplunkEndpoint());
   }
+  
   function registerTabCloseEvent(eventData, workflowStep) {
     window.addEventListener('beforeunload', (windowEvent) => {
       handleExit(windowEvent, VERB, eventData, false, workflowStep);
     });
   }
-  function handleError(
-    {
-      code,
-      status = 'Unknown',
-      message,
-      info,
-    },
-    logToLana = false,
-    logOptions = lanaOptions,
-  ) {
-    const accountType = window?.adobeIMS?.getAccountType?.() || 'anonymous';
+  
+  function handleUploadingEvent(data, attempts, cookieExp, canSendDataToSplunk) {
+    isUploading = true;
+    exitFlag = false;
+    prefetchTarget();
+    const metadata = mergeData({ ...data, userAttempts: attempts });
+    handleAnalyticsEvent('job:uploading', metadata, false, canSendDataToSplunk);
+    if (LIMITS[VERB]?.multipleFiles) {
+      handleAnalyticsEvent('job:multi-file-uploading', metadata, false, canSendDataToSplunk);
+    }
+    setCookie('UTS_Uploading', Date.now(), cookieExp);
+    registerTabCloseEvent(metadata, 'uploading');
+  }
+  
+  function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
+    exitFlag = true;
+    setTimeout(() => {
+      window.dispatchEvent(redirectReady);
+      window.lana?.log(
+        'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
+        { sampleRate: 5, tags: 'DC_Milo,Project Unity (DC)' },
+      );
+    }, 3000);
+    setCookie('UTS_Uploaded', Date.now(), cookieExp);
+    const calcUploadedTime = uploadedTime();
+    const metadata = { ...data, uploadTime: calcUploadedTime, userAttempts: attempts };
+    handleAnalyticsEvent('job:uploaded', metadata, false, canSendDataToSplunk);
+    if (LIMITS[VERB]?.multipleFiles) {
+      handleAnalyticsEvent('job:multi-file-uploaded', metadata, false, canSendDataToSplunk);
+    }
+    setUser();
+    incrementVerbKey(`${VERB}_attempts`);
+  }
+  
+  const handleError = (detail, logToLana = false, logOptions = {}) => {
+    const { code, message, status, info = 'No additional info provided', accountType = 'Unknown account type' } = detail;
     if (message) {
       setDraggingClass(false);
       errorState.classList.add('study-marquee-error');
@@ -514,6 +540,7 @@ export default async function init(element) {
       errorStateText.textContent = '';
     }, 5000);
   }
+  
   const setDraggingClass = (shouldToggle) => {
     if (shouldToggle) {
       dropzone.classList.add('dragging');
@@ -592,6 +619,7 @@ export default async function init(element) {
     errorState.classList.add('hide');
   });
   element.addEventListener('unity:track-analytics', (e) => {
+    const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
     const { event, data } = e.detail || {};
     const canSendDataToSplunk = e.detail?.sendToSplunk ?? true;
     if (!event) return;
@@ -615,40 +643,8 @@ export default async function init(element) {
         handleAnalyticsEvent('job:cancel', metadata, true, canSendDataToSplunk);
         exitFlag = true;
       },
-      uploading_started: () => {
-        isUploading = true;
-        exitFlag = false;
-        prefetchTarget();
-        uploadingStartTime = Date.now();
-        const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
-        setCookie('UTS_Uploading', Date.now(), cookieExp);
-        handleAnalyticsEvent('job:uploading', metadata, true, canSendDataToSplunk);
-        if (LIMITS[VERB]?.multipleFiles) {
-          handleAnalyticsEvent('job:multi-file-uploading', metadata, true, canSendDataToSplunk);
-        }
-        registerTabCloseEvent(metadata, 'uploading');
-      },
-      upload_success: () => {
-        isUploading = false;
-        exitFlag = true;
-        const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
-        setCookie('UTS_Uploaded', Date.now(), cookieExp);
-        const calcUploadedTime = uploadedTime();
-        const uploadMetadata = { ...metadata, uploadTime: calcUploadedTime };
-        handleAnalyticsEvent('job:uploaded', uploadMetadata, true, canSendDataToSplunk);
-        if (LIMITS[VERB]?.multipleFiles) {
-          handleAnalyticsEvent('job:multi-file-uploaded', uploadMetadata, true, canSendDataToSplunk);
-        }
-        setUser();
-        incrementVerbKey(`${VERB}_attempts`);
-        setTimeout(() => {
-          window.dispatchEvent(redirectReady);
-          window.lana?.log(
-            'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
-            { sampleRate: 5, tags: 'DC_Milo,Project Unity (DC)' },
-          );
-        }, 3000);
-      },
+      uploading: () => handleUploadingEvent(data, userAttempts, cookieExp, canSendDataToSplunk),
+      uploaded: () => handleUploadedEvent(data, userAttempts, cookieExp, canSendDataToSplunk),
       chunk_uploaded: () => {
         if (canSendDataToSplunk) window.analytics.sendAnalyticsToSplunk('job:chunk-uploaded', VERB, metadata, getSplunkEndpoint());
       },
@@ -726,6 +722,7 @@ export default async function init(element) {
       document.cookie = `UTS_Redirect=${Date.now()};domain=.adobe.com;path=/;expires=${cookieExp}`;
     }
   });
+  
   async function checkSignedInUser() {
     if (!window.adobeIMS?.isSignedInUser?.()) return;
     element.classList.remove('upsell');
@@ -740,6 +737,8 @@ export default async function init(element) {
   }
   await checkSignedInUser();
   window.addEventListener('IMS:Ready', checkSignedInUser);
+  window.prefetchTargetUrl = null;
+  element.parentNode.style.display = 'block';
   window.addEventListener('pageshow', (event) => {
     const historyTraversal = event.persisted
       || (typeof window.performance !== 'undefined'
