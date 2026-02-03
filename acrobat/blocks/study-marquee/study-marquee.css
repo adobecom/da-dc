@@ -3,6 +3,12 @@
   --study-marquee-gap: 32px;
 }
 
+@media screen and (min-width: 600px) {
+  :root {
+    --study-marquee-padding: 64px 16px;
+  }
+}
+
 .study-marquee {
   position: relative;
   padding: var(--study-marquee-padding);
