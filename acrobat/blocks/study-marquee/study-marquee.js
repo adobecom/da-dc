@@ -20,8 +20,17 @@ const ICONS = {
 
 export const LIMITS = {
   'quiz-maker': {
-    maxFileSize: 52428800,
-    acceptedFiles: ['.pdf'],
+    maxFileSize: 104857600, // 100 MB
+    maxFileSizeFriendly: '1 MB',
+    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
+    maxNumFiles: 100,
+    multipleFiles: true,
+    uploadType: 'multifile-only',
+  },
+  'flashcard-maker': {
+    maxFileSize: 104857600, // 100 MB
+    maxFileSizeFriendly: '1 MB',
+    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
     maxNumFiles: 100,
     multipleFiles: true,
     uploadType: 'multifile-only',
@@ -324,7 +333,7 @@ export default async function init(element) {
   const children = element.querySelectorAll(':scope > div');
   const foreground = children[children.length - 1];
   foreground.classList.add('foreground', 'container');
-  if (children.length > 1) {
+  if (children.length > 1 && children[0].textContent !== '') {
     children[0].classList.add('background');
     decorateBlockBg(element, children[0], { useHandleFocalpoint: true });
   }
