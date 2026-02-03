@@ -268,6 +268,7 @@ function processMedia(mediaDiv) {
 }
 
 export default async function init(element) {
+  element.classList.add('con-block');
   if (isOldBrowser()) {
     window.location.href = EOLBrowserPage;
     return;
@@ -333,7 +334,7 @@ export default async function init(element) {
   const children = element.querySelectorAll(':scope > div');
   const foreground = children[children.length - 1];
   foreground.classList.add('foreground', 'container');
-  if (children.length > 1) {
+  if (children.length > 1 && children[0].textContent !== '') {
     children[0].classList.add('background');
     decorateBlockBg(element, children[0], { useHandleFocalpoint: true });
   }
