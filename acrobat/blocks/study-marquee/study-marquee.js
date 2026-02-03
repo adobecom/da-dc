@@ -268,6 +268,7 @@ function processMedia(mediaDiv) {
 }
 
 export default async function init(element) {
+  element.classList.add('con-block');
   if (isOldBrowser()) {
     window.location.href = EOLBrowserPage;
     return;
