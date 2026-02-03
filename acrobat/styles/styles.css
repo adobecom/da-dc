@@ -915,7 +915,7 @@ a[href*="susi"] {
       letter-spacing: -0.03em;
     }
 
-    .media[class*="heading-"] {
+    .media [class*="heading-"] {
       font-family: "Adobe Clean ExtraBold", var(--body-font-family);
       font-weight: 800;
       line-height: 1;
@@ -923,7 +923,7 @@ a[href*="susi"] {
       font-size: 36px;
     }
 
-    .media[class*="body-"] {
+    .media [class*="body-"] {
       line-height: 1.5;
       font-size: 18px;
     }
@@ -954,7 +954,7 @@ a[href*="susi"] {
         font-size: 32px;
       }
 
-      .media[class*="heading-"] {
+      .media [class*="heading-"] {
         line-height: 0.98;
         font-size: 42px;
       }
@@ -989,12 +989,12 @@ a[href*="susi"] {
         font-size: 42px;
       }
 
-      .media[class*="heading-"] {
+      .media [class*="heading-"] {
         line-height: 0.98;
         font-size: 64px;
       }
   
-      .media[class*="body-"] {
+      .media [class*="body-"] {
         font-size: 20px;
       }
     }
