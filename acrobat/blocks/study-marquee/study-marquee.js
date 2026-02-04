@@ -22,7 +22,7 @@ export const LIMITS = {
   'quiz-maker': {
     maxFileSize: 104857600, // 100 MB
     maxFileSizeFriendly: '1 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
+    acceptedFiles: ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.rtf', '.txt', '.text', '.vtt'],
     maxNumFiles: 100,
     multipleFiles: true,
     uploadType: 'multifile-only',
@@ -30,7 +30,7 @@ export const LIMITS = {
   'flashcard-maker': {
     maxFileSize: 104857600, // 100 MB
     maxFileSizeFriendly: '1 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
+    acceptedFiles: ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.rtf', '.txt', '.text', '.vtt'],
     maxNumFiles: 100,
     multipleFiles: true,
     uploadType: 'multifile-only',
