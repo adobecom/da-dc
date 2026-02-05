@@ -936,7 +936,6 @@ a[href*="susi"] {
     @media screen and (min-width: 600px) and (max-width: 1199px) {
       .text-block [class*="heading-"] {
         line-height: 0.98;
-        font-weight: 800;
         font-size: 42px;
       }
 
@@ -967,7 +966,6 @@ a[href*="susi"] {
     @media screen and (min-width: 1200px) {
       .text-block [class*="heading-"] {
         line-height: 0.98;
-        font-weight: 900;
         font-size: 64px;
       }
 
