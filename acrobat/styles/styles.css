@@ -895,7 +895,7 @@ a[href*="susi"] {
     .quote .figcaption .cite p {
       font-family: "Adobe Clean Italic", var(--body-font-family);
       line-height: 1.5;
-      font-size: 16px;
+      font-size: 16px !important;
       font-weight: 400;
     }
 
