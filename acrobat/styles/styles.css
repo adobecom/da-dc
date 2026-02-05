@@ -929,7 +929,7 @@ a[href*="susi"] {
     }
 
     .media.medium-compact [class*="heading-"] {
-      line-height: 0.98;
+      line-height: 0.98 !important;
     }
 
 
