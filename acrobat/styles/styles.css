@@ -1007,8 +1007,8 @@ a[href*="susi"] {
       }
 
       .media.medium-compact [class*="heading-"] {
-        line-height: 1.25;
-        font-size: 54px;
+        line-height: 1.25 !important;
+        font-size: 54px !important;
       }
     }
   }
