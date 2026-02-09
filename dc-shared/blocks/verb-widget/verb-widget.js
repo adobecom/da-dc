@@ -262,6 +262,12 @@ export const LIMITS = {
     acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
     multipleFiles: true,
   },
+  'heic-to-pdf': {
+    maxFileSize: 104857600, // 100 MB
+    maxFileSizeFriendly: '100 MB',
+    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff', '.heic'],
+    multipleFiles: true,
+  },
 };
 
 const DC_ENV = ['www.adobe.com', 'acrobat.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
