@@ -203,6 +203,7 @@ async function loadAnalyticsAfterLCP(analyticsData) {
 }
 
 window.addEventListener('analyticsLoad', async ({ detail }) => {
+  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
   const delay = (ms) => new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
@@ -279,9 +280,20 @@ export default async function init(element) {
   // Initialize analytics - track attempts for analytics data (no UI changes based on attempts)
   const userAttempts = getVerbKey(`${VERB}_attempts`);
   let noOfFiles = null;
-  
+
   function mergeData(eventData = {}) {
     return { ...eventData, noOfFiles };
+  }
+  function getLocale() {
+    const currLocale = getConfig().locale?.prefix.replace('/', '');
+    return currLocale || 'en-us';
+  }
+  function runWhenDocumentIsReady(callback) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', callback);
+    } else {
+      callback();
+    }
   }
   const initializePingService = async () => {
     try {
@@ -314,22 +326,9 @@ export default async function init(element) {
       );
     }
   };
-  function runWhenDocumentIsReady(callback) {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', callback);
-    } else {
-      callback();
-    }
-  }
-  function getLocale() {
-    const currLocale = getConfig().locale?.prefix.replace('/', '');
-    return currLocale || 'en-us';
-  }
   runWhenDocumentIsReady(() => {
     initializePingService();
-    window.dispatchEvent(new CustomEvent('analyticsLoad', {
-      detail: { verb: VERB, userAttempts },
-    }));
+    window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: VERB, userAttempts } }));
   });
   const children = element.querySelectorAll(':scope > div');
   const foreground = children[children.length - 1];
@@ -367,21 +366,21 @@ export default async function init(element) {
   header.append(iconWrapper, title);
   const headingEl = createTag('h1', { class: 'study-marquee-heading' }, heading);
   const isMobileOrTablet = window.innerWidth < 1200;
-  const copy1Text = (isMobileOrTablet && window.mph?.['study-marquee-quiz-maker-mobile-copy']) 
+  const copy1Text = (isMobileOrTablet && window.mph?.['study-marquee-quiz-maker-mobile-copy'])
     || window.mph?.[`study-marquee-${VERB}-copy`] || '';
-  const copy2Text = (isMobileOrTablet && window.mph?.['study-marquee-quiz-maker-mobile-sub-copy']) 
+  const copy2Text = (isMobileOrTablet && window.mph?.['study-marquee-quiz-maker-mobile-sub-copy'])
     || window.mph?.[`study-marquee-${VERB}-sub-copy`] || '';
   const copy1 = createTag('p', { class: 'study-marquee-copy' }, copy1Text);
   const copy2 = createTag('p', { class: 'study-marquee-copy study-marquee-copy-sub' }, copy2Text);
-  const dropzone = createTag('div', { 
-    class: 'study-marquee-dropzone', 
-    id: 'drop-zone'
+  const dropzone = createTag('div', {
+    class: 'study-marquee-dropzone',
+    id: 'drop-zone',
   });
   const ctaButtonLabel = getCTA(VERB);
-  const ctaButton = createTag('button', { 
+  const ctaButton = createTag('button', {
     class: 'study-marquee-cta',
     type: 'button',
-    ...(ctaButtonLabel && { 'aria-label': ctaButtonLabel })
+    ...(ctaButtonLabel && { 'aria-label': ctaButtonLabel }),
   });
   const uploadIconSvg = createSvgElement('UPLOAD_ICON');
   if (uploadIconSvg) {
@@ -392,9 +391,9 @@ export default async function init(element) {
   const ctaLabel = createTag('span', { class: 'study-marquee-cta-label' }, ctaButtonLabel);
   ctaButton.appendChild(ctaLabel);
   const dragText = createTag('p', { class: 'study-marquee-drag' }, window.mph?.[`study-widget-${VERB}-dragndrop-text`] || '');
-  const fileLimitText = createTag('p', { 
+  const fileLimitText = createTag('p', {
     class: 'study-marquee-file-limit',
-    id: 'file-upload-description'
+    id: 'file-upload-description',
   }, window.mph?.[`study-widget-${VERB}-file-limit`] || '');
   const fileInput = createTag('input', {
     type: 'file',
@@ -405,19 +404,19 @@ export default async function init(element) {
     'aria-describedby': 'file-upload-description',
     ...(LIMITS[VERB]?.multipleFiles && { multiple: '' }),
   });
-  const errorState = createTag('div', { 
+  const errorState = createTag('div', {
     class: 'error hide',
     role: 'alert',
     'aria-live': 'assertive',
-    'aria-atomic': 'true'
+    'aria-atomic': 'true',
   });
-  const errorStateText = createTag('p', { 
+  const errorStateText = createTag('p', {
     class: 'study-marquee-errorText',
-    id: 'error-message'
+    id: 'error-message',
   });
-  const errorIcon = createTag('div', { 
+  const errorIcon = createTag('div', {
     class: 'study-marquee-errorIcon',
-    'aria-hidden': 'true'
+    'aria-hidden': 'true',
   });
   const errorCloseBtn = createTag('div', { class: 'study-marquee-errorBtn' });
   const closeIconSvg = createSvgElement('CLOSE_ICON');
@@ -435,14 +434,17 @@ export default async function init(element) {
   const touURL = window.mph?.['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
   const legalText = createTag('p', { class: 'study-marquee-legal' }, window.mph?.['study-marquee-legal-text'] || '');
   if (legalText.textContent) {
-    const createLegalLink = (text, url) => `<a class="study-marquee-legal-url" target="_blank" href="${url}">${text}</a>`;
+    const createLegalLink = (label, url) => `<a class="study-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
     const legalLinks = [
       ['Terms of Use', touURL],
       ['Privacy Policy', ppURL],
     ];
-    legalText.innerHTML = legalLinks.reduce((html, [text, url]) => {
-      return url ? html.replace(text, createLegalLink(text, url)) : html;
-    }, legalText.textContent);
+    legalText.innerHTML = legalLinks.reduce(
+      (html, [linkText, url]) => (url
+        ? html.replace(linkText, createLegalLink(linkText, url))
+        : html),
+      legalText.textContent,
+    );
   }
   const tooltipContent = window.mph?.['verb-widget-tool-tip'] || '';
   const infoIcon = createTag('button', {
@@ -459,7 +461,7 @@ export default async function init(element) {
   }
   const tooltipText = createTag('span', {
     id: 'info-tooltip-text',
-    class: 'hide'
+    class: 'hide',
   }, tooltipContent);
   infoIcon.appendChild(tooltipText);
   footer.append(legalText);
@@ -480,7 +482,7 @@ export default async function init(element) {
   foreground.innerHTML = '';
   foreground.append(container);
   element.append(errorState);
-  
+
   function handleAnalyticsEvent(
     eventName,
     metadata = {},
@@ -491,13 +493,13 @@ export default async function init(element) {
     if (!canSendDataToSplunk) return;
     window.analytics.sendAnalyticsToSplunk(eventName, VERB, metadata, getSplunkEndpoint());
   }
-  
+
   function registerTabCloseEvent(eventData, workflowStep) {
     window.addEventListener('beforeunload', (windowEvent) => {
       handleExit(windowEvent, VERB, eventData, false, workflowStep);
     });
   }
-  
+
   function handleUploadingEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     isUploading = true;
     exitFlag = false;
@@ -510,7 +512,7 @@ export default async function init(element) {
     setCookie('UTS_Uploading', Date.now(), cookieExp);
     registerTabCloseEvent(metadata, 'uploading');
   }
-  
+
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
     setTimeout(() => {
@@ -530,7 +532,14 @@ export default async function init(element) {
     setUser();
     incrementVerbKey(`${VERB}_attempts`);
   }
-  
+
+  const setDraggingClass = (shouldToggle) => {
+    if (shouldToggle) {
+      dropzone.classList.add('dragging');
+    } else {
+      dropzone.classList.remove('dragging');
+    }
+  };
   const handleError = (detail, logToLana = false, logOptions = {}) => {
     const { code, message, status, info = 'No additional info provided', accountType = 'Unknown account type' } = detail;
     if (message) {
@@ -550,14 +559,6 @@ export default async function init(element) {
       errorState.classList.add('hide');
       errorStateText.textContent = '';
     }, 5000);
-  }
-  
-  const setDraggingClass = (shouldToggle) => {
-    if (shouldToggle) {
-      dropzone.classList.add('dragging');
-    } else {
-      dropzone.classList.remove('dragging');
-    }
   };
   ctaButton.addEventListener('click', () => {
     fileInput.click();
@@ -589,7 +590,7 @@ export default async function init(element) {
     const { dataTransfer: { files } } = e;
     if (files.length > 0) {
       const dataTransfer = new DataTransfer();
-      Array.from(files).forEach(file => dataTransfer.items.add(file));
+      Array.from(files).forEach((file) => dataTransfer.items.add(file));
       fileInput.files = dataTransfer.files;
       const changeEvent = new Event('change', { bubbles: true });
       fileInput.dispatchEvent(changeEvent);
@@ -733,7 +734,7 @@ export default async function init(element) {
       document.cookie = `UTS_Redirect=${Date.now()};domain=.adobe.com;path=/;expires=${cookieExp}`;
     }
   });
-  
+
   async function checkSignedInUser() {
     if (!window.adobeIMS?.isSignedInUser?.()) return;
     element.classList.remove('upsell');
