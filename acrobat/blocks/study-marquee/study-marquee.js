@@ -1,8 +1,9 @@
 import { setLibs, isOldBrowser, loadPlaceholders } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
-const { createTag, getConfig } = await import(`${miloLibs}/utils/utils.js`);
-const { decorateBlockBg } = await import(`${miloLibs}/utils/decorate.js`);
+let createTag;
+let getConfig;
+let decorateBlockBg;
 
 const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 
@@ -269,6 +270,9 @@ function processMedia(mediaDiv) {
 }
 
 export default async function init(element) {
+  ({ createTag, getConfig } = (await import(`${miloLibs}/utils/utils.js`)));
+  ({ decorateBlockBg } = (await import(`${miloLibs}/utils/decorate.js`)));
+
   element.classList.add('con-block');
   if (isOldBrowser()) {
     window.location.href = EOLBrowserPage;
