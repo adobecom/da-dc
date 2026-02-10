@@ -178,7 +178,7 @@ describe('study-marquee block', () => {
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.study-marquee');
     await init(block);
-    await delay(100);    
+    await delay(100);
     const button = block.querySelector('button');
     expect(button).to.exist;
     expect(button.classList.contains('study-marquee-cta')).to.be.true;
@@ -283,3 +283,4 @@ describe('study-marquee block', () => {
     });
   });
 });
+
