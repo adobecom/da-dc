@@ -319,6 +319,10 @@ div.how-to ol li::before{
   margin-bottom: 10px;
 }
 
+main {
+  isolation: isolate;
+}
+
 :root:has(meta[name="typography"][content="studyspace"]) {
   main {
     .text-block [class*="heading-"] {
@@ -670,10 +674,6 @@ div.how-to ol li::before{
   [data-path*="caas"] .fragment {
     min-height: 1899px;
   }
-}
-
-main {
-  isolation: isolate;
 }
 
 /* Mobile Widget */
