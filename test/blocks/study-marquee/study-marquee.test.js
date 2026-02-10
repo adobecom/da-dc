@@ -2,8 +2,8 @@
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
+import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved
 import { delay } from '../../helpers/waitfor.js';
-import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
 
 const { default: init } = await import(
   '../../../acrobat/blocks/study-marquee/study-marquee.js'
@@ -169,9 +169,7 @@ describe('study-marquee block', () => {
     expect(verbAnalyticsCalls.length).to.be.greaterThan(0);
 
     expect(() => {
-      block.dispatchEvent(new CustomEvent('unity:track-analytics', {
-        detail: { event: 'unknown', data: {} },
-      }));
+      block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'unknown', data: {} } }));
     }).to.not.throw();
   });
 
@@ -180,8 +178,7 @@ describe('study-marquee block', () => {
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.study-marquee');
     await init(block);
-    await delay(100);
-    
+    await delay(100);    
     const button = block.querySelector('button');
     expect(button).to.exist;
     expect(button.classList.contains('study-marquee-cta')).to.be.true;

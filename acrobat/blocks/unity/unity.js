@@ -1,4 +1,3 @@
-
 import { LIMITS as VERB_WIDGET_LIMITS } from '../verb-widget/verb-widget.js';
 import { LIMITS as STUDY_MARQUEE_LIMITS } from '../study-marquee/study-marquee.js';
 
