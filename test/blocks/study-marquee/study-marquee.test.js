@@ -282,5 +282,4 @@ describe('study-marquee block', () => {
       writable: false,
     });
   });
-
 });
