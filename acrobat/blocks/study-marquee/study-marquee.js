@@ -480,7 +480,10 @@ export default async function init(element) {
     footer.append(infoIcon);
   }
   dropzone.append(ctaButton, dragText, fileLimitText);
-  leftCol.append(header, headingEl, copy1, ...(copy2Text ? [copy2] : []), dropzone, fileInput, footer);
+  const leftColChildren = [
+    header, headingEl, copy1, ...(copy2Text ? [copy2] : []), dropzone, fileInput, footer,
+  ];
+  leftCol.append(...leftColChildren);
   if (media) {
     const mediaWrapper = createTag('div', { class: 'study-marquee-media' });
     while (media.firstChild) {
