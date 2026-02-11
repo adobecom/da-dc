@@ -86,9 +86,10 @@
 }
 
 .study-marquee-title {
-  font-size: 18px;
-  line-height: 1.2;
+  font-size: 20px;
+  line-height: 1.25;
   font-weight: 700;
+  letter-spacing: -0.42px;
   color: inherit;
   margin: 0;
 }
@@ -248,8 +249,7 @@
 }
 
 .study-marquee-drag {
-  font-size: 16px;
-  line-height: 1.5;
+  display: none;
   color: #FFF;
   margin: 0;
   text-align: center;
@@ -263,8 +263,8 @@
 }
 
 .study-marquee-file-limit {
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.4;
   color: #FFF;
   margin: 0;
   text-align: center;
@@ -686,10 +686,6 @@
     height: 28px;
   }
 
-  .study-marquee-title {
-    font-size: 20px;
-  }
-
   .study-marquee-heading {
     font-size: 64px;
   }
@@ -703,18 +699,9 @@
     gap: 14px;
   }
 
-  .study-marquee-drag {
-    display: none;
-    font-size: 16px;
-  }
-
   .study-marquee-cta {
     font-size: 16px;
     padding: 11px 22px;
-  }
-
-  .study-marquee-file-limit {
-    font-size: 13px;
   }
 
   .study-marquee-footer {
@@ -776,7 +763,7 @@
   }
 
   .study-marquee-title {
-    font-size: clamp(18px, 1.5vw, 22px);
+    font-size: 21px;
   }
 
   .study-marquee-heading {
@@ -794,11 +781,11 @@
   }
 
   .study-marquee-drag {
-    font-size: clamp(14px, 1.2vw, 18px);
-  }
-
-  .study-marquee-file-limit {
-    font-size: clamp(12px, 0.9vw, 14px);
+    display: block;
+    max-width: 261px;
+    font-size: 18px;
+    line-height: 0.98;
+    letter-spacing: -0.54px;
   }
 
   .study-marquee-footer {
@@ -883,10 +870,6 @@
 
   .study-marquee-dropzone {
     padding: 32px 24px;
-  }
-
-  .study-marquee-drag {
-    display: none;
   }
 
   .study-marquee .milo-tooltip.top::before {
