@@ -53,7 +53,7 @@
 .study-marquee-col-left {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
   width: 100%;
   min-width: 0;
   overflow-wrap: break-word;
@@ -136,6 +136,10 @@
   opacity: 0.8;
 }
 
+.study-marquee-copy-sub:empty {
+  display: none;
+}
+
 .study-marquee.light .study-marquee-copy,
 .study-marquee.mobile-light .study-marquee-copy {
   color: #000;
@@ -162,8 +166,6 @@
   box-sizing: border-box;
   width: 100%;
   align-self: stretch;
-  margin-top: 8px;
-  margin-bottom: 8px;
 }
 
 .study-marquee-dropzone:hover {
@@ -678,7 +680,7 @@
   }
 
   .study-marquee-col-left {
-    gap: 20px;
+    gap: 32px;
   }
 
   .acrobat-icon {
@@ -750,7 +752,7 @@
 
   .study-marquee-col-left {
     min-width: 0;
-    gap: clamp(16px, 1.8vw, 24px);
+    gap: 32px;
   }
 
   .study-marquee-col-right {
