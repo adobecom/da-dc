@@ -27,6 +27,7 @@ export const LIMITS = {
     maxNumFiles: 100,
     multipleFiles: true,
     uploadType: 'multifile-only',
+    genAI: true,
   },
   'flashcard-maker': {
     maxFileSize: 104857600, // 100 MB
@@ -35,6 +36,7 @@ export const LIMITS = {
     maxNumFiles: 100,
     multipleFiles: true,
     uploadType: 'multifile-only',
+    genAI: true,
   },
 };
 
@@ -370,10 +372,12 @@ export default async function init(element) {
   header.append(iconWrapper, title);
   const headingEl = createTag('h1', { class: 'study-marquee-heading' }, heading);
   const isMobileOrTablet = window.innerWidth < 1200;
-  const copy1Text = (isMobileOrTablet && window.mph?.['study-marquee-quiz-maker-mobile-copy'])
-    || window.mph?.[`study-marquee-${VERB}-copy`] || '';
-  const copy2Text = (isMobileOrTablet && window.mph?.['study-marquee-quiz-maker-mobile-sub-copy'])
-    || window.mph?.[`study-marquee-${VERB}-sub-copy`] || '';
+  const copy1Text = isMobileOrTablet
+    ? (window.mph?.[`study-marquee-${VERB}-mobile-copy`] || window.mph?.[`study-marquee-${VERB}-copy`] || '')
+    : (window.mph?.[`study-marquee-${VERB}-copy`] || '');
+  const copy2Text = isMobileOrTablet
+    ? (window.mph?.[`study-marquee-${VERB}-mobile-sub-copy`] || window.mph?.[`study-marquee-${VERB}-sub-copy`] || '')
+    : (window.mph?.[`study-marquee-${VERB}-sub-copy`] || '');
   const copy1 = createTag('p', { class: 'study-marquee-copy' }, copy1Text);
   const copy2 = createTag('p', { class: 'study-marquee-copy study-marquee-copy-sub' }, copy2Text);
   const dropzone = createTag('div', {
@@ -436,17 +440,20 @@ export default async function init(element) {
   const { locale } = getConfig();
   const ppURL = window.mph?.['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
   const touURL = window.mph?.['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
+  const genAIurl = window.mph?.['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`;
   const legalText = createTag('p', { class: 'study-marquee-legal' }, window.mph?.['study-marquee-legal-text'] || '');
   if (legalText.textContent) {
     const createLegalLink = (label, url) => `<a class="study-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
     const legalLinks = [
-      ['Terms of Use', touURL],
-      ['Privacy Policy', ppURL],
+      ['verb-widget-terms-of-use', touURL],
+      ['verb-widget-privacy-policy', ppURL],
+      ...(LIMITS[VERB]?.genAI ? [['verb-widget-genai-guidelines', genAIurl]] : []),
     ];
     legalText.innerHTML = legalLinks.reduce(
-      (html, [linkText, url]) => (url
-        ? html.replace(linkText, createLegalLink(linkText, url))
-        : html),
+      (html, [key, url]) => {
+        const linkText = window.mph?.[key];
+        return linkText ? html.replace(linkText, createLegalLink(linkText, url)) : html;
+      },
       legalText.textContent,
     );
   }
