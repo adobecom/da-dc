@@ -305,6 +305,12 @@ function initiatePrefetch(url) {
   }
 }
 
+function addCookieIfSubdomain() {
+  if (['acrobat.adobe.com', 'stage.acrobat.adobe.com'].includes(window.location.hostname)) {
+    document.cookie = `dc_fl=1;domain=.adobe.com;path=/;expires=${new Date(Date.now() + 30 * 1000).toUTCString()}`;
+  }
+}
+
 function redDirLink(verb) {
   const hostname = window?.location?.hostname;
   const ENV = getEnv();
@@ -1021,7 +1027,10 @@ export default async function init(element) {
       uploading: () => handleUploadingEvent(data, userAttempts, cookieExp, canSendDataToSplunk),
       uploaded: () => handleUploadedEvent(data, userAttempts, cookieExp, canSendDataToSplunk),
       redirectUrl: () => {
-        if (data) initiatePrefetch(data.redirectUrl);
+        if (data) {
+          addCookieIfSubdomain();
+          initiatePrefetch(data.redirectUrl);
+        }
         handleAnalyticsEvent('job:redirect-success', metadata, false, canSendDataToSplunk);
       },
       chunk_uploaded: () => {
