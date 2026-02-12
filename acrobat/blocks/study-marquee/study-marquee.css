@@ -156,7 +156,7 @@
 .study-marquee-dropzone {
   border: 1.043px dashed #8F8F8F;
   border-radius: 24px;
-  padding: 40px 32px;
+  padding: 34px 10px;
   background: #393939;
   display: flex;
   flex-direction: column;
@@ -226,12 +226,12 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 12px 24px 14px;
   background-color: #1473E6;
   color: #FFF;
   border: none;
   border-radius: 100px;
-  font-size: 17px;
+  font-size: 19px;
   line-height: 1.4;
   font-weight: 700;
   cursor: pointer;
@@ -256,6 +256,7 @@
   color: #FFF;
   margin: 0;
   text-align: center;
+  font-weight: 800;
 }
 
 .study-marquee.light .study-marquee-drag,
@@ -422,7 +423,7 @@
 .study-marquee.mobile-light .study-marquee-legal,
 .study-marquee.tablet-light .study-marquee-legal,
 .study-marquee.desktop-light .study-marquee-legal {
-  color: #6d6d6d;
+  color: #464646;
 }
 
 .study-marquee.light .study-marquee-legal a,
@@ -690,17 +691,11 @@
   }
 
   .study-marquee-copy {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .study-marquee-dropzone {
-    padding: 32px 24px;
     gap: 14px;
-  }
-
-  .study-marquee-cta {
-    font-size: 16px;
-    padding: 11px 22px;
   }
 
   .study-marquee-footer {
@@ -766,14 +761,12 @@
     letter-spacing: -4.32px;
   }
 
-  .study-marquee-dropzone {
-    padding: clamp(24px, 2.5vw, 40px) clamp(20px, 2vw, 32px);
-    gap: clamp(12px, 1vw, 16px);
+  .study-marquee-copy {
+    font-size: 24px;
   }
 
-  .study-marquee-cta {
-    font-size: clamp(14px, 1.1vw, 17px);
-    padding: clamp(10px, 0.8vw, 12px) clamp(20px, 1.5vw, 24px);
+  .study-marquee-dropzone {
+    gap: clamp(12px, 1vw, 16px);
   }
 
   .study-marquee-drag {
@@ -862,10 +855,6 @@
   .study-marquee-errorBtn {
     width: 28px;
     height: 28px;
-  }
-
-  .study-marquee-dropzone {
-    padding: 32px 24px;
   }
 
   .study-marquee .milo-tooltip.top::before {
