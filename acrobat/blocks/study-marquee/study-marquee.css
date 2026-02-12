@@ -184,9 +184,9 @@
 .study-marquee.mobile-light .study-marquee-dropzone,
 .study-marquee.tablet-light .study-marquee-dropzone,
 .study-marquee.desktop-light .study-marquee-dropzone {
-  border: 3px dashed #d5d5d5;
-  border-radius: 16px;
-  background-color: rgb(255 255 255 / 60%);
+  border: 1px dashed #8F8F8F;
+  border-radius: 24px;
+  background-color: #F7F7F7;
   backdrop-filter: blur(10px);
 }
 
