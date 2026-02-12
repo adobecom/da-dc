@@ -70,7 +70,7 @@
 .study-marquee-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .study-marquee .acrobat-icon {
@@ -101,14 +101,15 @@
 .study-marquee-heading {
   font-family: "Adobe Clean Black", var(--body-font-family);
   font-size: 44px;
-  line-height: 1.1;
+  line-height: 1.25;
   font-weight: 900;
   color: inherit;
   margin: 0;
+  margin-top: -24px; /* 8px gap from title (column gap 32px − 24px) */
   word-break: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
-  letter-spacing: -0.045em;
+  letter-spacing: -2.88px;
 }
 
 .study-marquee.light .study-marquee-heading,
@@ -690,6 +691,7 @@
 
   .study-marquee-heading {
     font-size: 64px;
+    line-height: 0.98;
   }
 
   .study-marquee-copy {
@@ -770,6 +772,8 @@
 
   .study-marquee-heading {
     font-size: 96px;
+    line-height: 0.98;
+    letter-spacing: -4.32px;
   }
 
   .study-marquee-dropzone {
