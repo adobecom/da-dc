@@ -305,10 +305,24 @@ function initiatePrefetch(url) {
   }
 }
 
+function isSubdomain() {
+  return ['acrobat.adobe.com', 'stage.acrobat.adobe.com'].includes(window.location.hostname);
+}
+
 function addCookieIfSubdomain() {
-  if (['acrobat.adobe.com', 'stage.acrobat.adobe.com'].includes(window.location.hostname)) {
+  if (isSubdomain()) {
     document.cookie = `dc_fl=1;domain=.adobe.com;path=/;expires=${new Date(Date.now() + 30 * 1000).toUTCString()}`;
   }
+}
+
+function initPrerender(url) {
+  if (!url || !HTMLScriptElement?.supports('speculationrules') || !isSubdomain()) {
+    return;
+  }
+  const specScript = document.createElement('script');
+  specScript.type = 'speculationrules';
+  specScript.textContent = JSON.stringify({ prerender: [{ urls: [url] }] });
+  document.head.appendChild(specScript);
 }
 
 function redDirLink(verb) {
@@ -1030,6 +1044,7 @@ export default async function init(element) {
         if (data) {
           addCookieIfSubdomain();
           initiatePrefetch(data.redirectUrl);
+          initPrerender(data.redirectUrl);
         }
         handleAnalyticsEvent('job:redirect-success', metadata, false, canSendDataToSplunk);
       },
