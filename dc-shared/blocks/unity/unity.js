@@ -97,7 +97,7 @@ function getUnityLibs(prodLibs = '/unitylibs') {
   const { hostname, search } = window.location;
   if (hostname === 'acrobat.adobe.com') return 'https://www.adobe.com/unitylibs';
   if (hostname === 'stage.acrobat.adobe.com' && !(new URLSearchParams(search).get('unitylibs'))) return 'https://www.stage.adobe.com/unitylibs';
-  if (!/\.hlx\.|\.aem\.|local|stage/.test(hostname)) return prodLibs;
+  if (!['.aem.', '.hlx.', '.stage.', 'local', '.da.'].some((i) => hostname.includes(i))) return prodLibs;
   // eslint-disable-next-line compat/compat
   const branch = new URLSearchParams(search).get('unitylibs') || 'main';
   if (branch === 'main' && hostname === 'www.stage.adobe.com') return prodLibs;

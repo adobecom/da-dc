@@ -48,7 +48,7 @@ describe('verb-widget block', () => {
 
   it('log lana for no svg', async () => {
     const conf = getConfig();
-    setConfig({ ...conf, locale: { prefix: '' }, codeRoot: '/acrobat' });
+    setConfig({ ...conf, locale: { prefix: '' }, codeRoot: '/dc-shared' });
     const block = document.body.querySelector('.verb-widget');
     await init(block);
     expect(window.lana.log.calledOnce).to.be.true;
