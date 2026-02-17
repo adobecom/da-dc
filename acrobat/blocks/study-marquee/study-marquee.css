@@ -194,8 +194,8 @@
 .study-marquee.mobile-light .study-marquee-dropzone:hover,
 .study-marquee.tablet-light .study-marquee-dropzone:hover,
 .study-marquee.desktop-light .study-marquee-dropzone:hover {
-  border-color: #909090;
-  background-color: rgb(255 255 255 / 80%);
+  border-color: #1473E6;
+  background-color: #FFFFFF;
 }
 
 .study-marquee-dropzone.dragging {
