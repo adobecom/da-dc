@@ -2,10 +2,10 @@
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
+import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved
 import { delay } from '../../helpers/waitfor.js';
-import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
 
-const { default: init } = await import(
+const { default: init, LIMITS } = await import(
   '../../../acrobat/blocks/study-marquee/study-marquee.js'
 );
 
@@ -40,6 +40,14 @@ describe('study-marquee block', () => {
     sinon.restore();
   });
 
+  it('exports LIMITS for quiz-maker and flashcard-maker', () => {
+    expect(LIMITS).to.have.property('quiz-maker');
+    expect(LIMITS).to.have.property('flashcard-maker');
+    expect(LIMITS['quiz-maker'].acceptedFiles).to.be.an('array');
+    expect(LIMITS['quiz-maker'].maxFileSize).to.equal(104857600);
+    expect(LIMITS['flashcard-maker'].multipleFiles).to.be.true;
+  });
+
   it('init study-marquee', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
@@ -47,6 +55,17 @@ describe('study-marquee block', () => {
     await init(block);
     expect(document.querySelector('.study-marquee .acrobat-icon svg')).to.exist;
     expect(document.querySelector('.study-marquee .info-icon svg')).to.exist;
+  });
+
+  it('init flashcard-maker block', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.remove('quiz-maker');
+    block.classList.add('flashcard-maker');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.classList.contains('flashcard-maker')).to.be.true;
+    expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
   });
 
   it('signed in', async () => {
@@ -92,6 +111,37 @@ describe('study-marquee block', () => {
     expect(window.analytics.sendAnalyticsToSplunk.called).to.be.true;
 
     expect(window.lana.log.called).to.be.true;
+  });
+
+  it('error close button hides error state', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Error', sendToSplunk: false } }));
+    await delay(50);
+
+    const errorCloseBtn = block.querySelector('.study-marquee-errorBtn');
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+    errorCloseBtn.click();
+    expect(errorState.classList.contains('hide')).to.be.true;
+  });
+
+  it('cookie_not_set error does not send to Splunk', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_cookie_not_set', message: 'Cookie not set', sendToSplunk: true } }));
+
+    expect(window.analytics.sendAnalyticsToSplunk.called).to.be.false;
   });
 
   it('track analytics', async () => {
@@ -169,10 +219,60 @@ describe('study-marquee block', () => {
     expect(verbAnalyticsCalls.length).to.be.greaterThan(0);
 
     expect(() => {
-      block.dispatchEvent(new CustomEvent('unity:track-analytics', {
-        detail: { event: 'unknown', data: {} },
-      }));
+      block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'unknown', data: {} } }));
     }).to.not.throw();
+  });
+
+  it('dropzone click triggers file input', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    const fileInput = block.querySelector('#file-upload');
+    const dropzone = block.querySelector('.study-marquee-dropzone');
+    const clickSpy = sinon.spy(fileInput, 'click');
+    const dragText = dropzone.querySelector('.study-marquee-drag');
+    dragText.click();
+    expect(clickSpy.called).to.be.true;
+  });
+
+  it('dragleave removes dragging-block class', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    block.dispatchEvent(new DragEvent('dragover', { bubbles: true, dataTransfer: new DataTransfer() }));
+    expect(block.classList.contains('dragging-block')).to.be.true;
+    block.dispatchEvent(new DragEvent('dragleave', { bubbles: true, relatedTarget: null }));
+    expect(block.classList.contains('dragging-block')).to.be.false;
+  });
+
+  it('file input cancel fires analytics', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+    const fileInput = block.querySelector('#file-upload');
+    fileInput.dispatchEvent(new Event('cancel', { bubbles: true }));
+    expect(window.analytics.verbAnalytics.calledWith('choose-file:close')).to.be.true;
+  });
+
+  it('legal footer contains Terms of Use and Privacy Policy links', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    const legalEl = block.querySelector('.study-marquee-legal');
+    expect(legalEl).to.exist;
+    const links = legalEl.querySelectorAll('a.study-marquee-legal-url');
+    const hrefs = Array.from(links).map((a) => a.getAttribute('href'));
+    expect(hrefs.some((h) => h && h.includes('terms'))).to.be.true;
+    expect(hrefs.some((h) => h && h.includes('privacy'))).to.be.true;
   });
 
   it('upload button exists', async () => {
@@ -181,7 +281,6 @@ describe('study-marquee block', () => {
     const block = document.body.querySelector('.study-marquee');
     await init(block);
     await delay(100);
-    
     const button = block.querySelector('button');
     expect(button).to.exist;
     expect(button.classList.contains('study-marquee-cta')).to.be.true;
@@ -285,5 +384,4 @@ describe('study-marquee block', () => {
       writable: false,
     });
   });
-
 });
