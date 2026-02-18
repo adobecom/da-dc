@@ -7,7 +7,7 @@
 <script>
   window.setLibs = (prodLibs, location = window.location) => {
     const { hostname, search } = location;
-    if (!/\.hlx\.|\.aem\.|local|stage/.test(hostname)) return prodLibs;
+    if (!['.aem.', '.hlx.', '.stage.', 'local', '.da.'].some((i) => hostname.includes(i))) return prodLibs;
     const branch = new URLSearchParams(search).get('milolibs') || 'main';
     if (branch === 'main' && hostname === 'www.stage.adobe.com') return '/libs';
     if (branch === 'local') return 'http://localhost:6456/libs';
@@ -17,7 +17,7 @@
 
   window.getUnityLibs = (prodLibs = '/unitylibs') => {
     const { hostname, search } = window.location;
-    if (!/\.hlx\.|\.aem\.|local|stage/.test(hostname)) return prodLibs;
+    if (!['.aem.', '.hlx.', '.stage.', 'local', '.da.'].some((i) => hostname.includes(i))) return prodLibs;
     const branch = new URLSearchParams(search).get('unitylibs') || 'main';
     if (branch === 'main' && hostname === 'www.stage.adobe.com') return prodLibs;
     const env = hostname.includes('.hlx.') ? 'hlx' : 'aem';
