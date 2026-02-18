@@ -175,9 +175,9 @@
 }
 
 .study-marquee.dragging-block .study-marquee-dropzone {
-  border-color: #1473E6;
-  background-color: rgb(20 115 230 / 10%);
-  border-style: solid;
+  border-color: #B8B8B8;
+  background: #4D4D4D;
+  border-style: dashed;
 }
 
 .study-marquee.light .study-marquee-dropzone,
@@ -199,26 +199,31 @@
 }
 
 .study-marquee-dropzone.dragging {
-  background-color: #ecf5ff;
-  border-color: #0265dc;
-  border-style: solid;
+  border-color: #B8B8B8;
+  background: #4D4D4D;
+  border-style: dashed;
 }
 
 .study-marquee.dragging-block {
-  outline: 3px dashed #1473E6;
-  outline-offset: -6px;
+  outline: none;
 }
 
 .study-marquee.dragging-block::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgb(20 115 230 / 3%);
-  pointer-events: none;
-  z-index: 1;
+  display: none;
+}
+
+/* Light: drag/drop dropzone same as hover */
+.study-marquee.light.dragging-block .study-marquee-dropzone,
+.study-marquee.mobile-light.dragging-block .study-marquee-dropzone,
+.study-marquee.tablet-light.dragging-block .study-marquee-dropzone,
+.study-marquee.desktop-light.dragging-block .study-marquee-dropzone,
+.study-marquee.light .study-marquee-dropzone.dragging,
+.study-marquee.mobile-light .study-marquee-dropzone.dragging,
+.study-marquee.tablet-light .study-marquee-dropzone.dragging,
+.study-marquee.desktop-light .study-marquee-dropzone.dragging {
+  border-color: #1473E6;
+  background-color: #FFFFFF;
+  border-style: dashed;
 }
 
 .study-marquee-cta {
