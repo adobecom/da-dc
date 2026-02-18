@@ -339,7 +339,7 @@ function redDirLink(verb) {
 }
 
 function redDir(verb) {
-  window.location.href = redDirLink(verb);
+  //window.location.href = redDirLink(verb);
 }
 
 function getSplunkEndpoint() {

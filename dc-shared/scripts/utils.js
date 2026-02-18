@@ -54,6 +54,7 @@ export function getEnv() {
       'stage--dc--adobecom.aem.live',
       'main--dc--adobecom.aem.live',
       'www.stage.adobe.com',
+      'stage.acrobat.adobe.com',
     ].includes(hostname)
   ) return 'stage';
   return 'dev';
