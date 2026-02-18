@@ -170,13 +170,13 @@
 }
 
 .study-marquee-dropzone:hover {
-  border-color: #B8B8B8;
-  background: #4D4D4D;
+  border-color: #FFFFFF;
+  background: #2D2D2D;
 }
 
 .study-marquee.dragging-block .study-marquee-dropzone {
-  border-color: #B8B8B8;
-  background: #4D4D4D;
+  border-color: #FFFFFF;
+  background: #2D2D2D;
   border-style: dashed;
 }
 
@@ -199,8 +199,8 @@
 }
 
 .study-marquee-dropzone.dragging {
-  border-color: #B8B8B8;
-  background: #4D4D4D;
+  border-color: #FFFFFF;
+  background: #2D2D2D;
   border-style: dashed;
 }
 
