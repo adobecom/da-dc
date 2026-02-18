@@ -1044,7 +1044,8 @@ export default async function init(element) {
         if (data) {
           addCookieIfSubdomain();
           initiatePrefetch(data.redirectUrl);
-          initPrerender(data.redirectUrl);
+          // TODO: add back once analytics can handle prerender
+          // initPrerender(data.redirectUrl);
         }
         handleAnalyticsEvent('job:redirect-success', metadata, false, canSendDataToSplunk);
       },
