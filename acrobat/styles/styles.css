@@ -319,6 +319,160 @@ div.how-to ol li::before{
   margin-bottom: 10px;
 }
 
+main {
+  isolation: isolate;
+}
+
+:root:has(meta[name="typography"][content="studyspace"]) {
+  main {
+    .text-block [class*="heading-"] {
+      line-height: 1;
+      font-weight: 800;
+      font-size: 36px;
+      font-family: "Adobe Clean ExtraBold", var(--body-font-family);
+      letter-spacing: -0.04em;
+    }
+
+    .text-block [class*="body-"] {
+      line-height: 1.5;
+      font-size: 20px;
+      font-weight: 400;
+    }
+
+    .hero-marquee [class*="body-"] {
+      line-height: 1.5;
+      font-size: 20px;
+    }
+
+    .hero-marquee [class*="heading-"] {
+      line-height: 1.25;
+      font-weight: 900;
+      font-size: 44px;
+      font-family: "Adobe Clean Black", var(--body-font-family);
+    }
+
+    .quote .quote-copy {
+      font-family: "Adobe Clean ExtraBold", var(--body-font-family);
+      line-height: 1.25;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .quote .figcaption {
+      font-family: "Adobe Clean Bold", var(--body-font-family);
+      line-height: 1.5;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .quote figcaption cite p {
+      font-family: "Adobe Clean Italic", var(--body-font-family);
+      line-height: 1.5;
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    .editorial-card [class*="heading-"],
+    .icon-block [class*="heading-"] {
+      font-family: "Adobe Clean ExtraBold", var(--body-font-family);
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+      font-size: 20px;
+    }
+
+    .icon-block [class*="heading-"] {
+      letter-spacing: -0.035em;
+    }
+
+    .media [class*="heading-"] {
+      font-family: "Adobe Clean ExtraBold", var(--body-font-family);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-size: 36px;
+    }
+
+    .media [class*="body-"] {
+      line-height: 1.5;
+      font-size: 18px;
+    }
+
+    .media.medium-compact [class*="heading-"] {
+      line-height: 0.98 !important;
+    }
+
+    @media screen and (min-width: 600px) and (max-width: 1199px) {
+      .text-block [class*="heading-"] {
+        line-height: 0.98;
+        font-size: 42px;
+      }
+
+      .text-block [class*="body-"],
+      .hero-marquee [class*="body-"] {
+        font-size: 24px;
+      }
+
+      .hero-marquee [class*="heading-"] {
+        line-height: 0.98;
+        font-size: 64px;
+        letter-spacing: -0.045em;
+      }
+
+      .quote .quote-copy {
+        font-size: 32px;
+      }
+
+      .media [class*="heading-"] {
+        line-height: 0.98;
+        font-size: 42px;
+      }
+    }
+
+    @media screen and (min-width: 1200px) {
+      .text-block [class*="heading-"] {
+        line-height: 0.98;
+        font-size: 64px;
+      }
+
+      .text-block [class*="body-"],
+      .hero-marquee [class*="body-"] {
+        font-size: 24px;
+      }
+
+      .hero-marquee [class*="heading-"] {
+        line-height: 0.98;
+        font-size: 96px;
+        letter-spacing: -0.045em;
+      }
+
+      .editorial-card [class*="heading-"],
+      .icon-block [class*="heading-"] {
+        font-size: 24px;
+      }
+
+      .quote .quote-copy {
+        font-size: 42px;
+      }
+
+      .media [class*="heading-"] {
+        line-height: 0.98;
+        font-size: 64px;
+      }
+
+      .media [class*="body-"] {
+        font-size: 20px;
+      }
+
+      .media.medium-compact [class*="heading-"] {
+        line-height: 1.25 !important;
+        font-size: 54px !important;
+      }
+    }
+  }
+}
+
 #CID div,
 #CID p,
 #CID span,
@@ -520,10 +674,6 @@ div.how-to ol li::before{
   [data-path*="caas"] .fragment {
     min-height: 1899px;
   }
-}
-
-main {
-  isolation: isolate;
 }
 
 /* Mobile Widget */
