@@ -631,6 +631,14 @@ window.addEventListener('analyticsLoad', async ({ detail }) => {
 });
 
 export default async function init(element) {
+  if (window.adobeIMS?.isSignedInUser() && !localStorage.getItem('signed_in_reload')) {
+    localStorage.setItem('signed_in_reload', 'true');
+    console.log('instant reload');
+    window.location.reload();
+    return;
+  }
+  localStorage.removeItem('signed_in_reload');
+
   ({
     createTag, getConfig, loadBlock, getMetadata, loadIms, loadScript,
   } = await import(`${miloLibs}/utils/utils.js`));
