@@ -68,34 +68,31 @@ function getEnv() {
 
 function redDirLink(verb) {
   const hostname = window?.location?.hostname;
-  const ENV = getEnv();
-  const VERB = verb;
-  let newLocation;
-  if (hostname !== 'www.adobe.com') {
-    newLocation = `https://www.adobe.com/go/acrobat-${VERB.split('-').join('')}-${ENV}`;
-  } else {
-    newLocation = `https://www.adobe.com/go/acrobat-${VERB.split('-').join('')}`;
-  }
-  return newLocation;
+  const env = getEnv();
+  const verbSlug = verb.split('-').join('');
+  return hostname !== 'www.adobe.com'
+    ? `https://www.adobe.com/go/acrobat-${verbSlug}-${env}`
+    : `https://www.adobe.com/go/acrobat-${verbSlug}`;
 }
 
 function redDir(verb) {
   window.location.href = redDirLink(verb);
 }
 
-function isMobileDevice() {
+function getDeviceType() {
   const ua = navigator.userAgent.toLowerCase();
-  const isMobileUA = /android|iphone|ipod|blackberry|windows phone/i.test(ua);
-  return isMobileUA;
+  const isMobile = /android|iphone|ipod|blackberry|windows phone/i.test(ua);
+  const isIPadOS = navigator.userAgent.includes('Mac') && 'ontouchend' in document && !/iphone|ipod/i.test(ua);
+  const isTablet = isIPadOS || /ipad|android(?!.*mobile)/i.test(ua);
+  return { isMobile, isTablet };
+}
+
+function isMobileDevice() {
+  return getDeviceType().isMobile;
 }
 
 function isTabletDevice() {
-  const ua = navigator.userAgent.toLowerCase();
-  const isIPadOS = navigator.userAgent.includes('Mac')
-    && 'ontouchend' in document
-    && !/iphone|ipod/i.test(ua);
-  const isTabletUA = /ipad|android(?!.*mobile)/i.test(ua);
-  return isIPadOS || isTabletUA;
+  return getDeviceType().isTablet;
 }
 
 function getSplunkEndpoint() {
@@ -434,8 +431,7 @@ export default async function init(element) {
     errorCloseBtn.prepend(closeIconSvg);
   }
   errorState.append(errorIcon, errorStateText, errorCloseBtn);
-  const isMobile = isMobileDevice();
-  const isTablet = isTabletDevice();
+  const { isMobile, isTablet } = getDeviceType();
   const footer = createTag('div', { class: 'study-marquee-footer' });
   const { locale } = getConfig();
   const ppURL = window.mph?.['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
@@ -548,11 +544,7 @@ export default async function init(element) {
   }
 
   const setDraggingClass = (shouldToggle) => {
-    if (shouldToggle) {
-      dropzone.classList.add('dragging');
-    } else {
-      dropzone.classList.remove('dragging');
-    }
+    dropzone.classList.toggle('dragging', !!shouldToggle);
   };
   const handleError = (detail, logToLana = false, logOptions = {}) => {
     const { code, message, status, info = 'No additional info provided', accountType = 'Unknown account type' } = detail;
