@@ -87,14 +87,6 @@ function getDeviceType() {
   return { isMobile, isTablet };
 }
 
-function isMobileDevice() {
-  return getDeviceType().isMobile;
-}
-
-function isTabletDevice() {
-  return getDeviceType().isTablet;
-}
-
 function getSplunkEndpoint() {
   return (getEnv() === 'prod') ? 'https://unity.adobe.io/api/v1/log' : 'https://unity-stage.adobe.io/api/v1/log';
 }
