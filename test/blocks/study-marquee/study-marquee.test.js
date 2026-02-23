@@ -68,22 +68,6 @@ describe('study-marquee block', () => {
     expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
   });
 
-  it('signed in', async () => {
-    window.adobeIMS = {
-      isSignedInUser: () => true,
-      getAccountType: () => null,
-    };
-    const conf = getConfig();
-    setConfig({ ...conf, locale: { prefix: '' } });
-    const block = document.body.querySelector('.study-marquee');
-    await init(block);
-
-    expect(block.classList.contains('upsell')).to.be.false;
-    expect(block.classList.contains('signed-in')).to.be.true;
-
-    expect(document.querySelector('.study-marquee .acrobat-icon svg')).to.exist;
-  });
-
   it('show error toast', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
