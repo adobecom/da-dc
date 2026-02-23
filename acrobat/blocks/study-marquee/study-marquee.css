@@ -128,7 +128,7 @@
 }
 
 .study-marquee-copy-sub {
-  font-size: 20px;
+  font-size: 18px;
   font-style: normal;
   font-weight: 700;
   line-height: 0.98;
@@ -699,6 +699,10 @@
     font-size: 24px;
   }
 
+  .study-marquee-copy-sub {
+    font-size: 20px;
+  }
+
   .study-marquee-dropzone {
     gap: 14px;
   }
@@ -768,6 +772,10 @@
 
   .study-marquee-copy {
     font-size: 24px;
+  }
+
+  .study-marquee-copy-sub {
+    font-size: 20px;
   }
 
   .study-marquee-dropzone {
