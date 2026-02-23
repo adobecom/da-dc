@@ -78,14 +78,6 @@ function redDir(verb) {
   window.location.href = redDirLink(verb);
 }
 
-function getDeviceType() {
-  const ua = navigator.userAgent.toLowerCase();
-  const isMobile = /android|iphone|ipod|blackberry|windows phone/i.test(ua);
-  const isIPadOS = navigator.userAgent.includes('Mac') && 'ontouchend' in document && !/iphone|ipod/i.test(ua);
-  const isTablet = isIPadOS || /ipad|android(?!.*mobile)/i.test(ua);
-  return { isMobile, isTablet };
-}
-
 function getSplunkEndpoint() {
   return (getEnv() === 'prod') ? 'https://unity.adobe.io/api/v1/log' : 'https://unity-stage.adobe.io/api/v1/log';
 }
@@ -422,7 +414,6 @@ export default async function init(element) {
     errorCloseBtn.prepend(closeIconSvg);
   }
   errorState.append(errorIcon, errorStateText, errorCloseBtn);
-  const { isMobile, isTablet } = getDeviceType();
   const footer = createTag('div', { class: 'study-marquee-footer' });
   const { locale } = getConfig();
   const ppURL = window.mph?.['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
@@ -462,10 +453,7 @@ export default async function init(element) {
     class: 'hide',
   }, tooltipContent);
   infoIcon.appendChild(tooltipText);
-  footer.append(legalText);
-  if (!isMobile || isTablet) {
-    footer.append(infoIcon);
-  }
+  footer.append(legalText, infoIcon);
   dropzone.append(ctaButton, dragText, fileLimitText);
   const leftColChildren = [
     header, headingEl, copy1, ...(copy2Text ? [copy2] : []), dropzone, fileInput, footer,
