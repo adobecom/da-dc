@@ -61,8 +61,7 @@ const getCTA = (verb) => {
 
 function getEnv() {
   const { hostname } = window.location;
-  if (hostname.includes('localhost') || hostname.includes('.hlx.')) return 'stage';
-  if (hostname.includes('stage.adobe.com')) return 'stage';
+  if (['localhost', '.hlx.', '.aem.', 'stage.adobe.com'].some((p) => hostname.includes(p))) return 'stage';
   return 'prod';
 }
 
@@ -408,7 +407,7 @@ export default async function init(element) {
     'aria-atomic': 'true',
   });
   const errorStateText = createTag('p', {
-    class: 'study-marquee-errorText',
+    class: 'study-marquee-error-text',
     id: 'error-message',
   });
   const errorIcon = createTag('div', {
@@ -735,8 +734,6 @@ export default async function init(element) {
 
   async function checkSignedInUser() {
     if (!window.adobeIMS?.isSignedInUser?.()) return;
-    element.classList.remove('upsell');
-    element.classList.add('signed-in');
     let accountType;
     try {
       accountType = window.adobeIMS.getAccountType();
