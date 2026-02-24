@@ -335,7 +335,6 @@ const CONFIG = {
       'news.adobe.com': 'news.adobe.com',
     },
     'stage.acrobat.adobe.com': {
-      'acrobat.adobe.com': 'origin',
       'www.adobe.com': 'www.stage.adobe.com',
       'business.adobe.com': 'business.stage.adobe.com',
       'blog.adobe.com': 'blog.stage.adobe.com',
