@@ -312,7 +312,8 @@ const CONFIG = {
   prodDomains: ['www.adobe.com', 'acrobat.adobe.com', 'business.adobe.com', 'helpx.adobe.com'],
   clientEnv: window.location.hostname === 'stage.acrobat.adobe.com' ? 'stage' : null,
   stageDomainsMap: {
-    '--dc--adobecom.(hlx|aem).page': {
+    '--dc-frictionless--adobecom.(hlx|aem).page': {
+      'acrobat.adobe.com': 'stage.acrobat.adobe.com',
       'www.adobe.com': 'www.stage.adobe.com',
       'business.adobe.com': 'business.adobe.com',
       'blog.adobe.com': 'blog.adobe.com',
@@ -322,7 +323,8 @@ const CONFIG = {
       'milo.adobe.com': 'milo.adobe.com',
       'news.adobe.com': 'news.adobe.com',
     },
-    '--dc--adobecom.(hlx|aem).live': {
+    '--dc-frictionless--adobecom.(hlx|aem).live': {
+      'acrobat.adobe.com': 'acrobat.adobe.com',
       'www.adobe.com': 'www.adobe.com',
       'business.adobe.com': 'business.adobe.com',
       'blog.adobe.com': 'blog.adobe.com',
@@ -332,8 +334,9 @@ const CONFIG = {
       'milo.adobe.com': 'milo.adobe.com',
       'news.adobe.com': 'news.adobe.com',
     },
-    'www.stage.adobe.com': {
-      'www.adobe.com': 'origin',
+    'stage.acrobat.adobe.com': {
+      'acrobat.adobe.com': 'origin',
+      'www.adobe.com': 'www.stage.adobe.com',
       'business.adobe.com': 'business.stage.adobe.com',
       'blog.adobe.com': 'blog.stage.adobe.com',
       'developer.adobe.com': 'developer-stage.adobe.com',
