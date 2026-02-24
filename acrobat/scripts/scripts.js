@@ -401,7 +401,7 @@ replaceDotMedia(document);
 
 // Default to loading the first image as eager.
 (async function loadLCPImage() {
-  const blocks = '.marquee,.hero-marquee';
+  const blocks = '.marquee,.hero-marquee,.study-marquee';
   const marquee = document.querySelector(blocks); // first marquee only
   if (marquee) {
     if (window?.browser?.isMobile) {
