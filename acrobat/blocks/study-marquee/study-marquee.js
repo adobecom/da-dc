@@ -1,3 +1,4 @@
+
 import { setLibs, isOldBrowser, loadPlaceholders } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
@@ -61,8 +62,7 @@ const getCTA = (verb) => {
 
 function getEnv() {
   const { hostname } = window.location;
-  if (hostname.includes('localhost') || hostname.includes('.hlx.')) return 'stage';
-  if (hostname.includes('stage.adobe.com')) return 'stage';
+  if (['localhost', '.hlx.', '.aem.', 'stage.adobe.com'].some((p) => hostname.includes(p))) return 'stage';
   return 'prod';
 }
 
@@ -77,14 +77,6 @@ function redDirLink(verb) {
 
 function redDir(verb) {
   window.location.href = redDirLink(verb);
-}
-
-function getDeviceType() {
-  const ua = navigator.userAgent.toLowerCase();
-  const isMobile = /android|iphone|ipod|blackberry|windows phone/i.test(ua);
-  const isIPadOS = navigator.userAgent.includes('Mac') && 'ontouchend' in document && !/iphone|ipod/i.test(ua);
-  const isTablet = isIPadOS || /ipad|android(?!.*mobile)/i.test(ua);
-  return { isMobile, isTablet };
 }
 
 function getSplunkEndpoint() {
@@ -408,7 +400,7 @@ export default async function init(element) {
     'aria-atomic': 'true',
   });
   const errorStateText = createTag('p', {
-    class: 'study-marquee-errorText',
+    class: 'study-marquee-error-text',
     id: 'error-message',
   });
   const errorIcon = createTag('div', {
@@ -423,7 +415,6 @@ export default async function init(element) {
     errorCloseBtn.prepend(closeIconSvg);
   }
   errorState.append(errorIcon, errorStateText, errorCloseBtn);
-  const { isMobile, isTablet } = getDeviceType();
   const footer = createTag('div', { class: 'study-marquee-footer' });
   const { locale } = getConfig();
   const ppURL = window.mph?.['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
@@ -463,10 +454,7 @@ export default async function init(element) {
     class: 'hide',
   }, tooltipContent);
   infoIcon.appendChild(tooltipText);
-  footer.append(legalText);
-  if (!isMobile || isTablet) {
-    footer.append(infoIcon);
-  }
+  footer.append(legalText, infoIcon);
   dropzone.append(ctaButton, dragText, fileLimitText);
   const leftColChildren = [
     header, headingEl, copy1, ...(copy2Text ? [copy2] : []), dropzone, fileInput, footer,
@@ -735,8 +723,6 @@ export default async function init(element) {
 
   async function checkSignedInUser() {
     if (!window.adobeIMS?.isSignedInUser?.()) return;
-    element.classList.remove('upsell');
-    element.classList.add('signed-in');
     let accountType;
     try {
       accountType = window.adobeIMS.getAccountType();
