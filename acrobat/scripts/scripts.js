@@ -487,7 +487,7 @@ async function loadPage() {
   }
 
   // Import base milo features and run them
-  const { loadArea, setConfig, loadLana, getMetadata, loadIms, getConfig, convertStageLinks } = await import(`${miloLibs}/utils/utils.js`);
+  const { loadArea, setConfig, loadLana, getMetadata, loadIms } = await import(`${miloLibs}/utils/utils.js`);
   addLocale(ietf);
 
   if (getMetadata('commerce')) {
@@ -515,28 +515,6 @@ async function loadPage() {
   loadLana({ clientId: 'dxdc', tags: 'DC_Milo' });
 
   await loadArea(document, false);
-
-  // Convert stage links in header/gnav (gnav injects links after decorateLinks runs)
-  const runStageLinksOnHeader = () => {
-    const header = document.querySelector('header');
-    if (header) {
-      const anchors = header.getElementsByTagName('a');
-      const config = getConfig();
-      const { hostname, href } = window.location;
-      if (anchors.length && config?.stageDomainsMap) {
-        convertStageLinks({ anchors: [...anchors], config, hostname, href });
-      }
-    }
-  };
-  runStageLinksOnHeader();
-  // Gnav may inject links after loadArea; run again after a short delay and observe for late-injected links
-  requestAnimationFrame(() => runStageLinksOnHeader());
-  setTimeout(runStageLinksOnHeader, 1500);
-  const header = document.querySelector('header');
-  if (header && typeof MutationObserver !== 'undefined') {
-    const obs = new MutationObserver(() => runStageLinksOnHeader());
-    obs.observe(header, { childList: true, subtree: true });
-  }
 
   // Setup Logging
   const { default: lanaLogging } = await import('./dcLana.js');
