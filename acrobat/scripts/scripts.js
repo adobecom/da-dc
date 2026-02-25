@@ -301,7 +301,8 @@ const CONFIG = {
   // geoRouting: 'on',
   prodDomains: ['www.adobe.com', 'business.adobe.com', 'helpx.adobe.com'],
   stageDomainsMap: {
-    '--dc--adobecom.(hlx|aem).page': {
+    // Match both --dc--adobecom and --da-dc--adobecom (e.g. heic-link--da-dc--adobecom.aem.page)
+    '--(da-)?dc--adobecom.(hlx|aem).page': {
       'www.adobe.com': 'www.stage.adobe.com',
       'business.adobe.com': 'business.adobe.com',
       'blog.adobe.com': 'blog.adobe.com',
@@ -310,9 +311,9 @@ const CONFIG = {
       'helpx.adobe.com': 'helpx.adobe.com',
       'milo.adobe.com': 'milo.adobe.com',
       'news.adobe.com': 'news.adobe.com',
-      'acrobat\\.adobe\\.com': 'stage.acrobat.adobe.com',
+      'acrobat.adobe.com': 'stage.acrobat.adobe.com',
     },
-    '--dc--adobecom.(hlx|aem).live': {
+    '--(da-)?dc--adobecom.(hlx|aem).live': {
       'www.adobe.com': 'www.adobe.com',
       'business.adobe.com': 'business.adobe.com',
       'blog.adobe.com': 'blog.adobe.com',
@@ -331,7 +332,7 @@ const CONFIG = {
       'helpx.adobe.com': 'helpx.stage.adobe.com',
       'milo.adobe.com': 'milo-stage.corp.adobe.com',
       'news.adobe.com': 'news.stage.adobe.com',
-      'acrobat\\.adobe\\.com': 'stage.acrobat.adobe.com',
+      'acrobat.adobe.com': 'stage.acrobat.adobe.com',
     },
     '.graybox.adobe.com': { 'www.adobe.com': 'origin' },
     '.business-graybox.adobe.com': { 'business.adobe.com': 'origin' },
@@ -486,7 +487,7 @@ async function loadPage() {
   }
 
   // Import base milo features and run them
-  const { loadArea, setConfig, loadLana, getMetadata, loadIms } = await import(`${miloLibs}/utils/utils.js`);
+  const { loadArea, setConfig, loadLana, getMetadata, loadIms, getConfig, convertStageLinks } = await import(`${miloLibs}/utils/utils.js`);
   addLocale(ietf);
 
   if (getMetadata('commerce')) {
@@ -514,6 +515,28 @@ async function loadPage() {
   loadLana({ clientId: 'dxdc', tags: 'DC_Milo' });
 
   await loadArea(document, false);
+
+  // Convert stage links in header/gnav (gnav injects links after decorateLinks runs)
+  const runStageLinksOnHeader = () => {
+    const header = document.querySelector('header');
+    if (header) {
+      const anchors = header.getElementsByTagName('a');
+      const config = getConfig();
+      const { hostname, href } = window.location;
+      if (anchors.length && config?.stageDomainsMap) {
+        convertStageLinks({ anchors: [...anchors], config, hostname, href });
+      }
+    }
+  };
+  runStageLinksOnHeader();
+  // Gnav may inject links after loadArea; run again after a short delay and observe for late-injected links
+  requestAnimationFrame(() => runStageLinksOnHeader());
+  setTimeout(runStageLinksOnHeader, 1500);
+  const header = document.querySelector('header');
+  if (header && typeof MutationObserver !== 'undefined') {
+    const obs = new MutationObserver(() => runStageLinksOnHeader());
+    obs.observe(header, { childList: true, subtree: true });
+  }
 
   // Setup Logging
   const { default: lanaLogging } = await import('./dcLana.js');
