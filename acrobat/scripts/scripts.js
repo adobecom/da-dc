@@ -311,7 +311,8 @@ const CONFIG = {
       'helpx.adobe.com': 'helpx.adobe.com',
       'milo.adobe.com': 'milo.adobe.com',
       'news.adobe.com': 'news.adobe.com',
-      'acrobat\\.adobe\\.com': 'stage.acrobat.adobe.com',
+      // Only match prod host so we don't re-match inside stage.acrobat.adobe.com (avoids double "stage")
+      '(?<!stage\\.)acrobat\\.adobe\\.com': 'stage.acrobat.adobe.com',
     },
     '--(da-)?dc--adobecom.(hlx|aem).live': {
       'www.adobe.com': 'www.adobe.com',
@@ -332,7 +333,7 @@ const CONFIG = {
       'helpx.adobe.com': 'helpx.stage.adobe.com',
       'milo.adobe.com': 'milo-stage.corp.adobe.com',
       'news.adobe.com': 'news.stage.adobe.com',
-      'acrobat\\.adobe\\.com': 'stage.acrobat.adobe.com',
+      '(?<!stage\\.)acrobat\\.adobe\\.com': 'stage.acrobat.adobe.com',
     },
     '.graybox.adobe.com': { 'www.adobe.com': 'origin' },
     '.business-graybox.adobe.com': { 'business.adobe.com': 'origin' },
