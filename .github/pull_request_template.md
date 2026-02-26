@@ -7,5 +7,5 @@ Resolves: [MWPW-XXXXXX](https://jira.corp.adobe.com/browse/MWPW-XXXXXX)
 
 ## Test URLs
 <!-- List the URLs where the changes can be tested -->
-- https://main--dc--adobecom.aem.live/acrobat/online/compress-pdf
-- https://mwpw-XXXXXX--dc--adobecom.aem.live/acrobat/online/compress-pdf
+- https://main--da-dc--adobecom.aem.live/acrobat/online/compress-pdf
+- https://mwpw-XXXXXX--da-dc--adobecom.aem.live/acrobat/online/compress-pdf
