@@ -165,6 +165,9 @@ export async function responseProvider(request) {
       let prerenderHtml = '<!-- init -->';
       try {
         const item = last + ((isMobile || isIPadOS || isTablet) ? '_mobile' : '_desktop');
+        rewriter.onElement('body', el => {
+          el.append(`<script>console.log('kv item: ${item}')</script>`);
+        });
         const prerenderJson = await edgeKv.getJson({ item, default_value: {html: '', top: 0} });
         prerenderHtml = prerenderJson.html;
         prerenderTop = prerenderJson.top;
@@ -203,6 +206,9 @@ export async function responseProvider(request) {
   };
 
   try {
+    rewriter.onElement('body', el => {
+      el.append(`<script>console.log('responseProvider executed')</script>`);
+    });
     const miloBaseUrl = isProd ? 'https://www.adobe.com' : 'https://www.stage.adobe.com';
     const [
       [responseStream, responseHeaders, dcCoreVersion, mobileWidget, unityWorkflow],
