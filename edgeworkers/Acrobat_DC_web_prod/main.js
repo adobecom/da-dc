@@ -206,7 +206,9 @@ export async function responseProvider(request) {
   };
 
   try {
+    // Debug: visible in response HTML so we can confirm EdgeWorker + rewriter ran (no CSP/script execution needed)
     rewriter.onElement('body', el => {
+      el.prepend('<!-- EW responseProvider + rewriter executed -->\n');
       el.append(`<script>console.log('responseProvider executed')</script>`);
     });
     const miloBaseUrl = isProd ? 'https://www.adobe.com' : 'https://www.stage.adobe.com';
@@ -265,7 +267,8 @@ export async function responseProvider(request) {
     const headers = {
       ...responseHeaders,
       'Content-Security-Policy': csp,
-      Link: headerLink
+      Link: headerLink,
+      'X-EdgeWorker': 'responseProvider'  // Debug: if you see this header, EW ran and returned this response
     };
 
     return createResponse(
@@ -274,7 +277,18 @@ export async function responseProvider(request) {
       responseStream.pipeThrough(rewriter),
     );
   } catch (error) {
-    return createResponse(error.status ?? 500, {}, error.body ?? error.message);
+    const status = error.status ?? 500;
+    const errMsg = String(error?.message ?? error);
+    const headers = {
+      'X-EdgeWorker': 'error',
+      'X-EdgeWorker-Error': errMsg.slice(0, 200),
+      'Content-Type': 'text/html; charset=utf-8',
+    };
+    const body = error.body ?? (() => {
+      const safe = errMsg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>EdgeWorker error</title></head><body><!-- EW error path (responseProvider threw) --><p><strong>EdgeWorker error path</strong></p><pre>${safe}</pre></body></html>`;
+    })();
+    return createResponse(status, headers, body);
   }
 }
 
