@@ -151,7 +151,16 @@ export async function responseProvider(request) {
     const isIPadOS = ua.includes('Mac') && ua.includes('Version/') && !/iphone|ipod/i.test(ua);
     const isTablet = /ipad|android(?!.*mobile)/i.test(ua);    
     if (unityWorkflow && !(isTablet || isIPadOS)) {
-      const group = 'frictionless' + (first === 'acrobat' ? '' : `_${first}`);
+      let group;
+      // on acrobat subdomain
+      if (['acrobat.adobe.com','stage.acrobat.adobe.com'].includes(request.host)) {
+        // FIXME: handle locale for subdomain
+        group = 'frictionless_acrobat';
+      } else {
+        // on www domain
+        group = 'frictionless' + (first === 'acrobat' ? '' : `_${first}`);
+      }
+
       const edgeKv = new EdgeKV({namespace: isProd? 'prod' : 'stage', group});
       let prerenderHtml = '<!-- init -->';
       try {
