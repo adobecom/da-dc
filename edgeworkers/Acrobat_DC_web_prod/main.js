@@ -17,7 +17,8 @@ export async function responseProvider(request) {
   const last = path.splice(-1)[0].split('.')[0];
   const verb = verbMap[last] || last;
   const origin = `${request.scheme}://${request.host}`;
-  const isProd = request.host === 'www.adobe.com';
+  const isProd = request.host === 'www.adobe.com' || request.host === 'acrobat.adobe.com';
+  const codeRoot = ['acrobat.adobe.com','stage.acrobat.adobe.com'].includes(request.host) ? '/dc-shared' : '/acrobat';
   const rewriter = new HtmlRewritingStream();
 
   const fetchFrictionlessPage = async () => {
@@ -84,7 +85,8 @@ export async function responseProvider(request) {
   };
 
   const fetchResource = async path => {
-    const response = await httpRequest(origin + path);
+    const url = path.startsWith('http') ? path : origin + path;
+    const response = await httpRequest(url);
     if (response.ok) {
       return response.text();
     }
@@ -124,16 +126,16 @@ export async function responseProvider(request) {
     // Change relative paths to absolute. Remove JS-driven CSP in favor of HTTP header.
     let inlineScript = scripts
       .replace('await import(\'./contentSecurityPolicy/csp.js\')', '{default:()=>{}}')
-      .replace('await import(\'./dcLana.js\')', 'await import(\'/acrobat/scripts/dcLana.js\')')
-      .replace('await import(\'./susiAuthHandler.js\')', 'await import(\'/acrobat/scripts/susiAuthHandler.js\')')
-      .replace('await import(\'./geo-phoneNumber.js\')', 'await import(\'/acrobat/scripts/geo-phoneNumber.js\')')
-      .replace('await import(\'./tooltips.js\')', 'await import(\'/acrobat/scripts/tooltips.js\')')
-      .replace('await import(\'./imageReplacer.js\')', 'await import(\'/acrobat/scripts/imageReplacer.js\')');
+      .replace('await import(\'./dcLana.js\')', `await import('${codeRoot}/scripts/dcLana.js')`)
+      .replace('await import(\'./susiAuthHandler.js\')', `await import('${codeRoot}/scripts/susiAuthHandler.js')`)
+      .replace('await import(\'./geo-phoneNumber.js\')', `await import('${codeRoot}/scripts/geo-phoneNumber.js')`)
+      .replace('await import(\'./tooltips.js\')', `await import('${codeRoot}/scripts/tooltips.js')`)
+      .replace('await import(\'./imageReplacer.js\')', `await import('${codeRoot}/scripts/imageReplacer.js')`);
 
     if (!(mobileWidget && request.device.isMobile) && !unityWorkflow) {
       inlineScript = dcConverter
         .replace('export default', 'const dcConverter = ')
-        .replace('import(\'../../scripts/frictionless.js\')', 'import(\'/acrobat/scripts/frictionless.js\')')
+        .replace('import(\'../../scripts/frictionless.js\')', `import('${codeRoot}/scripts/frictionless.js')`)
       + inlineScript
         .replace('const { default: dcConverter } = await import(`../blocks/${blockName}/${blockName}.js`);', '')
     } 
@@ -170,7 +172,7 @@ export async function responseProvider(request) {
     }
 
     // Remove external script reference
-    rewriter.onElement('script[src="/acrobat/scripts/scripts.js"]', el => {
+    rewriter.onElement(`script[src="${codeRoot}/scripts/scripts.js"]`, el => {
       el.replaceWith('');
     });
     // Can't put scripts.js in HEAD, loadPage needs the BODY to be parsed.
@@ -192,6 +194,7 @@ export async function responseProvider(request) {
   };
 
   try {
+    const miloBaseUrl = isProd ? 'https://www.adobe.com' : 'https://www.stage.adobe.com';
     const [
       [responseStream, responseHeaders, dcCoreVersion, mobileWidget, unityWorkflow],
       scripts,
@@ -201,11 +204,11 @@ export async function responseProvider(request) {
       verbWidgetStyles
     ] = await Promise.all([
       fetchFrictionlessPageAndInlineSnippet(),
-      fetchResource('/acrobat/scripts/scripts.js'),
-      fetchResource('/acrobat/blocks/dc-converter-widget/dc-converter-widget.js'),
-      fetchResource('/acrobat/styles/styles.css'),
-      fetchResource('/libs/styles/styles.css'),
-      fetchResource('/acrobat/blocks/verb-widget/verb-widget.css')
+      fetchResource(`${codeRoot}/scripts/scripts.js`),
+      fetchResource(`${codeRoot}/blocks/dc-converter-widget/dc-converter-widget.js`),
+      fetchResource(`${codeRoot}/styles/styles.css`),
+      fetchResource(`${miloBaseUrl}/libs/styles/styles.css`),
+      fetchResource(`${codeRoot}/blocks/verb-widget/verb-widget.css`)
     ]);
 
     await inlineScripts(unityWorkflow, mobileWidget, scripts, dcConverter);
@@ -220,18 +223,19 @@ export async function responseProvider(request) {
         `<${adobeid}>;rel="preconnect"`,
         '<https://assets.adobedtm.com>;rel="preconnect"',
         '<https://use.typekit.net>;rel="preconnect"',
-        `</libs/deps/imslib.min.js>;rel="preload";as="script"`,
+        `<${miloBaseUrl}>;rel="preconnect"`,
+        `<${miloBaseUrl}/libs/deps/imslib.min.js>;rel="preload";as="script"`,
     ];
     if (unityWorkflow) {
       headerLink = [...headerLink,
-        `</acrobat/blocks/unity/unity.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</acrobat/blocks/unity/unity.css>;rel="preload";as="style"`,
-        `</acrobat/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
-        `</acrobat/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
+        `<${codeRoot}/blocks/unity/unity.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `<${codeRoot}/blocks/unity/unity.css>;rel="preload";as="style"`,
+        `<${codeRoot}/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `<${codeRoot}/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
+        `<${codeRoot}/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `<${miloBaseUrl}/libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `<${miloBaseUrl}/libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `<${first === 'acrobat' ? '' : `/${first}`}${codeRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
       ];
     } else if (!(mobileWidget && request.device.isMobile)) {
       headerLink = [...headerLink,
