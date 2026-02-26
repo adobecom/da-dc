@@ -37,7 +37,7 @@ export async function responseProvider(request) {
 
     // Make preliminary pass through the content to capture version metadata
     const firstPassRewriter = new HtmlRewritingStream();
-    let version, widgetVersion, mobileWidget, unityWorkflow;
+    let version, widgetVersion, mobileWidget, unityWorkflow, studyMarquee;
     const prefix = isProd ? '' : 'stg-';
     firstPassRewriter.onElement(`meta[name="${prefix}dc-widget-version"]`, el => {
       widgetVersion = el.getAttribute('content');
@@ -47,6 +47,9 @@ export async function responseProvider(request) {
     });
     firstPassRewriter.onElement('meta[name="mobile-widget"]', el => {
       mobileWidget = el.getAttribute('content');
+    });
+    firstPassRewriter.onElement('.study-marquee', el => {
+      studyMarquee = true;
     });
     firstPassRewriter.onElement('.unity.workflow-acrobat', el => {
       unityWorkflow = true;
@@ -80,7 +83,7 @@ export async function responseProvider(request) {
       delete responseHeaders[prop];
     }
 
-    return [responseStream, responseHeaders, version, widgetVersion, mobileWidget, unityWorkflow];
+    return [responseStream, responseHeaders, version, widgetVersion, mobileWidget, unityWorkflow, studyMarquee];
   };
 
   const fetchResource = async path => {
@@ -92,7 +95,7 @@ export async function responseProvider(request) {
   };
 
   const fetchFrictionlessPageAndInlineSnippet = async () => {
-    const [responseStream, responseHeaders, version, widgetVersion, mobileWidget, unityWorkflow] = await fetchFrictionlessPage();
+    const [responseStream, responseHeaders, version, widgetVersion, mobileWidget, unityWorkflow, studyMarquee] = await fetchFrictionlessPage();
 
     if (!verb || !locale || !version || !widgetVersion) {
       throw new Error('Missing metadata');
@@ -113,7 +116,7 @@ export async function responseProvider(request) {
     }
     const dcCoreVersion = widgetVersion.split("_")[0];
 
-    return [responseStream, responseHeaders, dcCoreVersion, mobileWidget, unityWorkflow];
+    return [responseStream, responseHeaders, dcCoreVersion, mobileWidget, unityWorkflow, studyMarquee];
   };
 
   const scriptHashes = [];
@@ -180,12 +183,14 @@ export async function responseProvider(request) {
     });
   };
 
-  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, unityWorkflow, prerenderTop) => {
+  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, unityWorkflow, studyMarquee, prerenderTop) => {
     rewriter.onElement('head', el => {
       el.append(`<style id="inline-milo-styles">${miloStyles}</style>`);
       el.append(`<style id="inline-dc-styles">${dcStyles}</style>`);
       if (unityWorkflow) {
-        el.append(`<style id="inline-verb-widget-styles">${verbWidgetStyles}</style>`);
+        const widgetStyles = studyMarquee ? studyMarqueeStyles : verbWidgetStyles;
+        const widgetStyleId = studyMarquee ? 'inline-study-marquee-styles' : 'inline-verb-widget-styles';
+        el.append(`<style id="${widgetStyleId}">${widgetStyles}</style>`);
         el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
       }
     });
@@ -193,23 +198,25 @@ export async function responseProvider(request) {
 
   try {
     const [
-      [responseStream, responseHeaders, dcCoreVersion, mobileWidget, unityWorkflow],
+      [responseStream, responseHeaders, dcCoreVersion, mobileWidget, unityWorkflow, studyMarquee],
       scripts,
       dcConverter,
       dcStyles,
       miloStyles,
-      verbWidgetStyles
+      verbWidgetStyles,
+      studyMarqueeStyles
     ] = await Promise.all([
       fetchFrictionlessPageAndInlineSnippet(),
       fetchResource('/acrobat/scripts/scripts.js'),
       fetchResource('/acrobat/blocks/dc-converter-widget/dc-converter-widget.js'),
       fetchResource('/acrobat/styles/styles.css'),
       fetchResource('/libs/styles/styles.css'),
-      fetchResource('/acrobat/blocks/verb-widget/verb-widget.css')
+      fetchResource('/acrobat/blocks/verb-widget/verb-widget.css'),
+      fetchResource('/acrobat/blocks/study-marquee/study-marquee.css')
     ]);
 
     await inlineScripts(unityWorkflow, mobileWidget, scripts, dcConverter);
-    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, unityWorkflow, prerenderTop);
+    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, unityWorkflow, studyMarquee, prerenderTop);
 
     const csp = contentSecurityPolicy(isProd, scriptHashes);
     const acrobat = isProd ? 'https://acrobat.adobe.com' : 'https://stage.acrobat.adobe.com';
@@ -223,11 +230,17 @@ export async function responseProvider(request) {
         `</libs/deps/imslib.min.js>;rel="preload";as="script"`,
     ];
     if (unityWorkflow) {
+      const widgetScript = studyMarquee
+        ? '</acrobat/blocks/study-marquee/study-marquee.js>;rel="preload";as="script";crossorigin="anonymous"'
+        : '</acrobat/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"';
+      const widgetStyle = studyMarquee
+        ? '</acrobat/blocks/study-marquee/study-marquee.css>;rel="preload";as="style"'
+        : '</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"';
       headerLink = [...headerLink,
         `</acrobat/blocks/unity/unity.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</acrobat/blocks/unity/unity.css>;rel="preload";as="style"`,
-        `</acrobat/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
+        widgetScript,
+        widgetStyle,
         `</acrobat/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
