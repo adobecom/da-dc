@@ -184,7 +184,7 @@ export async function responseProvider(request) {
       el.replaceWith('');
     });
     // Can't put scripts.js in HEAD, loadPage needs the BODY to be parsed.
-    rewriter.onElement('body"]', el => {
+    rewriter.onElement('body', el => {
       // TODO: Make more explicit markers in code
       el.append(`<script>${inlineScript}</script>`);
     });
