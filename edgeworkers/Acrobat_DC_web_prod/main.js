@@ -154,8 +154,7 @@ export async function responseProvider(request) {
       let group;
       // on acrobat subdomain
       if (['acrobat.adobe.com','stage.acrobat.adobe.com'].includes(request.host)) {
-        // FIXME: handle locale for subdomain
-        group = 'frictionless_acrobat';
+        group = 'frictionless_acrobat' + `${path.filter(Boolean).length <= 1 ? '' : `_${first}`}`;
       } else {
         // on www domain
         group = 'frictionless' + (first === 'acrobat' ? '' : `_${first}`);
