@@ -90,7 +90,10 @@ export async function responseProvider(request) {
     if (response.ok) {
       return response.text();
     }
-    throw new Error(`Failed to fetch resource: ${path} status: ${response.status}`);
+    const statusText = response.statusText || 'Unknown';
+    throw new Error(
+      `fetchResource failed | path: "${path}" | url: "${url}" | status: ${response.status} (${statusText})`
+    );
   };
 
   const fetchFrictionlessPageAndInlineSnippet = async () => {
