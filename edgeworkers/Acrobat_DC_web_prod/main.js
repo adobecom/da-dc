@@ -6,16 +6,12 @@ import { createResponse } from 'create-response';
 import { httpRequest } from 'http-request';
 //import { logger } from 'log';
 import { EdgeKV } from './edgekv.js';
-import localeMap from './utils/locales.js';
-import verbMap from './utils/verbs.js';
 import contentSecurityPolicy from './utils/csp/index.js';
 
 export async function responseProvider(request) {
   const path = request.path.split('/');
   const first = path[1];
-  const locale = localeMap[first];
   const last = path.splice(-1)[0].split('.')[0];
-  const verb = verbMap[last] || last;
   const origin = `${request.scheme}://${request.host}`;
   const isProd = request.host === 'www.adobe.com' || request.host === 'acrobat.adobe.com';
   const codeRoot = ['acrobat.adobe.com','stage.acrobat.adobe.com'].includes(request.host) ? '/dc-shared' : '/acrobat';
@@ -38,14 +34,8 @@ export async function responseProvider(request) {
 
     // Make preliminary pass through the content to capture version metadata
     const firstPassRewriter = new HtmlRewritingStream();
-    let version, widgetVersion, mobileWidget, unityWorkflow;
+    let mobileWidget, unityWorkflow;
     const prefix = isProd ? '' : 'stg-';
-    firstPassRewriter.onElement(`meta[name="${prefix}dc-widget-version"]`, el => {
-      widgetVersion = el.getAttribute('content');
-    });
-    firstPassRewriter.onElement(`meta[name="${prefix}dc-generate-cache-version"]`, el => {
-      version = el.getAttribute('content');
-    });
     firstPassRewriter.onElement('meta[name="mobile-widget"]', el => {
       mobileWidget = el.getAttribute('content');
     });
@@ -81,7 +71,7 @@ export async function responseProvider(request) {
       delete responseHeaders[prop];
     }
 
-    return [responseStream, responseHeaders, version, widgetVersion, mobileWidget, unityWorkflow];
+    return [responseStream, responseHeaders, mobileWidget, unityWorkflow];
   };
 
   const fetchResource = async path => {
@@ -94,31 +84,6 @@ export async function responseProvider(request) {
     throw new Error(
       `fetchResource failed | path: "${path}" | url: "${url}" | status: ${response.status} (${statusText})`
     );
-  };
-
-  const fetchFrictionlessPageAndInlineSnippet = async () => {
-    const [responseStream, responseHeaders, version, widgetVersion, mobileWidget, unityWorkflow] = await fetchFrictionlessPage();
-
-    if (!verb || !locale || !version || !widgetVersion) {
-      throw new Error('Missing metadata');
-    }
-
-    if (!(mobileWidget && request.device.isMobile) && !unityWorkflow) {
-      const snippet =
-        await fetchResource(`/dc/dc-generate-cache/dc-hosted-${version}/${verb}-${locale}.html`);
-      const snippetHead = snippet.substring(snippet.indexOf('<head>')+6, snippet.indexOf('</head>'));
-      const snippetBody = snippet.substring(snippet.indexOf('<body>')+6, snippet.indexOf('</body>'));
-
-      rewriter.onElement('head', el => {
-        el.append(snippetHead);
-      });
-      rewriter.onElement('div.dc-converter-widget', el => {
-        el.append(`<section id="edge-snippet">${snippetBody}</section>`);
-      });
-    }
-    const dcCoreVersion = widgetVersion.split("_")[0];
-
-    return [responseStream, responseHeaders, dcCoreVersion, mobileWidget, unityWorkflow];
   };
 
   const scriptHashes = [];
@@ -207,14 +172,14 @@ export async function responseProvider(request) {
   try {
     const miloBaseUrl = isProd ? 'https://www.adobe.com' : 'https://www.stage.adobe.com';
     const [
-      [responseStream, responseHeaders, dcCoreVersion, mobileWidget, unityWorkflow],
+      [responseStream, responseHeaders, mobileWidget, unityWorkflow],
       scripts,
       dcConverter,
       dcStyles,
       miloStyles,
       verbWidgetStyles
     ] = await Promise.all([
-      fetchFrictionlessPageAndInlineSnippet(),
+      fetchFrictionlessPage(),
       fetchResource(`${codeRoot}/scripts/scripts.js`),
       fetchResource(`${codeRoot}/blocks/dc-converter-widget/dc-converter-widget.js`),
       fetchResource(`${codeRoot}/styles/styles.css`),
@@ -227,7 +192,6 @@ export async function responseProvider(request) {
 
     const csp = contentSecurityPolicy(isProd, scriptHashes);
     const acrobat = isProd ? 'https://acrobat.adobe.com' : 'https://stage.acrobat.adobe.com';
-    const pdfnow = isProd ? 'https://pdfnow.adobe.io' : 'https://pdfnow-stage.adobe.io';
     const adobeid = isProd ? 'https://adobeid-na1.services.adobe.com' : 'https://adobeid-na1-stg1.services.adobe.com';
 
     let headerLink = [
@@ -247,13 +211,6 @@ export async function responseProvider(request) {
         `<${miloBaseUrl}/libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${first === 'acrobat' ? '' : `/${first}`}${codeRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
-      ];
-    } else if (!(mobileWidget && request.device.isMobile)) {
-      headerLink = [...headerLink,
-        `<${acrobat}>;rel="preconnect"`,
-        `<${pdfnow}>;rel="preconnect"`,
-        `<${acrobat}/dc-core/${dcCoreVersion}/dc-core.js>;rel="preload";as="script"`,
-        `<${acrobat}/dc-core/${dcCoreVersion}/dc-core.css>;rel="preload";as="style"`,
       ];
     }
     headerLink = headerLink.join();
