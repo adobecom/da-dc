@@ -331,8 +331,8 @@ function redDirLink(verb) {
   const hostname = window?.location?.hostname;
   const VERB = verb;
   let newLocation;
-  if (hostname !== 'acrobat.adobe.com') newLocation = `https://acrobat.adobe.com/${verbRedirMap[VERB]}`;
-  else newLocation = `https://stage.acrobat.adobe.com/${verbRedirMap[VERB]}` || fallBack;
+  if (hostname !== 'acrobat.adobe.com') newLocation = `https://stage.acrobat.adobe.com/${verbRedirMap[VERB]}`;
+  else newLocation = `https://acrobat.adobe.com/${verbRedirMap[VERB]}` || fallBack;
   return newLocation;
 }
 

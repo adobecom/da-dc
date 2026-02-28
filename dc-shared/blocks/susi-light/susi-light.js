@@ -35,10 +35,10 @@ function getDestURL(url) {
     destURL = new URL(url);
   } catch (err) {
     window.lana?.log(`invalid redirect uri for susi-light: ${url}`);
-    destURL = new URL('https://www.adobe.com');
+    destURL = new URL('https://acrobat.adobe.com');
   }
   if (isStage) {
-    destURL.hostname = 'www.stage.adobe.com';
+    destURL.hostname = 'stage.acrobat.adobe.com';
   }
   return destURL.toString();
 }
