@@ -14,12 +14,13 @@ export async function responseProvider(request) {
   const last = path.splice(-1)[0].split('.')[0];
   const origin = `${request.scheme}://${request.host}`;
   const isProd = request.host === 'www.adobe.com' || request.host === 'acrobat.adobe.com';
-  const codeRoot = ['acrobat.adobe.com','stage.acrobat.adobe.com'].includes(request.host) ? '/dc-shared' : '/acrobat';
+  const isAcrobatSubdomain = ['acrobat.adobe.com','stage.acrobat.adobe.com'].includes(request.host);
+  const codeRoot = isAcrobatSubdomain ? '/dc-shared' : '/acrobat';
   const rewriter = new HtmlRewritingStream();
 
   const fetchFrictionlessPage = async () => {
     // Setup: Fetch a stream containing HTML
-    const path = `${origin}${request.path}.html`;
+    const path = `${origin}${request.path}${isAcrobatSubdomain ? '' : '.html'}`;
     const headers = {'X-EW-Frictionless-Page': ['true']};
     const htmlResponse = await httpRequest(
       path,
@@ -35,7 +36,6 @@ export async function responseProvider(request) {
     // Make preliminary pass through the content to capture version metadata
     const firstPassRewriter = new HtmlRewritingStream();
     let mobileWidget, unityWorkflow;
-    const prefix = isProd ? '' : 'stg-';
     firstPassRewriter.onElement('meta[name="mobile-widget"]', el => {
       mobileWidget = el.getAttribute('content');
     });
@@ -121,7 +121,7 @@ export async function responseProvider(request) {
     if (unityWorkflow && !(isTablet || isIPadOS)) {
       let group;
       // on acrobat subdomain
-      if (['acrobat.adobe.com','stage.acrobat.adobe.com'].includes(request.host)) {
+      if (isAcrobatSubdomain) {
         group = 'frictionless_acrobat' + `${path.filter(Boolean).length <= 1 ? '' : `_${first}`}`;
       } else {
         // on www domain
@@ -191,7 +191,6 @@ export async function responseProvider(request) {
     inlineStyles(dcStyles, miloStyles, verbWidgetStyles, unityWorkflow, prerenderTop);
 
     const csp = contentSecurityPolicy(isProd, scriptHashes);
-    const acrobat = isProd ? 'https://acrobat.adobe.com' : 'https://stage.acrobat.adobe.com';
     const adobeid = isProd ? 'https://adobeid-na1.services.adobe.com' : 'https://adobeid-na1-stg1.services.adobe.com';
 
     let headerLink = [
