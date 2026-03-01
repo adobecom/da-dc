@@ -33,7 +33,7 @@ export async function responseProvider(request) {
       throw err;
     }
 
-    // Make preliminary pass through the content to capture version metadata
+    // Make preliminary pass through the content to capture metadata
     const firstPassRewriter = new HtmlRewritingStream();
     let mobileWidget, unityWorkflow;
     firstPassRewriter.onElement('meta[name="mobile-widget"]', el => {
