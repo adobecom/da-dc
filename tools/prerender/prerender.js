@@ -87,9 +87,13 @@ const deviceConfig = {
     });
 
     // Extract basename from URL and create filenames with layout suffix
-    const urlPath = new URL(url).pathname;
+    const { pathname: urlPath, hostname } = new URL(url);
     const pathParts = urlPath.split('/').filter(Boolean);
-    const locale = pathParts[0] === 'acrobat' ? '' : `_${pathParts[0]}`;
+    const locale =
+      pathParts[0] === 'acrobat' ||
+      (['acrobat.adobe.com', 'stage.acrobat.adobe.com'].includes(hostname) && pathParts.length <= 1)
+        ? ''
+        : `_${pathParts[0]}`;
     const basename = path.basename(urlPath, '.html');
     const outputHtmlPath = path.join(__dirname, `${basename}-${layout}.html`);
     const outputJsonPath = path.join(__dirname, `${basename}-${layout}.json`);
@@ -114,6 +118,7 @@ const deviceConfig = {
         section: 'edgekv',
       });
 
+      console.log(`Putting to EdgeKV: /edgekv/v1/networks/${network}/namespaces/${namespace}/groups/${group}${locale}/items/${basename}_${layout}`);
       eg.auth({
         path: `/edgekv/v1/networks/${network}/namespaces/${namespace}/groups/${group}${locale}/items/${basename}_${layout}`,
         method: 'PUT',
