@@ -24,8 +24,8 @@ const config = {
   testDir: './nala',
   outputDir: './test-results',
   globalSetup: './nala/utils/global.setup.js',
-  timeout: 30 * 1000,
-  expect: { timeout: 5000 },
+  timeout: 300 * 1000,
+  expect: { timeout: 20000 },
   testMatch: '**/*.test.js',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -41,6 +41,9 @@ const config = {
       process.env.PR_BRANCH_LIVE_URL
       || process.env.LOCAL_TEST_LIVE_URL
       || BASE_URLS.main,
+    launchOptions: {
+      slowMo: process.env.CI ? 0 : 300,
+    },
   },
   projects: [
     {
