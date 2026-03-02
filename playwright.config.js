@@ -41,9 +41,6 @@ const config = {
       process.env.PR_BRANCH_LIVE_URL
       || process.env.LOCAL_TEST_LIVE_URL
       || BASE_URLS.main,
-    launchOptions: {
-      slowMo: process.env.CI ? 0 : 300,
-    },
   },
   projects: [
     {
