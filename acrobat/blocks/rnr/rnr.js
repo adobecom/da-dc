@@ -24,7 +24,7 @@ const RNR_API_KEY = 'dc-general';
 
 // Errors, Analytics & Logging
 const lanaOptions = {
-  sampleRate: 100,
+  sampleRate: 10,
   tags: 'DC_Milo, RnR Block',
 };
 
