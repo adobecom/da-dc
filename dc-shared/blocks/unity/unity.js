@@ -93,10 +93,12 @@ export const localeMap = {
   vn_vi: 'en-us',
 };
 
-function getUnityLibs(prodLibs = '/unitylibs') {
+function getUnityLibs(prodLibs = 'https://www.adobe.com//unitylibs') {
   const { hostname, search } = window.location;
-  if (hostname === 'acrobat.adobe.com') return 'https://www.adobe.com/unitylibs';
-  if (hostname === 'stage.acrobat.adobe.com' && !(new URLSearchParams(search).get('unitylibs'))) return 'https://www.stage.adobe.com/unitylibs';
+  if (!(new URLSearchParams(search).get('unitylibs'))) {
+    if (hostname === 'acrobat.adobe.com') return 'https://www.adobe.com/unitylibs';
+    if (hostname === 'stage.acrobat.adobe.com') return 'https://www.stage.adobe.com/unitylibs';
+  }
   if (!['.aem.', '.hlx.', '.stage.', 'local', '.da.'].some((i) => hostname.includes(i))) return prodLibs;
   // eslint-disable-next-line compat/compat
   const branch = new URLSearchParams(search).get('unitylibs') || 'main';
