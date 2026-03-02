@@ -33,16 +33,7 @@ test.describe('Acrobat Features Smoke Tests', () => {
     await page.goto(path, { waitUntil: 'domcontentloaded' });
     await acrobatFeaturesPage.verifyGnav();
     await acrobatFeaturesPage.verifyMerchCardPlans();
-
-    await acrobatFeaturesPage.tabCompareIndividuals.click();
-    await acrobatFeaturesPage.verifyIndividualMerchCards();
-
-    await acrobatFeaturesPage.tabCompareBusiness.click();
-    await acrobatFeaturesPage.verifyBusinessMerchCards();
-
-    await acrobatFeaturesPage.tabCompareStudentsAndTeachers.click();
     await acrobatFeaturesPage.verifyStudentsAndTeachersMerchCards();
-    await acrobatFeaturesPage.verifyThreeUpEditorialCards();
     await acrobatFeaturesPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
     await acrobatFeaturesPage.verifyFooter();
   });

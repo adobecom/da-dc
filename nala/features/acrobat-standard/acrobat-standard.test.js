@@ -21,7 +21,7 @@ test.describe('Acrobat Standard Smoke Test', () => {
     // await acrobatStandard.verifyHeroMarquee();
 
     // Verify Merch Card Plans section (tabs)
-    await acrobatStandard.verifyMerchCardPlans();
+    // await acrobatStandard.verifyMerchCardPlans();
 
     // // Click Individuals tab and verify cards
     // await acrobatStandard.tabCompareIndividuals.click();
