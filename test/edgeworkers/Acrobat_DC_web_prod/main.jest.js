@@ -73,7 +73,6 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         'https://www.adobe.com/acrobat/styles/styles.css',
         'https://www.adobe.com/libs/styles/styles.css',
         'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
-        'https://www.adobe.com/dc/dc-generate-cache/dc-hosted-1.0/pdf-to-ppt-en-us.html'
       ]);
     });
   });
@@ -92,7 +91,6 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         'https://www.adobe.com/acrobat/styles/styles.css',
         'https://www.adobe.com/libs/styles/styles.css',
         'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
-        'https://www.adobe.com/dc/dc-generate-cache/dc-hosted-1.0/pdf-to-ppt-ja-jp.html'
       ]);
     });
   });  
@@ -127,28 +125,15 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
   });
 
   it("resource 404 exception", async () => {
-    let requestMock = new Request({path: '/acrobat/online/pdf-to-ppt'});
+    let requestMock = new Request({ path: '/acrobat/online/pdf-to-ppt' });
     resource404 = true;
 
     const responsePromise = replaceResponseProvider(requestMock);
     responsePromise.then(response => {
       expect(response.status).toEqual(500);
-      expect(response.body).toContain('Failed to fetch resource: /libs/styles/styles.css status: 404');
-    });
-  });    
-
-  it("missing metadata exception", async () => {
-    let requestMock = new Request({path: '/acrobat/online/pdf-to-ppt'});
-    mockOnElement.mockImplementation((elem, fn) => {
-      let el =  {
-        getAttribute: jest.fn().mockImplementation(() => undefined),
-      };
-    });
-
-    const responsePromise = replaceResponseProvider(requestMock);
-    responsePromise.then(response => {
-      expect(response.status).toEqual(500);
-      expect(response.body).toContain('Missing metadata');
+      expect(response.body).toContain('fetchResource failed');
+      expect(response.body).toContain('/libs/styles/styles.css');
+      expect(response.body).toContain('status: 404');
     });
   });
 

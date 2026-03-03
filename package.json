@@ -67,7 +67,6 @@
     "jest-environment-jsdom": "^29.5.0",
     "koa-proxies": "^0.12.4",
     "microbundle": "^0.15.1",
-    "playwright": "1.56.0",
     "sinon": "13.0.1",
     "stylelint": "14.6.0",
     "stylelint-config-prettier": "9.0.3",
@@ -85,6 +84,7 @@
     "async": "^3.2.5",
     "bowser": "^2.11.0",
     "jest-fetch-mock": "^3.0.3",
+    "playwright": "1.56.0",
     "ws": "^8.18.0",
     "yargs": "^17.7.2"
   },
