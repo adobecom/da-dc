@@ -301,7 +301,8 @@ const CONFIG = {
   // geoRouting: 'on',
   prodDomains: ['www.adobe.com', 'business.adobe.com', 'helpx.adobe.com'],
   stageDomainsMap: {
-    '--dc--adobecom.(hlx|aem).page': {
+    // Match both --dc--adobecom and --da-dc--adobecom
+    '--(da-)?dc--adobecom.(hlx|aem).page': {
       'www.adobe.com': 'www.stage.adobe.com',
       'business.adobe.com': 'business.adobe.com',
       'blog.adobe.com': 'blog.adobe.com',
@@ -310,8 +311,9 @@ const CONFIG = {
       'helpx.adobe.com': 'helpx.adobe.com',
       'milo.adobe.com': 'milo.adobe.com',
       'news.adobe.com': 'news.adobe.com',
+      '(?<!stage\\.)acrobat\\.adobe\\.com': 'stage.acrobat.adobe.com',
     },
-    '--dc--adobecom.(hlx|aem).live': {
+    '--(da-)?dc--adobecom.(hlx|aem).live': {
       'www.adobe.com': 'www.adobe.com',
       'business.adobe.com': 'business.adobe.com',
       'blog.adobe.com': 'blog.adobe.com',
@@ -330,6 +332,7 @@ const CONFIG = {
       'helpx.adobe.com': 'helpx.stage.adobe.com',
       'milo.adobe.com': 'milo-stage.corp.adobe.com',
       'news.adobe.com': 'news.stage.adobe.com',
+      '(?<!stage\\.)acrobat\\.adobe\\.com': 'stage.acrobat.adobe.com',
     },
     '.graybox.adobe.com': { 'www.adobe.com': 'origin' },
     '.business-graybox.adobe.com': { 'business.adobe.com': 'origin' },
@@ -401,7 +404,7 @@ replaceDotMedia(document);
 
 // Default to loading the first image as eager.
 (async function loadLCPImage() {
-  const blocks = '.marquee,.hero-marquee';
+  const blocks = '.marquee,.hero-marquee,.study-marquee';
   const marquee = document.querySelector(blocks); // first marquee only
   if (marquee) {
     if (window?.browser?.isMobile) {

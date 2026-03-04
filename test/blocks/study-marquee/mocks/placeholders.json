@@ -1,0 +1,95 @@
+{
+  "total": 20,
+  "offset": 0,
+  "limit": 20,
+  "data": [
+    {
+      "key": "verb-widget-cta",
+      "value": "Select a file"
+    },
+    {
+      "key": "verb-widget-cta-multifile-only",
+      "value": "Select files"
+    },
+    {
+      "key": "verb-widget-drag-drop",
+      "value": "or drag and drop a file"
+    },
+    {
+      "key": "verb-widget-limits",
+      "value": "PDF, up to 100 MB"
+    },
+    {
+      "key": "verb-widget-security",
+      "value": "Your files are secure with us. Learn more"
+    },
+    {
+      "key": "verb-widget-error-file-size",
+      "value": "Your file is too large. Please select a file under 100 MB."
+    },
+    {
+      "key": "verb-widget-error-file-type",
+      "value": "We don't support that file type. Please try again with a PDF."
+    },
+    {
+      "key": "verb-widget-error-only-accept-one-file",
+      "value": "Please select only one file."
+    },
+    {
+      "key": "verb-widget-error-generic",
+      "value": "Something went wrong. Please try again."
+    },
+    {
+      "key": "study-marquee-legal",
+      "value": "By using this service, you agree to the Adobe Terms of Use and Privacy Policy."
+    },
+    {
+      "key": "study-marquee-legal-text",
+      "value": "By using this service, you agree to the Adobe Terms of Use and Privacy Policy."
+    },
+    {
+      "key": "verb-widget-terms-of-use",
+      "value": "Terms of Use"
+    },
+    {
+      "key": "verb-widget-privacy-policy",
+      "value": "Privacy Policy"
+    },
+    {
+      "key": "acrobat-reader",
+      "value": "Acrobat Reader"
+    },
+    {
+      "key": "acrobat",
+      "value": "Acrobat"
+    },
+    {
+      "key": "close",
+      "value": "Close"
+    },
+    {
+      "key": "cancel",
+      "value": "Cancel"
+    },
+    {
+      "key": "uploading",
+      "value": "Uploading..."
+    },
+    {
+      "key": "processing",
+      "value": "Processing..."
+    },
+    {
+      "key": "preparing-download",
+      "value": "Preparing your download..."
+    },
+    {
+      "key": "download-ready",
+      "value": "Your download is ready!"
+    },
+    {
+      "key": "download",
+      "value": "Download"
+    }
+  ]
+}
