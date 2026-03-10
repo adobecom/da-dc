@@ -663,10 +663,6 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 }
 
-.verb-widget .mobile.milo-tooltip.top::before {
-  transform: translateX(-7%) translateY(-100%) !important;
-}
-
 .verb-widget .milo-tooltip {
   position: relative;
   text-decoration: none;
@@ -744,6 +740,28 @@ html[dir="rtl"] .verb-cta .upload-icon {
   .verb-widget .milo-tooltip:focus::before {
     outline: 4px solid -webkit-focus-ring-color;
     outline-offset: 1px;
+  }
+}
+
+/* Tooltip truncation fix for tablet/iPad - align right to prevent overflow */
+@media screen and (max-width: 1199px) {
+  .verb-widget .milo-tooltip.top::before {
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(-100%);
+    max-width: 200px;
+  }
+
+  .verb-widget .milo-tooltip.top::after {
+    left: auto;
+    right: 4px;
+    transform: translateX(0) translateY(-50%);
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .verb-widget .milo-tooltip.top::before {
+    max-width: 180px;
   }
 }
 
