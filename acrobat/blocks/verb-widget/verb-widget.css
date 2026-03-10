@@ -743,7 +743,6 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 }
 
-/* Tooltip truncation fix for tablet/iPad - align right to prevent overflow */
 @media screen and (max-width: 1199px) {
   .verb-widget .milo-tooltip.top::before {
     left: auto;
