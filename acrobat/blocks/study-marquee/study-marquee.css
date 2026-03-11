@@ -19,6 +19,20 @@
   flex-direction: column;
 }
 
+.study-marquee-heading {
+  font-family: "Adobe Clean Black", var(--body-font-family);
+  font-size: 44px;
+  line-height: 1.25;
+  font-weight: 900;
+  color: inherit;
+  margin: 0;
+  margin-top: -22px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  letter-spacing: -2.88px;
+}
+
 .study-marquee.light,
 .study-marquee.mobile-light,
 .study-marquee.light .study-marquee-heading,
@@ -96,20 +110,6 @@
   color: #EB1000;
 }
 
-.study-marquee-heading {
-  font-family: "Adobe Clean Black", var(--body-font-family);
-  font-size: 44px;
-  line-height: 1.25;
-  font-weight: 900;
-  color: inherit;
-  margin: 0;
-  margin-top: -22px;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-  letter-spacing: -2.88px;
-}
-
 .study-marquee-copy {
   font-size: 20px;
   font-style: normal;
@@ -184,7 +184,7 @@
 .study-marquee.tablet-light .study-marquee-dropzone:hover,
 .study-marquee.desktop-light .study-marquee-dropzone:hover {
   border-color: #1473E6;
-  background-color: #FFFFFF;
+  background-color: #FFF;
 }
 
 .study-marquee-dropzone.dragging {
@@ -211,7 +211,7 @@
 .study-marquee.tablet-light .study-marquee-dropzone.dragging,
 .study-marquee.desktop-light .study-marquee-dropzone.dragging {
   border-color: #1473E6;
-  background-color: #FFFFFF;
+  background-color: #FFF;
   border-style: dashed;
 }
 
@@ -302,6 +302,13 @@
   line-height: 0;
 }
 
+.study-marquee .background img,
+.study-marquee .background video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .study-marquee-media img,
 .study-marquee-media picture img,
 .study-marquee-media video,
@@ -317,13 +324,6 @@
 .study-marquee .background {
   position: absolute;
   inset: 0;
-}
-
-.study-marquee .background img,
-.study-marquee .background video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .study-marquee-legal a {
