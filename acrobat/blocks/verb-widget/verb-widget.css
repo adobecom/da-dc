@@ -756,6 +756,17 @@ html[dir="rtl"] .verb-cta .upload-icon {
     right: 4px;
     transform: translateX(0) translateY(-50%);
   }
+
+  html[dir="rtl"] .verb-widget .milo-tooltip.top::before {
+    left: 0;
+    right: auto;
+    text-align: right;
+  }
+
+  html[dir="rtl"] .verb-widget .milo-tooltip.top::after {
+    left: 4px;
+    right: auto;
+  }
 }
 
 @media screen and (max-width: 600px) {
