@@ -302,6 +302,15 @@
   line-height: 0;
 }
 
+.study-marquee-media img,
+.study-marquee-media picture img,
+.study-marquee-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .study-marquee .background img,
 .study-marquee .background video {
   width: 100%;
@@ -309,9 +318,6 @@
   object-fit: cover;
 }
 
-.study-marquee-media img,
-.study-marquee-media picture img,
-.study-marquee-media video,
 .study-marquee-media .asset img,
 .study-marquee-media .asset picture img,
 .study-marquee-media .asset video {
