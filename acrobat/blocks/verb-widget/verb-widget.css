@@ -760,7 +760,7 @@ html[dir="rtl"] .verb-cta .upload-icon {
   html[dir="rtl"] .verb-widget .milo-tooltip.top::before {
     left: 0;
     right: auto;
-    text-align: right;
+    text-align: left;
   }
 
   html[dir="rtl"] .verb-widget .milo-tooltip.top::after {
