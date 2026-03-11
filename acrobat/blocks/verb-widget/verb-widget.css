@@ -757,15 +757,17 @@ html[dir="rtl"] .verb-cta .upload-icon {
     transform: translateX(0) translateY(-50%);
   }
 
-  html[dir="rtl"] .verb-widget .milo-tooltip.top::before {
+  [dir="rtl"] .verb-widget .milo-tooltip.top::before {
     left: 0;
     right: auto;
-    text-align: left;
+    transform: translateX(0) translateY(-100%);
+    text-align: right;
   }
 
-  html[dir="rtl"] .verb-widget .milo-tooltip.top::after {
+  [dir="rtl"] .verb-widget .milo-tooltip.top::after {
     left: 4px;
     right: auto;
+    transform: translateX(0) translateY(-50%);
   }
 }
 
