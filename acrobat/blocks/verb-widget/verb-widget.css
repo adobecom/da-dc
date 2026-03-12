@@ -744,6 +744,9 @@ html[dir="rtl"] .verb-cta .upload-icon {
 }
 
 @media screen and (min-width: 768px) and (max-width: 1199px) {
+  .verb-footer {
+    overflow: visible;
+  }
 
   .verb-widget .milo-tooltip.top::before {
     left: auto;
@@ -753,22 +756,22 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 
   .verb-widget .milo-tooltip.top::after {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%) translateY(-50%);
+    left: auto;
+    right: 4px;
+    transform: translateX(0) translateY(-50%);
   }
 
   [dir="rtl"] .verb-widget .milo-tooltip.top::before {
     left: 0;
     right: auto;
     transform: translateX(0) translateY(-100%);
-    text-align: left;
+    text-align: right;
   }
 
   [dir="rtl"] .verb-widget .milo-tooltip.top::after {
-    left: 50%;
+    left: 4px;
     right: auto;
-    transform: translateX(-50%) translateY(-50%);
+    transform: translateX(0) translateY(-50%);
   }
 }
 
@@ -785,9 +788,9 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 
   .verb-widget .milo-tooltip.top::after {
-    left: 50%;
+    left: 4px;
     right: auto;
-    transform: translateX(-50%) translateY(-50%);
+    transform: translateX(0) translateY(-50%);
   }
 
   [dir="rtl"] .verb-widget .milo-tooltip.top::before {
@@ -798,9 +801,9 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 
   [dir="rtl"] .verb-widget .milo-tooltip.top::after {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%) translateY(-50%);
+    left: auto;
+    right: 4px;
+    transform: translateX(0) translateY(-50%);
   }
 }
 
