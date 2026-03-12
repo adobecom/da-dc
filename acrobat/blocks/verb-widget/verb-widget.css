@@ -753,9 +753,9 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 
   .verb-widget .milo-tooltip.top::after {
-    left: auto;
-    right: 4px;
-    transform: translateX(0) translateY(-50%);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(-50%);
   }
 
   [dir="rtl"] .verb-widget .milo-tooltip.top::before {
@@ -766,9 +766,9 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 
   [dir="rtl"] .verb-widget .milo-tooltip.top::after {
-    left: 4px;
+    left: 50%;
     right: auto;
-    transform: translateX(0) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
   }
 }
 
@@ -785,9 +785,9 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 
   .verb-widget .milo-tooltip.top::after {
-    left: 4px;
+    left: 50%;
     right: auto;
-    transform: translateX(0) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
   }
 
   [dir="rtl"] .verb-widget .milo-tooltip.top::before {
@@ -798,9 +798,9 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 
   [dir="rtl"] .verb-widget .milo-tooltip.top::after {
-    left: auto;
-    right: 4px;
-    transform: translateX(0) translateY(-50%);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(-50%);
   }
 }
 
