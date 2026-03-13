@@ -16,6 +16,7 @@ export async function responseProvider(request) {
   const isProd = request.host === 'www.adobe.com' || request.host === 'acrobat.adobe.com';
   const isAcrobatSubdomain = ['acrobat.adobe.com','stage.acrobat.adobe.com'].includes(request.host);
   const codeRoot = isAcrobatSubdomain ? '/dc-shared' : '/acrobat';
+  const contentRoot = '/dc-shared';
   const rewriter = new HtmlRewritingStream();
 
   const fetchFrictionlessPage = async () => {
@@ -211,9 +212,9 @@ export async function responseProvider(request) {
         `<${miloBaseUrl}/libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
       ];
       if (isAcrobatSubdomain) {
-        headerLink.push(`<${path.filter(Boolean).length <= 1 ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`);
+        headerLink.push(`<${path.filter(Boolean).length <= 1 ? '' : `/${first}`}/${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`);
       } else {
-        headerLink.push(`<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`);
+        headerLink.push(`<${first === 'acrobat' ? '' : `/${first}`}/${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`);
       }
     }
     headerLink = headerLink.join();
