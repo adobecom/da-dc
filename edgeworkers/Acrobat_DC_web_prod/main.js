@@ -209,8 +209,12 @@ export async function responseProvider(request) {
         `<${codeRoot}/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `<${first === 'acrobat' ? '' : `/${first}`}${codeRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
       ];
+      if (isAcrobatSubdomain) {
+        headerLink.push(`<${path.filter(Boolean).length <= 1 ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`);
+      } else {
+        headerLink.push(`<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`);
+      }
     }
     headerLink = headerLink.join();
 
