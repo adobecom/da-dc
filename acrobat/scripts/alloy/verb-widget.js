@@ -126,7 +126,7 @@ export function sendAnalyticsToSplunk(eventName, verb, metaData, splunkEndpoint,
   } catch(error) {
     window.lana?.log(
       `An error occurred while sending ${eventName} to splunk, verb: ${verb}, metadata: ${metaData}, error: ${error}`,
-      { sampleRate: 100, tags: 'DC_Milo,Project Unity (DC)' },
+      { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)' },
     );
   }
 }
@@ -148,7 +148,7 @@ export function createEventObject(eventName, verb, metaData, trackingParams, doc
         if (error) {
           window.lana?.log(
             `Error Code: ${error}, Status: 'Unknown', Message: An error occurred while sending ${verbEvent}, Account Type: ${accountType}`,
-            { sampleRate: 100, tags: 'DC_Milo,Project Unity (DC)' },
+            { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)' },
           );
         }
       }
