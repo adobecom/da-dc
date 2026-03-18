@@ -22,7 +22,7 @@ export default async function geoPhoneNumber() {
     phoneNumberEle.href = `tel:${visNum}`;
 
     const firstChild = phoneNumberEle.childNodes[0];
-    const isIconFirst = firstChild?.nodeType === 1 && firstChild?.classList?.contains?.('icon');
+    const isIconFirst = firstChild?.nodeType === Node.ELEMENT_NODE && firstChild?.classList?.contains?.('icon');
 
     if (isIconFirst && phoneNumberEle.childNodes.length > 1) {
       const node = phoneNumberEle.childNodes[1];
