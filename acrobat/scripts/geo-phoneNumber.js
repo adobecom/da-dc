@@ -20,8 +20,17 @@ export default async function geoPhoneNumber() {
   const updatePhoneNumber = (visNum, i) => {
     const phoneNumberEle = document.querySelector(`.${i}`);
     phoneNumberEle.href = `tel:${visNum}`;
-    if (phoneNumberEle.childNodes.length > 1) {
-      phoneNumberEle.childNodes[1].textContent = visNum;
+
+    const firstChild = phoneNumberEle.childNodes[0];
+    const isIconFirst = firstChild?.nodeType === 1 && firstChild?.classList?.contains?.('icon');
+
+    if (isIconFirst && phoneNumberEle.childNodes.length > 1) {
+      const node = phoneNumberEle.childNodes[1];
+      if (node?.nodeType === Node.TEXT_NODE) {
+        node.nodeValue = visNum;
+      } else {
+        phoneNumberEle.textContent = visNum;
+      }
     } else {
       phoneNumberEle.textContent = visNum;
     }
