@@ -22,15 +22,11 @@ export default async function geoPhoneNumber() {
     phoneNumberEle.href = `tel:${visNum}`;
 
     const firstChild = phoneNumberEle.childNodes[0];
-    const isIconFirst = firstChild?.nodeType === Node.ELEMENT_NODE && firstChild?.classList?.contains?.('icon');
-
-    if (isIconFirst && phoneNumberEle.childNodes.length > 1) {
-      const node = phoneNumberEle.childNodes[1];
-      if (node?.nodeType === Node.TEXT_NODE) {
-        node.nodeValue = visNum;
-      } else {
-        phoneNumberEle.textContent = visNum;
-      }
+    const secondChild = phoneNumberEle.childNodes[1];
+    const isIconFirst = firstChild?.nodeType === Node.ELEMENT_NODE && firstChild.classList.contains('icon');
+    if (isIconFirst && secondChild) {
+      if (secondChild.nodeType === Node.TEXT_NODE) secondChild.nodeValue = visNum;
+      else phoneNumberEle.textContent = visNum;
     } else {
       phoneNumberEle.textContent = visNum;
     }
