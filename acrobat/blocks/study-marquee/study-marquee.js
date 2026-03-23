@@ -346,8 +346,8 @@ export default async function init(element) {
     iconWrapper.appendChild(widgetIconSvg);
   }
   const title = createTag('div', { class: 'study-marquee-title' });
-  const adobeText = createTag('span', { class: 'adobe-red' }, 'Adobe');
-  const studySpaceText = createTag('span', {}, ' StudySpace');
+  const adobeText = createTag('span', {}, 'Adobe');
+  const studySpaceText = createTag('span', {}, ' Acrobat');
   title.append(adobeText, studySpaceText);
   header.append(iconWrapper, title);
   const headingEl = createTag('h1', { class: 'study-marquee-heading' }, heading);
