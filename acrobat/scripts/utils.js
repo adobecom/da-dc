@@ -83,7 +83,6 @@ export async function loadPlaceholders(prefix) {
   const { getConfig } = await import(`${miloLibs}/utils/utils.js`);
   const config = getConfig();
   window.mph = window.mph || {};
-  const mph = window.mph;
   const placeholdersPath = `${config.locale.contentRoot}/placeholders.json`;
   if (cachedPlaceholderData == null || cachedPlaceholdersPath !== placeholdersPath) {
     try {
@@ -105,7 +104,7 @@ export async function loadPlaceholders(prefix) {
   for (let i = 0; i < rows.length; i++) {
     const { key, value } = rows[i];
     if (prefix && !key.startsWith(prefix)) continue;
-    if (Object.prototype.hasOwnProperty.call(mph, key)) continue;
-    mph[key] = value.replace(/\u00A0/g, ' ');
+    if (Object.prototype.hasOwnProperty.call(window.mph, key)) continue;
+    window.mph[key] = value.replace(/\u00A0/g, ' ');
   }
 }
