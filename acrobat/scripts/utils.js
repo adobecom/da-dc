@@ -68,14 +68,17 @@ export function isOldBrowser() {
 
 /**
  * Loads placeholders, if SOME were not already loaded
- * @param {string | undefined} prefix Optional prefix for loading specific placeholders
+ * @param {string | string[] | undefined} prefix Optional prefix, or list of prefixes, for loading specific placeholders
  */
 export async function loadPlaceholders(prefix) {
   const miloLibs = setLibs('/libs');
   const { getConfig } = await import(`${miloLibs}/utils/utils.js`);
   const config = getConfig();
 
-  const mphKeys = Object.keys(window.mph || {}).filter((key) => !prefix || key.startsWith(prefix));
+  const prefixes = prefix == null ? [] : (Array.isArray(prefix) ? prefix : [prefix]);
+  const keyMatches = (key) => prefixes.length === 0 || prefixes.some((p) => key.startsWith(p));
+
+  const mphKeys = Object.keys(window.mph || {}).filter(keyMatches);
   if (mphKeys.length === 0) {
     const placeholdersPath = `${config.locale.contentRoot}/placeholders.json`;
     try {
@@ -83,7 +86,7 @@ export async function loadPlaceholders(prefix) {
       if (response.ok) {
         const placeholderData = await response.json();
         placeholderData.data.forEach(({ key, value }) => {
-          if (prefix && !key.startsWith(prefix)) return;
+          if (prefixes.length && !keyMatches(key)) return;
           window.mph[key] = value.replace(/\u00A0/g, ' ');
         });
       }
