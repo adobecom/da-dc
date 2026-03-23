@@ -68,8 +68,8 @@ export function isOldBrowser() {
 
 /**
  * Loads placeholders, if SOME were not already loaded
- * @param {string | string[] | undefined} prefix Optional prefix, or list of prefixes, for loading specific placeholders.
- * With multiple prefixes, fetches unless window.mph already has at least one key for each prefix (not merely any match).
+ * @param {string | string[] | undefined} prefix Optional
+ * With multiple prefixes, fetches unless window.mph already has at least one key for each prefix
  */
 export async function loadPlaceholders(prefix) {
   const miloLibs = setLibs('/libs');
