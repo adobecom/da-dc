@@ -66,29 +66,47 @@ export function isOldBrowser() {
   );
 }
 
+/** @type {string | null} */
+let cachedPlaceholdersPath = null;
+/** @type {{ data: { key: string, value: string }[] } | null} */
+let cachedPlaceholderData = null;
+
 /**
- * Loads placeholders, if SOME were not already loaded
+ * Loads placeholders from placeholders.json (cached per locale path). Merges only keys
+ * that are not yet own properties of window.mph for the current prefix filter (or all
+ * keys when prefix is omitted). This fixes the case where loadPlaceholders('rnr') runs
+ * first and a later loadPlaceholders() must still fill the rest of the sheet.
  * @param {string | undefined} prefix Optional prefix for loading specific placeholders
  */
 export async function loadPlaceholders(prefix) {
   const miloLibs = setLibs('/libs');
   const { getConfig } = await import(`${miloLibs}/utils/utils.js`);
   const config = getConfig();
-
-  const mphKeys = Object.keys(window.mph || {}).filter((key) => !prefix || key.startsWith(prefix));
-  if (mphKeys.length === 0) {
-    const placeholdersPath = `${config.locale.contentRoot}/placeholders.json`;
+  window.mph = window.mph || {};
+  const mph = window.mph;
+  const placeholdersPath = `${config.locale.contentRoot}/placeholders.json`;
+  if (cachedPlaceholderData == null || cachedPlaceholdersPath !== placeholdersPath) {
     try {
       const response = await fetch(placeholdersPath);
       if (response.ok) {
-        const placeholderData = await response.json();
-        placeholderData.data.forEach(({ key, value }) => {
-          if (prefix && !key.startsWith(prefix)) return;
-          window.mph[key] = value.replace(/\u00A0/g, ' ');
-        });
+        cachedPlaceholderData = await response.json();
+        cachedPlaceholdersPath = placeholdersPath;
+      } else {
+        cachedPlaceholderData = null;
+        cachedPlaceholdersPath = null;
+        return;
       }
     } catch (error) {
       window.lana?.log(`Failed to load placeholders: ${error?.message}`);
+      return;
     }
+  }
+  const rows = Array.isArray(cachedPlaceholderData.data) ? cachedPlaceholderData.data : [];
+  const p = prefix;
+  for (let i = 0; i < rows.length; i += 1) {
+    const { key, value } = rows[i];
+    if (p && !key.startsWith(p)) continue;
+    if (Object.prototype.hasOwnProperty.call(mph, key)) continue;
+    mph[key] = value.replace(/\u00A0/g, ' ');
   }
 }
