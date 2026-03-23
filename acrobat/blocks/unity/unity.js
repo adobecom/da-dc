@@ -1,7 +1,6 @@
 import { LIMITS as VERB_WIDGET_LIMITS } from '../verb-widget/verb-widget.js';
-import { LIMITS as STUDY_MARQUEE_LIMITS } from '../study-marquee/study-marquee.js';
 
-const LIMITS = { ...VERB_WIDGET_LIMITS, ...STUDY_MARQUEE_LIMITS };
+const LIMITS = { ...VERB_WIDGET_LIMITS };
 
 export const localeMap = {
   '': 'en-us',
@@ -116,6 +115,12 @@ export default async function init(el) {
   const element = el.querySelector('span');
   const verbWidget = el.closest('.section')?.querySelector('.verb-widget');
   const studyMarquee = el.closest('.section')?.querySelector('.study-marquee');
+  if (studyMarquee) {
+    const { LIMITS: STUDY_MARQUEE_LIMITS } = await import('../study-marquee/study-marquee.js');
+    Object.entries(STUDY_MARQUEE_LIMITS).forEach(([key, val]) => {
+      LIMITS[key] = val;
+    });
+  }
   const widgetBlock = verbWidget || studyMarquee;
   const verb = (widgetBlock && [...widgetBlock.classList].find((cn) => LIMITS[cn])) || element.classList[1].replace('icon-', '');
   if (mobileApp && LIMITS[verb]?.mobileApp) return;
