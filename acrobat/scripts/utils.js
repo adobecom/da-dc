@@ -102,10 +102,9 @@ export async function loadPlaceholders(prefix) {
     }
   }
   const rows = Array.isArray(cachedPlaceholderData.data) ? cachedPlaceholderData.data : [];
-  const p = prefix;
-  for (let i = 0; i < rows.length; i += 1) {
+  for (let i = 0; i < rows.length; i++) {
     const { key, value } = rows[i];
-    if (p && !key.startsWith(p)) continue;
+    if (prefix && !key.startsWith(prefix)) continue;
     if (Object.prototype.hasOwnProperty.call(mph, key)) continue;
     mph[key] = value.replace(/\u00A0/g, ' ');
   }
