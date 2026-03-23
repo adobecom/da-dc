@@ -261,7 +261,7 @@ export default async function init(element) {
     return;
   }
   window.mph = window.mph || {};
-  await loadPlaceholders('study');
+  await loadPlaceholders();
   const VERB = element.classList[1];
   // Initialize analytics - track attempts for analytics data (no UI changes based on attempts)
   const userAttempts = getVerbKey(`${VERB}_attempts`);
