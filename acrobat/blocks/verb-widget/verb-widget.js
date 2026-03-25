@@ -750,7 +750,7 @@ export default async function init(element) {
   const errorIcon = createTag('div', { class: 'verb-errorIcon' });
   const errorCloseBtn = createTag('div', { class: 'verb-errorBtn', role: 'button', tabindex: '0', 'aria-label': 'Close error' });
   const errorLiveRegion = createTag('div', {
-    'aria-live': 'polite',
+    'aria-live': 'assertive',
     'aria-atomic': 'true',
     style: 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0',
   });
@@ -1051,7 +1051,7 @@ export default async function init(element) {
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
       errorLiveRegion.textContent = '';
-      requestAnimationFrame(() => { errorLiveRegion.textContent = message; });
+      setTimeout(() => { errorLiveRegion.textContent = message; }, 10000);
     }
     if (logToLana) {
       window.lana?.log(
@@ -1065,7 +1065,7 @@ export default async function init(element) {
       errorState.classList.add('hide');
       errorStateText.textContent = '';
     }, 5000);
-    setTimeout(() => { errorLiveRegion.textContent = ''; }, 20000);
+    setTimeout(() => { errorLiveRegion.textContent = ''; }, 10000);
   };
 
   element.addEventListener('unity:show-error-toast', (e) => {
