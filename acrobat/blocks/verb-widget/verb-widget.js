@@ -750,7 +750,8 @@ export default async function init(element) {
   const errorIcon = createTag('div', { class: 'verb-errorIcon' });
   const errorCloseBtn = createTag('div', { class: 'verb-errorBtn', role: 'button', tabindex: '0', 'aria-label': 'Close error' });
   const errorLiveRegion = createTag('div', {
-    role: 'alert',
+    'aria-live': 'polite',
+    'aria-atomic': 'true',
     style: 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0',
   });
   const closeIconSvg = await createSvgElement('CLOSE_ICON');
@@ -1050,7 +1051,7 @@ export default async function init(element) {
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
       errorLiveRegion.textContent = '';
-      setTimeout(() => { errorLiveRegion.textContent = message; }, 500);
+      requestAnimationFrame(() => { errorLiveRegion.textContent = message; });
     }
     if (logToLana) {
       window.lana?.log(
