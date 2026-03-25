@@ -1049,7 +1049,8 @@ export default async function init(element) {
       errorState.classList.add('verb-error');
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
-      errorLiveRegion.textContent = message;
+      errorLiveRegion.textContent = '';
+      setTimeout(() => { errorLiveRegion.textContent = message; }, 500);
     }
     if (logToLana) {
       window.lana?.log(
