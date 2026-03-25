@@ -100,7 +100,14 @@
       }
       
       try {
-        const response = await fetch(`${origin}${sitemapPath}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        let response;
+        try {
+          response = await fetch(`${origin}${sitemapPath}`, { signal: controller.signal });
+        } finally {
+          clearTimeout(timeoutId);
+        }
         if (!response.ok) {
           console.warn('Failed to fetch sitemap:', response.status);
           return;
@@ -116,8 +123,8 @@
         
         const urlElements = xmlDoc.querySelectorAll('url');
         let currentUrlElement = null;
-        const correctedPath = pathname.includes('html') ? pathname : `${pathname}.html`
-        const isLocalRoot = `${sitemapOrigin}/${localeMatch}/` === `${sitemapOrigin}${pathname}`;
+        const correctedPath = pathname.endsWith('.html') ? pathname : `${pathname}.html`;
+        const isLocalRoot = localeMatch && `${sitemapOrigin}/${localeMatch}/` === `${sitemapOrigin}${pathname}`;
         const rootPage = isLocalRoot ? `${sitemapOrigin}/${localeMatch}/` : `${sitemapOrigin}/`; 
         const currentPageUrl = pathname !== '/' && pathname !== `/${localeMatch}/` ? `${sitemapOrigin}${correctedPath}` : `${rootPage}`;
 
