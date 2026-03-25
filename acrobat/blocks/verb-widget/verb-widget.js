@@ -745,10 +745,10 @@ export default async function init(element) {
   }
   const footer = createTag('div', { class: 'verb-footer' });
 
-  const errorState = createTag('div', { class: 'error hide' });
+  const errorState = createTag('div', { class: 'error hide', role: 'alert' });
   const errorStateText = createTag('p', { class: 'verb-errorText' });
   const errorIcon = createTag('div', { class: 'verb-errorIcon' });
-  const errorCloseBtn = createTag('div', { class: 'verb-errorBtn' });
+  const errorCloseBtn = createTag('div', { class: 'verb-errorBtn', role: 'button', tabindex: '0', 'aria-label': 'Close error' });
   const closeIconSvg = await createSvgElement('CLOSE_ICON');
   if (closeIconSvg) {
     closeIconSvg.classList.add('close-icon', 'error');
@@ -984,6 +984,7 @@ export default async function init(element) {
   errorCloseBtn.addEventListener('click', () => {
     errorState.classList.remove('verb-error');
     errorState.classList.add('hide');
+    errorStateText.textContent = '';
   });
 
   element.addEventListener('unity:track-analytics', (e) => {
@@ -1054,6 +1055,7 @@ export default async function init(element) {
     setTimeout(() => {
       errorState.classList.remove('verb-error');
       errorState.classList.add('hide');
+      errorStateText.textContent = '';
     }, 5000);
   };
 
