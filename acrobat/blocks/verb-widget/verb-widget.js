@@ -745,10 +745,14 @@ export default async function init(element) {
   }
   const footer = createTag('div', { class: 'verb-footer' });
 
-  const errorState = createTag('div', { class: 'error hide', role: 'alert' });
+  const errorState = createTag('div', { class: 'error hide' });
   const errorStateText = createTag('p', { class: 'verb-errorText' });
   const errorIcon = createTag('div', { class: 'verb-errorIcon' });
   const errorCloseBtn = createTag('div', { class: 'verb-errorBtn', role: 'button', tabindex: '0', 'aria-label': 'Close error' });
+  const errorLiveRegion = createTag('div', {
+    role: 'alert',
+    style: 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0',
+  });
   const closeIconSvg = await createSvgElement('CLOSE_ICON');
   if (closeIconSvg) {
     closeIconSvg.classList.add('close-icon', 'error');
@@ -770,7 +774,7 @@ export default async function init(element) {
     infoIcon.classList.add('tablet');
   }
 
-  widgetLeft.append(widgetHeader, widgetHeading, errorState);
+  widgetLeft.append(widgetHeader, widgetHeading, errorState, errorLiveRegion);
 
   if (isMobile || isTablet) {
     widgetLeft.insertBefore(widgetMobCopy, errorState);
@@ -985,6 +989,7 @@ export default async function init(element) {
     errorState.classList.remove('verb-error');
     errorState.classList.add('hide');
     errorStateText.textContent = '';
+    errorLiveRegion.textContent = '';
   });
 
   element.addEventListener('unity:track-analytics', (e) => {
@@ -1044,6 +1049,7 @@ export default async function init(element) {
       errorState.classList.add('verb-error');
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
+      errorLiveRegion.textContent = message;
     }
     if (logToLana) {
       window.lana?.log(
@@ -1056,6 +1062,7 @@ export default async function init(element) {
       errorState.classList.remove('verb-error');
       errorState.classList.add('hide');
       errorStateText.textContent = '';
+      errorLiveRegion.textContent = '';
     }, 5000);
   };
 
