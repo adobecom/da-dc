@@ -749,11 +749,28 @@ export default async function init(element) {
   const errorStateText = createTag('p', { class: 'verb-errorText' });
   const errorIcon = createTag('div', { class: 'verb-errorIcon' });
   const errorCloseBtn = createTag('div', { class: 'verb-errorBtn', role: 'button', tabindex: '0', 'aria-label': 'Close error' });
-  const errorLiveRegion = createTag('div', {
-    'aria-live': 'assertive',
-    'aria-atomic': 'true',
-    style: 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0',
-  });
+  const SR_ONLY_STYLE = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0';
+  let announceTimeout = null;
+  const announceToScreenReader = (msg) => {
+    clearTimeout(announceTimeout);
+    const prev = document.querySelector('.verb-sr-alert');
+    if (prev) prev.remove();
+    announceTimeout = setTimeout(() => {
+      const alertEl = createTag('div', {
+        class: 'verb-sr-alert',
+        role: 'alert',
+        style: SR_ONLY_STYLE,
+      });
+      alertEl.textContent = msg;
+      document.body.appendChild(alertEl);
+      setTimeout(() => alertEl.remove(), 10000);
+    }, 5000);
+  };
+  const cancelScreenReaderAnnouncement = () => {
+    clearTimeout(announceTimeout);
+    const prev = document.querySelector('.verb-sr-alert');
+    if (prev) prev.remove();
+  };
   const closeIconSvg = await createSvgElement('CLOSE_ICON');
   if (closeIconSvg) {
     closeIconSvg.classList.add('close-icon', 'error');
@@ -775,7 +792,7 @@ export default async function init(element) {
     infoIcon.classList.add('tablet');
   }
 
-  widgetLeft.append(widgetHeader, widgetHeading, errorState, errorLiveRegion);
+  widgetLeft.append(widgetHeader, widgetHeading, errorState);
 
   if (isMobile || isTablet) {
     widgetLeft.insertBefore(widgetMobCopy, errorState);
@@ -990,7 +1007,7 @@ export default async function init(element) {
     errorState.classList.remove('verb-error');
     errorState.classList.add('hide');
     errorStateText.textContent = '';
-    errorLiveRegion.textContent = '';
+    cancelScreenReaderAnnouncement();
   });
 
   element.addEventListener('unity:track-analytics', (e) => {
@@ -1050,8 +1067,7 @@ export default async function init(element) {
       errorState.classList.add('verb-error');
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
-      errorLiveRegion.textContent = '';
-      setTimeout(() => { errorLiveRegion.textContent = message; }, 10000);
+      announceToScreenReader(message);
     }
     if (logToLana) {
       window.lana?.log(
@@ -1065,7 +1081,6 @@ export default async function init(element) {
       errorState.classList.add('hide');
       errorStateText.textContent = '';
     }, 5000);
-    setTimeout(() => { errorLiveRegion.textContent = ''; }, 10000);
   };
 
   element.addEventListener('unity:show-error-toast', (e) => {
