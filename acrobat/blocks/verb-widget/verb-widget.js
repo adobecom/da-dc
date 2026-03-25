@@ -1064,8 +1064,8 @@ export default async function init(element) {
       errorState.classList.remove('verb-error');
       errorState.classList.add('hide');
       errorStateText.textContent = '';
-      errorLiveRegion.textContent = '';
     }, 5000);
+    setTimeout(() => { errorLiveRegion.textContent = ''; }, 20000);
   };
 
   element.addEventListener('unity:show-error-toast', (e) => {
