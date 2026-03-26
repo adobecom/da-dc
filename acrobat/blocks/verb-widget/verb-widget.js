@@ -749,27 +749,24 @@ export default async function init(element) {
   const errorStateText = createTag('p', { class: 'verb-errorText' });
   const errorIcon = createTag('div', { class: 'verb-errorIcon' });
   const errorCloseBtn = createTag('div', { class: 'verb-errorBtn', role: 'button', tabindex: '0', 'aria-label': 'Close error' });
-  const SR_ONLY_STYLE = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0';
-  let announceTimeout = null;
+  const srAlert = { announceTimer: null, cleanupTimer: null };
+  const clearSrAlert = () => {
+    clearTimeout(srAlert.announceTimer);
+    clearTimeout(srAlert.cleanupTimer);
+    document.querySelector('.verb-sr-alert')?.remove();
+  };
   const announceToScreenReader = (msg) => {
-    clearTimeout(announceTimeout);
-    const prev = document.querySelector('.verb-sr-alert');
-    if (prev) prev.remove();
-    announceTimeout = setTimeout(() => {
+    clearSrAlert();
+    srAlert.announceTimer = setTimeout(() => {
       const alertEl = createTag('div', {
         class: 'verb-sr-alert',
         role: 'alert',
-        style: SR_ONLY_STYLE,
+        style: 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0',
       });
       alertEl.textContent = msg;
       document.body.appendChild(alertEl);
-      setTimeout(() => alertEl.remove(), 10000);
+      srAlert.cleanupTimer = setTimeout(() => alertEl.remove(), 10000);
     }, 5000);
-  };
-  const cancelScreenReaderAnnouncement = () => {
-    clearTimeout(announceTimeout);
-    const prev = document.querySelector('.verb-sr-alert');
-    if (prev) prev.remove();
   };
   const closeIconSvg = await createSvgElement('CLOSE_ICON');
   if (closeIconSvg) {
@@ -1007,7 +1004,7 @@ export default async function init(element) {
     errorState.classList.remove('verb-error');
     errorState.classList.add('hide');
     errorStateText.textContent = '';
-    cancelScreenReaderAnnouncement();
+    clearSrAlert();
   });
 
   element.addEventListener('unity:track-analytics', (e) => {
