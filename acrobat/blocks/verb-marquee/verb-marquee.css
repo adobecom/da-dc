@@ -73,7 +73,6 @@
   overflow-wrap: break-word;
 }
 
-/* 32px (col gap) + 16px = 48px from subcopy to dropzone on tablet/desktop; mobile uses 32px gap only */
 @media screen and (min-width: 600px) {
   .verb-marquee-col-left:has(.verb-marquee-copy-sub) .verb-marquee-dropzone {
     margin-top: 16px;
@@ -131,7 +130,6 @@
   opacity: 1;
 }
 
-/* Col flex gap is 32px; pull copy + subcopy closer only for this pair */
 .verb-marquee-col-left > .verb-marquee-copy:has(+ .verb-marquee-copy-sub) {
   margin-bottom: -20px;
 }
@@ -142,8 +140,6 @@
   }
 }
 
-/* Subcopy: Figma marquee bullet — 20px / 1.5 / 400 at all breakpoints.
-   Grid: text wraps in column 2; icon stays in column 1. 1lh/1em centers icon in first line box (follows line-height for any locale). */
 .verb-marquee-copy-sub {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -166,7 +162,6 @@
   height: 1em;
   display: block;
   line-height: inherit;
-  /* Vertically center 1em icon in first line box; lh matches subcopy used line-height */
   margin-top: calc((1lh - 1em) / 2);
 }
 
@@ -214,6 +209,12 @@
   background: #4D4D4D;
 }
 
+.verb-marquee-dropzone.dragging {
+  border-color: #B8B8B8;
+  background: #4D4D4D;
+  border-style: dashed;
+}
+
 .verb-marquee.dragging-block .verb-marquee-dropzone {
   border-color: #B8B8B8;
   background: #4D4D4D;
@@ -230,18 +231,22 @@
   backdrop-filter: blur(10px);
 }
 
+.verb-marquee.verb-marquee-mobile-app .verb-marquee-dropzone {
+  border: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border-radius: 0;
+  padding: 8px 0 0;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
 .verb-marquee.light .verb-marquee-dropzone:hover,
 .verb-marquee.mobile-light .verb-marquee-dropzone:hover,
 .verb-marquee.tablet-light .verb-marquee-dropzone:hover,
 .verb-marquee.desktop-light .verb-marquee-dropzone:hover {
   border-color: #1473E6;
   background-color: #FFF;
-}
-
-.verb-marquee-dropzone.dragging {
-  border-color: #B8B8B8;
-  background: #4D4D4D;
-  border-style: dashed;
 }
 
 .verb-marquee.dragging-block {
@@ -252,7 +257,6 @@
   display: none;
 }
 
-/* Light: drag/drop dropzone same as hover */
 .verb-marquee.light.dragging-block .verb-marquee-dropzone,
 .verb-marquee.mobile-light.dragging-block .verb-marquee-dropzone,
 .verb-marquee.tablet-light.dragging-block .verb-marquee-dropzone,
@@ -266,9 +270,6 @@
   border-style: dashed;
 }
 
-/* Figma (mobileApp store): no dashed shell; must follow all dropzone rules (see !important). */
-/* stylelint-disable no-descending-specificity */
-.verb-marquee.verb-marquee-mobile-app .verb-marquee-dropzone,
 .verb-marquee.verb-marquee-mobile-app .verb-marquee-dropzone:hover,
 .verb-marquee.verb-marquee-mobile-app.dragging-block .verb-marquee-dropzone,
 .verb-marquee.verb-marquee-mobile-app .verb-marquee-dropzone.dragging {
@@ -280,8 +281,6 @@
   backdrop-filter: none;
   box-shadow: none;
 }
-
-/* stylelint-enable no-descending-specificity */
 
 .verb-marquee-cta {
   display: inline-flex;
@@ -306,7 +305,6 @@
   background-color: #0D66D0;
 }
 
-/* Matches .verb-mobile-cta in verb-widget (store / trial links on mobile & tablet). */
 .verb-marquee-mobile-cta {
   display: inline-flex;
   padding: 12px 24px;
@@ -325,7 +323,6 @@
   box-sizing: border-box;
 }
 
-/* Figma (fillsign + mobileApp): full-width pill “Get app” with vertical rhythm */
 .verb-marquee-mobile-app .verb-marquee-mobile-cta {
   width: 100%;
   max-width: 100%;
@@ -938,7 +935,6 @@
   }
 }
 
-/* Limit-exhausted: injected .verb-widget.upsell; hide marquee chrome */
 .verb-marquee:has(.verb-widget.upsell) > .background,
 .verb-marquee:has(.verb-widget.upsell) > .foreground {
   display: none;
@@ -948,8 +944,6 @@
   display: none;
 }
 
-/* Let injected .verb-widget match standalone block: verb-widget.css gradient + padding;
-   drop marquee’s outer padding so the widget isn’t framed in a separate band. */
 .verb-marquee:has(.verb-widget.upsell) {
   padding: 0;
 }
