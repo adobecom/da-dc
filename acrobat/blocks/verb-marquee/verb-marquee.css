@@ -914,30 +914,8 @@
   display: none;
 }
 
-/* Full neutral surface: marquee padding + transparency were showing section/marquee color
-   around the card; .verb-widget also ships a red hero gradient — strip both for embedded SUSI. */
+/* Let injected .verb-widget match standalone block: verb-widget.css gradient + padding;
+   drop marquee’s outer padding so the widget isn’t framed in a separate band. */
 .verb-marquee:has(.verb-widget.upsell) {
-  padding: 24px 16px;
-  background: #fff;
-  color: var(--consonant-color-gray-700, #464646);
-  justify-content: center;
-  align-items: stretch;
-  min-height: 100vh;
-  min-height: 100dvh;
-}
-
-@media screen and (min-width: 600px) {
-  .verb-marquee:has(.verb-widget.upsell) {
-    padding: 48px 24px;
-  }
-}
-
-.verb-marquee:has(.verb-widget.upsell) .verb-widget.upsell {
-  width: 100%;
-  max-width: var(--grid-container-width, 1200px);
-  margin-inline: auto;
-  box-sizing: border-box;
-  background-image: none;
-  background-color: #fff;
-  min-height: 0;
+  padding: 0;
 }
