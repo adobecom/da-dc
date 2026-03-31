@@ -35,7 +35,25 @@ export const LIMITS = {
 const miloLibs = setLibs('/libs');
 let createTag;
 let getConfig;
+let loadStyle;
 let decorateBlockBg;
+
+/** Mirrors verb-widget exhLimitCookieMap for anonymous conversion-limit cookies. */
+const exhLimitCookieMap = {
+  'to-pdf': 'cr_p_c',
+  'pdf-to': 'ex_p_c',
+  'compress-pdf': 'cm_p_ops',
+  'rotate-pages': 'or_p_c',
+  createpdf: 'cr_p_c',
+  'ocr-pdf': 'ocr_p_c',
+};
+
+const appEnvCookieMap = {
+  stage: 's_ta_',
+  prod: 'p_ac_',
+};
+
+const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
 
 const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 
@@ -289,7 +307,7 @@ function processMedia(mediaDiv) {
 }
 
 export default async function init(element) {
-  ({ createTag, getConfig } = (await import(`${miloLibs}/utils/utils.js`)));
+  ({ createTag, getConfig, loadStyle } = (await import(`${miloLibs}/utils/utils.js`)));
   ({ decorateBlockBg } = (await import(`${miloLibs}/utils/decorate.js`)));
 
   element.classList.add('con-block');
@@ -843,6 +861,20 @@ export default async function init(element) {
       document.cookie = `UTS_Redirect=${Date.now()};domain=.adobe.com;path=/;expires=${cookieExp}`;
     }
   });
+
+  const { cookie } = document;
+  const limitCookie = exhLimitCookieMap[VERB] || exhLimitCookieMap[VERB.match(/^pdf-to|to-pdf$/)?.[0]];
+  const cookiePrefix = appEnvCookieMap[DC_ENV] || '';
+  const isLimitExhausted = limitCookie && cookie.includes(`${cookiePrefix}${limitCookie}`);
+
+  if (!window.adobeIMS?.isSignedInUser?.() && isLimitExhausted) {
+    const { codeRoot = '/acrobat' } = getConfig() || {};
+    loadStyle(`${codeRoot}/blocks/verb-widget/verb-widget.css`);
+    const { showVerbLimitUpsell } = await import('../verb-widget/verb-widget.js');
+    await showVerbLimitUpsell(VERB, element);
+    window.analytics.verbAnalytics('upsell:shown', VERB, { userAttempts });
+    window.analytics.verbAnalytics('upsell-wall:shown', VERB, { userAttempts });
+  }
 
   async function checkSignedInUser() {
     if (!window.adobeIMS?.isSignedInUser?.()) return;

@@ -400,13 +400,6 @@ function getPricingLink() {
   return links[ENV] || links.prod;
 }
 
-async function loadGoogleLogin() {
-  if (window.adobeIMS?.isSignedInUser()) return;
-
-  const { default: initGoogleLogin } = await import(`${miloLibs}/features/google-login.js`);
-  initGoogleLogin(loadIms, getMetadata, loadScript, getConfig);
-}
-
 function uploadedTime() {
   const uploadingUTS = parseInt(getCookie('UTS_Uploading'), 10);
   const uploadedUTS = parseInt(getCookie('UTS_Uploaded'), 10);
@@ -430,28 +423,41 @@ function getVerbKey(verbKey) {
   return trialMapping[count] || '2+';
 }
 
-async function showUpSell(verb, element) {
+/**
+ * Renders limit-exhausted upsell + SUSI (shared with verb-marquee).
+ * Pass `deps` when Milo utils are already loaded (verb-widget init) to avoid a second utils fetch.
+ */
+export async function showVerbLimitUpsell(verb, element, deps) {
+  const {
+    createTag: ct,
+    loadBlock: lb,
+    loadIms: li,
+    getMetadata: gm,
+    loadScript: ls,
+    getConfig: gc,
+  } = deps ?? await import(`${miloLibs}/utils/utils.js`);
+
   const headline = window.mph[`verb-widget-upsell-headline-${verb}`] || window.mph['verb-widget-upsell-headline'];
   const headlineNopayment = window.mph['verb-widget-upsell-headline-nopayment'];
   const bulletsHeading = window.mph['verb-widget-upsell-bullets-heading'];
   const bullets = window.mph[`verb-widget-upsell-bullets-${verb}`] || window.mph['verb-widget-upsell-bullets'];
 
-  const headlineEl = createTag('h1', { class: 'verb-upsell-heading' }, headline);
-  const headingNopaymentEl = createTag('h1', { class: 'verb-upsell-heading verb-upsell-heading-nopayment' }, headlineNopayment);
-  const upsellBulletsHeading = createTag('p', { class: 'verb-upsell-bullets-heading' }, bulletsHeading);
-  const upsellBullets = createTag('ul', { class: 'verb-upsell-bullets' });
-  bullets.split('\n').forEach((bullet) => upsellBullets.append(createTag('li', {}, bullet)));
+  const headlineEl = ct('h1', { class: 'verb-upsell-heading' }, headline);
+  const headingNopaymentEl = ct('h1', { class: 'verb-upsell-heading verb-upsell-heading-nopayment' }, headlineNopayment);
+  const upsellBulletsHeading = ct('p', { class: 'verb-upsell-bullets-heading' }, bulletsHeading);
+  const upsellBullets = ct('ul', { class: 'verb-upsell-bullets' });
+  bullets.split('\n').forEach((bullet) => upsellBullets.append(ct('li', {}, bullet)));
 
-  const upsell = createTag('div', { class: 'verb-upsell' });
-  const upsellColumn = createTag('div', { class: 'verb-upsell-column' });
+  const upsell = ct('div', { class: 'verb-upsell' });
+  const upsellColumn = ct('div', { class: 'verb-upsell-column' });
 
-  const socialContainer = createTag('div', { class: 'verb-upsell-social-container' });
-  const socialCta = createTag('div', { class: 'susi-light' });
+  const socialContainer = ct('div', { class: 'verb-upsell-social-container' });
+  const socialCta = ct('div', { class: 'susi-light' });
   socialCta.innerHTML = `<div><div>${redDirLink(verb)}</div></div>`;
   socialContainer.append(socialCta);
-  await loadBlock(socialCta);
+  await lb(socialCta);
 
-  const upsellRow = createTag('div', { class: 'verb-row' });
+  const upsellRow = ct('div', { class: 'verb-row' });
 
   upsellRow.append(upsellColumn, socialContainer);
 
@@ -459,15 +465,26 @@ async function showUpSell(verb, element) {
 
   upsellColumn.append(headlineEl, headingNopaymentEl, upsellBulletsHeading, upsellBullets);
 
-  const widget = createTag('div', { class: 'verb-wrapper verb-upsell-active' });
-  const widgetContainer = createTag('div', { class: 'verb-container' });
+  const widget = ct('div', { class: 'verb-wrapper verb-upsell-active' });
+  const widgetContainer = ct('div', { class: 'verb-container' });
   widget.append(widgetContainer);
   widgetContainer.append(upsell);
 
   element.classList.add('upsell');
   element.append(widget);
 
-  loadGoogleLogin();
+  async function loadGoogleLoginForUpsell() {
+    if (window.adobeIMS?.isSignedInUser()) return;
+    const { default: initGoogleLogin } = await import(`${miloLibs}/features/google-login.js`);
+    initGoogleLogin(li, gm, ls, gc);
+  }
+  loadGoogleLoginForUpsell();
+}
+
+async function showUpSell(verb, element) {
+  await showVerbLimitUpsell(verb, element, {
+    createTag, loadBlock, loadIms, getMetadata, loadScript, getConfig,
+  });
 }
 
 // Errors, Analytics & Logging

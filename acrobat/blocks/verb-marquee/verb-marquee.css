@@ -903,3 +903,13 @@
     max-width: 180px;
   }
 }
+
+/* Limit-exhausted upsell (verb-widget showVerbLimitUpsell); mirrors .verb-widget.upsell */
+.verb-marquee.upsell > .background,
+.verb-marquee.upsell > .foreground {
+  display: none;
+}
+
+.verb-marquee.upsell .error {
+  display: none;
+}
