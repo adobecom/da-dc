@@ -748,7 +748,26 @@ export default async function init(element) {
   const errorState = createTag('div', { class: 'error hide' });
   const errorStateText = createTag('p', { class: 'verb-errorText' });
   const errorIcon = createTag('div', { class: 'verb-errorIcon' });
-  const errorCloseBtn = createTag('div', { class: 'verb-errorBtn' });
+  const errorCloseBtn = createTag('div', { class: 'verb-errorBtn', role: 'button', tabindex: '0', 'aria-label': 'Close error' });
+  const srAlert = { announceTimer: null, cleanupTimer: null };
+  const clearSrAlert = () => {
+    clearTimeout(srAlert.announceTimer);
+    clearTimeout(srAlert.cleanupTimer);
+    document.querySelector('.verb-sr-alert')?.remove();
+  };
+  const announceToScreenReader = (msg) => {
+    clearSrAlert();
+    srAlert.announceTimer = setTimeout(() => {
+      const alertEl = createTag('div', {
+        class: 'verb-sr-alert',
+        role: 'alert',
+        style: 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0',
+      });
+      alertEl.textContent = msg;
+      document.body.appendChild(alertEl);
+      srAlert.cleanupTimer = setTimeout(() => alertEl.remove(), 10000);
+    }, 5000);
+  };
   const closeIconSvg = await createSvgElement('CLOSE_ICON');
   if (closeIconSvg) {
     closeIconSvg.classList.add('close-icon', 'error');
@@ -984,6 +1003,8 @@ export default async function init(element) {
   errorCloseBtn.addEventListener('click', () => {
     errorState.classList.remove('verb-error');
     errorState.classList.add('hide');
+    errorStateText.textContent = '';
+    clearSrAlert();
   });
 
   element.addEventListener('unity:track-analytics', (e) => {
@@ -1043,6 +1064,7 @@ export default async function init(element) {
       errorState.classList.add('verb-error');
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
+      announceToScreenReader(message);
     }
     if (logToLana) {
       window.lana?.log(
@@ -1054,6 +1076,7 @@ export default async function init(element) {
     setTimeout(() => {
       errorState.classList.remove('verb-error');
       errorState.classList.add('hide');
+      errorStateText.textContent = '';
     }, 5000);
   };
 
@@ -1203,11 +1226,13 @@ export default async function init(element) {
     soloUpload();
     // Initialize ping service when page loads
     initializePingService();
-    window.dispatchEvent(new CustomEvent('analyticsLoad', {
-      detail: {
-        verb: VERB,
-        userAttempts,
-      },
-    }));
+    if (!element.dataset.dcInjectedFromMarquee) {
+      window.dispatchEvent(new CustomEvent('analyticsLoad', {
+        detail: {
+          verb: VERB,
+          userAttempts,
+        },
+      }));
+    }
   });
 }

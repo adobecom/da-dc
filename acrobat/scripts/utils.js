@@ -68,22 +68,34 @@ export function isOldBrowser() {
 
 /**
  * Loads placeholders, if SOME were not already loaded
- * @param {string | undefined} prefix Optional prefix for loading specific placeholders
+ * @param {string | string[] | undefined} prefix Optional
+ * With multiple prefixes, fetches unless window.mph already has at least one key for each prefix
  */
 export async function loadPlaceholders(prefix) {
   const miloLibs = setLibs('/libs');
   const { getConfig } = await import(`${miloLibs}/utils/utils.js`);
   const config = getConfig();
 
-  const mphKeys = Object.keys(window.mph || {}).filter((key) => !prefix || key.startsWith(prefix));
-  if (mphKeys.length === 0) {
+  let prefixes;
+  if (prefix == null) prefixes = [];
+  else if (Array.isArray(prefix)) prefixes = prefix;
+  else prefixes = [prefix];
+  const keyMatches = (key) => prefixes.length === 0 || prefixes.some((p) => key.startsWith(p));
+
+  window.mph = window.mph || {};
+
+  const mphKeyList = Object.keys(window.mph);
+  const allCovered = (prefixes.length === 0 && mphKeyList.length > 0)
+    || (prefixes.length > 0 && prefixes.every((p) => mphKeyList.some((k) => k.startsWith(p))));
+
+  if (!allCovered) {
     const placeholdersPath = `${config.locale.contentRoot}/placeholders.json`;
     try {
       const response = await fetch(placeholdersPath);
       if (response.ok) {
         const placeholderData = await response.json();
         placeholderData.data.forEach(({ key, value }) => {
-          if (prefix && !key.startsWith(prefix)) return;
+          if (prefixes.length && !keyMatches(key)) return;
           window.mph[key] = value.replace(/\u00A0/g, ' ');
         });
       }
