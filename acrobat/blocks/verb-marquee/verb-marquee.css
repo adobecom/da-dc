@@ -145,7 +145,7 @@
 /* Subcopy: Figma marquee bullet — 20px / 1.5 / 400 at all breakpoints */
 .verb-marquee-copy-sub {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8.37px;
   max-width: 480px;
   margin: 0;
