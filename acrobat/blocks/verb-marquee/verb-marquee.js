@@ -868,12 +868,26 @@ export default async function init(element) {
   const isLimitExhausted = limitCookie && cookie.includes(`${cookiePrefix}${limitCookie}`);
 
   if (!window.adobeIMS?.isSignedInUser?.() && isLimitExhausted) {
+    if (useFileUpload && fileInput?.isConnected) {
+      fileInput.remove();
+    }
     const { codeRoot = '/acrobat' } = getConfig() || {};
     loadStyle(`${codeRoot}/blocks/verb-widget/verb-widget.css`);
-    const { showVerbLimitUpsell } = await import('../verb-widget/verb-widget.js');
-    await showVerbLimitUpsell(VERB, element);
-    window.analytics.verbAnalytics('upsell:shown', VERB, { userAttempts });
-    window.analytics.verbAnalytics('upsell-wall:shown', VERB, { userAttempts });
+    const headingForWidget = heading || window.mph?.[`verb-widget-${VERB}-title`] || '\u00a0';
+    const widgetRoot = createTag('div', { class: `verb-widget ${VERB}` });
+    widgetRoot.dataset.dcInjectedFromMarquee = 'true';
+    widgetRoot.append(createTag('div', {}, headingForWidget));
+    element.append(widgetRoot);
+    try {
+      const { default: initVerbWidget } = await import('../verb-widget/verb-widget.js');
+      await initVerbWidget(widgetRoot);
+    } catch (error) {
+      window.lana?.log(
+        `Error Code: Unknown, Status: 'Unknown', Message: verb-widget init from verb-marquee failed: ${error.message}`,
+        lanaOptions,
+      );
+      widgetRoot.remove();
+    }
   }
 
   async function checkSignedInUser() {

@@ -904,12 +904,12 @@
   }
 }
 
-/* Limit-exhausted upsell (verb-widget showVerbLimitUpsell); mirrors .verb-widget.upsell */
-.verb-marquee.upsell > .background,
-.verb-marquee.upsell > .foreground {
+/* Limit-exhausted: injected .verb-widget.upsell; hide marquee chrome */
+.verb-marquee:has(.verb-widget.upsell) > .background,
+.verb-marquee:has(.verb-widget.upsell) > .foreground {
   display: none;
 }
 
-.verb-marquee.upsell .error {
+.verb-marquee:has(.verb-widget.upsell) > .error {
   display: none;
 }
