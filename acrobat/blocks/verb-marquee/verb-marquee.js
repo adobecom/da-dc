@@ -9,7 +9,6 @@ export const LIMITS = {
     maxNumFiles: 1,
     multipleFiles: false,
     mobileApp: true,
-    typeOneLanding: true,
   },
   'word-to-pdf': {
     maxFileSize: 104857600, // 100 MB
@@ -549,7 +548,8 @@ export default async function init(element) {
   const legalCombined = [legalPart1, legalPart2].filter(Boolean).join(' ').trim();
   const legalInitial = legalCombined || (mph['verb-marquee-legal-text'] || '');
   const legalText = createTag('p', { class: 'verb-marquee-legal' }, legalInitial);
-  if (!(limits?.mobileApp && isMobile)) {
+  const omitFooterForMobileStore = limits?.mobileApp && mobileOrTabletTouch;
+  if (!omitFooterForMobileStore && !(limits?.mobileApp && isMobile)) {
     if (legalText.textContent) {
       const createLegalLink = (label, url) => `<a class="verb-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
       const legalLinks = [
@@ -584,10 +584,8 @@ export default async function init(element) {
     class: 'hide',
   }, tooltipContent);
   infoIcon.appendChild(tooltipText);
-  if (!(limits?.mobileApp && isMobile)) {
+  if (!omitFooterForMobileStore) {
     footer.append(legalText, infoIcon);
-  } else {
-    footer.append(infoIcon);
   }
   const leftColChildren = [
     header,
@@ -596,7 +594,7 @@ export default async function init(element) {
     ...(copy2 ? [copy2] : []),
     dropzone,
     ...(fileInput ? [fileInput] : []),
-    footer,
+    ...(omitFooterForMobileStore ? [] : [footer]),
   ];
   leftCol.append(...leftColChildren);
   if (media) {

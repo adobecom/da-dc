@@ -125,6 +125,12 @@
   opacity: 0.9;
 }
 
+.verb-marquee.light .verb-marquee-copy,
+.verb-marquee.mobile-light .verb-marquee-copy {
+  color: var(--color-black);
+  opacity: 1;
+}
+
 /* Col flex gap is 32px; pull copy + subcopy closer only for this pair */
 .verb-marquee-col-left > .verb-marquee-copy:has(+ .verb-marquee-copy-sub) {
   margin-bottom: -20px;
@@ -161,18 +167,12 @@
 }
 
 .verb-marquee-copy-sub-icon path {
-  fill: currentColor;
+  fill: currentcolor;
 }
 
 .verb-marquee-copy-sub-label {
   flex: 1;
   min-width: 0;
-}
-
-.verb-marquee.light .verb-marquee-copy,
-.verb-marquee.mobile-light .verb-marquee-copy {
-  color: var(--color-black);
-  opacity: 1;
 }
 
 .verb-marquee.light .verb-marquee-copy-sub,
@@ -196,6 +196,12 @@
   box-sizing: border-box;
   width: 100%;
   align-self: stretch;
+}
+
+.verb-marquee-mobile-app .verb-marquee-dropzone,
+.verb-marquee-trial .verb-marquee-dropzone {
+  align-items: stretch;
+  cursor: default;
 }
 
 .verb-marquee-dropzone:hover {
@@ -255,6 +261,23 @@
   border-style: dashed;
 }
 
+/* Figma (mobileApp store): no dashed shell; must follow all dropzone rules (see !important). */
+/* stylelint-disable no-descending-specificity */
+.verb-marquee.verb-marquee-mobile-app .verb-marquee-dropzone,
+.verb-marquee.verb-marquee-mobile-app .verb-marquee-dropzone:hover,
+.verb-marquee.verb-marquee-mobile-app.dragging-block .verb-marquee-dropzone,
+.verb-marquee.verb-marquee-mobile-app .verb-marquee-dropzone.dragging {
+  border: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border-radius: 0;
+  padding: 8px 0 0;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* stylelint-enable no-descending-specificity */
+
 .verb-marquee-cta {
   display: inline-flex;
   align-items: center;
@@ -297,17 +320,23 @@
   box-sizing: border-box;
 }
 
+/* Figma (fillsign + mobileApp): full-width pill “Get app” with vertical rhythm */
+.verb-marquee-mobile-app .verb-marquee-mobile-cta {
+  width: 100%;
+  max-width: 100%;
+  min-height: 48px;
+  padding: 14px 24px;
+  line-height: 1.4;
+  margin-top: 8px;
+  margin-bottom: 32px;
+  white-space: normal;
+}
+
 .verb-marquee-mobile-cta:hover,
 .verb-marquee-mobile-cta:active {
   background-color: #0054b6;
   color: #fff;
   text-decoration: none;
-}
-
-.verb-marquee-mobile-app .verb-marquee-dropzone,
-.verb-marquee-trial .verb-marquee-dropzone {
-  align-items: center;
-  cursor: default;
 }
 
 .verb-marquee-cta .upload-icon {
