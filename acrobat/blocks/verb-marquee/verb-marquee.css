@@ -142,11 +142,13 @@
   }
 }
 
-/* Subcopy: Figma marquee bullet — 20px / 1.5 / 400 at all breakpoints */
+/* Subcopy: Figma marquee bullet — 20px / 1.5 / 400 at all breakpoints.
+   Grid: text wraps in column 2; icon stays in column 1. 1lh/1em centers icon in first line box (follows line-height for any locale). */
 .verb-marquee-copy-sub {
-  display: flex;
-  align-items: flex-start;
-  gap: 8.37px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.42em;
+  align-items: start;
   max-width: 480px;
   margin: 0;
   font-size: 20px;
@@ -158,12 +160,14 @@
 }
 
 .verb-marquee-copy-sub-icon {
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
-  min-height: 20px;
+  grid-column: 1;
+  grid-row: 1;
+  width: 1em;
+  height: 1em;
   display: block;
+  line-height: inherit;
+  /* Vertically center 1em icon in first line box; lh matches subcopy used line-height */
+  margin-top: calc((1lh - 1em) / 2);
 }
 
 .verb-marquee-copy-sub-icon path {
@@ -171,7 +175,8 @@
 }
 
 .verb-marquee-copy-sub-label {
-  flex: 1;
+  grid-column: 2;
+  grid-row: 1;
   min-width: 0;
 }
 
