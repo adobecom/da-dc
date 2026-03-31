@@ -1203,11 +1203,13 @@ export default async function init(element) {
     soloUpload();
     // Initialize ping service when page loads
     initializePingService();
-    window.dispatchEvent(new CustomEvent('analyticsLoad', {
-      detail: {
-        verb: VERB,
-        userAttempts,
-      },
-    }));
+    if (!element.dataset.dcInjectedFromMarquee) {
+      window.dispatchEvent(new CustomEvent('analyticsLoad', {
+        detail: {
+          verb: VERB,
+          userAttempts,
+        },
+      }));
+    }
   });
 }
