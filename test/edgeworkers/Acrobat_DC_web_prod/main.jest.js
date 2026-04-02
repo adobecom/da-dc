@@ -41,7 +41,9 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
       } else if (path.includes('/acrobat/styles/styles.css')) {
         response = new HttpResponseStyles();
       } else if (path.includes('/acrobat/blocks/verb-widget/verb-widget.css')) {
-        response = new HttpResponseVerbWidgetStyles();        
+        response = new HttpResponseVerbWidgetStyles();
+      } else if (path.includes('/acrobat/blocks/study-marquee/study-marquee.css')) {
+        response = new HttpResponseVerbWidgetStyles();
       } else {
         response = new HttpResponse404();
       }
@@ -73,6 +75,7 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         'https://www.adobe.com/acrobat/styles/styles.css',
         'https://www.adobe.com/libs/styles/styles.css',
         'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
+        'https://www.adobe.com/acrobat/blocks/study-marquee/study-marquee.css',
         'https://www.adobe.com/dc/dc-generate-cache/dc-hosted-1.0/pdf-to-ppt-en-us.html'
       ]);
     });
@@ -92,6 +95,7 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         'https://www.adobe.com/acrobat/styles/styles.css',
         'https://www.adobe.com/libs/styles/styles.css',
         'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
+        'https://www.adobe.com/acrobat/blocks/study-marquee/study-marquee.css',
         'https://www.adobe.com/dc/dc-generate-cache/dc-hosted-1.0/pdf-to-ppt-ja-jp.html'
       ]);
     });
@@ -113,6 +117,7 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         'https://www.adobe.com/acrobat/styles/styles.css',
         'https://www.adobe.com/libs/styles/styles.css',
         'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
+        'https://www.adobe.com/acrobat/blocks/study-marquee/study-marquee.css',
       ]);
     });
   });
