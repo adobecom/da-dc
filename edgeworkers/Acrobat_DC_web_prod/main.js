@@ -275,11 +275,7 @@ async function frictionlessResponseProvider(request) {
   const fetchFrictionlessPage = async () => {
     // Setup: Fetch a stream containing HTML
     const path = `${origin}${request.path}`;
-    const headers = {'X-EW-Frictionless-Page': ['true']};
-    const htmlResponse = await httpRequest(
-      path,
-      {headers},
-    );
+    const htmlResponse = await httpRequest(path);
     if (!htmlResponse.ok) {
       const err = new Error(`Failed to fetch doc: ${path}`);
       err.body = htmlResponse.body;
@@ -416,7 +412,7 @@ async function frictionlessResponseProvider(request) {
   };
 
   try {
-    const miloBaseUrl = isProd ? 'https://milo.adobe.com' : 'https://milo.stage.adobe.com';
+    const miloBaseUrl = '/dc-shared';
     const [
       [responseStream, responseHeaders, mobileWidget, unityWorkflow],
       scripts,
@@ -443,7 +439,6 @@ async function frictionlessResponseProvider(request) {
         `<${adobeid}>;rel="preconnect"`,
         '<https://assets.adobedtm.com>;rel="preconnect"',
         '<https://use.typekit.net>;rel="preconnect"',
-        `<${miloBaseUrl}>;rel="preconnect"`,
         `<${miloBaseUrl}/libs/deps/imslib.min.js>;rel="preload";as="script"`,
     ];
     if (unityWorkflow) {
