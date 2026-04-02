@@ -801,7 +801,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
-    gap: 100px;
+    gap: 50px;
   }
 
   .verb-marquee-col-right {
@@ -818,7 +818,7 @@
   }
 
   .verb-marquee-dropzone {
-    width: 550px;
+    width: 575px;
     max-width: 100%;
     align-self: center;
     padding: 24px 0;
