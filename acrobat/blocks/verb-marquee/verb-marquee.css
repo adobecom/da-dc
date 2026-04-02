@@ -722,10 +722,6 @@
 }
 
 @media screen and (min-width: 600px) and (max-width: 1199px) {
-  .verb-marquee-row {
-    gap: 40px;
-  }
-
   .verb-marquee-heading {
     font-size: 64px;
     letter-spacing: -2.88px;
@@ -733,6 +729,10 @@
 
   .verb-marquee-dropzone {
     gap: 14px;
+  }
+
+  .verb-marquee.verb-marquee-mobile-app .verb-marquee-col-left:has(.verb-marquee-copy-sub) .verb-marquee-dropzone {
+    margin-top: 0;
   }
 }
 
@@ -744,6 +744,26 @@
 }
 
 @media screen and (max-width: 1199px) {
+  .verb-marquee-row {
+    gap: 48px;
+  }
+
+  .verb-marquee.verb-marquee-mobile-app .verb-marquee-row {
+    gap: 0;
+  }
+
+  .verb-marquee.verb-marquee-mobile-app .verb-marquee-dropzone,
+  .verb-marquee.verb-marquee-mobile-app .verb-marquee-dropzone:hover,
+  .verb-marquee.verb-marquee-mobile-app.dragging-block .verb-marquee-dropzone,
+  .verb-marquee.verb-marquee-mobile-app .verb-marquee-dropzone.dragging {
+    padding: 0;
+  }
+
+  .verb-marquee.verb-marquee-mobile-app .verb-marquee-mobile-cta {
+    margin-top: 0;
+    margin-bottom: 48px;
+  }
+
   .verb-marquee .milo-tooltip.top::before {
     left: auto;
     right: 0;
