@@ -352,6 +352,8 @@
 
 .verb-marquee-media {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 16px;
@@ -795,18 +797,21 @@
 @media screen and (min-width: 1200px) {
   :root {
     --verb-marquee-padding: 80px;
-    --verb-marquee-gap: 100px;
+    --verb-marquee-gap: 75px;
   }
 
   .verb-marquee-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    grid-template-columns: minmax(0, 550px) minmax(0, 575px);
     align-items: center;
-    gap: 50px;
+    column-gap: 75px;
+    row-gap: 0;
   }
 
   .verb-marquee-col-right {
     justify-content: center;
+    min-width: 0;
   }
 
   .verb-marquee-title {
@@ -819,9 +824,9 @@
   }
 
   .verb-marquee-dropzone {
-    width: 575px;
+    width: 100%;
     max-width: 100%;
-    align-self: center;
+    align-self: stretch;
     padding: 24px 0;
     gap: 18px;
   }
