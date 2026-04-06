@@ -406,7 +406,31 @@ export default async function init(element) {
     class: 'study-marquee-errorIcon',
     'aria-hidden': 'true',
   });
-  const errorCloseBtn = createTag('div', { class: 'study-marquee-errorBtn' });
+  const errorCloseBtn = createTag('div', {
+    class: 'study-marquee-errorBtn',
+    role: 'button',
+    tabindex: '0',
+    'aria-label': 'Close error',
+  });
+  const srAlert = { announceTimer: null, cleanupTimer: null };
+  const clearSrAlert = () => {
+    clearTimeout(srAlert.announceTimer);
+    clearTimeout(srAlert.cleanupTimer);
+    document.querySelector('.study-marquee-sr-alert')?.remove();
+  };
+  const announceToScreenReader = (msg) => {
+    clearSrAlert();
+    srAlert.announceTimer = setTimeout(() => {
+      const alertEl = createTag('div', {
+        class: 'study-marquee-sr-alert',
+        role: 'alert',
+        style: 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0',
+      });
+      alertEl.textContent = msg;
+      document.body.appendChild(alertEl);
+      srAlert.cleanupTimer = setTimeout(() => alertEl.remove(), 10000);
+    }, 5000);
+  };
   const closeIconSvg = createSvgElement('CLOSE_ICON');
   if (closeIconSvg) {
     closeIconSvg.classList.add('close-icon', 'error');
@@ -532,6 +556,8 @@ export default async function init(element) {
       errorState.classList.add('study-marquee-error');
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
+      announceToScreenReader(message);
+      errorCloseBtn.focus();
     }
     if (logToLana) {
       window.lana?.log(
@@ -543,6 +569,7 @@ export default async function init(element) {
       errorState.classList.remove('study-marquee-error');
       errorState.classList.add('hide');
       errorStateText.textContent = '';
+      clearSrAlert();
     }, 5000);
   };
   ctaButton.addEventListener('click', () => {
@@ -611,9 +638,18 @@ export default async function init(element) {
   fileInput.addEventListener('cancel', () => {
     window.analytics.verbAnalytics('choose-file:close', VERB, { userAttempts });
   });
-  errorCloseBtn.addEventListener('click', () => {
+  const dismissError = () => {
     errorState.classList.remove('study-marquee-error');
     errorState.classList.add('hide');
+    errorStateText.textContent = '';
+    clearSrAlert();
+  };
+  errorCloseBtn.addEventListener('click', dismissError);
+  errorCloseBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      dismissError();
+    }
   });
   element.addEventListener('unity:track-analytics', (e) => {
     const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
