@@ -108,13 +108,20 @@
 
 .verb-marquee-copy,
 .verb-marquee-copy-sub {
-  font-size: 20px;
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
   color: inherit;
   margin: 0;
   opacity: 0.9;
+}
+
+.verb-marquee-copy {
+  font-size: 24px;
+}
+
+.verb-marquee-copy-sub {
+  font-size: 20px;
 }
 
 .verb-marquee-heading + .verb-marquee-copy {
@@ -325,6 +332,7 @@
   color: #FFF;
   margin: 0;
   text-align: center;
+  font-family: 'Adobe Clean ExtraBold', 'Adobe Clean', sans-serif;
   font-weight: 800;
 }
 
@@ -671,10 +679,6 @@
 
   .verb-marquee-col-left:has(.verb-marquee-copy-sub) .verb-marquee-dropzone {
     margin-top: 16px;
-  }
-
-  .verb-marquee-copy {
-    font-size: 24px;
   }
 
   .verb-marquee-footer {
