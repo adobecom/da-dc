@@ -557,6 +557,7 @@ export default async function init(element) {
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
       announceToScreenReader(message);
+      errorCloseBtn.focus();
     }
     if (logToLana) {
       window.lana?.log(
@@ -637,11 +638,18 @@ export default async function init(element) {
   fileInput.addEventListener('cancel', () => {
     window.analytics.verbAnalytics('choose-file:close', VERB, { userAttempts });
   });
-  errorCloseBtn.addEventListener('click', () => {
+  const dismissError = () => {
     errorState.classList.remove('study-marquee-error');
     errorState.classList.add('hide');
     errorStateText.textContent = '';
     clearSrAlert();
+  };
+  errorCloseBtn.addEventListener('click', dismissError);
+  errorCloseBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      dismissError();
+    }
   });
   element.addEventListener('unity:track-analytics', (e) => {
     const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
