@@ -704,12 +704,24 @@ export default async function init(element) {
     }, 5000);
   };
   if (useFileUpload && fileInput) {
+    const fireClickAnalytics = () => {
+      [
+        'cta:clicked',
+        'files-selected',
+        'entry:clicked',
+        'discover:clicked',
+      ].forEach((analyticsEvent) => {
+        window.analytics.verbAnalytics(analyticsEvent, VERB, { userAttempts });
+      });
+    };
     ctaButton.addEventListener('click', () => {
+      fireClickAnalytics();
       fileInput.click();
     });
     dropzone.addEventListener('click', (e) => {
       if (e.target.tagName === 'BUTTON' || e.target.closest('button')) { return; }
       if (e.target.classList.value.includes('error') || e.target.closest('.error')) { return; }
+      fireClickAnalytics();
       fileInput.click();
     });
     element.addEventListener('dragover', (e) => {
@@ -734,15 +746,6 @@ export default async function init(element) {
       if (files.length > 0) {
         noOfFiles = files.length;
       }
-    });
-    fileInput.addEventListener('click', () => {
-      [
-        'cta:clicked',
-        'entry:clicked',
-        'discover:clicked',
-      ].forEach((analyticsEvent) => {
-        window.analytics.verbAnalytics(analyticsEvent, VERB, { userAttempts });
-      });
     });
     fileInput.addEventListener('change', (data) => {
       const { target: { files } } = data;
