@@ -606,12 +606,6 @@ export default async function init(element) {
       fileInput.files = dataTransfer.files;
       const changeEvent = new Event('change', { bubbles: true });
       fileInput.dispatchEvent(changeEvent);
-      element.dispatchEvent(new CustomEvent('unity:track-analytics', {
-        detail: {
-          event: 'drop',
-          data: { userAttempts },
-        },
-      }));
     }
   });
   fileInput.addEventListener('click', () => {
@@ -627,12 +621,6 @@ export default async function init(element) {
     const { target: { files } } = data;
     if (files.length > 0) {
       noOfFiles = files.length;
-      element.dispatchEvent(new CustomEvent('unity:track-analytics', {
-        detail: {
-          event: 'change',
-          data: { userAttempts },
-        },
-      }));
     }
   });
   fileInput.addEventListener('cancel', () => {
