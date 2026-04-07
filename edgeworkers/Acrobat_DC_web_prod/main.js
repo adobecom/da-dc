@@ -293,7 +293,7 @@ async function frictionlessResponseProvider(request) {
 
   const fetchFrictionlessPage = async () => {
     // Setup: Fetch a stream containing HTML
-    const path = `${origin}${request.path}`;
+    const path = `${origin}/dc-shared${request.path}`;
     const htmlResponse = await httpRequest(path);
     if (!htmlResponse.ok) {
       const err = new Error(`Failed to fetch doc: ${path}`);
