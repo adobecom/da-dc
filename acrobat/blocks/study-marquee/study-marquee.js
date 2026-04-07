@@ -596,27 +596,18 @@ export default async function init(element) {
   });
   element.addEventListener('drop', (e) => {
     e.preventDefault();
-    e.stopPropagation();
     setDraggingClass(false);
     element.classList.remove('dragging-block');
     const { dataTransfer: { files } } = e;
     if (files.length > 0) {
-      const dataTransfer = new DataTransfer();
-      Array.from(files).forEach((file) => dataTransfer.items.add(file));
-      fileInput.files = dataTransfer.files;
-      const changeEvent = new Event('change', { bubbles: true });
-      fileInput.dispatchEvent(changeEvent);
-      element.dispatchEvent(new CustomEvent('unity:track-analytics', {
-        detail: {
-          event: 'drop',
-          data: { userAttempts },
-        },
-      }));
+      noOfFiles = files.length;
     }
   });
   fileInput.addEventListener('click', () => {
     [
-      'cta:clicked',
+      'filepicker:shown',
+      'dropzone:choose-file-clicked',
+      'files-selected',
       'entry:clicked',
       'discover:clicked',
     ].forEach((analyticsEvent) => {
@@ -627,12 +618,6 @@ export default async function init(element) {
     const { target: { files } } = data;
     if (files.length > 0) {
       noOfFiles = files.length;
-      element.dispatchEvent(new CustomEvent('unity:track-analytics', {
-        detail: {
-          event: 'change',
-          data: { userAttempts },
-        },
-      }));
     }
   });
   fileInput.addEventListener('cancel', () => {
