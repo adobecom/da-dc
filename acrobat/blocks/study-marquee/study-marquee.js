@@ -1,3 +1,4 @@
+
 import { setLibs, isOldBrowser, loadPlaceholders } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
@@ -596,16 +597,11 @@ export default async function init(element) {
   });
   element.addEventListener('drop', (e) => {
     e.preventDefault();
-    e.stopPropagation();
     setDraggingClass(false);
     element.classList.remove('dragging-block');
     const { dataTransfer: { files } } = e;
     if (files.length > 0) {
-      const dataTransfer = new DataTransfer();
-      Array.from(files).forEach((file) => dataTransfer.items.add(file));
-      fileInput.files = dataTransfer.files;
-      const changeEvent = new Event('change', { bubbles: true });
-      fileInput.dispatchEvent(changeEvent);
+      noOfFiles = files.length;
     }
   });
   fileInput.addEventListener('click', () => {
