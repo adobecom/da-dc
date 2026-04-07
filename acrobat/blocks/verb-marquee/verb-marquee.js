@@ -704,24 +704,12 @@ export default async function init(element) {
     }, 5000);
   };
   if (useFileUpload && fileInput) {
-    const fireClickAnalytics = () => {
-      [
-        'cta:clicked',
-        'files-selected',
-        'entry:clicked',
-        'discover:clicked',
-      ].forEach((analyticsEvent) => {
-        window.analytics.verbAnalytics(analyticsEvent, VERB, { userAttempts });
-      });
-    };
     ctaButton.addEventListener('click', () => {
-      fireClickAnalytics();
       fileInput.click();
     });
     dropzone.addEventListener('click', (e) => {
       if (e.target.tagName === 'BUTTON' || e.target.closest('button')) { return; }
       if (e.target.classList.value.includes('error') || e.target.closest('.error')) { return; }
-      fireClickAnalytics();
       fileInput.click();
     });
     element.addEventListener('dragover', (e) => {
@@ -740,17 +728,45 @@ export default async function init(element) {
     });
     element.addEventListener('drop', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       setDraggingClass(false);
       element.classList.remove('dragging-block');
       const { dataTransfer: { files } } = e;
       if (files.length > 0) {
-        noOfFiles = files.length;
+        const dataTransfer = new DataTransfer();
+        Array.from(files).forEach((file) => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+        const changeEvent = new Event('change', { bubbles: true });
+        fileInput.dispatchEvent(changeEvent);
+        element.dispatchEvent(new CustomEvent('unity:track-analytics', {
+          detail: {
+            event: 'drop',
+            data: { userAttempts },
+          },
+        }));
       }
+    });
+    fileInput.addEventListener('click', () => {
+      [
+        'filepicker:shown',
+        'dropzone:choose-file-clicked',
+        'files-selected',
+        'entry:clicked',
+        'discover:clicked',
+      ].forEach((analyticsEvent) => {
+        window.analytics.verbAnalytics(analyticsEvent, VERB, { userAttempts });
+      });
     });
     fileInput.addEventListener('change', (data) => {
       const { target: { files } } = data;
       if (files.length > 0) {
         noOfFiles = files.length;
+        element.dispatchEvent(new CustomEvent('unity:track-analytics', {
+          detail: {
+            event: 'change',
+            data: { userAttempts },
+          },
+        }));
       }
     });
     fileInput.addEventListener('cancel', () => {
