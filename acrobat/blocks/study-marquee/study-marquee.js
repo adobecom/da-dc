@@ -1,4 +1,3 @@
-
 import { setLibs, isOldBrowser, loadPlaceholders } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
