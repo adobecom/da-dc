@@ -282,7 +282,9 @@ export async function responseProvider(request) {
 }
 
 async function frictionlessResponseProvider(request) {
+  const secretCDNToken = request.getVariable('PMUSER_ADOBE_CDN_TOKEN');
   const path = request.path.split('/');
+  const headers = {'X-Adobe-CDN-Token': secretCDNToken};
   const first = path[1];
   const last = path.splice(-1)[0].split('.')[0];
   const origin = `${request.scheme}://${request.host}`;
@@ -294,7 +296,7 @@ async function frictionlessResponseProvider(request) {
   const fetchFrictionlessPage = async () => {
     // Setup: Fetch a stream containing HTML
     const path = `${origin}/dc-shared${request.path}`;
-    const htmlResponse = await httpRequest(path);
+    const htmlResponse = await httpRequest(path, { headers });
     if (!htmlResponse.ok) {
       const err = new Error(`Failed to fetch doc: ${path}`);
       err.body = htmlResponse.body;
@@ -345,7 +347,7 @@ async function frictionlessResponseProvider(request) {
 
   const fetchResource = async path => {
     const url = path.startsWith('http') ? path : origin + path;
-    const response = await httpRequest(url);
+    const response = await httpRequest(url, { headers });
     if (response.ok) {
       return response.text();
     }
