@@ -295,7 +295,7 @@ async function frictionlessResponseProvider(request) {
 
   const fetchFrictionlessPage = async () => {
     // Setup: Fetch a stream containing HTML
-    const hasLocalePrefix = path.filter(Boolean).length > 1;
+    const hasLocalePrefix = request.path.split('/').filter(Boolean).length > 1;
     let docPath;
     if (hasLocalePrefix) {
       docPath = `${origin}${request.path.replace(`/${first}/`, `/${first}/dc-shared/`)}`;
