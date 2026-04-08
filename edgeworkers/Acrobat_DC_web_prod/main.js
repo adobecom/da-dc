@@ -295,10 +295,17 @@ async function frictionlessResponseProvider(request) {
 
   const fetchFrictionlessPage = async () => {
     // Setup: Fetch a stream containing HTML
-    const path = `${origin}/dc-shared${request.path}`;
-    const htmlResponse = await httpRequest(path, { headers });
+    const hasLocalePrefix = path.filter(Boolean).length > 1;
+    let docPath;
+    if (hasLocalePrefix) {
+      docPath = `${origin}${request.path.replace(`/${first}/`, `/${first}/dc-shared/`)}`;
+    } else {
+      docPath = `${origin}/dc-shared${request.path}`;
+    }
+    
+    const htmlResponse = await httpRequest(docPath, { headers });
     if (!htmlResponse.ok) {
-      const err = new Error(`Failed to fetch doc: ${path}`);
+      const err = new Error(`Failed to fetch doc: ${docPath}`);
       err.body = htmlResponse.body;
       err.status = htmlResponse.status;
       throw err;
