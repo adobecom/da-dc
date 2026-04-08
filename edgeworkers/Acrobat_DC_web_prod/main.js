@@ -397,7 +397,7 @@ async function frictionlessResponseProvider(request) {
     const isIPadOS = ua.includes('Mac') && ua.includes('Version/') && !/iphone|ipod/i.test(ua);
     const isTablet = /ipad|android(?!.*mobile)/i.test(ua);    
     if (unityWorkflow && !(isTablet || isIPadOS)) {
-      const group = 'frictionless_acrobat' + `${path.filter(Boolean).length <= 1 ? '' : `_${first}`}`;
+      const group = 'frictionless_acrobat' + `${request.path.split('/').filter(Boolean).length <= 1 ? '' : `_${first}`}`;
       const edgeKv = new EdgeKV({namespace: isProd? 'prod' : 'stage', group});
       let prerenderHtml = '<!-- init -->';
       try {
@@ -478,7 +478,7 @@ async function frictionlessResponseProvider(request) {
         `<${codeRoot}/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `<${path.filter(Boolean).length <= 1 ? '' : `/${first}`}${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`
+        `<${request.path.split('/').filter(Boolean).length <= 1 ? '' : `/${first}`}${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`
       ];
     }
     headerLink = headerLink.join();
