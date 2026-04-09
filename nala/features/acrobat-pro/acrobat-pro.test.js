@@ -16,8 +16,8 @@ test.describe('Acrobat Pro Smoke Test', () => {
 
     // Verify Global Navigation
     await acrobatPro.verifyGnav();
-    await acrobatPro.verifyLink('a[is*="checkout-link"]', null, acrobatPro.heroMarquee);
-    await acrobatPro.verifyLink('a:not([is*="checkout-link"])', '/acrobat/pricing', acrobatPro.heroMarquee);
+    await acrobatPro.verifyLink('a[is*="checkout-link"]', null, acrobatPro.heroMarquee.root);
+    await acrobatPro.verifyLink('a:not([is*="checkout-link"])', '/acrobat/pricing', acrobatPro.heroMarquee.root);
     await acrobatPro.verifyLink('a[href*="/go/EditOrganizeDiscover"]');
 
     // Verify Merch Card Plans section (tabs)

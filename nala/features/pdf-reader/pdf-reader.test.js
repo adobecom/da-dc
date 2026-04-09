@@ -18,13 +18,13 @@ test.describe('Acrobat PDF Reader Smoke Test', () => {
 
     await pdfReaderPage.verifyMerchCardPlans();
 
-    await pdfReaderPage.tabCompareIndividuals.click();
+    await pdfReaderPage.merchCards.tabCompareIndividuals.click();
     await pdfReaderPage.verifyIndividualMerchCards();
 
-    await pdfReaderPage.tabCompareBusiness.click();
+    await pdfReaderPage.merchCards.tabCompareBusiness.click();
     await pdfReaderPage.verifyBusinessMerchCards();
 
-    await pdfReaderPage.tabCompareStudentsAndTeachers.click();
+    await pdfReaderPage.merchCards.tabCompareStudentsAndTeachers.click();
     await pdfReaderPage.verifyStudentsAndTeachersMerchCards();
 
     // await pdfReaderPage.verifyFAQAccordion('/dc-shared/fragments/faq/acrobat-overview-faq');

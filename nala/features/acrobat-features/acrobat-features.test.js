@@ -16,8 +16,8 @@ test.describe('Acrobat Features Smoke Tests', () => {
 
     await acrobatFeaturesPage.verifyGnav();
 
-    await acrobatFeaturesPage.verifyLink('a[is*="checkout-link"]', null, acrobatFeaturesPage.heroMarquee);
-    await acrobatFeaturesPage.verifyLink('a:not([is*="checkout-link"])', '/acrobat/pricing', acrobatFeaturesPage.heroMarquee);
+    await acrobatFeaturesPage.verifyLink('a[is*="checkout-link"]', null, acrobatFeaturesPage.heroMarquee.root);
+    await acrobatFeaturesPage.verifyLink('a:not([is*="checkout-link"])', '/acrobat/pricing', acrobatFeaturesPage.heroMarquee.root);
     await acrobatFeaturesPage.verifyTabs(5);
 
     await acrobatFeaturesPage.verifyMerchCardPlans();
@@ -46,13 +46,13 @@ test.describe('Acrobat Features Smoke Tests', () => {
     await acrobatFeaturesPage.verifyGnav();
     await acrobatFeaturesPage.verifyMerchCardPlans();
 
-    await acrobatFeaturesPage.tabCompareIndividuals.click();
+    await acrobatFeaturesPage.merchCards.tabCompareIndividuals.click();
     await acrobatFeaturesPage.verifyIndividualMerchCards();
 
-    await acrobatFeaturesPage.tabCompareBusiness.click();
+    await acrobatFeaturesPage.merchCards.tabCompareBusiness.click();
     await acrobatFeaturesPage.verifyBusinessMerchCards();
 
-    await acrobatFeaturesPage.tabCompareStudentsAndTeachers.click();
+    await acrobatFeaturesPage.merchCards.tabCompareStudentsAndTeachers.click();
     await acrobatFeaturesPage.verifyStudentsAndTeachersMerchCards();
     // await acrobatFeaturesPage.verifyThreeUpEditorialCards();
     await acrobatFeaturesPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');

@@ -17,8 +17,8 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
     // Verify Global Navigation
     await acrobat.verifyGnav();
 
-    await acrobat.verifyLink('a[is*="checkout-link"]', null, acrobat.heroMarquee);
-    await acrobat.verifyLink('a:not([is*="checkout-link"])', '/acrobat/pricing', acrobat.heroMarquee);
+    await acrobat.verifyLink('a[is*="checkout-link"]', null, acrobat.heroMarquee.root);
+    await acrobat.verifyLink('a:not([is*="checkout-link"])', '/acrobat/pricing', acrobat.heroMarquee.root);
     await page.waitForTimeout(1000);
 
     // Verify Carousel

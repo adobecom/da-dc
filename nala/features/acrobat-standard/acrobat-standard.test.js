@@ -24,15 +24,15 @@ test.describe('Acrobat Standard Smoke Test', () => {
     // await acrobatStandard.verifyMerchCardPlans();
 
     // // Click Individuals tab and verify cards
-    // await acrobatStandard.tabCompareIndividuals.click();
+    // await acrobatStandard.merchCards.tabCompareIndividuals.click();
     // await acrobatStandard.verifyIndividualMerchCards();
 
     // // Click Business tab and verify cards
-    // await acrobatStandard.tabCompareBusiness.click();
+    // await acrobatStandard.merchCards.tabCompareBusiness.click();
     // await acrobatStandard.verifyBusinessMerchCards();
 
     // // Click Students & Teachers tab and verify cards
-    // await acrobatStandard.tabCompareStudentsAndTeachers.click();
+    // await acrobatStandard.merchCards.tabCompareStudentsAndTeachers.click();
     // await acrobatStandard.verifyStudentsAndTeachersMerchCards();
 
     // Verify FAQ

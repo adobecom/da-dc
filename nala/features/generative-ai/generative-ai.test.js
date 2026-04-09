@@ -20,13 +20,13 @@ test.describe('Acrobat Generative AI Smoke Test', () => {
 
     await generativeAiPage.verifyMerchCardPlans();
 
-    await generativeAiPage.tabCompareIndividuals.click();
+    await generativeAiPage.merchCards.tabCompareIndividuals.click();
     await generativeAiPage.verifyIndividualMerchCards();
 
-    await generativeAiPage.tabCompareBusiness.click();
+    await generativeAiPage.merchCards.tabCompareBusiness.click();
     await generativeAiPage.verifyBusinessMerchCards();
 
-    await generativeAiPage.tabCompareStudentsAndTeachers.click();
+    await generativeAiPage.merchCards.tabCompareStudentsAndTeachers.click();
     await generativeAiPage.verifyStudentsAndTeachersMerchCards();
 
     await generativeAiPage.verifyFAQAccordion('/dc-shared/fragments/faq/generative-ai-faq');
