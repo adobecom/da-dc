@@ -345,6 +345,7 @@ async function frictionlessResponseProvider(request) {
       'transfer-encoding',
       'upgrade',
       'vary',
+      'x-robots-tag',
     ]) {
       delete responseHeaders[prop];
     }
