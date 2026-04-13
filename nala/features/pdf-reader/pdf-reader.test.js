@@ -14,7 +14,7 @@ test.describe('Acrobat PDF Reader Smoke Test', () => {
     console.info(`[PDF Reader Test] Navigating to: ${path}`);
     await page.goto(path, { waitUntil: 'domcontentloaded' });
 
-    await pdfReaderPage.verifyGnav();
+    await pdfReaderPage.verifyGnavSmoke();
 
     await pdfReaderPage.verifyMerchCardPlans();
 

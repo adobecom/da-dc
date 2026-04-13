@@ -14,7 +14,7 @@ test.describe('Acrobat Generative AI Smoke Test', () => {
     console.info(`[Generative AI Test] Navigating to: ${path}`);
     await page.goto(path, { waitUntil: 'domcontentloaded' });
 
-    await generativeAiPage.verifyGnav();
+    await generativeAiPage.verifyGnavSmoke();
 
     await generativeAiPage.getCheckoutLink('Rx0_PNHTOvg4Lgs4fZuns0dctT7LagQs2h1ivTTJGro');
 
@@ -30,7 +30,7 @@ test.describe('Acrobat Generative AI Smoke Test', () => {
     console.info(`[Generative AI Students Test] Navigating to: ${path}`);
     await page.goto(path, { waitUntil: 'domcontentloaded' });
 
-    await generativeAiPage.verifyGnav();
+    await generativeAiPage.verifyGnavSmoke();
 
     const generativeAIStudentsBuyNow = await generativeAiPage.getCheckoutLink('Rx0_PNHTOvg4Lgs4fZuns0dctT7LagQs2h1ivTTJGro');
     await expect(generativeAIStudentsBuyNow.first()).toBeVisible();

@@ -14,7 +14,7 @@ test.describe('Acrobat Free Trial Smoke Test', () => {
     console.info(`[Free Trial Test] Navigating to: ${path}`);
     await page.goto(path, { waitUntil: 'domcontentloaded' });
 
-    await freeTrialPage.verifyGnav();
+    await freeTrialPage.verifyGnavSmoke();
 
     const acrobatProWithAiPrice = freeTrialPage.getPrice('-lYm-YaTSZoUgv1gzqCgybgFotLqRsLwf8CgYdvdnsQ,bKwlW94xSVU_ykn4WHDjS1eiZrXopDo8VD7UhGAKYBI');
     await expect(acrobatProWithAiPrice).toBeVisible();

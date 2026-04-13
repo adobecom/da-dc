@@ -14,7 +14,7 @@ test.describe('Acrobat Features Smoke Tests', () => {
     console.info(`[Acrobat Features Test] Navigating to: ${path}`);
     await page.goto(path, { waitUntil: 'domcontentloaded' });
 
-    await acrobatFeaturesPage.verifyGnav();
+    await acrobatFeaturesPage.verifyGnavSmoke();
 
     await acrobatFeaturesPage.verifyLink('a[is*="checkout-link"]', null, acrobatFeaturesPage.heroMarquee.root);
     await acrobatFeaturesPage.verifyLink('a:not([is*="checkout-link"])', '/acrobat/pricing', acrobatFeaturesPage.heroMarquee.root);
@@ -31,7 +31,7 @@ test.describe('Acrobat Features Smoke Tests', () => {
     const { path } = features[1];
     console.info(`[Acrobat Features Test] Navigating to: ${path}`);
     await page.goto(path, { waitUntil: 'domcontentloaded' });
-    await acrobatFeaturesPage.verifyGnav();
+    await acrobatFeaturesPage.verifyGnavSmoke();
     await acrobatFeaturesPage.verifyMerchCardPlans();
     await acrobatFeaturesPage.verifyStudentsAndTeachersMerchCards();
     await acrobatFeaturesPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
@@ -43,7 +43,7 @@ test.describe('Acrobat Features Smoke Tests', () => {
     console.info(`[Acrobat Features Test] Navigating to: ${path}`);
     await page.goto(path, { waitUntil: 'domcontentloaded' });
 
-    await acrobatFeaturesPage.verifyGnav();
+    await acrobatFeaturesPage.verifyGnavSmoke();
     await acrobatFeaturesPage.verifyMerchCardPlans();
 
     await acrobatFeaturesPage.merchCards.tabCompareIndividuals.click();
