@@ -15,7 +15,6 @@ test.describe('Acrobat Business Smoke Tests', () => {
     await page.goto(path, { waitUntil: 'domcontentloaded' });
 
     // await businessPage.verifyGnav();
-
     await businessPage.verifyBusinessComparisonTable();
 
     await businessPage.verifyFooter();

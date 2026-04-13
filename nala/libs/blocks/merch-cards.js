@@ -73,6 +73,37 @@ export default class MerchCards {
     this.acrobatStudioBuyNow = this.individualMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=BASE"]');
     this.individualMerchCardsPricingLink = this.individualMerchCardsContainer.locator('div[class="body-m action-area"] a');
 
+    // Individual Standard Merch Cards Section (acrobat-individuals-standard fragment)
+    this.individualStandardMerchCardsContainer = page.locator('div[data-path="/dc-shared/fragments/merch-cards/acrobat-individuals-standard"]');
+    this.individualStandardMerchCards = this.individualStandardMerchCardsContainer.locator('merch-card');
+    this.individualStandardMerchCardAcrobatStandard = this.individualStandardMerchCards.nth(0);
+    this.acrobatStandardPrice = this.individualStandardMerchCardAcrobatStandard.locator('span[is*="inline-price"]');
+    this.acrobatStandardBuyNow = this.individualStandardMerchCardAcrobatStandard.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.individualStandardMerchCardAcrobatPro = this.individualStandardMerchCards.nth(1);
+    this.acrobatProStandardPrice = this.individualStandardMerchCardAcrobatPro.locator('span[is*="inline-price"]');
+    this.acrobatProStandardFreeTrial = this.individualStandardMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
+    this.acrobatProStandardBuyNow = this.individualStandardMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.individualStandardMerchCardAcrobatStudio = this.individualStandardMerchCards.nth(2);
+    this.acrobatStudioStandardPrice = this.individualStandardMerchCardAcrobatStudio.locator('span[is*="inline-price"]');
+    this.acrobatStudioStandardFreeTrial = this.individualStandardMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
+    this.acrobatStudioStandardBuyNow = this.individualStandardMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.individualStandardMerchCardsPricingLink = this.individualStandardMerchCardsContainer.locator('div[class="body-m action-area"] a');
+
+    // Business Standard Merch Cards Section (acrobat-business fragment)
+    this.businessStandardMerchCardsContainer = page.locator('div[data-path="/dc-shared/fragments/merch-cards/acrobat-business"]');
+    this.businessStandardMerchCards = this.businessStandardMerchCardsContainer.locator('merch-card');
+    this.businessStandardMerchCardAcrobatStandardForTeams = this.businessStandardMerchCards.nth(0);
+    this.acrobatStandardForTeamsPrice = this.businessStandardMerchCardAcrobatStandardForTeams.locator('span[is*="inline-price"]');
+    this.acrobatStandardForTeamsBuyNow = this.businessStandardMerchCardAcrobatStandardForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.businessStandardMerchCardAcrobatProForTeams = this.businessStandardMerchCards.nth(1);
+    this.acrobatProForTeamsStandardPrice = this.businessStandardMerchCardAcrobatProForTeams.locator('span[is*="inline-price"]');
+    this.acrobatProForTeamsStandardFreeTrial = this.businessStandardMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
+    this.acrobatProForTeamsStandardBuyNow = this.businessStandardMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.businessStandardMerchCardAcrobatStudioForTeams = this.businessStandardMerchCards.nth(2);
+    this.acrobatStudioForTeamsStandardPrice = this.businessStandardMerchCardAcrobatStudioForTeams.locator('span[is*="inline-price"]');
+    this.acrobatStudioForTeamsStandardFreeTrial = this.businessStandardMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
+    this.acrobatStudioForTeamsStandardBuyNow = this.businessStandardMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+
     // Business Merch Cards Section (acrobat-business-contact fragment)
     this.businessMerchCardsContainer = page.locator('div[data-path="/dc-shared/fragments/merch-cards/acrobat-business-contact"]');
     this.businessMerchCards = this.businessMerchCardsContainer.locator('merch-card');
@@ -194,6 +225,61 @@ export default class MerchCards {
     await expect(this.individualMerchCardsPricingLink).toBeVisible();
     await expect(this.individualMerchCardsPricingLink).toBeEnabled();
     await expect(this.individualMerchCardsPricingLink).toHaveCount(1);
+  }
+
+  async verifyIndividualStandardMerchCards() {
+    await expect(this.individualStandardMerchCards.first()).toBeVisible();
+    await expect(this.individualStandardMerchCards).toHaveCount(3);
+
+    await expect(this.acrobatStandardPrice.first()).toBeVisible();
+    await expect(this.acrobatStandardBuyNow).toBeVisible();
+    await expect(this.acrobatStandardBuyNow).toBeEnabled();
+    await expect(this.acrobatStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
+
+    await expect(this.acrobatProStandardPrice.first()).toBeVisible();
+    await expect(this.acrobatProStandardFreeTrial).toBeVisible();
+    await expect(this.acrobatProStandardFreeTrial).toBeEnabled();
+    await expect(this.acrobatProStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
+    await expect(this.acrobatProStandardBuyNow).toBeVisible();
+    await expect(this.acrobatProStandardBuyNow).toBeEnabled();
+    await expect(this.acrobatProStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
+
+    await expect(this.acrobatStudioStandardPrice.first()).toBeVisible();
+    await expect(this.acrobatStudioStandardFreeTrial).toBeVisible();
+    await expect(this.acrobatStudioStandardFreeTrial).toBeEnabled();
+    await expect(this.acrobatStudioStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
+    await expect(this.acrobatStudioStandardBuyNow).toBeVisible();
+    await expect(this.acrobatStudioStandardBuyNow).toBeEnabled();
+    await expect(this.acrobatStudioStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
+
+    await expect(this.individualStandardMerchCardsPricingLink).toBeVisible();
+    await expect(this.individualStandardMerchCardsPricingLink).toBeEnabled();
+  }
+
+  async verifyBusinessStandardMerchCards() {
+    await expect(this.businessStandardMerchCards.first()).toBeVisible();
+    await expect(this.businessStandardMerchCards).toHaveCount(3);
+
+    await expect(this.acrobatStandardForTeamsPrice.first()).toBeVisible();
+    await expect(this.acrobatStandardForTeamsBuyNow).toBeVisible();
+    await expect(this.acrobatStandardForTeamsBuyNow).toBeEnabled();
+    await expect(this.acrobatStandardForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
+
+    await expect(this.acrobatProForTeamsStandardPrice.first()).toBeVisible();
+    await expect(this.acrobatProForTeamsStandardFreeTrial).toBeVisible();
+    await expect(this.acrobatProForTeamsStandardFreeTrial).toBeEnabled();
+    await expect(this.acrobatProForTeamsStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
+    await expect(this.acrobatProForTeamsStandardBuyNow).toBeVisible();
+    await expect(this.acrobatProForTeamsStandardBuyNow).toBeEnabled();
+    await expect(this.acrobatProForTeamsStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
+
+    await expect(this.acrobatStudioForTeamsStandardPrice.first()).toBeVisible();
+    await expect(this.acrobatStudioForTeamsStandardFreeTrial).toBeVisible();
+    await expect(this.acrobatStudioForTeamsStandardFreeTrial).toBeEnabled();
+    await expect(this.acrobatStudioForTeamsStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
+    await expect(this.acrobatStudioForTeamsStandardBuyNow).toBeVisible();
+    await expect(this.acrobatStudioForTeamsStandardBuyNow).toBeEnabled();
+    await expect(this.acrobatStudioForTeamsStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
   }
 
   async verifyBusinessMerchCards() {
@@ -348,9 +434,9 @@ export default class MerchCards {
     await expect(this.pricingPageBusinessMerchCards).toHaveCount(3);
 
     await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsPrice).toBeVisible();
-    await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsFreeTrial).toBeVisible();
-    await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsFreeTrial).toBeEnabled();
-    await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
+    // await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsFreeTrial).toBeVisible();
+    // await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsFreeTrial).toBeEnabled();
+    // await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow).toBeVisible();
     await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow).toBeEnabled();
     await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);

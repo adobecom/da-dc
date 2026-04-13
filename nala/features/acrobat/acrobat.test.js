@@ -13,27 +13,16 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
     const { path } = features[0];
     console.info(`[Acrobat Test] Navigating to: ${path}`);
     await page.goto(path, { waitUntil: 'domcontentloaded' });
-
-    // Verify Global Navigation
     await acrobat.verifyGnavSmoke();
-    await acrobat.verifyStudyMarquee();
+    await acrobat.verifyHeroMarqueeSmoke();
     await page.waitForTimeout(1000);
-
-    // Verify Carousel
     await acrobat.verifyCarousel();
-
-    // Verify Merch Card Plans section (tabs)
     await acrobat.verifyMerchCardPlans();
 
-    // Verify FAQ Accordion
-    await acrobat.verifyFAQAccordion('/dc-shared/fragments/faq/acrobat-overview-faq');
+    await acrobat.verifyFAQAccordion();
 
-    // Verify Questions About Section
-    await acrobat.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
-
-    // Verify Promo Sticky
+    await acrobat.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support'); 
     // await acrobat.verifyPromoSticky();
-
     // Verify Footer
     await acrobat.verifyFooter();
   });

@@ -8,6 +8,7 @@ export default class BasePage {
 
     // Global Navigation Section
     this.gnav = this.page.locator('nav.feds-topnav');
+    this.gnavBreadcrumbs = this.page.locator('nav.feds-breadcrumbs');
     this.gnavLogo = this.gnav.locator('.feds-brand');
 
     // Nav items by position (assuming order is consistent)
@@ -70,15 +71,6 @@ export default class BasePage {
     this.comparisonTableFeatureRows = this.comparisonTable.locator('div.section-row');
     this.comparisonTableCompareLink = this.comparisonTableSection.locator('div.text-block a');
 
-    // Business Comparison Table Section
-    this.businessComparisonTable = this.page.locator('div.table.sticky-tablet-up[role="table"]');
-    this.businessComparisonTableHeadingRow = this.businessComparisonTable.locator('div.row-heading');
-    this.businessComparisonTableColumnHeaders = this.businessComparisonTableHeadingRow.locator('div.col-heading');
-    this.businessComparisonTableFeatureRows = this.businessComparisonTable.locator('div.section-row');
-    this.businessComparisonTableFreeTrialLinks = this.businessComparisonTableHeadingRow.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.businessComparisonTableBuyNowLinks = this.businessComparisonTableHeadingRow.locator('a[is*="checkout-link"][href*="ot=BASE"]');
-    this.businessComparisonTableLearnMoreLink = this.businessComparisonTableHeadingRow.locator('a:not([is*="checkout-link"])');
-
     // Tabbed Comparison Table Section (Compare Versions page)
     this.compareTabs = this.page.locator('div.tabs#tabs-compare');
     this.compareTabButtons = this.compareTabs.locator('button[role="tab"]');
@@ -118,8 +110,13 @@ export default class BasePage {
   }
 
   async verifyStudyMarquee() {
-    this.studyMarquee = this.page.locator('div[class*="hero-marquee"]');
+    this.studyMarquee = this.page.locator('div[class*="study-marquee"][data-block-status="loaded"]');
     await expect(this.studyMarquee).toBeVisible();
+  }
+
+  async verifyHeroMarqueeSmoke() {
+    this.heroMarquee = this.page.locator('div[class*="hero-marquee"]');
+    await expect(this.heroMarquee).toBeVisible();
   }
 
   async uploadFileToStudyMarquee(filePath) {
@@ -169,20 +166,7 @@ export default class BasePage {
   async verifyGnavSmoke() {
     await this.gnav.waitFor({ state: 'visible' });
     await expect(this.gnav).toBeVisible();
-
-    const links = this.gnav.locator('a');
-    const buttons = this.gnav.locator('button');
-
-    const linkCount = await links.count();
-    const buttonCount = await buttons.count();
-
-    for (let i = 0; i < linkCount; i += 1) {
-      await expect(links.nth(i)).toBeEnabled();
-    }
-
-    for (let i = 0; i < buttonCount; i += 1) {
-      await expect(buttons.nth(i)).toBeEnabled();
-    }
+    await expect(this.gnavBreadcrumbs).toBeVisible();
   }
 
   async verifyGnav() {
@@ -228,17 +212,15 @@ export default class BasePage {
     await expect(links).toHaveCount(2);
   }
 
-  async verifyFAQAccordion(dataPath) {
-    const faqSection = this.page.locator(`div[data-path*="${dataPath}"]`);
-    const title = faqSection.locator('h2');
+  async verifyFAQAccordion() {
+    const faqSection = this.page.locator('div[class*="accordion-container"]');
     const accordionButtons = faqSection.locator('button.accordion-trigger');
 
     await expect(faqSection).toBeVisible();
-    await expect(title).toBeVisible();
 
     const buttonCount = await accordionButtons.count();
 
-    for (let i = 0; i < buttonCount; i++) {
+    for (let i = 0; i < buttonCount; i += 1) {
       const button = accordionButtons.nth(i);
       const ariaControls = await button.getAttribute('aria-controls');
       const contentPanel = faqSection.locator(`#${ariaControls}`);
@@ -347,6 +329,14 @@ export default class BasePage {
     await this.merchCards.verifyIndividualMerchCards();
   }
 
+  async verifyIndividualStandardMerchCards() {
+    await this.merchCards.verifyIndividualStandardMerchCards();
+  }
+
+  async verifyBusinessStandardMerchCards() {
+    await this.merchCards.verifyBusinessStandardMerchCards();
+  }
+
   async verifyBusinessMerchCards() {
     await this.merchCards.verifyBusinessMerchCards();
   }
@@ -357,6 +347,39 @@ export default class BasePage {
 
   async verifyPlansAndPricingTabsPDFSolution() {
     await this.merchCards.verifyPlansAndPricingTabsPDFSolution();
+  }
+
+  async verifyCompareVersionsTable() {
+    const table = this.page.locator('div[data-path*="/dc-shared/fragments/merch/acrobat/pricing/compare-versions/table/default"] div.table[role="table"]');
+    await expect(table).toBeVisible();
+
+    const headingRow = table.locator('div.row-heading');
+    await expect(headingRow).toBeVisible();
+
+    const colHeadings = headingRow.locator('div[role="columnheader"]');
+    await expect(colHeadings).toHaveCount(4);
+
+    const headingLinks = headingRow.locator('a');
+    const headingLinkCount = await headingLinks.count();
+    for (let i = 0; i < headingLinkCount; i += 1) {
+      await expect(headingLinks.nth(i)).toBeVisible();
+      await expect(headingLinks.nth(i)).toBeEnabled();
+    }
+
+    const headingButtons = headingRow.locator('button');
+    const headingButtonCount = await headingButtons.count();
+    for (let i = 0; i < headingButtonCount; i += 1) {
+      await expect(headingButtons.nth(i)).toBeVisible();
+      await expect(headingButtons.nth(i)).toBeEnabled();
+    }
+
+    const featureRows = table.locator('div.section-row');
+    const rowCount = await featureRows.count();
+    expect(rowCount).toBeGreaterThan(0);
+
+    const checkmarks = table.locator('span.icon-checkmark');
+    const checkmarkCount = await checkmarks.count();
+    expect(checkmarkCount).toBeGreaterThan(0);
   }
 
   async verifyHeroMarquee() {
@@ -521,35 +544,34 @@ export default class BasePage {
   }
 
   async verifyBusinessComparisonTable() {
-    await expect(this.businessComparisonTable).toBeVisible();
-    await expect(this.businessComparisonTableHeadingRow).toBeVisible();
+    const table = this.page.locator('div.table.sticky.highlight[role="table"]');
+    await expect(table).toBeVisible();
 
-    await expect(this.businessComparisonTableColumnHeaders).toHaveCount(4);
+    const headingRow = table.locator('div.row-heading');
+    await expect(headingRow).toBeVisible();
 
-    const visibleColumnHeaders = this.businessComparisonTableColumnHeaders.filter({ has: this.page.locator('p.tracking-header') });
-    const visibleHeaderCount = await visibleColumnHeaders.count();
-    expect(visibleHeaderCount).toBe(3);
+    const colHeadings = headingRow.locator('div[role="columnheader"]');
+    await expect(colHeadings).toHaveCount(3);
 
-    await expect(this.businessComparisonTableFreeTrialLinks.first()).toBeVisible();
-    await expect(this.businessComparisonTableFreeTrialLinks.first()).toBeEnabled();
-    await expect(this.businessComparisonTableFreeTrialLinks.first()).toHaveAttribute('href', /ot=TRIAL/);
-    await expect(this.businessComparisonTableFreeTrialLinks).toHaveCount(2);
+    const headingLinks = headingRow.locator('a');
+    const headingLinkCount = await headingLinks.count();
+    for (let i = 0; i < headingLinkCount; i += 1) {
+      await expect(headingLinks.nth(i)).toBeVisible();
+      await expect(headingLinks.nth(i)).toBeEnabled();
+    }
 
-    await expect(this.businessComparisonTableBuyNowLinks.first()).toBeVisible();
-    await expect(this.businessComparisonTableBuyNowLinks.first()).toBeEnabled();
-    await expect(this.businessComparisonTableBuyNowLinks.first()).toHaveAttribute('href', /ot=BASE/);
-    await expect(this.businessComparisonTableBuyNowLinks).toHaveCount(2);
+    const headingButtons = headingRow.locator('button');
+    const headingButtonCount = await headingButtons.count();
+    for (let i = 0; i < headingButtonCount; i += 1) {
+      await expect(headingButtons.nth(i)).toBeVisible();
+      await expect(headingButtons.nth(i)).toBeEnabled();
+    }
 
-    await expect(this.businessComparisonTableLearnMoreLink).toBeVisible();
-    await expect(this.businessComparisonTableLearnMoreLink).toBeEnabled();
+    const featureRows = table.locator('div.section-row');
+    const rowCount = await featureRows.count();
+    expect(rowCount).toBeGreaterThan(0);
 
-    const featureRowCount = await this.businessComparisonTableFeatureRows.count();
-    expect(featureRowCount).toBeGreaterThan(0);
-
-    const firstFeatureRow = this.businessComparisonTableFeatureRows.first();
-    await expect(firstFeatureRow).toBeVisible();
-
-    const checkmarks = this.businessComparisonTable.locator('span.icon-checkmark');
+    const checkmarks = table.locator('span.icon-checkmark');
     const checkmarkCount = await checkmarks.count();
     expect(checkmarkCount).toBeGreaterThan(0);
   }

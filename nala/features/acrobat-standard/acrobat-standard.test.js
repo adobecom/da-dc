@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 import AcrobatStandardPage from './acrobat-standard.page.js';
 import { features } from './acrobat-standard.spec.js';
 
@@ -14,36 +14,20 @@ test.describe('Acrobat Standard Smoke Test', () => {
     console.info(`[Acrobat Standard Test] Navigating to: ${path}`);
     await page.goto(path, { waitUntil: 'domcontentloaded' });
 
-    // Verify Global Navigation
-    await acrobatStandard.verifyGnav();
+    await acrobatStandard.verifyGnavSmoke();
+    await acrobatStandard.verifyHeroMarqueeSmoke();
 
-    // Verify Hero Marquee
-    // await acrobatStandard.verifyHeroMarquee();
+    await acrobatStandard.merchCards.tabCompareIndividuals.click();
+    await acrobatStandard.verifyIndividualStandardMerchCards();
 
-    // Verify Merch Card Plans section (tabs)
-    // await acrobatStandard.verifyMerchCardPlans();
+    await acrobatStandard.merchCards.tabCompareBusiness.click();
+    await acrobatStandard.verifyBusinessStandardMerchCards();
 
-    // // Click Individuals tab and verify cards
-    // await acrobatStandard.merchCards.tabCompareIndividuals.click();
-    // await acrobatStandard.verifyIndividualMerchCards();
+    await acrobatStandard.merchCards.tabCompareStudentsAndTeachers.click();
+    await acrobatStandard.verifyStudentsAndTeachersMerchCards();
 
-    // // Click Business tab and verify cards
-    // await acrobatStandard.merchCards.tabCompareBusiness.click();
-    // await acrobatStandard.verifyBusinessMerchCards();
-
-    // // Click Students & Teachers tab and verify cards
-    // await acrobatStandard.merchCards.tabCompareStudentsAndTeachers.click();
-    // await acrobatStandard.verifyStudentsAndTeachersMerchCards();
-
-    // Verify FAQ
-    await expect(acrobatStandard.acrobatOverviewFAQ).toBeVisible();
-    await expect(acrobatStandard.acrobatOverviewFAQTitle).toBeVisible();
-    await expect(acrobatStandard.acrobatOverviewFAQButton.first()).toBeVisible();
-
-    // Verify Promo Sticky
-    // await acrobatStandard.verifyPromoSticky();
-
-    // Verify Footer
+    await acrobatStandard.verifyFAQAccordion();
+    await acrobatStandard.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');  
     await acrobatStandard.verifyFooter();
   });
 });

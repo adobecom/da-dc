@@ -27,7 +27,7 @@ test.describe('Acrobat PDF Reader Smoke Test', () => {
     await pdfReaderPage.merchCards.tabCompareStudentsAndTeachers.click();
     await pdfReaderPage.verifyStudentsAndTeachersMerchCards();
 
-    // await pdfReaderPage.verifyFAQAccordion('/dc-shared/fragments/faq/acrobat-overview-faq');
+    // await pdfReaderPage.verifyFAQAccordion();
     await pdfReaderPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
     await pdfReaderPage.verifyFooter();
   });

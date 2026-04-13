@@ -27,7 +27,7 @@ test.describe('Complete PDF Solution Smoke Tests', () => {
     await expect(acrobatProWithAIBuyNow.last()).toBeVisible();
     await expect(acrobatProWithAIBuyNow.last()).toBeEnabled();
     await pdfSolutionPage.verifyPlansAndPricingTabsPDFSolution();
-    await pdfSolutionPage.verifyFAQAccordion('/dc-shared/fragments/acrobat/complete-pdf-solution/faq-acrobat-pro');
+    await pdfSolutionPage.verifyFAQAccordion();
     await pdfSolutionPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/acrobat-here-to-help-blade');
     await pdfSolutionPage.verifyFooterOptions();
   });
@@ -43,7 +43,7 @@ test.describe('Complete PDF Solution Smoke Tests', () => {
     await expect(acrobatProWithAiFreeTrial.last()).toBeEnabled();
 
     await pdfSolutionPage.verifyPlansAndPricingTabsPDFSolution();
-    await pdfSolutionPage.verifyFAQAccordion('/dc-shared/fragments/acrobat/complete-pdf-solution/faq-acrobat-pro');
+    await pdfSolutionPage.verifyFAQAccordion();
     await pdfSolutionPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/acrobat-here-to-help-blade');
     await pdfSolutionPage.verifyFooterOptions();
   });
