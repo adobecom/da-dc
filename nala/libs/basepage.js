@@ -122,7 +122,7 @@ export default class BasePage {
   async uploadFileToStudyMarquee(filePath) {
     const [fileChooser] = await Promise.all([
       this.page.waitForEvent('filechooser'),
-      this.page.locator('button.study-marquee-cta').click(),
+      this.page.locator('main button.study-marquee-cta').click(),
     ]);
     await fileChooser.setFiles(filePath);
   }
@@ -130,7 +130,7 @@ export default class BasePage {
   async uploadFileToVerbWidget(verb, filePath) {
     const [fileChooser] = await Promise.all([
       this.page.waitForEvent('filechooser'),
-      this.page.locator(`div[class*="verb-widget ${verb}"]`).click(),
+      this.page.locator(`main div[class*="verb-widget ${verb}"]`).first().click(),
     ]);
     await fileChooser.setFiles(filePath);
   }

@@ -21,7 +21,7 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
 
     await acrobat.verifyFAQAccordion();
 
-    await acrobat.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support'); 
+    await acrobat.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
     // await acrobat.verifyPromoSticky();
     // Verify Footer
     await acrobat.verifyFooter();
