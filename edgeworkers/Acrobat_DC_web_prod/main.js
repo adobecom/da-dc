@@ -445,7 +445,8 @@ async function frictionlessResponseProvider(request) {
     rewriter.onElement('link[rel="canonical"]', el => {
       const href = el.getAttribute('href');
       if (href && href.includes('/dc-shared')) {
-        el.setAttribute('href', href.replace('/dc-shared', ''));
+        const newHref = href.replace('/dc-shared', '');
+        el.replaceWith(`<link rel="canonical" href="${newHref}">`);
       }
     });
   }
