@@ -8,7 +8,7 @@ module.exports = {
       path: '/acrobat/online/pdf-editor',
       verb: 'add-comment',
       data: {},
-      tags: '@online @edit @verbs @pdf-editor @smoke @live',
+      tags: '@online @edit @verbs @pdf-editor @smoke @live @nopr',
     },
     {
       tcid: '1',
@@ -16,7 +16,7 @@ module.exports = {
       path: '/acrobat/online/merge-pdf',
       verb: 'combine-pdf',
       data: {},
-      tags: '@online @edit @verbs @merge-pdf @smoke @live',
+      tags: '@online @edit @verbs @merge-pdf @smoke @live @nopr',
     },
     {
       tcid: '2',
@@ -24,7 +24,7 @@ module.exports = {
       path: '/acrobat/online/split-pdf',
       verb: 'split-pdf',
       data: {},
-      tags: '@online @edit @verbs @split-pdf @smoke @live',
+      tags: '@online @edit @verbs @split-pdf @smoke @live @nopr',
     },
     {
       tcid: '3',
@@ -32,7 +32,7 @@ module.exports = {
       path: '/acrobat/online/crop-pdf',
       verb: 'crop-pages',
       data: {},
-      tags: '@online @edit @verbs @crop-pdf @smoke @live',
+      tags: '@online @edit @verbs @crop-pdf @smoke @live @nopr',
     },
     {
       tcid: '4',
@@ -40,7 +40,7 @@ module.exports = {
       path: '/acrobat/online/delete-pdf-pages',
       verb: 'delete-pages',
       data: {},
-      tags: '@online @edit @verbs @delete-pdf-pages @smoke @live',
+      tags: '@online @edit @verbs @delete-pdf-pages @smoke @live @nopr',
     },
     {
       tcid: '5',
@@ -48,7 +48,7 @@ module.exports = {
       path: '/acrobat/online/rotate-pdf',
       verb: 'rotate-pages',
       data: {},
-      tags: '@online @edit @verbs @rotate-pdf @smoke @live',
+      tags: '@online @edit @verbs @rotate-pdf @smoke @live @nopr',
     },
     {
       tcid: '6',
@@ -56,7 +56,7 @@ module.exports = {
       path: '/acrobat/online/rearrange-pdf',
       verb: 'reorder-pages',
       data: {},
-      tags: '@online @edit @verbs @rearrange-pdf @smoke @live',
+      tags: '@online @edit @verbs @rearrange-pdf @smoke @live @nopr',
     },
     {
       tcid: '7',
@@ -64,7 +64,7 @@ module.exports = {
       path: '/acrobat/online/extract-pdf-pages',
       verb: 'extract-pages',
       data: {},
-      tags: '@online @edit @verbs @extract-pdf-pages @smoke @live',
+      tags: '@online @edit @verbs @extract-pdf-pages @smoke @live @nopr',
     },
     {
       tcid: '8',
@@ -72,7 +72,7 @@ module.exports = {
       path: '/acrobat/online/add-pages-to-pdf',
       verb: 'insert-pdf',
       data: {},
-      tags: '@online @edit @verbs @add-pages-to-pdf @smoke @live',
+      tags: '@online @edit @verbs @add-pages-to-pdf @smoke @live @nopr',
     },
     {
       tcid: '9',
@@ -80,7 +80,7 @@ module.exports = {
       path: '/acrobat/online/add-pdf-page-numbers',
       verb: 'number-pages',
       data: {},
-      tags: '@online @edit @verbs @add-pdf-page-numbers @smoke @live',
+      tags: '@online @edit @verbs @add-pdf-page-numbers @smoke @live @nopr',
     },
   ],
 };

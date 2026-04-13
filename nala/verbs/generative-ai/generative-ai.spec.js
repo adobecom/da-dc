@@ -8,7 +8,7 @@ module.exports = {
       path: '/acrobat/online/ai-chat-pdf',
       verb: 'chat-pdf',
       data: {},
-      tags: '@online @gen-ai @verbs @ai-chat-pdf @smoke @live',
+      tags: '@online @gen-ai @verbs @ai-chat-pdf @smoke @live @nopr',
     },
     {
       tcid: '1',
@@ -16,7 +16,7 @@ module.exports = {
       path: '/acrobat/online/ai-summary-generator',
       verb: 'summarize-pdf',
       data: {},
-      tags: '@online @gen-ai @verbs @ai-summary-generator @smoke @live',
+      tags: '@online @gen-ai @verbs @ai-summary-generator @smoke @live @nopr',
     },
     {
       tcid: '2',
@@ -24,7 +24,7 @@ module.exports = {
       path: '/acrobat/online/pdf-ai',
       verb: 'pdf-ai',
       data: {},
-      tags: '@online @gen-ai @verbs @pdf-ai @smoke @live',
+      tags: '@online @gen-ai @verbs @pdf-ai @smoke @live @nopr',
     },
     {
       tcid: '3',
@@ -32,7 +32,7 @@ module.exports = {
       path: '/acrobat/online/flashcard-maker',
       verb: 'flashcard-maker',
       data: {},
-      tags: '@online @gen-ai @verbs @flashcard-maker @smoke @live',
+      tags: '@online @gen-ai @verbs @flashcard-maker @smoke @live @nopr',
     },
     {
       tcid: '4',
@@ -40,7 +40,7 @@ module.exports = {
       path: '/acrobat/online/quiz-maker',
       verb: 'quiz-maker',
       data: {},
-      tags: '@online @gen-ai @verbs @quiz-maker @smoke @live',
+      tags: '@online @gen-ai @verbs @quiz-maker @smoke @live @nopr',
     },
   ],
 };

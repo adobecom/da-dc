@@ -8,7 +8,7 @@ module.exports = {
       path: '/acrobat/online/compress-pdf',
       verb: 'compress-pdf',
       data: {},
-      tags: '@online @reduce-size @verbs @compress-pdf @smoke @live',
+      tags: '@online @reduce-size @verbs @compress-pdf @smoke @live @nopr',
     },
   ],
 };

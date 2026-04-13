@@ -8,7 +8,7 @@ module.exports = {
       path: '/acrobat/online/sign-pdf',
       verb: 'fillsign',
       data: {},
-      tags: '@online @sign @verbs @sign-pdf @smoke @live',
+      tags: '@online @sign @verbs @sign-pdf @smoke @live @nopr',
     },
     {
       tcid: '1',
@@ -16,7 +16,7 @@ module.exports = {
       path: '/acrobat/online/request-signature',
       verb: 'sendforsignature',
       data: {},
-      tags: '@online @sign @verbs @request-signature @smoke @live',
+      tags: '@online @sign @verbs @request-signature @smoke @live @nopr',
     },
     {
       tcid: '2',
@@ -24,7 +24,7 @@ module.exports = {
       path: '/acrobat/online/password-protect-pdf',
       verb: 'protect-pdf',
       data: {},
-      tags: '@online @sign @verbs @password-protect-pdf @smoke @live',
+      tags: '@online @sign @verbs @password-protect-pdf @smoke @live @nopr',
     },
   ],
 };

@@ -8,7 +8,7 @@ module.exports = {
       path: '/acrobat/online/pdf-to-word',
       verb: 'pdf-to-word',
       data: {},
-      tags: '@online @convert @verbs @pdf-to-word @smoke @live',
+      tags: '@online @convert @verbs @pdf-to-word @smoke @live @nopr',
     },
     {
       tcid: '1',
@@ -16,7 +16,7 @@ module.exports = {
       path: '/acrobat/online/pdf-to-excel',
       verb: 'pdf-to-excel',
       data: {},
-      tags: '@online @convert @verbs @pdf-to-excel @smoke @live',
+      tags: '@online @convert @verbs @pdf-to-excel @smoke @live @nopr',
     },
     {
       tcid: '2',
@@ -24,7 +24,7 @@ module.exports = {
       path: '/acrobat/online/pdf-to-ppt',
       verb: 'pdf-to-ppt',
       data: {},
-      tags: '@online @convert @verbs @pdf-to-ppt @smoke @live',
+      tags: '@online @convert @verbs @pdf-to-ppt @smoke @live @nopr',
     },
     {
       tcid: '3',
@@ -32,7 +32,7 @@ module.exports = {
       path: '/acrobat/online/pdf-to-jpg',
       verb: 'pdf-to-image',
       data: {},
-      tags: '@online @convert @verbs @pdf-to-jpg @smoke @live',
+      tags: '@online @convert @verbs @pdf-to-jpg @smoke @live @nopr',
     },
     {
       tcid: '4',
@@ -40,7 +40,7 @@ module.exports = {
       path: '/acrobat/online/pdf-to-png',
       verb: 'pdf-to-png',
       data: {},
-      tags: '@online @convert @verbs @pdf-to-png @smoke @live',
+      tags: '@online @convert @verbs @pdf-to-png @smoke @live @nopr',
     },
     {
       tcid: '5',
@@ -48,7 +48,7 @@ module.exports = {
       path: '/acrobat/online/word-to-pdf',
       verb: 'word-to-pdf',
       data: {},
-      tags: '@online @convert @verbs @word-to-pdf @smoke @live',
+      tags: '@online @convert @verbs @word-to-pdf @smoke @live @nopr',
     },
     {
       tcid: '6',
@@ -56,7 +56,7 @@ module.exports = {
       path: '/acrobat/online/excel-to-pdf',
       verb: 'excel-to-pdf',
       data: {},
-      tags: '@online @convert @verbs @excel-to-pdf @smoke @live',
+      tags: '@online @convert @verbs @excel-to-pdf @smoke @live @nopr',
     },
     {
       tcid: '7',
@@ -64,7 +64,7 @@ module.exports = {
       path: '/acrobat/online/ppt-to-pdf',
       verb: 'ppt-to-pdf',
       data: {},
-      tags: '@online @convert @verbs @ppt-to-pdf @smoke @live',
+      tags: '@online @convert @verbs @ppt-to-pdf @smoke @live @nopr',
     },
     {
       tcid: '8',
@@ -72,7 +72,7 @@ module.exports = {
       path: '/acrobat/online/jpg-to-pdf',
       verb: 'jpg-to-pdf',
       data: {},
-      tags: '@online @convert @verbs @jpg-to-pdf @smoke @live',
+      tags: '@online @convert @verbs @jpg-to-pdf @smoke @live @nopr',
     },
     {
       tcid: '9',
@@ -80,7 +80,7 @@ module.exports = {
       path: '/acrobat/online/png-to-pdf',
       verb: 'png-to-pdf',
       data: {},
-      tags: '@online @convert @verbs @png-to-pdf @smoke @live',
+      tags: '@online @convert @verbs @png-to-pdf @smoke @live @nopr',
     },
     {
       tcid: '10',
@@ -88,7 +88,7 @@ module.exports = {
       path: 'https://acrobat.adobe.com/heic-to-pdf',
       verb: 'heic-to-pdf',
       data: {},
-      tags: '@online @convert @verbs @heic-to-pdf @smoke @live',
+      tags: '@online @convert @verbs @heic-to-pdf @smoke @live @nopr',
     },
     {
       tcid: '11',
@@ -96,7 +96,7 @@ module.exports = {
       path: '/acrobat/online/convert-pdf',
       verb: 'createpdf',
       data: {},
-      tags: '@online @convert @verbs @convert-pdf @smoke @live',
+      tags: '@online @convert @verbs @convert-pdf @smoke @live @nopr',
     },
     {
       tcid: '12',
@@ -104,7 +104,7 @@ module.exports = {
       path: '/acrobat/online/ocr-pdf',
       verb: 'ocr-pdf',
       data: {},
-      tags: '@online @convert @verbs @ocr-pdf @smoke @live',
+      tags: '@online @convert @verbs @ocr-pdf @smoke @live @nopr',
     },
   ],
 };
