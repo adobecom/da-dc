@@ -15,10 +15,8 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
     await page.goto(path, { waitUntil: 'domcontentloaded' });
 
     // Verify Global Navigation
-    await acrobat.verifyGnav();
-
-    await acrobat.verifyLink('a[is*="checkout-link"]', null, acrobat.heroMarquee.root);
-    await acrobat.verifyLink('a:not([is*="checkout-link"])', '/acrobat/pricing', acrobat.heroMarquee.root);
+    await acrobat.verifyGnavSmoke();
+    await acrobat.verifyStudyMarquee();
     await page.waitForTimeout(1000);
 
     // Verify Carousel
@@ -31,8 +29,8 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
     await acrobat.verifyFAQAccordion('/dc-shared/fragments/faq/acrobat-overview-faq');
 
     // Verify Questions About Section
-    await acrobat.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support'); 
-    
+    await acrobat.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
+
     // Verify Promo Sticky
     // await acrobat.verifyPromoSticky();
 

@@ -28,7 +28,7 @@ test.describe('Acrobat Pro Smoke Test', () => {
     await acrobatPro.verifyFAQAccordion('/dc-shared/fragments/faq/acrobat-overview-faq');
 
     // Verify Questions About Section
-    await acrobatPro.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support'); 
+    await acrobatPro.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
 
     // Verify Footer
     await acrobatPro.verifyFooter();

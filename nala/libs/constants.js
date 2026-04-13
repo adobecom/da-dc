@@ -8,6 +8,7 @@ const BASE_URLS = {
   local: 'http://localhost:3000',
   stage: `http://stage--${DEFAULT_REPO}--${DEFAULT_ORG}.aem.live`,
   main: `https://main--${DEFAULT_REPO}--${DEFAULT_ORG}.aem.live`,
+  prod: 'https://www.adobe.com',
 };
 
 // Utility function to generate branch live URLs dynamically

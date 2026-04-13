@@ -44,7 +44,7 @@ test.describe('Acrobat Pricing Smoke Tests', () => {
     await expect(checkoutLink).toBeEnabled();
 
     await pricingPage.verifyFAQAccordion('/dc-shared/fragments/faq/acrobat-overview-faq');
-    await pricingPage.verifyFooter()
+    await pricingPage.verifyFooter();
   });
 
   test(`${features[3].name}, ${features[3].tags}`, async ({ page }) => {

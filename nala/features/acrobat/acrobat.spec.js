@@ -8,7 +8,7 @@ module.exports = {
       path: '/acrobat',
       data: {
         heroTitle: 'Do more with Acrobat',
-      },  
+      },
       tags: '@acrobat @smoke @live',
     },
   ],

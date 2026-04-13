@@ -37,7 +37,6 @@ test.describe('Acrobat Business Smoke Tests', () => {
 
     await businessPage.verifyMultipleComparisonTables();
 
-
     await businessPage.verifyFooter();
   });
 });

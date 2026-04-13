@@ -46,7 +46,5 @@ test.describe('Complete PDF Solution Smoke Tests', () => {
     await pdfSolutionPage.verifyFAQAccordion('/dc-shared/fragments/acrobat/complete-pdf-solution/faq-acrobat-pro');
     await pdfSolutionPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/acrobat-here-to-help-blade');
     await pdfSolutionPage.verifyFooterOptions();
-
-
   });
 });

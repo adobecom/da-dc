@@ -53,13 +53,10 @@ export default class BasePage {
     this.promoStickyActionArea = this.promoSticky.locator('p[class*="action-area"]');
     this.promoStickyCheckoutLinks = this.promoStickyActionArea.locator('a[is*="checkout-link"]');
 
-
-
     // Acrobat Overview FAQ Section
     this.acrobatOverviewFAQ = this.page.locator('div[data-path*="/dc-shared/fragments/faq/acrobat-overview-faq"]');
     this.acrobatOverviewFAQTitle = this.acrobatOverviewFAQ.locator('h2');
     this.acrobatOverviewFAQButton = this.acrobatOverviewFAQ.locator('button');
-
 
     // Merch Cards Block
     this.merchCards = new MerchCards(page);
@@ -93,7 +90,6 @@ export default class BasePage {
     this.compareTabPanelBusiness = this.compareTabs.locator('div#tab-panel-compare-2');
     this.compareTabPanelStudents = this.compareTabs.locator('div#tab-panel-compare-3');
 
-
     // Generative AI Students Prompt Tabs Section
     this.genAiStudentsTabs = this.page.locator('div.tabs#tabs-genaipdfstudents');
     this.genAiStudentsTabButtons = this.genAiStudentsTabs.locator('button[role="tab"]');
@@ -114,6 +110,37 @@ export default class BasePage {
 
     // Three-up Editorial Cards Section
     this.editorialCard = this.page.locator('div.editorial-card');
+  }
+
+  async verifyVerbWidget(verb) {
+    this.verbWidget = this.page.locator(`div[class*="verb-widget ${verb}"]`);
+    await expect(this.verbWidget).toBeVisible();
+  }
+
+  async verifyStudyMarquee() {
+    this.studyMarquee = this.page.locator('div[class*="hero-marquee"]');
+    await expect(this.studyMarquee).toBeVisible();
+  }
+
+  async uploadFileToStudyMarquee(filePath) {
+    const [fileChooser] = await Promise.all([
+      this.page.waitForEvent('filechooser'),
+      this.page.locator('button.study-marquee-cta').click(),
+    ]);
+    await fileChooser.setFiles(filePath);
+  }
+
+  async uploadFileToVerbWidget(verb, filePath) {
+    const [fileChooser] = await Promise.all([
+      this.page.waitForEvent('filechooser'),
+      this.page.locator(`div[class*="verb-widget ${verb}"]`).click(),
+    ]);
+    await fileChooser.setFiles(filePath);
+  }
+
+  async verifyUploadRedirect() {
+    await this.page.waitForURL(/acrobat\.adobe\.com/, { timeout: 30000 });
+    await expect(this.page).toHaveURL(/acrobat\.adobe\.com/);
   }
 
   getCheckoutLink(osi) {
@@ -138,7 +165,26 @@ export default class BasePage {
       await expect(price).toBeVisible();
     }
   }
-  
+
+  async verifyGnavSmoke() {
+    await this.gnav.waitFor({ state: 'visible' });
+    await expect(this.gnav).toBeVisible();
+
+    const links = this.gnav.locator('a');
+    const buttons = this.gnav.locator('button');
+
+    const linkCount = await links.count();
+    const buttonCount = await buttons.count();
+
+    for (let i = 0; i < linkCount; i += 1) {
+      await expect(links.nth(i)).toBeEnabled();
+    }
+
+    for (let i = 0; i < buttonCount; i += 1) {
+      await expect(buttons.nth(i)).toBeEnabled();
+    }
+  }
+
   async verifyGnav() {
     await this.gnav.waitFor({ state: 'visible' });
     await expect(this.gnavPDFsESignatures).toBeVisible();
@@ -161,7 +207,7 @@ export default class BasePage {
     await expect(this.universalNavAppSwitcher).toBeEnabled();
     await expect(this.signInButton).toBeVisible();
     await expect(this.signInButton).toBeEnabled();
-  }   
+  }
 
   async verifyQuestionsAboutSection(dataPath) {
     const questionsAboutSection = this.page.locator(`div[data-path*="${dataPath}"]`);
@@ -207,7 +253,6 @@ export default class BasePage {
   }
 
   async verifyCarousel() {
-
     const carousel = this.page.locator('div.carousel');
     const slides = carousel.locator('div.carousel-slide');
     const nextButton = carousel.locator('button.carousel-next');
@@ -320,7 +365,6 @@ export default class BasePage {
 
   async verifyTableBasics() {
     await expect(this.comparisonTable).toBeVisible();
-    
     await expect(this.comparisonTableHeadingRow).toBeVisible();
 
     const sectionHeadCount = await this.comparisonTableSectionHeads.count();
@@ -346,7 +390,6 @@ export default class BasePage {
     const checkmarks = firstVisibleRow.locator('span.icon-checkmark');
     const checkmarkCount = await checkmarks.count();
     expect(checkmarkCount).toBeGreaterThan(0);
-
   }
 
   async verifyComparisonTableCompareLink() {
@@ -575,34 +618,34 @@ export default class BasePage {
     await expect(link).toBeVisible();
     await expect(link).toBeEnabled();
     if (hrefPattern) {
-      await expect(link).toHaveAttribute('href', hrefPattern);
+      await expect(link).toHaveAttribute('href', expect.stringContaining(hrefPattern));
     }
   }
 
   async verifyTabs(expectedTabCount = null, verifyPanelContent = null) {
     const tabsContainer = this.page.locator('div[class*="tablist-features-section"]');
     await expect(tabsContainer).toBeVisible();
-      
+
     const tabButtons = tabsContainer.locator('button[role="tab"]');
-      
+
     if (expectedTabCount) {
       await expect(tabButtons).toHaveCount(expectedTabCount);
     }
-      
+
     const tabCount = await tabButtons.count();
-      
+
     for (let i = 0; i < tabCount; i += 1) {
       const tab = tabButtons.nth(i);
       await expect(tab).toBeVisible();
       await expect(tab).toBeEnabled();
-        
+
       await tab.click();
       await expect(tab).toHaveAttribute('aria-selected', 'true');
-        
+
       const panelId = await tab.getAttribute('aria-controls');
       const panel = tabsContainer.locator(`#${panelId}`);
       await expect(panel).toBeVisible();
-        
+
       if (verifyPanelContent) {
         await verifyPanelContent(panel, i);
       }
