@@ -186,6 +186,7 @@ export default class BasePage {
     await expect(this.gnavLearnAndSupport).toBeVisible();
     await expect(this.gnavLearnAndSupport).toBeEnabled();
 
+    await this.universalNav.waitFor({ state: 'visible' });
     await expect(this.universalNav).toBeVisible();
     await expect(this.universalNavAppSwitcher).toBeVisible();
     await expect(this.universalNavAppSwitcher).toBeEnabled();
