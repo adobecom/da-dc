@@ -440,6 +440,16 @@ async function frictionlessResponseProvider(request) {
     });
   };
 
+  // remove wrong canonical caused by duplicating content
+  function fixCanonical() {
+    rewriter.onElement('link[rel="canonical"]', el => {
+      const href = el.getAttribute('href');
+      if (href && href.includes('/dc-shared')) {
+        el.setAttribute('href', href.replace('/dc-shared', ''));
+      }
+    });
+  }
+
   try {
     const miloBaseUrl = '/dc-shared';
     const [
@@ -460,6 +470,7 @@ async function frictionlessResponseProvider(request) {
 
     await inlineScripts(unityWorkflow, mobileWidget, scripts, dcConverter);
     inlineStyles(dcStyles, miloStyles, verbWidgetStyles, unityWorkflow, prerenderTop);
+    fixCanonical();
 
     const csp = contentSecurityPolicy(isProd, scriptHashes);
     const adobeid = isProd ? 'https://adobeid-na1.services.adobe.com' : 'https://adobeid-na1-stg1.services.adobe.com';
