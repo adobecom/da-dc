@@ -136,7 +136,7 @@ export default class BasePage {
   }
 
   async verifyUploadRedirect() {
-    await this.page.waitForURL(/acrobat\.adobe\.com/, { timeout: 30000 });
+    await this.page.waitForURL(/acrobat\.adobe\.com/, { timeout: 30000, waitUntil: 'domcontentloaded' });
     await expect(this.page).toHaveURL(/acrobat\.adobe\.com/);
   }
 
