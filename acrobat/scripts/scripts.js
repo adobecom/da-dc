@@ -489,16 +489,20 @@ async function loadPage() {
   // Setup Milo
   const miloLibs = setLibs(LIBS);
 
-  // Milo and site styles
-  if (!document.getElementById('inline-milo-styles')) {
-    const paths = [`${miloLibs}/styles/styles.css`];
-    if (STYLES) { paths.push(STYLES); }
-    paths.forEach((css) => loadStyle(css));
-  }
-
   // Import base milo features and run them
   const { loadArea, setConfig, loadLana, getMetadata, loadIms } = await import(`${miloLibs}/utils/utils.js`);
   addLocale(ietf);
+
+  // Milo and site styles
+  if (!document.getElementById('inline-milo-styles')) {
+    const paths = [];
+    const stylesPrefix = getMetadata('foundation') === 'c2' ? '/c2' : '';
+    paths.push(`${miloLibs}${stylesPrefix}/styles/styles.css`);
+    const skin = getMetadata('skin');
+    if (skin) paths.push(`${miloLibs}/styles/skins/${skin}.css`);
+    if (STYLES) { paths.push(STYLES); }
+    paths.forEach((css) => loadStyle(css));
+  }
 
   if (getMetadata('commerce')) {
     const { default: replacePlaceholdersWithImages } = await import('./imageReplacer.js');
