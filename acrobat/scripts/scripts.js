@@ -486,12 +486,22 @@ async function loadPage() {
     }
   })();
 
+  function getCustomMetadata(name, doc = document) {
+    const attr = name && name.includes(':') ? 'property' : 'name';
+    const meta = doc.head.querySelector(`meta[${attr}="${name}"]`);
+    return meta && meta.content;
+  }
+
   // Setup Milo
   const miloLibs = setLibs(LIBS);
 
   // Milo and site styles
   if (!document.getElementById('inline-milo-styles')) {
-    const paths = [`${miloLibs}/styles/styles.css`];
+    const paths = [];
+    const stylesPrefix = getCustomMetadata('foundation') === 'c2' ? '/c2' : '';
+    paths.push(`${miloLibs}${stylesPrefix}/styles/styles.css`);
+    const skin = getCustomMetadata('skin');
+    if (skin) paths.push(`${miloLibs}/styles/skins/${skin}.css`);
     if (STYLES) { paths.push(STYLES); }
     paths.forEach((css) => loadStyle(css));
   }
