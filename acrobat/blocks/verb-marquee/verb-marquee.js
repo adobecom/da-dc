@@ -59,6 +59,7 @@ const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 const lanaOptions = {
   sampleRate: 100,
   tags: 'DC_Milo,Project Unity (DC)',
+  severity: 'error',
 };
 
 const ICONS = {
@@ -665,7 +666,7 @@ export default async function init(element) {
       window.dispatchEvent(redirectReady);
       window.lana?.log(
         'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
-        { sampleRate: 5, tags: 'DC_Milo,Project Unity (DC)' },
+        { sampleRate: 5, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
       );
     }, 3000);
     setCookie('UTS_Uploaded', Date.now(), cookieExp);

@@ -18,8 +18,8 @@ const onRedirect = (e) => {
     // temporary solution: allows analytics to go thru
   }, 100);
 };
-const onError = (e) => {
-  window.lana?.log('on error:', e);
+const onError = () => {
+  window.lana?.log('on error', { severity: 'error' });
 };
 
 export function loadWrapper() {
@@ -34,7 +34,7 @@ function getDestURL(url) {
   try {
     destURL = new URL(url);
   } catch (err) {
-    window.lana?.log(`invalid redirect uri for susi-light: ${url}`);
+    window.lana?.log(`invalid redirect uri for susi-light: ${url}`, { severity: 'error' });
     destURL = new URL('https://www.adobe.com');
   }
   if (isStage) {
