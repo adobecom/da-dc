@@ -75,8 +75,7 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         'https://www.adobe.com/acrobat/styles/styles.css',
         'https://www.adobe.com/libs/styles/styles.css',
         'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
-        'https://www.adobe.com/acrobat/blocks/study-marquee/study-marquee.css',
-        'https://www.adobe.com/dc/dc-generate-cache/dc-hosted-1.0/pdf-to-ppt-en-us.html'
+        'https://www.adobe.com/acrobat/blocks/study-marquee/study-marquee.css'
       ]);
     });
   });
@@ -95,8 +94,7 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         'https://www.adobe.com/acrobat/styles/styles.css',
         'https://www.adobe.com/libs/styles/styles.css',
         'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
-        'https://www.adobe.com/acrobat/blocks/study-marquee/study-marquee.css',
-        'https://www.adobe.com/dc/dc-generate-cache/dc-hosted-1.0/pdf-to-ppt-ja-jp.html'
+        'https://www.adobe.com/acrobat/blocks/study-marquee/study-marquee.css'
       ]);
     });
   });  
