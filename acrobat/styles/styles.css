@@ -154,7 +154,6 @@ div [class *= PdfnowLifecycle__dropzone2___] {
 }
 
 .media .image img {
-  aspect-ratio: 5/3;
   width: 100%;
   object-fit: contain;
 }
