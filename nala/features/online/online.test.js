@@ -17,6 +17,7 @@ test.describe('Acrobat Online Tools Smoke Tests', () => {
       await expect(onlinePage.heroTitle).toBeVisible();
       await expect(onlinePage.gnav).toBeVisible();
       await expect(onlinePage.footer.first()).toBeVisible();
+      await onlinePage.verifyAllCheckoutLinks();
     });
   });
 });

@@ -29,5 +29,6 @@ test.describe('Acrobat Standard Smoke Test', () => {
     await acrobatStandard.verifyFAQAccordion();
     await acrobatStandard.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
     await acrobatStandard.verifyFooter();
+    await acrobatStandard.verifyAllCheckoutLinks();
   });
 });

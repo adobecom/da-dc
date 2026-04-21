@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 import AcrobatPage from './acrobat.page.js';
 import { features } from './acrobat.spec.js';
 
@@ -25,5 +25,6 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
     // await acrobat.verifyPromoSticky();
     // Verify Footer
     await acrobat.verifyFooter();
+    await acrobat.verifyAllCheckoutLinks();
   });
 });

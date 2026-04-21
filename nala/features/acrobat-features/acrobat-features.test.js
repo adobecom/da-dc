@@ -25,6 +25,7 @@ test.describe('Acrobat Features Smoke Tests', () => {
     await acrobatFeaturesPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
 
     await acrobatFeaturesPage.verifyFooter();
+    await acrobatFeaturesPage.verifyAllCheckoutLinks();
   });
 
   test(`${features[1].name}, ${features[1].tags}`, async ({ page }) => {
@@ -36,6 +37,7 @@ test.describe('Acrobat Features Smoke Tests', () => {
     await acrobatFeaturesPage.verifyStudentsAndTeachersMerchCards();
     await acrobatFeaturesPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
     await acrobatFeaturesPage.verifyFooter();
+    await acrobatFeaturesPage.verifyAllCheckoutLinks();
   });
 
   test(`${features[2].name}, ${features[2].tags}`, async ({ page }) => {
@@ -57,5 +59,6 @@ test.describe('Acrobat Features Smoke Tests', () => {
     // await acrobatFeaturesPage.verifyThreeUpEditorialCards();
     await acrobatFeaturesPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
     await acrobatFeaturesPage.verifyFooter();
+    await acrobatFeaturesPage.verifyAllCheckoutLinks();
   });
 });

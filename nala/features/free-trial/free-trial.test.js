@@ -33,5 +33,6 @@ test.describe('Acrobat Free Trial Smoke Test', () => {
     await expect(acrobatProBuyNowLink).toBeEnabled();
 
     await freeTrialPage.verifyFooter();
+    await freeTrialPage.verifyAllCheckoutLinks();
   });
 });

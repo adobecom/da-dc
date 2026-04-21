@@ -19,6 +19,7 @@ test.describe('Acrobat Pricing Smoke Tests', () => {
     await pricingPage.verifyFAQAccordion();
     await pricingPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/acrobat-here-to-help-blade');
     await pricingPage.verifyFooterOptions();
+    await pricingPage.verifyAllCheckoutLinks();
   });
 
   test(`${features[1].name}, ${features[1].tags}`, async ({ page }) => {
@@ -31,6 +32,7 @@ test.describe('Acrobat Pricing Smoke Tests', () => {
     await expect(legalblock).toBeVisible();
     await pricingPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/acrobat-here-to-help-blade');
     await pricingPage.verifyFooterOptions();
+    await pricingPage.verifyAllCheckoutLinks();
   });
 
   test(`${features[2].name}, ${features[2].tags}`, async ({ page }) => {
@@ -45,16 +47,18 @@ test.describe('Acrobat Pricing Smoke Tests', () => {
 
     await pricingPage.verifyFAQAccordion();
     await pricingPage.verifyFooter();
+    await pricingPage.verifyAllCheckoutLinks();
   });
 
   test(`${features[3].name}, ${features[3].tags}`, async ({ page }) => {
     console.info(`[Pricing Test] Navigating to: ${features[3].path}`);
     await page.goto(features[3].path, { waitUntil: 'domcontentloaded' });
     await pricingPage.verifyPricingBusinessPageMerchCards();
-    await pricingPage.verifyComparisonTable();
+    await pricingPage.verifyBusinessComparisonTable();
     await pricingPage.verifyComparisonTableSectionToggle();
     await pricingPage.verifyFAQAccordion();
     await pricingPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/acrobat-here-to-help-blade');
     await pricingPage.verifyFooterOptions();
+    await pricingPage.verifyAllCheckoutLinks();
   });
 });

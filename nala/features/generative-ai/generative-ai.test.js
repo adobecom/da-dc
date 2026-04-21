@@ -23,6 +23,7 @@ test.describe('Acrobat Generative AI Smoke Test', () => {
     await generativeAiPage.verifyFAQAccordion();
 
     await generativeAiPage.verifyFooter();
+    await generativeAiPage.verifyAllCheckoutLinks();
   });
 
   test(`${features[1].name}, ${features[1].tags}`, async ({ page }) => {
@@ -41,5 +42,6 @@ test.describe('Acrobat Generative AI Smoke Test', () => {
     await generativeAiPage.verifyFAQAccordion();
 
     await generativeAiPage.verifyFooter();
+    await generativeAiPage.verifyAllCheckoutLinks();
   });
 });

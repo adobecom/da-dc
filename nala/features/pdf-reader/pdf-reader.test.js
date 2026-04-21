@@ -30,5 +30,6 @@ test.describe('Acrobat PDF Reader Smoke Test', () => {
     // await pdfReaderPage.verifyFAQAccordion();
     await pdfReaderPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/get-acrobat-support');
     await pdfReaderPage.verifyFooter();
+    await pdfReaderPage.verifyAllCheckoutLinks();
   });
 });

@@ -30,6 +30,7 @@ test.describe('Complete PDF Solution Smoke Tests', () => {
     await pdfSolutionPage.verifyFAQAccordion();
     await pdfSolutionPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/acrobat-here-to-help-blade');
     await pdfSolutionPage.verifyFooterOptions();
+    await pdfSolutionPage.verifyAllCheckoutLinks();
   });
 
   test(`${features[1].name}, ${features[1].tags}`, async ({ page }) => {
@@ -46,5 +47,6 @@ test.describe('Complete PDF Solution Smoke Tests', () => {
     await pdfSolutionPage.verifyFAQAccordion();
     await pdfSolutionPage.verifyQuestionsAboutSection('/dc-shared/fragments/acrobat/acrobat-here-to-help-blade');
     await pdfSolutionPage.verifyFooterOptions();
+    await pdfSolutionPage.verifyAllCheckoutLinks();
   });
 });

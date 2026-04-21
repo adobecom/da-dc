@@ -152,6 +152,17 @@ export default class BasePage {
     }
   }
 
+  async verifyAllCheckoutLinks() {
+    const checkoutLinks = this.page.locator('a[is="checkout-link"]');
+    const count = await checkoutLinks.count();
+    for (let i = 0; i < count; i += 1) {
+      const link = checkoutLinks.nth(i);
+      if (await link.isVisible()) {
+        await expect(link).toBeEnabled();
+      }
+    }
+  }
+
   getPrice(osi) {
     return this.page.locator(`span[is="inline-price"][data-wcs-osi="${osi}"]`);
   }
@@ -388,6 +399,7 @@ export default class BasePage {
   }
 
   async verifyTableBasics() {
+    await this.comparisonTable.scrollIntoViewIfNeeded();
     await expect(this.comparisonTable).toBeVisible();
     await expect(this.comparisonTableHeadingRow).toBeVisible();
 

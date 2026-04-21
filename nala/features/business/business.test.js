@@ -18,6 +18,7 @@ test.describe('Acrobat Business Smoke Tests', () => {
     await businessPage.verifyBusinessComparisonTable();
 
     await businessPage.verifyFooter();
+    await businessPage.verifyAllCheckoutLinks();
   });
 
   test(`${features[1].name}, ${features[1].tags}`, async ({ page }) => {
@@ -26,6 +27,7 @@ test.describe('Acrobat Business Smoke Tests', () => {
     await page.goto(path, { waitUntil: 'domcontentloaded' });
 
     await businessPage.verifyBusinessSignMerchCards();
+    await businessPage.verifyAllCheckoutLinks();
   });
 
   test(`${features[2].name}, ${features[2].tags}`, async ({ page }) => {
@@ -37,5 +39,6 @@ test.describe('Acrobat Business Smoke Tests', () => {
     await businessPage.verifyMultipleComparisonTables();
 
     await businessPage.verifyFooter();
+    await businessPage.verifyAllCheckoutLinks();
   });
 });

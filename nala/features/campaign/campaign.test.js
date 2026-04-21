@@ -33,5 +33,6 @@ test.describe('Acrobat Campaign Smoke Test', () => {
     await expect(campaignPage.acrobatProTeamsPricingLink).toBeVisible();
     await expect(campaignPage.acrobatProTeamsPricingLink).toBeEnabled();
     await expect(campaignPage.acrobatProTeamsPricingLink).toHaveAttribute('href', /pricing\/business/);
+    await campaignPage.verifyAllCheckoutLinks();
   });
 });

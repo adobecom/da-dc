@@ -17,6 +17,7 @@ test.describe('Acrobat Generative AI PDF Smoke Tests', () => {
       await expect(aiPdfPage.heroTitle).toBeVisible();
       await expect(aiPdfPage.gnav).toBeVisible();
       await expect(aiPdfPage.footer.first()).toBeVisible();
+      await aiPdfPage.verifyAllCheckoutLinks();
     });
   });
 });

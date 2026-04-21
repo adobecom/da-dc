@@ -31,5 +31,6 @@ test.describe('Acrobat Pro Smoke Test', () => {
 
     // Verify Footer
     await acrobatPro.verifyFooter();
+    await acrobatPro.verifyAllCheckoutLinks();
   });
 });
