@@ -73,30 +73,36 @@ function eventData(metaData, { appReferrer: referrer, trackingId: tracking }) {
 
 function createPayloadForSplunk(metaData) {
   const {
-    verb, eventName, noOfFiles, uploadTime, type, size, count, workflowStep, uploadType, userAttempts, errorData, chunkUploadAttempt, chunkNumber, assetId, maxRetryCount
+    verb, eventName, noOfFiles, uploadTime, type, size, count, workflowStep,
+    uploadType, userAttempts, errorData, chunkUploadAttempt, chunkNumber, assetId, maxRetryCount,
   } = metaData;
 
   return {
     event: {
       name: eventName,
-      category: "acrobat",
+      category: 'acrobat',
       subcategory: verb,
       ...(uploadTime && { uploadTime }),
-      ...(uploadType && { uploadType })
+      ...(uploadType && { uploadType }),
     },
-    content: { type, size, count, fileType: type, totalSize: size,
+    content: {
+      type,
+      size,
+      count,
+      fileType: type,
+      totalSize: size,
       ...(workflowStep && { workflowStep }),
       ...(noOfFiles && { no_of_files: noOfFiles }),
       ...(chunkUploadAttempt && { chunkUploadAttempt }),
       ...(chunkNumber && { chunkNumber }),
       ...(assetId && { assetId }),
-      ...(maxRetryCount && { maxRetryCount })
+      ...(maxRetryCount && { maxRetryCount }),
     },
     source: {
       user_agent: navigator.userAgent,
       lang: document.documentElement.lang,
-      app_name: `unity`,
-      url: window.location.href
+      app_name: 'unity',
+      url: window.location.href,
     },
     user: {
       locale: document.documentElement.lang.toLocaleLowerCase(),
@@ -113,17 +119,19 @@ function createPayloadForSplunk(metaData) {
   };
 }
 
+// eslint-disable-next-line max-len, compat/compat
 export function sendAnalyticsToSplunk(eventName, verb, metaData, splunkEndpoint, sendBeacon = false) {
   try {
     const eventDataPayload = createPayloadForSplunk({ ...metaData, eventName, verb });
     const payloadString = JSON.stringify(eventDataPayload);
-    if (sendBeacon && navigator.sendBeacon && navigator.sendBeacon(splunkEndpoint, payloadString)) return;
+    if (sendBeacon && navigator.sendBeacon
+      && navigator.sendBeacon(splunkEndpoint, payloadString)) return;
     fetch(splunkEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: payloadString,
     });
-  } catch(error) {
+  } catch (error) {
     window.lana?.log(
       `An error occurred while sending ${eventName} to splunk, verb: ${verb}, metadata: ${metaData}, error: ${error}`,
       { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'error' },
