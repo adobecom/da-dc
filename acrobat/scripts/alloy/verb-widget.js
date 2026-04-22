@@ -126,6 +126,7 @@ export function sendAnalyticsToSplunk(eventName, verb, metaData, splunkEndpoint,
     const payloadString = JSON.stringify(eventDataPayload);
     if (sendBeacon && navigator.sendBeacon
       && navigator.sendBeacon(splunkEndpoint, payloadString)) return;
+    // eslint-disable-next-line compat/compat
     fetch(splunkEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
