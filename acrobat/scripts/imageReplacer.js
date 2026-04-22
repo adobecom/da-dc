@@ -15,7 +15,7 @@ export default async function replacePlaceholdersWithImages(locale, miloLibs) {
           class: 'credit-cards-icon',
           style: 'min-height: 33px;',
           'data-country': `${country}`,
-          onerror: `window.lana?.log('Failed to load credit-card icon ${country}'); this.remove()`,
+          onerror: `window.lana?.log('Failed to load credit-card icon ${country}', { severity: 'warning' }); this.remove()`,
         });
         p.replaceWith(img);
       }

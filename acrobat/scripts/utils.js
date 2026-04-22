@@ -100,7 +100,7 @@ export async function loadPlaceholders(prefix) {
         });
       }
     } catch (error) {
-      window.lana?.log(`Failed to load placeholders: ${error?.message}`);
+      window.lana?.log(`Failed to load placeholders: ${error?.message}`, { severity: 'error' });
     }
   }
 }
