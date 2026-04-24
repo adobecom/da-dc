@@ -122,6 +122,11 @@
 
 .verb-marquee-copy-sub {
   font-size: 20px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.42em;
+  align-items: start;
+  max-width: 480px;
 }
 
 .verb-marquee-heading + .verb-marquee-copy {
@@ -136,14 +141,6 @@
 
 .verb-marquee-col-left > .verb-marquee-copy:has(+ .verb-marquee-copy-sub) {
   margin-bottom: -16px;
-}
-
-.verb-marquee-copy-sub {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  column-gap: 0.42em;
-  align-items: start;
-  max-width: 480px;
 }
 
 .verb-marquee-copy-sub-icon {
