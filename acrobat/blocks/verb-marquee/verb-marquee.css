@@ -967,20 +967,12 @@
         line-height: 0.98;
         font-size: 42px;
       }
-
-      .text-block [class*="body-"] {
-        font-size: 24px;
-      }
     }
 
     @media screen and (min-width: 1200px) {
       .text-block [class*="heading-"] {
         line-height: 0.98;
         font-size: 48px;
-      }
-
-      .text-block [class*="body-"] {
-        font-size: 24px;
       }
 
       .editorial-card [class*="heading-"],
