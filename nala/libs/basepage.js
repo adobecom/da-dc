@@ -120,9 +120,17 @@ export default class BasePage {
   }
 
   async uploadFileToStudyMarquee(filePath) {
+    // Scope to the loaded block (same as verifyStudyMarquee). Requiring `main` breaks when the
+    // marquee lives outside <main> or when another CTA inside main matches first.
+    const marquee = this.page.locator('div[class*="study-marquee"][data-block-status="loaded"]').first();
+    await marquee.waitFor({ state: 'visible', timeout: 60000 });
+    const cta = marquee.locator('button.study-marquee-cta');
+    await cta.scrollIntoViewIfNeeded();
+    // filechooser is tied to automation; if this flakes, use the scoped file input:
+    // await marquee.locator('input[type="file"]#file-upload').setInputFiles(filePath);
     const [fileChooser] = await Promise.all([
-      this.page.waitForEvent('filechooser'),
-      this.page.locator('main button.study-marquee-cta').click(),
+      this.page.waitForEvent('filechooser', { timeout: 60000 }),
+      cta.click(),
     ]);
     await fileChooser.setFiles(filePath);
   }
