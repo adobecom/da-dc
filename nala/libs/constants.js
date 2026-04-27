@@ -13,7 +13,9 @@ const BASE_URLS = {
 
 // Utility function to generate branch live URLs dynamically
 function getBranchUrl(branch, repo = DEFAULT_REPO, org = DEFAULT_ORG, path = '') {
-  return `https://${branch}--${repo}--${org}.aem.live${path.startsWith('/') ? '' : '/'}${path}`;
+  const base = `https://${branch}--${repo}--${org}.aem.live`;
+  if (!path) return base;
+  return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
 // Optional extras you can extend:
