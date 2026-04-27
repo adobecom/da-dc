@@ -624,7 +624,7 @@
   justify-content: center;
   align-items: center;
   padding: 8px;
-  z-index: 2;
+  z-index: 5;
 }
 
 .verb-marquee .close-icon {
