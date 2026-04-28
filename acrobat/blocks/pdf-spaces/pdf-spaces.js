@@ -55,25 +55,38 @@ async function getImsToken() {
 
 async function getAuthorization() {
   const result = await getImsToken();
+  const isGuest = !!(result.isGuestToken || result.token?.isGuestToken)
+    || !window.adobeIMS?.isSignedInUser?.();
   console.log('[pdf-spaces] ims token result:', {
     hasToken: !!result.token?.token,
-    isGuestToken: !!(result.isGuestToken || result.token?.isGuestToken),
+    isGuestToken: isGuest,
     tokenExpire: result.token?.expire,
     error: result.error?.message,
     imsAvailable: !!window.adobeIMS,
     isSignedIn: window.adobeIMS?.isSignedInUser?.() || false,
   });
-  const auth = result.token?.token ? `Bearer ${result.token.token}` : null;
-  console.log('[pdf-spaces] using auth scheme:', auth ? 'Bearer' : 'none');
+  if (isGuest) {
+    console.log('[pdf-spaces] using auth scheme: Guest Token');
+    return 'Guest Token';
+  }
+  const auth = result.token?.token ? `Bearer ${result.token.token}` : 'Guest Token';
+  console.log('[pdf-spaces] using auth scheme:', auth.startsWith('Bearer') ? 'Bearer' : 'Guest Token');
   return auth;
 }
 
 function authScheme(authorization) {
-  return authorization?.startsWith('Bearer') ? 'Bearer' : authorization || 'none';
+  if (!authorization) return 'none';
+  if (authorization.startsWith('Bearer')) return 'Bearer';
+  return authorization;
 }
 
 async function readErrorBody(res) {
   try { return (await res.text()).slice(0, 500); } catch { return ''; }
+}
+
+function genRequestId() {
+  if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 function buildHeaders(authorization, accept, additional = {}) {
@@ -82,7 +95,6 @@ function buildHeaders(authorization, accept, additional = {}) {
     Authorization: authorization,
     'Cache-Control': 'no-cache',
     Pragma: 'no-cache',
-    'x-api-client-id': DEFAULT_API_CLIENT_ID,
     ...additional,
   };
 }
@@ -114,14 +126,8 @@ async function fetchDiscovery(authorization) {
     return cachedDiscoveryEndpoint;
   }
   console.log('[pdf-spaces] discovery request:', { url: getDiscoveryUrl(), auth: authScheme(authorization) });
-  let res = await fetch(getDiscoveryUrl(), { headers: buildHeaders(authorization, DISCOVERY_ACCEPT) });
+  const res = await fetch(getDiscoveryUrl(), { headers: buildHeaders(authorization, DISCOVERY_ACCEPT) });
   console.log('[pdf-spaces] discovery response status:', res.status);
-  if (res.status === 401 && authorization?.startsWith('Bearer ')) {
-    const rawToken = authorization.slice('Bearer '.length);
-    console.warn('[pdf-spaces] retrying discovery without "Bearer " prefix (matches rnr block convention)');
-    res = await fetch(getDiscoveryUrl(), { headers: buildHeaders(rawToken, DISCOVERY_ACCEPT) });
-    console.log('[pdf-spaces] discovery retry status:', res.status);
-  }
   if (!res.ok) {
     const body = await readErrorBody(res);
     console.error('[pdf-spaces] discovery failed:', { status: res.status, auth: authScheme(authorization), body });
@@ -168,8 +174,14 @@ async function fetchCuratedCollections(cfg) {
       country: cfg.country,
       language: cfg.language,
     });
-    console.log('[pdf-spaces] curated collections request:', { url, auth: authScheme(authorization) });
-    const res = await fetch(url, { headers: buildHeaders(authorization, COLLECTION_ACCEPT) });
+    const requestId = genRequestId();
+    console.log('[pdf-spaces] curated collections request:', { url, auth: authScheme(authorization), requestId });
+    const res = await fetch(url, {
+      headers: buildHeaders(authorization, COLLECTION_ACCEPT, {
+        'x-api-client-id': DEFAULT_API_CLIENT_ID,
+        'x-request-id': requestId,
+      }),
+    });
     console.log('[pdf-spaces] curated collections response status:', res.status);
     if (!res.ok) {
       const body = await readErrorBody(res);
