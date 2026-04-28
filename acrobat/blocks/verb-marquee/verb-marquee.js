@@ -763,6 +763,36 @@ export default async function init(element) {
     errorStateText.textContent = '';
     clearSrAlert();
   });
+  function soloUpload() {
+    if (!useFileUpload || !fileInput || !ctaButton) return;
+    const uploadLinks = document.querySelectorAll('a[href*="#upload"]');
+    uploadLinks.forEach((link) => {
+      const labelElement = createTag('label', {
+        for: 'file-upload',
+        class: 'verb-marquee-cta verb-marquee-cta-solo',
+        tabindex: 0,
+        'daa-ll': ctaButton.textContent,
+        'aria-label': ctaButton.textContent,
+      });
+      labelElement.innerHTML = ctaButton.innerHTML;
+      const wrapper = link.closest('div');
+      if (!wrapper) return;
+      wrapper.append(labelElement);
+      link.remove();
+      labelElement.addEventListener('click', (data) => {
+        [
+          'filepicker:shown',
+          'cta:choose-file-clicked',
+          'files-selected',
+          'entry:clicked',
+          'discover:clicked',
+        ].forEach((analyticsEvent) => {
+          window.analytics.verbAnalytics(analyticsEvent, VERB, { ...data, userAttempts });
+        });
+      });
+    });
+  }
+  runWhenDocumentIsReady(soloUpload);
   element.addEventListener('unity:track-analytics', (e) => {
     const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
     const { event, data } = e.detail || {};

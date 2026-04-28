@@ -280,6 +280,26 @@
   background-color: #0D66D0;
 }
 
+.verb-marquee-cta-solo {
+  display: inline-flex;
+  padding: 9px 18px 10px;
+  min-width: auto;
+  font-size: 17px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.verb-marquee-cta-solo:hover {
+  text-decoration: none;
+  color: #FFF;
+}
+
+@media screen and (max-width: 600px) {
+  .verb-marquee-cta-solo {
+    inline-size: auto;
+  }
+}
+
 .verb-marquee-mobile-cta {
   display: inline-flex;
   padding: 12px 24px;
