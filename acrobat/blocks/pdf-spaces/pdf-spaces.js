@@ -63,12 +63,8 @@ async function getAuthorization() {
     imsAvailable: !!window.adobeIMS,
     isSignedIn: window.adobeIMS?.isSignedInUser?.() || false,
   });
-  if (result.isGuestToken || result.token?.isGuestToken) {
-    console.log('[pdf-spaces] using auth scheme: Guest Token');
-    return 'Guest Token';
-  }
-  const auth = result.token?.token ? `Bearer ${result.token.token}` : 'Guest Token';
-  console.log('[pdf-spaces] using auth scheme:', auth.startsWith('Bearer') ? 'Bearer' : 'Guest Token');
+  const auth = result.token?.token ? `Bearer ${result.token.token}` : null;
+  console.log('[pdf-spaces] using auth scheme:', auth ? 'Bearer' : 'none');
   return auth;
 }
 
@@ -117,10 +113,15 @@ async function fetchDiscovery(authorization) {
     console.log('[pdf-spaces] discovery (cached):', cachedDiscoveryEndpoint);
     return cachedDiscoveryEndpoint;
   }
-  const headers = buildHeaders(authorization, DISCOVERY_ACCEPT);
   console.log('[pdf-spaces] discovery request:', { url: getDiscoveryUrl(), auth: authScheme(authorization) });
-  const res = await fetch(getDiscoveryUrl(), { headers });
+  let res = await fetch(getDiscoveryUrl(), { headers: buildHeaders(authorization, DISCOVERY_ACCEPT) });
   console.log('[pdf-spaces] discovery response status:', res.status);
+  if (res.status === 401 && authorization?.startsWith('Bearer ')) {
+    const rawToken = authorization.slice('Bearer '.length);
+    console.warn('[pdf-spaces] retrying discovery without "Bearer " prefix (matches rnr block convention)');
+    res = await fetch(getDiscoveryUrl(), { headers: buildHeaders(rawToken, DISCOVERY_ACCEPT) });
+    console.log('[pdf-spaces] discovery retry status:', res.status);
+  }
   if (!res.ok) {
     const body = await readErrorBody(res);
     console.error('[pdf-spaces] discovery failed:', { status: res.status, auth: authScheme(authorization), body });
