@@ -26,15 +26,17 @@ All rows are optional. Use any subset.
 | eyebrow    | FEATURED     |
 | button     | Explore now  |
 | limit      | 4            |
+| background | #f5f5f5      |
 
-| Key        | Default                                  | Notes                                                         |
-| ---------- | ---------------------------------------- | ------------------------------------------------------------- |
-| `publicId` | `kwc_curated`                            | Will vary per category once additional public IDs ship.       |
-| `country`  | Derived from Milo locale, fallback `US`  | Forwarded to the curated-collections API.                     |
-| `language` | Derived from Milo locale, fallback `en-US` | BCP-47 (e.g. `en-US`, `de-DE`).                              |
-| `eyebrow`  | `FEATURED`                               | Small uppercase label above the title.                        |
-| `button`   | `Explore now`                            | CTA label.                                                    |
-| `limit`    | (no limit)                               | Cap on number of cards rendered.                              |
+| Key          | Default                                  | Notes                                                         |
+| ------------ | ---------------------------------------- | ------------------------------------------------------------- |
+| `publicId`   | `kwc_curated`                            | Will vary per category once additional public IDs ship.       |
+| `country`    | Derived from Milo locale, fallback `US`  | Forwarded to the curated-collections API.                     |
+| `language`   | Derived from Milo locale, fallback `en-US` | BCP-47 (e.g. `en-US`, `de-DE`).                              |
+| `eyebrow`    | `FEATURED`                               | Small uppercase label above the title.                        |
+| `button`     | `Explore now`                            | CTA label.                                                    |
+| `limit`      | (no limit)                               | Cap on number of cards rendered.                              |
+| `background` | (none — `no-bg` applied)                 | Hex (`#f5f5f5`), CSS color name (`red`), or image URL. URLs render via a `<div class="background">` (mirrors `editorial-card`); colors are applied as `background-color`. |
 
 ### Variations
 
@@ -52,7 +54,7 @@ Any class added to the `pdf-spaces` block element is forwarded to every generate
 | `center` / `footer-align-left` / `footer-align-center` | Alignment helpers.                              |
 | `open`                               | Adds the editorial-card "open" treatment (`l-rounded-corners-image`, `static-links-copy`, `no-border`). |
 
-`no-bg` is always applied because cards are dynamic and have no authored background row.
+When no `background` row is authored, `no-bg` is applied (matches `editorial-card`'s default). Authoring a `background` value drops `no-bg` and applies the color or image.
 
 ### Page structure
 

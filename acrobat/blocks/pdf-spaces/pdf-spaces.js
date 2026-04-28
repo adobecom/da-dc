@@ -192,8 +192,32 @@ function applyClickableCard(card) {
   });
 }
 
+function isImageUrl(value) {
+  if (!value) return false;
+  if (/^(https?:)?\/\//i.test(value) || value.startsWith('/')) return true;
+  return /\.(png|jpe?g|webp|gif|svg|avif)(\?|#|$)/i.test(value);
+}
+
+function applyBackground(card, value) {
+  if (!value) return;
+  if (isImageUrl(value)) {
+    card.style.background = 'transparent';
+    const bg = createTag('div', { class: 'background' });
+    const picture = createTag('picture');
+    const img = createTag('img', {
+      src: value, alt: '', loading: 'lazy', 'aria-hidden': 'true',
+    });
+    picture.append(img);
+    bg.append(picture);
+    card.prepend(bg);
+  } else {
+    card.style.backgroundColor = value;
+  }
+}
+
 function buildCard(collection, cfg) {
-  const baseClasses = ['pdf-spaces-card', 'editorial-card', 'con-block', 'no-bg'];
+  const baseClasses = ['pdf-spaces-card', 'editorial-card', 'con-block'];
+  if (!cfg.background) baseClasses.push('no-bg');
   const card = createTag('div', { class: [...baseClasses, ...cfg.variantClasses].join(' ') });
   const href = buildSpaceUrl(collection);
 
@@ -227,6 +251,7 @@ function buildCard(collection, cfg) {
   footer.append(actionArea);
 
   card.append(mediaArea, foreground, footer);
+  applyBackground(card, cfg.background);
   if (cfg.variantClasses.includes('click')) applyClickableCard(card);
   return card;
 }

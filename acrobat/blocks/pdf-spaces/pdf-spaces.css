@@ -12,6 +12,8 @@
 .pdf-spaces-card {
   --pdf-spaces-radius: 16px;
 
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -20,6 +22,21 @@
   overflow: hidden;
   height: 100%;
   box-sizing: border-box;
+}
+
+.pdf-spaces-card > .background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.pdf-spaces-card > .background picture,
+.pdf-spaces-card > .background img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .pdf-spaces-card,
