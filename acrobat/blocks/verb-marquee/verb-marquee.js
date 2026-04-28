@@ -502,6 +502,7 @@ export default async function init(element) {
     }
   }
 
+  let soloClicked = false;
   let fileInput = null;
   if (useFileUpload) {
     fileInput = createTag('input', {
@@ -737,6 +738,10 @@ export default async function init(element) {
       }
     });
     fileInput.addEventListener('click', () => {
+      if (soloClicked) {
+        soloClicked = false;
+        return;
+      }
       [
         'filepicker:shown',
         'dropzone:choose-file-clicked',
@@ -780,6 +785,7 @@ export default async function init(element) {
       wrapper.append(labelElement);
       link.remove();
       labelElement.addEventListener('click', (data) => {
+        soloClicked = true;
         [
           'filepicker:shown',
           'cta:choose-file-clicked',
