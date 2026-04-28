@@ -55,23 +55,15 @@ async function getImsToken() {
 
 async function getAuthorization() {
   const result = await getImsToken();
-  const isGuest = !!(result.isGuestToken || result.token?.isGuestToken)
-    || !window.adobeIMS?.isSignedInUser?.();
   console.log('[pdf-spaces] ims token result:', {
     hasToken: !!result.token?.token,
-    isGuestToken: isGuest,
+    isGuestToken: !!(result.isGuestToken || result.token?.isGuestToken),
     tokenExpire: result.token?.expire,
     error: result.error?.message,
     imsAvailable: !!window.adobeIMS,
     isSignedIn: window.adobeIMS?.isSignedInUser?.() || false,
   });
-  if (isGuest) {
-    console.log('[pdf-spaces] using auth scheme: Guest Token');
-    return 'Guest Token';
-  }
-  const auth = result.token?.token ? `Bearer ${result.token.token}` : 'Guest Token';
-  console.log('[pdf-spaces] using auth scheme:', auth.startsWith('Bearer') ? 'Bearer' : 'Guest Token');
-  return auth;
+  return result.token?.token ? `Bearer ${result.token.token}` : null;
 }
 
 function authScheme(authorization) {
