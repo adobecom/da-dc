@@ -126,12 +126,7 @@ async function fetchDiscovery(authorization) {
     return cachedDiscoveryEndpoint;
   }
   console.log('[pdf-spaces] discovery request:', { url: getDiscoveryUrl(), auth: authScheme(authorization) });
-  const res = await fetch(getDiscoveryUrl(), {
-    headers: buildHeaders(authorization, DISCOVERY_ACCEPT),
-    mode: 'cors',
-    referrer: 'https://acrobat.adobe.com/',
-    referrerPolicy: 'unsafe-url',
-  });
+  const res = await fetch(getDiscoveryUrl(), { headers: buildHeaders(authorization, DISCOVERY_ACCEPT) });
   console.log('[pdf-spaces] discovery response status:', res.status);
   if (!res.ok) {
     const body = await readErrorBody(res);
@@ -186,9 +181,6 @@ async function fetchCuratedCollections(cfg) {
         'x-api-client-id': DEFAULT_API_CLIENT_ID,
         'x-request-id': requestId,
       }),
-      mode: 'cors',
-      referrer: 'https://acrobat.adobe.com/',
-      referrerPolicy: 'unsafe-url',
     });
     console.log('[pdf-spaces] curated collections response status:', res.status);
     if (!res.ok) {
