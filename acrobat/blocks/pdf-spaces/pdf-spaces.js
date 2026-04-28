@@ -89,6 +89,17 @@ function genRequestId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function toCurl(url, { method = 'GET', headers = {} } = {}) {
+  const escape = (v) => String(v).replace(/'/g, "'\\''");
+  const lines = [`curl '${escape(url)}'`];
+  if (method && method !== 'GET') lines.push(`  -X ${method}`);
+  Object.entries(headers).forEach(([k, v]) => {
+    if (v == null) return;
+    lines.push(`  -H '${escape(k)}: ${escape(v)}'`);
+  });
+  return lines.join(' \\\n');
+}
+
 function buildHeaders(authorization, accept, additional = {}) {
   return {
     Accept: accept,
@@ -126,7 +137,9 @@ async function fetchDiscovery(authorization) {
     return cachedDiscoveryEndpoint;
   }
   console.log('[pdf-spaces] discovery request:', { url: getDiscoveryUrl(), auth: authScheme(authorization) });
-  const res = await fetch(getDiscoveryUrl(), { headers: buildHeaders(authorization, DISCOVERY_ACCEPT) });
+  const discoveryHeaders = buildHeaders(authorization, DISCOVERY_ACCEPT);
+  console.log(`[pdf-spaces] discovery curl:\n${toCurl(getDiscoveryUrl(), { headers: discoveryHeaders })}`);
+  const res = await fetch(getDiscoveryUrl(), { headers: discoveryHeaders });
   console.log('[pdf-spaces] discovery response status:', res.status);
   if (!res.ok) {
     const body = await readErrorBody(res);
@@ -176,12 +189,12 @@ async function fetchCuratedCollections(cfg) {
     });
     const requestId = genRequestId();
     console.log('[pdf-spaces] curated collections request:', { url, auth: authScheme(authorization), requestId });
-    const res = await fetch(url, {
-      headers: buildHeaders(authorization, COLLECTION_ACCEPT, {
-        'x-api-client-id': DEFAULT_API_CLIENT_ID,
-        'x-request-id': requestId,
-      }),
+    const collectionsHeaders = buildHeaders(authorization, COLLECTION_ACCEPT, {
+      'x-api-client-id': DEFAULT_API_CLIENT_ID,
+      'x-request-id': requestId,
     });
+    console.log(`[pdf-spaces] curated collections curl:\n${toCurl(url, { headers: collectionsHeaders })}`);
+    const res = await fetch(url, { headers: collectionsHeaders });
     console.log('[pdf-spaces] curated collections response status:', res.status);
     if (!res.ok) {
       const body = await readErrorBody(res);
