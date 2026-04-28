@@ -26,6 +26,7 @@ const setLibs = (prodLibs, location = window.location) => {
   if (!['.aem.', '.hlx.', '.stage.', 'local', '.da.'].some((i) => hostname.includes(i))) return prodLibs;
   // eslint-disable-next-line compat/compat
   const branch = new URLSearchParams(search).get('milolibs') || 'main';
+  if (!/^[a-zA-Z0-9_-]+$/.test(branch)) throw new Error('Invalid branch name.');
   if (branch === 'main' && hostname === 'www.stage.adobe.com') return '/libs';
   if (branch === 'local') return 'http://localhost:6456/libs';
   return `https://${branch}${branch.includes('--') ? '' : '--milo--adobecom'}.aem.live/libs`;
@@ -486,12 +487,22 @@ async function loadPage() {
     }
   })();
 
+  function getCustomMetadata(name, doc = document) {
+    const attr = name && name.includes(':') ? 'property' : 'name';
+    const meta = doc.head.querySelector(`meta[${attr}="${name}"]`);
+    return meta && meta.content;
+  }
+
   // Setup Milo
   const miloLibs = setLibs(LIBS);
 
   // Milo and site styles
   if (!document.getElementById('inline-milo-styles')) {
-    const paths = [`${miloLibs}/styles/styles.css`];
+    const paths = [];
+    const stylesPrefix = getCustomMetadata('foundation') === 'c2' ? '/c2' : '';
+    paths.push(`${miloLibs}${stylesPrefix}/styles/styles.css`);
+    const skin = getCustomMetadata('skin');
+    if (skin) paths.push(`${miloLibs}/styles/skins/${skin}.css`);
     if (STYLES) { paths.push(STYLES); }
     paths.forEach((css) => loadStyle(css));
   }

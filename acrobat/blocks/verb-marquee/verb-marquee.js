@@ -59,6 +59,7 @@ const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 const lanaOptions = {
   sampleRate: 100,
   tags: 'DC_Milo,Project Unity (DC)',
+  severity: 'error',
 };
 
 const ICONS = {
@@ -501,6 +502,7 @@ export default async function init(element) {
     }
   }
 
+  let soloClicked = false;
   let fileInput = null;
   if (useFileUpload) {
     fileInput = createTag('input', {
@@ -665,7 +667,7 @@ export default async function init(element) {
       window.dispatchEvent(redirectReady);
       window.lana?.log(
         'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
-        { sampleRate: 5, tags: 'DC_Milo,Project Unity (DC)' },
+        { sampleRate: 5, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
       );
     }, 3000);
     setCookie('UTS_Uploaded', Date.now(), cookieExp);
@@ -736,6 +738,10 @@ export default async function init(element) {
       }
     });
     fileInput.addEventListener('click', () => {
+      if (soloClicked) {
+        soloClicked = false;
+        return;
+      }
       [
         'filepicker:shown',
         'dropzone:choose-file-clicked',
@@ -762,6 +768,37 @@ export default async function init(element) {
     errorStateText.textContent = '';
     clearSrAlert();
   });
+  function soloUpload() {
+    if (!useFileUpload || !fileInput || !ctaButton) return;
+    const uploadLinks = document.querySelectorAll('a[href*="#upload"]');
+    uploadLinks.forEach((link) => {
+      const labelElement = createTag('label', {
+        for: 'file-upload',
+        class: 'verb-marquee-cta verb-marquee-cta-solo',
+        tabindex: 0,
+        'daa-ll': ctaButton.textContent,
+        'aria-label': ctaButton.textContent,
+      });
+      labelElement.innerHTML = ctaButton.innerHTML;
+      const wrapper = link.closest('div');
+      if (!wrapper) return;
+      wrapper.append(labelElement);
+      link.remove();
+      labelElement.addEventListener('click', (data) => {
+        soloClicked = true;
+        [
+          'filepicker:shown',
+          'cta:choose-file-clicked',
+          'files-selected',
+          'entry:clicked',
+          'discover:clicked',
+        ].forEach((analyticsEvent) => {
+          window.analytics.verbAnalytics(analyticsEvent, VERB, { ...data, userAttempts });
+        });
+      });
+    });
+  }
+  runWhenDocumentIsReady(soloUpload);
   element.addEventListener('unity:track-analytics', (e) => {
     const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
     const { event, data } = e.detail || {};

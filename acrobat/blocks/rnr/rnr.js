@@ -26,6 +26,7 @@ const RNR_API_KEY = 'dc-general';
 const lanaOptions = {
   sampleRate: 10,
   tags: 'DC_Milo, RnR Block',
+  severity: 'error',
 };
 
 // #endregion
@@ -548,7 +549,7 @@ function initControls(element) {
     };
 
     if (!data.rating) {
-      window.lana.log(`RnR: Invalid rating ${formData.get('rating')}`);
+      window.lana.log(`RnR: Invalid rating ${formData.get('rating')}`, { severity: 'warning' });
       return;
     }
 
@@ -609,7 +610,7 @@ export default async function init(element) {
   initData();
   // Get verb from meta
   if (!metadata.verb) {
-    window.lana.log('RnR: Verb not configured for the rnr widget');
+    window.lana.log('RnR: Verb not configured for the rnr widget', { severity: 'warning' });
   }
   preloadIcons();
   await loadPlaceholders('rnr');

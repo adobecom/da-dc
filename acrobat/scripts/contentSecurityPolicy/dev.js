@@ -219,7 +219,8 @@ const scriptSrc = [
   '*.aem.page',
   '*.aem.live',
   'tr.snapchat.com',
-  '\'sha256-C/4SCwdHW/4BImT58K62vMSoPNegE8Fq2ms9JhDvBZE=\'',
+  '\'sha256-dg0pQ3tkJ9KWGwSBExDwP6bSUKm2FRzq/s0tHhkcDtk=\'', // for this repo
+  '\'sha256-/B9aRx/bHjiUGWHC/33Ku1McTNnFGEiLwTJdRki4www=\'', // for acrobat subdomain dc-frictionless
   ';',
 ];
 
