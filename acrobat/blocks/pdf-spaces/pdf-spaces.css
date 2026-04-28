@@ -1,0 +1,126 @@
+.pdf-spaces {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-s, 24px);
+  width: 100%;
+}
+
+.pdf-spaces.pdf-spaces--error {
+  display: none;
+}
+
+.pdf-spaces-card {
+  --pdf-spaces-radius: 16px;
+
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: var(--pdf-spaces-radius);
+  box-shadow: 0 4px 16px rgba(0 0 0 / 8%);
+  overflow: hidden;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.pdf-spaces-card,
+.pdf-spaces-card *,
+.pdf-spaces-card *::before,
+.pdf-spaces-card *::after {
+  box-sizing: border-box;
+}
+
+.pdf-spaces-card .media-area {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--color-gray-200, #f0f0f0);
+}
+
+.pdf-spaces-card .media-area picture,
+.pdf-spaces-card .media-area img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.pdf-spaces-card .foreground {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs, 8px);
+  padding: var(--spacing-s, 24px) var(--spacing-s, 24px) var(--spacing-xs, 16px);
+}
+
+.pdf-spaces-card .pdf-spaces-eyebrow {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-gray-700, #4b4b4b);
+}
+
+.pdf-spaces-card .pdf-spaces-title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 800;
+  color: var(--color-black, #1d1d1d);
+}
+
+.pdf-spaces-card .pdf-spaces-description {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--color-gray-700, #5d5d5d);
+}
+
+.pdf-spaces-card .card-footer {
+  margin-top: auto;
+  padding: var(--spacing-xs, 16px) var(--spacing-s, 24px) var(--spacing-s, 24px);
+}
+
+.pdf-spaces-card .card-footer .action-area {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.pdf-spaces-card .card-footer .con-button {
+  background-color: #1473e6;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdf-spaces-card .card-footer .con-button:hover {
+  background-color: #0d66d0;
+}
+
+.carousel .pdf-spaces-card,
+.tabs .pdf-spaces-card {
+  height: 100%;
+}
+
+@media (min-width: 600px) {
+  .pdf-spaces-card .pdf-spaces-title {
+    font-size: 24px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .pdf-spaces-card .media-area {
+    aspect-ratio: 4 / 5;
+  }
+
+  .pdf-spaces-card .pdf-spaces-title {
+    font-size: 26px;
+  }
+}
