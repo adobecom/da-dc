@@ -55,7 +55,29 @@ async function getImsToken() {
 
 async function getAuthorization() {
   const result = await getImsToken();
-  return result.token?.token ? `Bearer ${result.token.token}` : 'Guest Token';
+  console.log('[pdf-spaces] ims token result:', {
+    hasToken: !!result.token?.token,
+    isGuestToken: !!(result.isGuestToken || result.token?.isGuestToken),
+    tokenExpire: result.token?.expire,
+    error: result.error?.message,
+    imsAvailable: !!window.adobeIMS,
+    isSignedIn: window.adobeIMS?.isSignedInUser?.() || false,
+  });
+  if (result.isGuestToken || result.token?.isGuestToken) {
+    console.log('[pdf-spaces] using auth scheme: Guest Token');
+    return 'Guest Token';
+  }
+  const auth = result.token?.token ? `Bearer ${result.token.token}` : 'Guest Token';
+  console.log('[pdf-spaces] using auth scheme:', auth.startsWith('Bearer') ? 'Bearer' : 'Guest Token');
+  return auth;
+}
+
+function authScheme(authorization) {
+  return authorization?.startsWith('Bearer') ? 'Bearer' : authorization || 'none';
+}
+
+async function readErrorBody(res) {
+  try { return (await res.text()).slice(0, 500); } catch { return ''; }
 }
 
 function buildHeaders(authorization, accept, additional = {}) {
@@ -91,13 +113,26 @@ function findCuratedListingEndpoint(discovery) {
 }
 
 async function fetchDiscovery(authorization) {
-  if (cachedDiscoveryEndpoint) return cachedDiscoveryEndpoint;
+  if (cachedDiscoveryEndpoint) {
+    console.log('[pdf-spaces] discovery (cached):', cachedDiscoveryEndpoint);
+    return cachedDiscoveryEndpoint;
+  }
   const headers = buildHeaders(authorization, DISCOVERY_ACCEPT);
+  console.log('[pdf-spaces] discovery request:', { url: getDiscoveryUrl(), auth: authScheme(authorization) });
   const res = await fetch(getDiscoveryUrl(), { headers });
-  if (!res.ok) throw new Error(`Discovery failed: ${res.status}`);
+  console.log('[pdf-spaces] discovery response status:', res.status);
+  if (!res.ok) {
+    const body = await readErrorBody(res);
+    console.error('[pdf-spaces] discovery failed:', { status: res.status, auth: authScheme(authorization), body });
+    throw new Error(`Discovery failed: status=${res.status} auth=${authScheme(authorization)} body=${body}`);
+  }
   const json = await res.json();
   const endpoint = findCuratedListingEndpoint(json);
-  if (!endpoint) throw new Error('Curated listing endpoint not found in discovery');
+  console.log('[pdf-spaces] discovery endpoint resolved:', endpoint);
+  if (!endpoint) {
+    console.error('[pdf-spaces] discovery payload (no endpoint found):', json);
+    throw new Error('Curated listing endpoint not found in discovery');
+  }
   cachedDiscoveryEndpoint = endpoint;
   return endpoint;
 }
@@ -132,10 +167,18 @@ async function fetchCuratedCollections(cfg) {
       country: cfg.country,
       language: cfg.language,
     });
+    console.log('[pdf-spaces] curated collections request:', { url, auth: authScheme(authorization) });
     const res = await fetch(url, { headers: buildHeaders(authorization, COLLECTION_ACCEPT) });
-    if (!res.ok) throw new Error(`Curated collections failed: ${res.status}`);
+    console.log('[pdf-spaces] curated collections response status:', res.status);
+    if (!res.ok) {
+      const body = await readErrorBody(res);
+      console.error('[pdf-spaces] curated collections failed:', { status: res.status, auth: authScheme(authorization), body });
+      throw new Error(`Curated collections failed: status=${res.status} auth=${authScheme(authorization)} body=${body}`);
+    }
     const json = await res.json();
-    return json?.collections || json?.data || json?.items || [];
+    const collections = json?.collections || json?.data || json?.items || [];
+    console.log('[pdf-spaces] curated collections received:', { count: collections.length, sample: collections[0] });
+    return collections;
   })();
 
   apiCache.set(cacheKey, promise);
@@ -301,14 +344,18 @@ export default async function init(element) {
     variantClasses,
   };
 
+  console.log('[pdf-spaces] init config:', { ...cfg, variantClasses: cfg.variantClasses });
   try {
     const collections = await fetchCuratedCollections(cfg);
     if (!collections?.length) {
+      console.warn('[pdf-spaces] no collections returned, rendering error state');
       renderError(element);
       return;
     }
     renderCards(element, collections, cfg);
+    console.log('[pdf-spaces] rendered', collections.length, 'cards');
   } catch (e) {
+    console.error('[pdf-spaces] init failed:', e);
     window.lana?.log?.(`pdf-spaces failed: ${e?.message || e}`, { tags: 'pdf-spaces' });
     renderError(element);
   }
