@@ -8,11 +8,14 @@ const BASE_URLS = {
   local: 'http://localhost:3000',
   stage: `http://stage--${DEFAULT_REPO}--${DEFAULT_ORG}.aem.live`,
   main: `https://main--${DEFAULT_REPO}--${DEFAULT_ORG}.aem.live`,
+  prod: 'https://www.adobe.com',
 };
 
 // Utility function to generate branch live URLs dynamically
 function getBranchUrl(branch, repo = DEFAULT_REPO, org = DEFAULT_ORG, path = '') {
-  return `https://${branch}--${repo}--${org}.aem.live${path.startsWith('/') ? '' : '/'}${path}`;
+  const base = `https://${branch}--${repo}--${org}.aem.live`;
+  if (!path) return base;
+  return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
 // Optional extras you can extend:

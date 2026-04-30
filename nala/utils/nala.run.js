@@ -108,6 +108,7 @@ function getLocalTestLiveUrl(env, milolibs, repo = PROJECT, owner = ORG) {
   if (env === 'main') return BASE_URLS.main;
   if (env === 'stage') return BASE_URLS.stage;
   if (env === 'local') return BASE_URLS.local;
+  if (env === 'prod') return BASE_URLS.prod;
   if (env === 'libs') return 'http://localhost:6456';
 
   if (milolibs) {
