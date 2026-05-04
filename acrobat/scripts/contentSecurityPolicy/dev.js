@@ -129,6 +129,7 @@ const imgSrc = [
   '*.services.adobe.com',
   'alb.reddit.com/rp.gif',
   'bat.bing.com/action/',
+  'c.contentsquare.net/',
   'cdn.cookielaw.org',
   'cm.everesttech.net/cm/',
   'dpm.demdex.net',

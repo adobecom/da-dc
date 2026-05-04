@@ -137,6 +137,7 @@ const imgSrc = [
   'analytics.twitter.com/',
   'bat.bing.com/action/',
   'c.clicktale.net',
+  'c.contentsquare.net/',
   'cc-prod.scene7.com/',
   'cdn.cookielaw.org',
   'cm.everesttech.net/cm/',
