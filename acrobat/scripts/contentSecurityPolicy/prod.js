@@ -266,6 +266,7 @@ const scriptSrc = [
   'api.demandbase.com/api/v3',
   '\'sha256-dg0pQ3tkJ9KWGwSBExDwP6bSUKm2FRzq/s0tHhkcDtk=\'', // for this repo
   '\'sha256-/B9aRx/bHjiUGWHC/33Ku1McTNnFGEiLwTJdRki4www=\'', // for acrobat subdomain dc-frictionless
+  't.contentsquare.net/ss/4451/2/uxa.js',
   ';',
 ];
 
