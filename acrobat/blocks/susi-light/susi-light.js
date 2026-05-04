@@ -5,7 +5,7 @@
 import { setLibs, getEnv } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
-const { createTag, loadScript, getConfig } = await import(`${miloLibs}/utils/utils.js`);
+const { createTag, loadScript, getConfig, getLingoRegion, lingoActive } = await import(`${miloLibs}/utils/utils.js`);
 
 const variant = 'standard';
 const isStage = ['stage', 'dev'].includes(getEnv());
@@ -48,9 +48,10 @@ export default async function init(el) {
   const redirectUrl = rows[0]?.textContent?.trim().toLowerCase();
   const { client_id, redirect_uri } = window.adobeid;
   const title = rows[2]?.textContent?.trim();
+  const lingoRegion = lingoActive() ? await getLingoRegion() : null;
   const authParams = {
     dt: false,
-    locale: getConfig().locale.ietf.toLowerCase(),
+    locale: lingoRegion?.ietf || getConfig().locale.ietf.toLowerCase(),
     response_type: 'code',
     client_id: 'acrobatmilosusi',
     redirect_uri: redirectUrl || redirect_uri,

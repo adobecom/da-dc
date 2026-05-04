@@ -4,7 +4,6 @@ import { setLibs, isOldBrowser, loadPlaceholders, getEnv as getAppEnv } from '..
 export const LIMITS = {
   fillsign: {
     maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
     acceptedFiles: ['.pdf'],
     maxNumFiles: 1,
     multipleFiles: false,
@@ -12,19 +11,16 @@ export const LIMITS = {
   },
   'word-to-pdf': {
     maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
     acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
     multipleFiles: true,
   },
   'jpg-to-pdf': {
     maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
     acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
     multipleFiles: true,
   },
   'summarize-pdf': {
     maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '1 MB',
     acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
     maxNumFiles: 1,
     genAI: true,

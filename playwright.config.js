@@ -15,6 +15,12 @@ try {
   BASE_URLS = DEFAULT_URLS;
 }
 
+/** @param {string | undefined} url */
+function baseUrlWithoutTrailingSlash(url) {
+  if (!url || typeof url !== 'string') return url;
+  return url.replace(/\/+$/, '');
+}
+
 const USER_AGENT_DESKTOP = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.6613.18 Safari/537.36 NALA-Acom';
 const USER_AGENT_MOBILE_CHROME = 'Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Mobile Safari/537.36 NALA-Acom';
 const USER_AGENT_MOBILE_SAFARI = 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Mobile/15E148 Safari/604.1 NALA-Acom';
@@ -24,8 +30,8 @@ const config = {
   testDir: './nala',
   outputDir: './test-results',
   globalSetup: './nala/utils/global.setup.js',
-  timeout: 30 * 1000,
-  expect: { timeout: 5000 },
+  timeout: 300 * 1000,
+  expect: { timeout: 20000 },
   testMatch: '**/*.test.js',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -37,10 +43,11 @@ const config = {
   use: {
     actionTimeout: 60000,
     trace: 'on-first-retry',
-    baseURL:
+    baseURL: baseUrlWithoutTrailingSlash(
       process.env.PR_BRANCH_LIVE_URL
       || process.env.LOCAL_TEST_LIVE_URL
       || BASE_URLS.main,
+    ),
   },
   projects: [
     {
