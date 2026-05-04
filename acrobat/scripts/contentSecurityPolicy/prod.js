@@ -31,6 +31,7 @@ const connectSrc = [
   'api.company-target.com/',
   'api.iperceptions.com',
   'bat.bing.com/',
+  'c.contentsquare.net/',
   'c.go-mpulse.net',
   'cdn.cookielaw.org',
   'dc-api.adobe.io',
