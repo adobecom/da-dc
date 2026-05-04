@@ -26,6 +26,7 @@ const connectSrc = [
   'analytics.tiktok.com',
   'api.company-target.com/api/v2/',
   'api.iperceptions.com',
+  'c.contentsquare.net/',
   'c.go-mpulse.net',
   'cdn.cookielaw.org',
   'dc-api-dev.adobe.io',
