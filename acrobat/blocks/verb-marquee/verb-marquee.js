@@ -1,30 +1,16 @@
 import { setLibs, isOldBrowser, loadPlaceholders, getEnv as getAppEnv } from '../../scripts/utils.js';
 
-/** Verbs supported by verb-marquee only; values mirror ../verb-widget/verb-widget.js LIMITS. */
+const MB100 = 104857600;
+const PDF_ONLY = ['.pdf'];
+const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
+const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
+const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
+const group = (verbs, config) => Object.fromEntries(verbs.map((v) => [v, config]));
+
 export const LIMITS = {
-  fillsign: {
-    maxFileSize: 104857600, // 100 MB
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 1,
-    multipleFiles: false,
-    mobileApp: true,
-  },
-  'word-to-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    multipleFiles: true,
-  },
-  'jpg-to-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    multipleFiles: true,
-  },
-  'summarize-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    maxNumFiles: 1,
-    genAI: true,
-  },
+  fillsign: { ...SINGLE_PDF, mobileApp: true },
+  'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, genAI: true },
+  ...group(['word-to-pdf', 'jpg-to-pdf'], MULTI_ALL),
 };
 
 const miloLibs = setLibs('/libs');
