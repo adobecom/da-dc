@@ -22,12 +22,17 @@ const ICONS = {
 
 const MB100 = 104857600;
 const STUDY_FILES = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.rtf', '.txt', '.text', '.vtt'];
-const STUDY_GENAI = { maxFileSize: MB100, acceptedFiles: STUDY_FILES, maxNumFiles: 100, multipleFiles: true, uploadType: 'multifile-only', genAI: true };
-const group = (verbs, config) => Object.fromEntries(verbs.map((v) => [v, config]));
-
-export const LIMITS = {
-  ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI),
+const STUDY_GENAI = {
+  maxFileSize: MB100,
+  acceptedFiles: STUDY_FILES,
+  maxNumFiles: 100,
+  multipleFiles: true,
+  uploadType: 'multifile-only',
+  genAI: true,
 };
+const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
+
+export const LIMITS = { ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI) };
 
 function createSvgElement(iconName) {
   const svgString = ICONS[iconName];

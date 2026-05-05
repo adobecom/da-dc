@@ -67,17 +67,30 @@ const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1
 const MULTI_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, multipleFiles: true };
 const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
 const GENAI_MULTI = { ...MULTI_ALL, maxNumFiles: 100, uploadType: 'multifile-only', subCopy: true, genAI: true };
-const group = (verbs, config) => Object.fromEntries(verbs.map((v) => [v, config]));
+const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
 export const LIMITS = {
   fillsign: { ...SINGLE_PDF, mobileApp: true, typeOneLanding: true },
   'ocr-pdf': { ...MULTI_PDF, maxNumFiles: 100 },
-  'chat-pdf-student': { maxFileSize: MB100, acceptedFiles: STUDENT_FILES, maxNumFiles: 100, multipleFiles: true, uploadType: 'multifile-only', subCopy: true, genAI: true },
+  'chat-pdf-student': {
+    maxFileSize: MB100,
+    acceptedFiles: STUDENT_FILES,
+    maxNumFiles: 100,
+    multipleFiles: true,
+    uploadType: 'multifile-only',
+    subCopy: true,
+    genAI: true,
+  },
   'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, subCopy: true, genAI: true },
   'split-pdf': { ...SINGLE_PDF, signedInAcceptedFiles: SIGNED_IN_FILES, typeOneLanding: true },
   'add-comment': { ...SINGLE_PDF, typeOneLanding: true },
   'compress-pdf': { maxFileSize: 2147483648, acceptedFiles: ALL_FILES, multipleFiles: true, typeOneLanding: true },
-  sendforsignature: { maxFileSize: 5242880, acceptedFiles: PDF_ONLY, maxNumFiles: 1, mobileApp: true },
+  sendforsignature: {
+    maxFileSize: 5242880,
+    acceptedFiles: PDF_ONLY,
+    maxNumFiles: 1,
+    mobileApp: true,
+  },
   ...group(['number-pages', 'crop-pages'], { ...SINGLE_PDF, level: 0, typeOneLanding: true }),
   ...group(['protect-pdf', 'delete-pages', 'insert-pdf', 'extract-pages', 'reorder-pages'], SINGLE_PDF),
   ...group(['chat-pdf', 'pdf-ai'], GENAI_MULTI),
