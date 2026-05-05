@@ -44,6 +44,7 @@ const verbRedirMap = {
 const exhLimitCookieMap = {
   'to-pdf': 'cr_p_c',
   'pdf-to': 'ex_p_c',
+  'combine-pdf': 'cb_p_c',
   'compress-pdf': 'cm_p_ops',
   'rotate-pages': 'or_p_c',
   createpdf: 'cr_p_c',
