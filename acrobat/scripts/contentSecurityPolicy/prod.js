@@ -266,7 +266,7 @@ const scriptSrc = [
   'rum.hlx.page',
   'tr.snapchat.com',
   'api.demandbase.com/api/v3',
-  '\'sha256-dg0pQ3tkJ9KWGwSBExDwP6bSUKm2FRzq/s0tHhkcDtk=\'', // for this repo
+  '\'sha256-EC0OK5p/Vh90R+aMsS5a2YXcCzBRrUHeKv2zKBBslN8=\'', // for head.html inline script
   '\'sha256-/B9aRx/bHjiUGWHC/33Ku1McTNnFGEiLwTJdRki4www=\'', // for acrobat subdomain dc-frictionless
   't.contentsquare.net/ss/4451/2/uxa.js',
   ';',
