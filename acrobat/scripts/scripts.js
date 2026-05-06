@@ -180,7 +180,7 @@ const locales = {
   de: { ietf: 'de-DE', tk: 'vin7zsi.css' },
   ee: { ietf: 'et-EE', tk: 'aaz7dvd.css' },
   es: { ietf: 'es-ES', tk: 'oln4yqj.css' },
-  fr: { ietf: 'fr-FR', tk: 'vrk5vyv.css' },
+  fr: { ietf: 'fr', tk: 'vrk5vyv.css' },
   gr_en: { ietf: 'en-GR', tk: 'pps7abe.css' },
   ie: { ietf: 'en-GB', tk: 'pps7abe.css' },
   il_en: { ietf: 'en-IL', tk: 'pps7abe.css' },
