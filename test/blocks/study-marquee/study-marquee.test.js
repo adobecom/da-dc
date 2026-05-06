@@ -40,12 +40,17 @@ describe('study-marquee block', () => {
     sinon.restore();
   });
 
-  it('exports LIMITS for quiz-maker and flashcard-maker', () => {
+  it('exports LIMITS for quiz-maker, flashcard-maker, and mindmap-maker', () => {
     expect(LIMITS).to.have.property('quiz-maker');
     expect(LIMITS).to.have.property('flashcard-maker');
+    expect(LIMITS).to.have.property('mindmap-maker');
     expect(LIMITS['quiz-maker'].acceptedFiles).to.be.an('array');
     expect(LIMITS['quiz-maker'].maxFileSize).to.equal(104857600);
     expect(LIMITS['flashcard-maker'].multipleFiles).to.be.true;
+    expect(LIMITS['mindmap-maker'].acceptedFiles).to.be.an('array');
+    expect(LIMITS['mindmap-maker'].maxFileSize).to.equal(104857600);
+    expect(LIMITS['mindmap-maker'].multipleFiles).to.be.true;
+    expect(LIMITS['mindmap-maker'].genAI).to.be.true;
   });
 
   it('init study-marquee', async () => {
@@ -65,6 +70,16 @@ describe('study-marquee block', () => {
     setConfig({ ...conf, locale: { prefix: '' } });
     await init(block);
     expect(block.classList.contains('flashcard-maker')).to.be.true;
+    expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
+  });
+
+  it('init mindmap-maker block', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-mindmap-maker.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.classList.contains('mindmap-maker')).to.be.true;
     expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
   });
 
