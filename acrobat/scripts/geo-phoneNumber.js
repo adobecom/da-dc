@@ -1,22 +1,81 @@
 /* eslint-disable compat/compat */
 
-export default async function geoPhoneNumber() {
+function readSessionLocale(key) {
+  const value = sessionStorage.getItem(key);
+  if (!value) return '';
+  try {
+    const parsed = JSON.parse(value);
+    if (parsed && typeof parsed === 'object') {
+      return parsed.country?.toLowerCase() || '';
+    }
+  } catch { /* not JSON */ }
+  return value.toLowerCase();
+}
+
+function getPageLang() {
+  const seg = (window.location?.pathname || '').split('/').filter(Boolean)[0];
+  return seg && /^[a-z]{2}$/i.test(seg) ? seg.toLowerCase() : '';
+}
+
+function getPagePrefix() {
+  const seg = (window.location?.pathname || '').split('/').filter(Boolean)[0];
+  return seg ? seg.toLowerCase() : '';
+}
+
+function placeholderUrl(prefix) {
+  return prefix === '' ? '/dc-shared/placeholders.json' : `/${prefix}/dc-shared/placeholders.json`;
+}
+
+function resolvePrefix(locales, country, lang, pagePrefix) {
+  const norm = country === 'us' ? '' : country;
+  const candidates = [
+    norm,
+    country && lang && country !== lang ? `${country}_${lang}` : null,
+    pagePrefix,
+  ];
+  for (const candidate of candidates) {
+    if (candidate === null || candidate === undefined) continue;
+    if (candidate in locales) return candidate;
+  }
+  return null;
+}
+
+async function fetchPlaceholders(locale, locales) {
+  const lang = getPageLang();
+  const pagePrefix = getPagePrefix();
+
+  if (locales && typeof locales === 'object') {
+    const prefix = resolvePrefix(locales, locale, lang, pagePrefix);
+    if (prefix === null) return { status: 404, json: async () => ({}) };
+    return fetch(placeholderUrl(prefix));
+  }
+
+  const primary = await fetch(placeholderUrl(locale === 'us' ? '' : locale));
+  if (primary.status === 200) return primary;
+
+  if (locale && /^[a-z]{2}$/.test(locale) && locale !== 'us' && lang && lang !== locale) {
+    const langFallback = await fetch(placeholderUrl(`${locale}_${lang}`));
+    if (langFallback.status === 200) return langFallback;
+  }
+
+  if (pagePrefix && pagePrefix !== locale) {
+    const prefixFallback = await fetch(placeholderUrl(pagePrefix));
+    if (prefixFallback.status === 200) return prefixFallback;
+  }
+
+  return primary;
+}
+
+export default async function geoPhoneNumber(locales) {
   const geoTwo = await fetch('https://geo2.adobe.com/json/');
   const urlParams = new URLSearchParams(window.location.search);
   const geoData = await geoTwo.json();
 
-  let newLocale = JSON.parse(sessionStorage.getItem('international'))?.country?.toLowerCase()
+  const newLocale = readSessionLocale('international')
   || urlParams.get('akamaiLocale')?.toLowerCase()
   || geoData?.country?.toLowerCase()
-  || JSON.parse(sessionStorage.getItem('international'))?.country?.toLowerCase()
-  || JSON.parse(sessionStorage.getItem('feds_location'))?.country?.toLowerCase()
+  || readSessionLocale('feds_location')
   || '';
-
-  if (newLocale === 'us' || newLocale === '/' || newLocale === '//') {
-    newLocale = '/';
-  } else {
-    newLocale = `/${newLocale}/`;
-  }
   const updatePhoneNumber = (visNum, i) => {
     const phoneNumberEle = document.querySelector(`.${i}`);
     phoneNumberEle.href = `tel:${visNum}`;
@@ -32,7 +91,7 @@ export default async function geoPhoneNumber() {
     }
   };
 
-  const placeHolderJson = await fetch(`${newLocale}dc-shared/placeholders.json`);
+  const placeHolderJson = await fetchPlaceholders(newLocale, locales);
   if (placeHolderJson.status !== 200) return;
   const placeHolderJsonData = await placeHolderJson.json();
   placeHolderJsonData.data = placeHolderJsonData.data.map((val) => ({

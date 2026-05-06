@@ -552,7 +552,7 @@ async function loadPage() {
 
   if (document.querySelectorAll('a[class*="geo-pn"]').length > 0 || document.querySelectorAll('a[href*="geo"]').length > 0) {
     const { default: geoPhoneNumber } = await import('./geo-phoneNumber.js');
-    geoPhoneNumber();
+    geoPhoneNumber(CONFIG.locales);
   }
 
   // Import tooltip accessibility implementation for WCAG 1.4.13 and 4.1.2
