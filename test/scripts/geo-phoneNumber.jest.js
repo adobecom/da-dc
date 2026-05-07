@@ -2,7 +2,8 @@
  * @jest-environment jsdom
  */
 /* eslint-env jest */
-import geoPhoneNumber from '../../acrobat/scripts/geo-phoneNumber';
+/* eslint-disable compat/compat */
+import geoPhoneNumber from '../../acrobat/scripts/geo-phoneNumber.js';
 
 // Mocking fetch API
 window.fetch = jest.fn((url) => {
@@ -10,7 +11,7 @@ window.fetch = jest.fn((url) => {
     status: 200,
     json: () => {
       if (url.includes('dc-shared/placeholders.json')) {
-        return Promise.resolve({ data: [{ key: 'phone-business', value: '800\u00A0915\u00A09430' }]});
+        return Promise.resolve({ data: [{ key: 'phone-business', value: '800\u00A0915\u00A09430' }] });
       }
       return Promise.resolve({ country: 'us' });
     },
@@ -19,9 +20,7 @@ window.fetch = jest.fn((url) => {
 });
 
 // Mocking sessionStorage
-global.sessionStorage = {
-  getItem: jest.fn(() => JSON.stringify({ country: 'us' })),
-};
+global.sessionStorage = { getItem: jest.fn(() => JSON.stringify({ country: 'us' })) };
 
 // Mocking window.location
 delete window.location;
@@ -65,7 +64,7 @@ describe('geoPhoneNumber', () => {
     const phoneLink = document.querySelector('.geo-pn3 a');
     expect(phoneLink.textContent).toEqual('800 915 9430');
     expect(phoneLink.href).toEqual('tel:800 915 9430');
-  })
+  });
 });
 
 function makeFetchMock(routes = [], geoCountry = 'US') {

@@ -34,8 +34,7 @@ function resolvePrefix(locales, country, lang, pagePrefix) {
     pagePrefix,
   ];
   for (const candidate of candidates) {
-    if (candidate === null || candidate === undefined) continue;
-    if (candidate in locales) return candidate;
+    if (candidate != null && candidate in locales) return candidate;
   }
   return null;
 }
