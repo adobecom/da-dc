@@ -1,4 +1,5 @@
 /* eslint-disable compat/compat */
+import { getEnv } from './utils.js';
 
 export default async function geoPhoneNumber() {
   const geoTwo = await fetch('https://geo2.adobe.com/json/');
@@ -42,8 +43,7 @@ export default async function geoPhoneNumber() {
 
   let navPlaceholderData = null;
   if (document.querySelector('.global-navigation a[class*="geo-pn"]')) {
-    const isStage = /aem\.(page|live)|stage\.adobe\.com/.test(window.location.hostname);
-    const baseUrl = `https://www.${isStage ? 'stage.' : ''}adobe.com`;
+    const baseUrl = `https://www.${getEnv() === 'prod' ? '' : 'stage.'}adobe.com`;
     const navPlaceholderJson = await fetch(`${baseUrl}${newLocale}federal/globalnav/placeholders.json`);
     if (navPlaceholderJson.status === 200) {
       const navData = await navPlaceholderJson.json();
