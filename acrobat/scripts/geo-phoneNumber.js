@@ -39,6 +39,18 @@ export default async function geoPhoneNumber() {
     ...val,
     value: val.value.replace(/\u00A0/g, ' '),
   }));
+
+  let navPlaceholderData = null;
+  if (document.querySelector('.global-navigation a[class*="geo-pn"]')) {
+    const isStage = /aem\.(page|live)|stage\.adobe\.com/.test(window.location.hostname);
+    const baseUrl = `https://www.${isStage ? 'stage.' : ''}adobe.com`;
+    const navPlaceholderJson = await fetch(`${baseUrl}${newLocale}federal/globalnav/placeholders.json`);
+    if (navPlaceholderJson.status === 200) {
+      const navData = await navPlaceholderJson.json();
+      navPlaceholderData = navData.data.map((val) => ({ ...val, value: val.value.replace(/\u00A0/g, ' ') }));
+    }
+  }
+
   window.dcpns = placeHolderJsonData.data;
   const globalPhoneNumbers = new CustomEvent('DCNumbers:Ready');
   window.dispatchEvent(globalPhoneNumbers);
@@ -46,7 +58,9 @@ export default async function geoPhoneNumber() {
   document.querySelectorAll('a[class*="geo-pn"]').forEach((phoneNumber) => {
     const numberType = phoneNumber.getAttribute('number-type');
     const numberID = phoneNumber.classList[0];
-    placeHolderJsonData.data.forEach((val) => {
+    const data = (phoneNumber.closest('.global-navigation') && navPlaceholderData)
+      ? navPlaceholderData : placeHolderJsonData.data;
+    data.forEach((val) => {
       if (val.key === numberType) {
         updatePhoneNumber(val.value, numberID);
       }
