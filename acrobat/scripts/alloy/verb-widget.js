@@ -183,6 +183,8 @@ export function createEventObject(eventName, verb, metaData, trackingParams, doc
           dcweb2: eventDataPayload,
         },
       },
+      appName: 'ACROBAT_WEB_FRICTIONLESS',
+      appVersion: '1.0',
     },
   };
 }
