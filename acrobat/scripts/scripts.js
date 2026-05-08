@@ -552,7 +552,7 @@ async function loadPage() {
       window.alloy_all = { get, set };
     }
     window.alloy_all.set(window.alloy_all, 'data._adobe_corpnew.app.appName', 'ACROBAT_WEB_FRICTIONLESS');
-    window.alloy_all.set(window.alloy_all, 'data._adobe_corpnew.app.appVersion', '<your application version>');
+    window.alloy_all.set(window.alloy_all, 'data._adobe_corpnew.app.appVersion', '1.0');
   }
 
   await loadArea(document, false);
