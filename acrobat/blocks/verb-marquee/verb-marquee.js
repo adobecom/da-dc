@@ -431,11 +431,11 @@ export default async function init(element) {
     : (window.mph?.[`verb-marquee-${VERB}-copy`] || '');
   const subCopies = ['', '-2']
     .map((suffix) => {
-      const text = isMobileOrTabletViewport
+      const subCopyText = isMobileOrTabletViewport
         ? (window.mph?.[`verb-marquee-${VERB}-mobile-sub-copy${suffix}`]
           || window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '')
         : (window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '');
-      if (!text) return null;
+      if (!subCopyText) return null;
       const el = createTag('p', { class: 'verb-marquee-copy-sub' });
       const icon = createSvgElement('SUBCOPY_CHECK');
       if (icon) {
@@ -443,7 +443,7 @@ export default async function init(element) {
         icon.setAttribute('aria-hidden', 'true');
         el.appendChild(icon);
       }
-      el.appendChild(createTag('span', { class: 'verb-marquee-copy-sub-label' }, text));
+      el.appendChild(createTag('span', { class: 'verb-marquee-copy-sub-label' }, subCopyText));
       return el;
     })
     .filter(Boolean);
