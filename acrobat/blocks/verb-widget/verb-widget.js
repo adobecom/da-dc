@@ -978,11 +978,19 @@ export default async function init(element) {
     noOfFiles = files.length;
   });
 
-  errorCloseBtn.addEventListener('click', () => {
+  const closeError = () => {
     errorState.classList.remove('verb-error');
     errorState.classList.add('hide');
     errorStateText.textContent = '';
     clearSrAlert();
+  };
+  errorCloseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeError();
+  });
+  document.addEventListener('click', (e) => {
+    if (errorState.classList.contains('hide')) return;
+    if (!errorState.contains(e.target)) closeError();
   });
 
   element.addEventListener('unity:track-analytics', (e) => {
@@ -1051,11 +1059,6 @@ export default async function init(element) {
       );
     }
 
-    setTimeout(() => {
-      errorState.classList.remove('verb-error');
-      errorState.classList.add('hide');
-      errorStateText.textContent = '';
-    }, 5000);
   };
 
   element.addEventListener('unity:show-error-toast', (e) => {

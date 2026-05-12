@@ -98,6 +98,68 @@ describe('verb-widget block', () => {
     expect(window.lana.log.called).to.be.true;
   });
 
+  it('error toast does not auto-close after 5 seconds', async () => {
+    window.lana = { log: sinon.spy() };
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    const clock = sinon.useFakeTimers();
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', {
+      detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false },
+    }));
+
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    clock.tick(6000);
+    expect(errorState.classList.contains('hide')).to.be.false;
+  });
+
+  it('error toast closes when clicking outside the toast', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', {
+      detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false },
+    }));
+
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.true;
+  });
+
+  it('error toast does not close on click inside toast', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', {
+      detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false },
+    }));
+
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    errorState.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.false;
+  });
+
   it('track analytics', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });

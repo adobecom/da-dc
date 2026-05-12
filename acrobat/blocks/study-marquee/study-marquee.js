@@ -606,12 +606,6 @@ export default async function init(element) {
         logOptions,
       );
     }
-    setTimeout(() => {
-      errorState.classList.remove('study-marquee-error');
-      errorState.classList.add('hide');
-      errorStateText.textContent = '';
-      clearSrAlert();
-    }, 5000);
   };
   ctaButton.addEventListener('click', () => {
     fileInput.click();
@@ -670,12 +664,19 @@ export default async function init(element) {
     errorStateText.textContent = '';
     clearSrAlert();
   };
-  errorCloseBtn.addEventListener('click', dismissError);
+  errorCloseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dismissError();
+  });
   errorCloseBtn.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       dismissError();
     }
+  });
+  document.addEventListener('click', (e) => {
+    if (errorState.classList.contains('hide')) return;
+    if (!errorState.contains(e.target)) dismissError();
   });
   element.addEventListener('unity:track-analytics', (e) => {
     const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
