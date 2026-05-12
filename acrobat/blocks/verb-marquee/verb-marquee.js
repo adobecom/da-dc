@@ -765,6 +765,12 @@ export default async function init(element) {
     e.stopPropagation();
     closeError();
   });
+  errorCloseBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      closeError();
+    }
+  });
   document.addEventListener('click', (e) => {
     if (errorState.classList.contains('hide')) return;
     if (!errorState.contains(e.target)) closeError();

@@ -160,6 +160,48 @@ describe('verb-widget block', () => {
     expect(errorState.classList.contains('hide')).to.be.false;
   });
 
+  it('error close button closes toast on Enter key', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', {
+      detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false },
+    }));
+
+    const errorState = block.querySelector('.error');
+    const errorCloseBtn = block.querySelector('.verb-errorBtn');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    errorCloseBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.true;
+  });
+
+  it('error close button closes toast on Space key', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', {
+      detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false },
+    }));
+
+    const errorState = block.querySelector('.error');
+    const errorCloseBtn = block.querySelector('.verb-errorBtn');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    errorCloseBtn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.true;
+  });
+
   it('track analytics', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
