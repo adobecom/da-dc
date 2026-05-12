@@ -433,7 +433,12 @@ export default async function init(element) {
     ? (window.mph?.[`verb-marquee-${VERB}-mobile-sub-copy`]
       || window.mph?.[`verb-marquee-${VERB}-sub-copy`] || '')
     : (window.mph?.[`verb-marquee-${VERB}-sub-copy`] || '');
+  const copy3Text = isMobileOrTabletViewport
+    ? (window.mph?.[`verb-marquee-${VERB}-mobile-sub-copy-2`]
+      || window.mph?.[`verb-marquee-${VERB}-sub-copy-2`] || '')
+    : (window.mph?.[`verb-marquee-${VERB}-sub-copy-2`] || '');
   const includeCopy2 = !!copy2Text;
+  const includeCopy3 = !!copy3Text;
   const copy1 = createTag('p', { class: 'verb-marquee-copy' }, copy1Text);
   let copy2 = null;
   if (includeCopy2) {
@@ -445,6 +450,17 @@ export default async function init(element) {
       copy2.appendChild(subcopyIcon);
     }
     copy2.appendChild(createTag('span', { class: 'verb-marquee-copy-sub-label' }, copy2Text));
+  }
+  let copy3 = null;
+  if (includeCopy3) {
+    copy3 = createTag('p', { class: 'verb-marquee-copy-sub' });
+    const subcopyIcon2 = createSvgElement('SUBCOPY_CHECK');
+    if (subcopyIcon2) {
+      subcopyIcon2.classList.add('verb-marquee-copy-sub-icon');
+      subcopyIcon2.setAttribute('aria-hidden', 'true');
+      copy3.appendChild(subcopyIcon2);
+    }
+    copy3.appendChild(createTag('span', { class: 'verb-marquee-copy-sub-label' }, copy3Text));
   }
   const dropzone = createTag('div', {
     class: 'verb-marquee-dropzone',
@@ -609,6 +625,7 @@ export default async function init(element) {
     headingEl,
     copy1,
     ...(copy2 ? [copy2] : []),
+    ...(copy3 ? [copy3] : []),
     dropzone,
     ...(fileInput ? [fileInput] : []),
     ...(omitFooterForMobileStore ? [] : [footer]),
