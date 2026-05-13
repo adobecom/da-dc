@@ -143,6 +143,10 @@
   margin-bottom: -16px;
 }
 
+.verb-marquee-col-left > .verb-marquee-copy-sub + .verb-marquee-copy-sub {
+  margin-top: -32px;
+}
+
 .verb-marquee-copy-sub-icon {
   grid-column: 1;
   grid-row: 1;
