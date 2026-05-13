@@ -1,4 +1,4 @@
-export default class FreeTrialPage {
+export default class PricingCompareVersionsPage {
   constructor(page) {
     this.page = page;
 
@@ -6,23 +6,13 @@ export default class FreeTrialPage {
     this.gnavBreadcrumbs = page.locator('nav.feds-breadcrumbs');
 
     this.heroMarquee = page.locator('div[class*="hero-marquee"]');
+    // First three-up above the compare table; `.first()` avoids lower-page three-ups
+    this.firstThreeUpSection = page.locator('div.section.three-up').first();
 
-    this.editTextAndImagesBlade = page.locator(
-      'div[data-path*="/dc-shared/fragments/acrobat/free-trial-download/edit-text-and-images-desktop"]',
+    this.compareVersionsTableRoot = page.locator(
+      'div[data-path*="/dc-shared/fragments/merch/acrobat/pricing/compare-versions/table/default"]',
     );
-
-    /** Split-image row (`image` + `split-image` classes on the same div) */
-    this.splitImageBlock = page.locator('div.image.split-image');
-
-    this.fourUpSection = page.locator('div[class*="four-up"]');
-
-    this.pcworldBestBlade = page.locator(
-      'div[data-path*="/dc-shared/fragments/acrobat/pcworld-best-2025"]',
-    );
-
-    this.discoverSmallBusinessVideoBlade = page.locator(
-      'div[data-path*="/dc-shared/fragments/acrobat/discover-small-business-video-blade"]',
-    );
+    this.compareVersionsTable = this.compareVersionsTableRoot.locator('div.table[role="table"]');
 
     this.faqSection = page.locator('div[class*="accordion-container"]');
     this.faqAccordionTriggers = this.faqSection.locator('button.accordion-trigger');
@@ -41,8 +31,8 @@ export default class FreeTrialPage {
     this.fedsFooterPrivacyListItems = this.fedsFooterLegalWrapper.locator('li[class*="feds-footer-privacy-list"]');
   }
 
-  /** @param {string} dataPath fragment path substring */
-  questionsAboutSection(dataPath) {
-    return this.page.locator(`div[data-path*="${dataPath}"]`);
+  /** @param {string} osi */
+  checkoutLinkByOsi(osi) {
+    return this.page.locator(`a[is*="checkout-link"][data-wcs-osi="${osi}"]`);
   }
 }

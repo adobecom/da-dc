@@ -1,34 +1,28 @@
-export default class AcrobatPage {
+/**
+ * Locators for `/acrobat/features` (merch + layout aligned with `acrobat/acrobat.page.js`).
+ * Assertions live in `features.test.js`.
+ */
+export default class FeaturesPage {
   constructor(page) {
     this.page = page;
 
-    // Global navigation (smoke)
     this.gnav = page.locator('nav.feds-topnav');
     this.gnavBreadcrumbs = page.locator('nav.feds-breadcrumbs');
 
-    // Hero
-    this.heroMarquee = page.locator('div[class*="hero-marquee"]');
+    this.heroMarqueeSection = page.locator('div[class*="hero-marquee"]');
+    this.heroTitle = this.heroMarqueeSection.locator('h1');
+    this.heroDescription = this.heroMarqueeSection.locator('p');
+    this.heroCheckoutLink = this.heroMarqueeSection.locator('a[is*="checkout-link"]');
+    this.heroNonCheckoutLinks = this.heroMarqueeSection.locator('a:not([is*="checkout-link"])');
 
-    // Editorial / marketing sections (no getByRole/getByText — strings vary by locale)
-    this.threeUpSection = page.locator('div.section.three-up');
-    this.twoUpSection = page.locator('div.section.two-up');
-    this.seeAllFeaturesLink = page.locator('a.con-button.outline[href*="/acrobat/features"]');
-    // Brick: layout / classes + media column — avoids heading copy and id slug per locale
-    this.generatePresentationsBrick = page
-      .locator('div.brick.light.rounded-corners.split.row.media-right')
-      .filter({ has: page.locator('.brick-text h3.heading-xl') })
-      .filter({ has: page.locator('.brick-media picture, .brick-media img') })
-      .first();
-    this.fourUpSection = page.locator('div.section.four-up');
+    this.tabsFeaturesSection = page.locator('div[class*="tablist-features-section"]');
 
-    // Carousel
-    this.carousel = page.locator('div.carousel');
-    this.carouselSlides = this.carousel.locator('div.carousel-slide');
-    this.carouselNext = this.carousel.locator('button.carousel-next');
-    this.carouselPrevious = this.carousel.locator('button.carousel-previous');
-    this.carouselIndicators = this.carousel.locator('li.carousel-indicator');
+    this.threeUpSections = page.locator('div.section.three-up');
+    this.editorialCards = page.locator('div.editorial-card');
 
-    // Merch — compare Acrobat plans (fragment + tabs + three panel bodies)
+    this.pcworldBestBlock = page.locator('div[data-path*="/dc-shared/fragments/acrobat/pcworld-best-2025"]');
+
+    // Merch — compare Acrobat plans (same fragment + locators as `acrobat/acrobat.page.js`)
     this.merchCardPlans = page.locator('div[data-path*="/dc-shared/fragments/merch-cards/compare-acrobat-plans"]');
     this.merchCardPlansTitle = this.merchCardPlans.locator('h2');
     this.tabCompareIndividuals = this.merchCardPlans.locator('button[id="tab-compare-plans-1"]');
@@ -83,11 +77,6 @@ export default class AcrobatPage {
       'a.con-button[href*="/acrobat/pricing/students"]',
     );
 
-    // FAQ accordion
-    this.faqSection = page.locator('div[class*="accordion-container"]');
-    this.faqAccordionTriggers = this.faqSection.locator('button.accordion-trigger');
-
-    // Footer
     this.footer = page.locator('footer[class="global-footer"]');
     this.fedsMenuContent = this.footer.locator('div[class*="feds-menu-content"]');
     this.fedsMenuColumns = this.fedsMenuContent.locator('div[class*="feds-menu-column"]');

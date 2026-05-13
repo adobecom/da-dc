@@ -1,4 +1,4 @@
-export default class FreeTrialPage {
+export default class GenerativeAiPdfPage {
   constructor(page) {
     this.page = page;
 
@@ -7,22 +7,12 @@ export default class FreeTrialPage {
 
     this.heroMarquee = page.locator('div[class*="hero-marquee"]');
 
-    this.editTextAndImagesBlade = page.locator(
-      'div[data-path*="/dc-shared/fragments/acrobat/free-trial-download/edit-text-and-images-desktop"]',
-    );
+    /** Masonry layout block(s) — separate from three-up sections */
+    this.masonrySections = page.locator('div.section[class*="masonry"]');
+    /** Three-up section block(s) — separate from masonry */
+    this.threeUpSections = page.locator('div.section.three-up');
 
-    /** Split-image row (`image` + `split-image` classes on the same div) */
-    this.splitImageBlock = page.locator('div.image.split-image');
-
-    this.fourUpSection = page.locator('div[class*="four-up"]');
-
-    this.pcworldBestBlade = page.locator(
-      'div[data-path*="/dc-shared/fragments/acrobat/pcworld-best-2025"]',
-    );
-
-    this.discoverSmallBusinessVideoBlade = page.locator(
-      'div[data-path*="/dc-shared/fragments/acrobat/discover-small-business-video-blade"]',
-    );
+    this.existingCustomerBlade = page.locator('div[id="already-an-existing-acrobat-customer"]');
 
     this.faqSection = page.locator('div[class*="accordion-container"]');
     this.faqAccordionTriggers = this.faqSection.locator('button.accordion-trigger');
@@ -39,10 +29,5 @@ export default class FreeTrialPage {
     this.fedsSocial = this.footer.locator('ul[class*="feds-social"] a');
     this.fedsFooterLegalWrapper = this.footer.locator('div[class*="feds-footer-legalWrapper"]');
     this.fedsFooterPrivacyListItems = this.fedsFooterLegalWrapper.locator('li[class*="feds-footer-privacy-list"]');
-  }
-
-  /** @param {string} dataPath fragment path substring */
-  questionsAboutSection(dataPath) {
-    return this.page.locator(`div[data-path*="${dataPath}"]`);
   }
 }

@@ -1,4 +1,4 @@
-export default class FreeTrialPage {
+export default class GenerativeAiPdfStudentsPage {
   constructor(page) {
     this.page = page;
 
@@ -7,22 +7,23 @@ export default class FreeTrialPage {
 
     this.heroMarquee = page.locator('div[class*="hero-marquee"]');
 
-    this.editTextAndImagesBlade = page.locator(
-      'div[data-path*="/dc-shared/fragments/acrobat/free-trial-download/edit-text-and-images-desktop"]',
-    );
+    this.sectionSpacingSection = page.locator('div.section[class*="s-spacing"]');
 
-    /** Split-image row (`image` + `split-image` classes on the same div) */
-    this.splitImageBlock = page.locator('div.image.split-image');
+    this.threeUpSection = page.locator('div.section.three-up').first();
 
-    this.fourUpSection = page.locator('div[class*="four-up"]');
+    this.genAiStudentsTabs = page.locator('div.tabs#tabs-genaipdfstudents');
+    this.genAiStudentsTabButtons = this.genAiStudentsTabs.locator('button[role="tab"]');
+    this.genAiStudentsTabAsk = this.genAiStudentsTabs.locator('button#tab-genaipdfstudents-1');
+    this.genAiStudentsTabAnalyze = this.genAiStudentsTabs.locator('button#tab-genaipdfstudents-2');
+    this.genAiStudentsTabModify = this.genAiStudentsTabs.locator('button#tab-genaipdfstudents-3');
+    this.genAiStudentsTabGenerate = this.genAiStudentsTabs.locator('button#tab-genaipdfstudents-4');
+    this.genAiStudentsTabBrainstorm = this.genAiStudentsTabs.locator('button#tab-genaipdfstudents-5');
 
-    this.pcworldBestBlade = page.locator(
-      'div[data-path*="/dc-shared/fragments/acrobat/pcworld-best-2025"]',
-    );
-
-    this.discoverSmallBusinessVideoBlade = page.locator(
-      'div[data-path*="/dc-shared/fragments/acrobat/discover-small-business-video-blade"]',
-    );
+    this.genAiStudentsPanelAsk = this.genAiStudentsTabs.locator('div#tab-panel-genaipdfstudents-1');
+    this.genAiStudentsPanelAnalyze = this.genAiStudentsTabs.locator('div#tab-panel-genaipdfstudents-2');
+    this.genAiStudentsPanelModify = this.genAiStudentsTabs.locator('div#tab-panel-genaipdfstudents-3');
+    this.genAiStudentsPanelGenerate = this.genAiStudentsTabs.locator('div#tab-panel-genaipdfstudents-4');
+    this.genAiStudentsPanelBrainstorm = this.genAiStudentsTabs.locator('div#tab-panel-genaipdfstudents-5');
 
     this.faqSection = page.locator('div[class*="accordion-container"]');
     this.faqAccordionTriggers = this.faqSection.locator('button.accordion-trigger');
@@ -39,10 +40,5 @@ export default class FreeTrialPage {
     this.fedsSocial = this.footer.locator('ul[class*="feds-social"] a');
     this.fedsFooterLegalWrapper = this.footer.locator('div[class*="feds-footer-legalWrapper"]');
     this.fedsFooterPrivacyListItems = this.fedsFooterLegalWrapper.locator('li[class*="feds-footer-privacy-list"]');
-  }
-
-  /** @param {string} dataPath fragment path substring */
-  questionsAboutSection(dataPath) {
-    return this.page.locator(`div[data-path*="${dataPath}"]`);
   }
 }
