@@ -429,23 +429,25 @@ export default async function init(element) {
   const copy1Text = isMobileOrTabletViewport
     ? (window.mph?.[`verb-marquee-${VERB}-mobile-copy`] || window.mph?.[`verb-marquee-${VERB}-copy`] || '')
     : (window.mph?.[`verb-marquee-${VERB}-copy`] || '');
-  const copy2Text = isMobileOrTabletViewport
-    ? (window.mph?.[`verb-marquee-${VERB}-mobile-sub-copy`]
-      || window.mph?.[`verb-marquee-${VERB}-sub-copy`] || '')
-    : (window.mph?.[`verb-marquee-${VERB}-sub-copy`] || '');
-  const includeCopy2 = !!copy2Text;
+  const subCopies = ['', '-2']
+    .map((suffix) => {
+      const subCopyText = isMobileOrTabletViewport
+        ? (window.mph?.[`verb-marquee-${VERB}-mobile-sub-copy${suffix}`]
+          || window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '')
+        : (window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '');
+      if (!subCopyText) return null;
+      const el = createTag('p', { class: 'verb-marquee-copy-sub' });
+      const icon = createSvgElement('SUBCOPY_CHECK');
+      if (icon) {
+        icon.classList.add('verb-marquee-copy-sub-icon');
+        icon.setAttribute('aria-hidden', 'true');
+        el.appendChild(icon);
+      }
+      el.appendChild(createTag('span', { class: 'verb-marquee-copy-sub-label' }, subCopyText));
+      return el;
+    })
+    .filter(Boolean);
   const copy1 = createTag('p', { class: 'verb-marquee-copy' }, copy1Text);
-  let copy2 = null;
-  if (includeCopy2) {
-    copy2 = createTag('p', { class: 'verb-marquee-copy-sub' });
-    const subcopyIcon = createSvgElement('SUBCOPY_CHECK');
-    if (subcopyIcon) {
-      subcopyIcon.classList.add('verb-marquee-copy-sub-icon');
-      subcopyIcon.setAttribute('aria-hidden', 'true');
-      copy2.appendChild(subcopyIcon);
-    }
-    copy2.appendChild(createTag('span', { class: 'verb-marquee-copy-sub-label' }, copy2Text));
-  }
   const dropzone = createTag('div', {
     class: 'verb-marquee-dropzone',
     id: 'drop-zone',
@@ -608,7 +610,7 @@ export default async function init(element) {
     header,
     headingEl,
     copy1,
-    ...(copy2 ? [copy2] : []),
+    ...subCopies,
     dropzone,
     ...(fileInput ? [fileInput] : []),
     ...(omitFooterForMobileStore ? [] : [footer]),
