@@ -10,15 +10,17 @@ on:
       - stage
       - main
     types: [opened, synchronize, reopened]
-  
+
   workflow_dispatch:
 
 jobs:
-  run-nala-tests:
-    name: Running Nala E2E UI Tests
+  nala-tests:
+    name: Nala E2E — ${{ matrix.browser }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
+        browser: [chromium, firefox, webkit]
         node-version: [20.x]
     steps:
       - name: Checkout repository
@@ -31,12 +33,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Set execute permission for nalarun.sh
+      - name: Set execute permission for pr.run.sh
         run: chmod +x ./nala/utils/pr.run.sh
 
-      - name: Run Nala Tests via pr.run.sh
+      - name: Run Nala Tests — ${{ matrix.browser }}
         run: ./nala/utils/pr.run.sh
         env:
+          BROWSER: ${{ matrix.browser }}
           labels: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
           branch: ${{ github.event.pull_request.head.ref }}
           repoName: ${{ github.repository }}
@@ -48,3 +51,11 @@ jobs:
           GITHUB_ACTION_PATH: ${{ github.workspace }}
           IMS_EMAIL: ${{ secrets.IMS_EMAIL }}
           IMS_PASS: ${{ secrets.IMS_PASS }}
+
+      - name: Upload Test Report — ${{ matrix.browser }}
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nala-report-${{ matrix.browser }}
+          path: test-html-results/
+          retention-days: 30
