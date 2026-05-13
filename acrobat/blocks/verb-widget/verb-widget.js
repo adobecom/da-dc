@@ -978,11 +978,16 @@ export default async function init(element) {
     noOfFiles = files.length;
   });
 
+  let outsideClickHandler = null;
   const closeError = () => {
     errorState.classList.remove('verb-error');
     errorState.classList.add('hide');
     errorStateText.textContent = '';
     clearSrAlert();
+    if (outsideClickHandler) {
+      document.removeEventListener('click', outsideClickHandler);
+      outsideClickHandler = null;
+    }
   };
   errorCloseBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -993,10 +998,6 @@ export default async function init(element) {
       e.preventDefault();
       closeError();
     }
-  });
-  document.addEventListener('click', (e) => {
-    if (errorState.classList.contains('hide')) return;
-    if (!errorState.contains(e.target)) closeError();
   });
 
   element.addEventListener('unity:track-analytics', (e) => {
@@ -1057,6 +1058,13 @@ export default async function init(element) {
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
       announceToScreenReader(message);
+      setTimeout(() => {
+        if (outsideClickHandler) return;
+        outsideClickHandler = (e) => {
+          if (!errorState.contains(e.target)) closeError();
+        };
+        document.addEventListener('click', outsideClickHandler);
+      }, 0);
     }
     if (logToLana) {
       window.lana?.log(

@@ -166,6 +166,7 @@ describe('study-marquee block', () => {
     const errorState = block.querySelector('.error');
     expect(errorState.classList.contains('hide')).to.be.false;
 
+    await delay(50);
     document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(errorState.classList.contains('hide')).to.be.true;
   });

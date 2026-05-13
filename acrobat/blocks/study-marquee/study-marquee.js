@@ -590,6 +590,17 @@ export default async function init(element) {
   const setDraggingClass = (shouldToggle) => {
     dropzone.classList.toggle('dragging', !!shouldToggle);
   };
+  let outsideClickHandler = null;
+  const dismissError = () => {
+    errorState.classList.remove('study-marquee-error');
+    errorState.classList.add('hide');
+    errorStateText.textContent = '';
+    clearSrAlert();
+    if (outsideClickHandler) {
+      document.removeEventListener('click', outsideClickHandler);
+      outsideClickHandler = null;
+    }
+  };
   const handleError = (detail, logToLana = false, logOptions = {}) => {
     const { code, message, status, info = 'No additional info provided', accountType = 'Unknown account type' } = detail;
     if (message) {
@@ -599,6 +610,13 @@ export default async function init(element) {
       errorStateText.textContent = message;
       announceToScreenReader(message);
       errorCloseBtn.focus();
+      setTimeout(() => {
+        if (outsideClickHandler) return;
+        outsideClickHandler = (e) => {
+          if (!errorState.contains(e.target)) dismissError();
+        };
+        document.addEventListener('click', outsideClickHandler);
+      }, 0);
     }
     if (logToLana) {
       window.lana?.log(
@@ -658,12 +676,6 @@ export default async function init(element) {
   fileInput.addEventListener('cancel', () => {
     window.analytics.verbAnalytics('choose-file:close', VERB, { userAttempts });
   });
-  const dismissError = () => {
-    errorState.classList.remove('study-marquee-error');
-    errorState.classList.add('hide');
-    errorStateText.textContent = '';
-    clearSrAlert();
-  };
   errorCloseBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     dismissError();
@@ -673,10 +685,6 @@ export default async function init(element) {
       e.preventDefault();
       dismissError();
     }
-  });
-  document.addEventListener('click', (e) => {
-    if (errorState.classList.contains('hide')) return;
-    if (!errorState.contains(e.target)) dismissError();
   });
   element.addEventListener('unity:track-analytics', (e) => {
     const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
