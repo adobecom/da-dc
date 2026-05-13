@@ -668,6 +668,9 @@
   height: 32px;
   cursor: pointer;
   display: block;
+  background: none;
+  border: none;
+  outline: none;
 }
 
 .verb-marquee-errorIcon {

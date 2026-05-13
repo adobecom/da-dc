@@ -416,6 +416,9 @@ html[dir="rtl"] .verb-cta .upload-icon {
   height: 32px;
   cursor: pointer;
   display: block;
+  background: none;
+  border: none;
+  outline: none;
 }
 
 .verb-errorIcon {

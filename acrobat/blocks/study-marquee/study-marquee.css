@@ -561,6 +561,9 @@
   height: 32px;
   cursor: pointer;
   display: block;
+  background: none;
+  border: none;
+  outline: none;
 }
 
 .study-marquee-errorIcon {

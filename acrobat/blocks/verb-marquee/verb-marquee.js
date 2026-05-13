@@ -701,6 +701,7 @@ export default async function init(element) {
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
       announceToScreenReader(message);
+      errorCloseBtn.focus();
       setTimeout(() => {
         if (outsideClickHandler) return;
         outsideClickHandler = (e) => {
