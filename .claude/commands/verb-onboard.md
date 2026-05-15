@@ -48,6 +48,17 @@ Additional optional flags (ask only if the user selects `verb-widget`):
 - `level: 0` — Trial mode (no file picker, shows pricing CTA)
 - `subCopy` — Show sub-description text from placeholders
 
+### 1d. Verb icon SVG *(verb-widget only)*
+
+If the block is `verb-widget`, ask the user to provide the SVG for the verb icon. This is required — every verb in `acrobat/blocks/verb-widget/icons/` must have a matching `<verb>.svg` file.
+
+Tell the user:
+> "Please share the SVG for `<verb>`. You can either:
+> - **Paste the SVG markup** directly into the chat, or
+> - **Provide the file path** on your machine and I will read it."
+
+Once received, validate it is well-formed SVG (starts with `<svg` and ends with `</svg>`). If the user provides a file path, read it with the Read tool.
+
 **Once all inputs are confirmed, display a summary and ask for a final go-ahead before making any file changes.**
 
 Summary format:
@@ -56,15 +67,32 @@ Block:      <block-name>
 Verb:       <verb-name>
 Config:     { maxFileSize: ..., acceptedFiles: [...], ... }
 Files that will change:
-  - acrobat/blocks/<block>/<block>.js         (add LIMITS entry)
-  - test/blocks/<block>/mocks/body-<verb>.html (new file)
-  - test/blocks/<block>/<block>.test.js        (add test cases)
-  - test/blocks/<block>/mocks/placeholders.json (add placeholder keys)
+  - acrobat/blocks/<block>/<block>.js                  (add LIMITS entry)
+  - acrobat/blocks/verb-widget/icons/<verb>.svg         (new file — verb-widget only)
+  - test/blocks/<block>/mocks/body-<verb>.html          (new file)
+  - test/blocks/<block>/<block>.test.js                 (add test cases)
+  - test/blocks/<block>/mocks/placeholders.json         (add placeholder keys)
 ```
 
 ---
 
-## Step 2 — Update LIMITS in the block JS
+## Step 2 — Write the verb icon SVG *(verb-widget only)*
+
+Skip this step entirely for `study-marquee` and `verb-marquee`.
+
+Write the SVG content provided in Step 1d to:
+
+```
+acrobat/blocks/verb-widget/icons/<verb>.svg
+```
+
+Use the Write tool. Do not wrap it in any other tags or add anything to the file — the raw SVG markup only.
+
+Verify the file exists with a quick `ls acrobat/blocks/verb-widget/icons/<verb>.svg` before moving on.
+
+---
+
+## Step 3 — Update LIMITS in the block JS
 
 Read the block JS file first, then apply the correct edit.
 
@@ -124,7 +152,7 @@ export const LIMITS = {
 
 ---
 
-## Step 3 — Create the test mock HTML file
+## Step 4 — Create the test mock HTML file
 
 Create `test/blocks/<block>/mocks/body-<verb>.html`.
 
@@ -197,7 +225,7 @@ Use the matching pattern for the block:
 
 ---
 
-## Step 4 — Add test cases to the test file
+## Step 5 — Add test cases to the test file
 
 Read the existing test file first. Add the new test cases **before the closing `});`** of the `describe` block.
 
@@ -274,7 +302,7 @@ it('init <verb> block', async () => {
 
 ---
 
-## Step 5 — Update test placeholders.json
+## Step 6 — Update test placeholders.json
 
 Read the existing `test/blocks/<block>/mocks/placeholders.json`. Append the verb-specific placeholder keys to the `data` array and increment `total` accordingly.
 
@@ -311,7 +339,7 @@ Use sensible placeholder values derived from the verb name (e.g. `essay-writer` 
 
 ---
 
-## Step 6 — Run the targeted tests
+## Step 7 — Run the targeted tests
 
 ```bash
 npx wtr "test/blocks/<block>/<block>.test.js" --node-resolve --port=2000
@@ -324,7 +352,7 @@ Fix any failures before proceeding. Common issues:
 
 ---
 
-## Step 7 — Run the full test suite
+## Step 8 — Run the full test suite
 
 ```bash
 npm test
@@ -334,7 +362,7 @@ All tests must be green before creating the PR. Fix any regressions.
 
 ---
 
-## Step 8 — Create the PR
+## Step 9 — Create the PR
 
 If not already provided, ask the user for the **Jira ticket number** (e.g. `194527` from `MWPW-194527`).
 
@@ -345,7 +373,9 @@ The feature branch name follows the pattern **`MWPW-<number>`** (e.g. `MWPW-1945
 git checkout -b MWPW-<number>
 
 # Stage only the files changed for this verb
+# (include the SVG line only when block is verb-widget)
 git add acrobat/blocks/<block>/<block>.js \
+        acrobat/blocks/verb-widget/icons/<verb>.svg \   # verb-widget only
         test/blocks/<block>/<block>.test.js \
         test/blocks/<block>/mocks/body-<verb>.html \
         test/blocks/<block>/mocks/placeholders.json
@@ -368,6 +398,7 @@ gh pr create \
 ## Summary
 - Adds \`<verb>\` to the \`LIMITS\` object in \`acrobat/blocks/<block>/<block>.js\`
 - Config: \`<config summary>\`
+- Adds verb icon SVG at \`acrobat/blocks/verb-widget/icons/<verb>.svg\` *(verb-widget only)*
 - Includes unit test mock HTML and test cases in \`test/blocks/<block>/\`
 
 ## Test plan
