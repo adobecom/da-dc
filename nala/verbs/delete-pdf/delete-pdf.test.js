@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import { features } from './delete-pdf.spec.js';
 import DeletePdf from './delete-pdf.page.js';
 import { checkPageLinks } from '../../utils/link-checker.js';
+
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-delete-pdf.pdf');
 
 let deletePdf;

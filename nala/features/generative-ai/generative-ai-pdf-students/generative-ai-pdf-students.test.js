@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import GenerativeAiPdfStudentsPage from './generative-ai-pdf-students.page.js';
 import { features } from './generative-ai-pdf-students.spec.js';
 import { checkPageLinks } from '../../../utils/link-checker.js';
-  
+
 let gai;
 
 test.describe('Acrobat Generative AI PDF — Students', () => {

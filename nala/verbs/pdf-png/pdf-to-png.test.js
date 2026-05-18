@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import { features } from './pdf-to-png.spec.js';
 import PdfToPng from './pdf-to-png.page.js';
 import { checkPageLinks } from '../../utils/link-checker.js';
+
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-pdf-png.pdf');
 
 let pdfToPng;

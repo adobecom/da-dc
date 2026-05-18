@@ -22,7 +22,7 @@ test.describe('Unity PPT to PDF test suite', () => {
 
     await test.step('step-1: Go to PPT to PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
-      await page.waitForLoadState('domcontentloaded');  
+      await page.waitForLoadState('domcontentloaded');
       // await expect(page).toHaveURL(`${baseURL}${features[0].path}${unityLibs}`);
     });
 

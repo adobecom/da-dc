@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import { features } from './ai-chat-pdf.spec.js';
 import AiChatPdf from './ai-chat-pdf.page.js';
 import { checkPageLinks } from '../../utils/link-checker.js';
+
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-ai-chat-pdf.pdf');
 
 let aiChatPdf;

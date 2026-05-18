@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import BusinessSignPage from './business-sign.page.js';
 import { features } from './business-sign.spec.js';
 import { checkPageLinks } from '../../utils/link-checker.js';
+
 let businessSign;
 
 test.describe('Acrobat Business — Sign', () => {
@@ -23,7 +24,7 @@ test.describe('Acrobat Business — Sign', () => {
     });
 
     await test.step('Verify notification strip', async () => {
-      const notification = businessSign.notification;
+      const { notification } = businessSign;
       await notification.scrollIntoViewIfNeeded();
       await expect(notification).toBeVisible({ timeout: 60000 });
     });

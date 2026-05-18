@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import CampaignPage from './campaign.page.js';
 import { features } from './campaign.spec.js';
 import { checkPageLinks } from '../../utils/link-checker.js';
+
 let campaign;
 
 test.describe('Acrobat Campaign — Acrobats got it', () => {

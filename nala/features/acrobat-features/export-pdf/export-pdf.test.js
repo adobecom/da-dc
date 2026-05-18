@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import ExportPdfPage from './export-pdf.page.js';
 import { features } from './export-pdf.spec.js';
 import { checkPageLinks } from '../../../utils/link-checker.js';
+
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/get-acrobat-support';
 
 let exportPdfPage;
@@ -38,7 +39,6 @@ test.describe('Acrobat Features — Export PDF', () => {
         await expect(block).not.toHaveClass(/hero-marquee/);
       }
     });
-
 
     await test.step('Verify aside Reader + Chrome extension links', async () => {
       const count = await exportPdfPage.asideBlocks.count();
@@ -212,7 +212,7 @@ test.describe('Acrobat Features — Export PDF', () => {
       await exportPdfPage.footer.scrollIntoViewIfNeeded();
       await expect(exportPdfPage.footer).toBeVisible({ timeout: 60000 });
     });
-    await test.step('Verify visible checkout links are visible and enabled', async () => {  
+    await test.step('Verify visible checkout links are visible and enabled', async () => {
       const checkoutLinks = page.locator('a[is="checkout-link"]');
       const count = await checkoutLinks.count();
       for (let i = 0; i < count; i += 1) {

@@ -17,24 +17,16 @@ export default class PricingIndividualsPage {
     );
     this.pricingPageIndividualsMerchCards = this.pricingPageIndividuals.locator('merch-card');
     this.pricingPageIndividualsMerchCardAcrobatStandard = this.pricingPageIndividualsMerchCards.nth(0);
-    this.pricingPageIndividualsMerchCardAcrobatStandardPrice =
-      this.pricingPageIndividualsMerchCardAcrobatStandard.locator('span[is*="inline-price"]');
-    this.pricingPageIndividualsMerchCardAcrobatStandardBuyNow =
-      this.pricingPageIndividualsMerchCardAcrobatStandard.locator('a[is="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageIndividualsMerchCardAcrobatStandardPrice = this.pricingPageIndividualsMerchCardAcrobatStandard.locator('span[is*="inline-price"]');
+    this.pricingPageIndividualsMerchCardAcrobatStandardBuyNow = this.pricingPageIndividualsMerchCardAcrobatStandard.locator('a[is="checkout-link"][href*="ot=BASE"]');
     this.pricingPageIndividualsMerchCardAcrobatPro = this.pricingPageIndividualsMerchCards.nth(1);
-    this.pricingPageIndividualsMerchCardAcrobatProPrice =
-      this.pricingPageIndividualsMerchCardAcrobatPro.locator('span[is*="inline-price"]');
-    this.pricingPageIndividualsMerchCardAcrobatProFreeTrial =
-      this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageIndividualsMerchCardAcrobatProBuyNow =
-      this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageIndividualsMerchCardAcrobatProPrice = this.pricingPageIndividualsMerchCardAcrobatPro.locator('span[is*="inline-price"]');
+    this.pricingPageIndividualsMerchCardAcrobatProFreeTrial = this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
+    this.pricingPageIndividualsMerchCardAcrobatProBuyNow = this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=BASE"]');
     this.pricingPageIndividualsMerchCardAcrobatStudio = this.pricingPageIndividualsMerchCards.nth(2);
-    this.pricingPageIndividualsMerchCardAcrobatStudioPrice =
-      this.pricingPageIndividualsMerchCardAcrobatStudio.locator('span[is*="inline-price"]');
-    this.pricingPageIndividualsMerchCardAcrobatStudioFreeTrial =
-      this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageIndividualsMerchCardAcrobatStudioBuyNow =
-      this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageIndividualsMerchCardAcrobatStudioPrice = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('span[is*="inline-price"]');
+    this.pricingPageIndividualsMerchCardAcrobatStudioFreeTrial = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
+    this.pricingPageIndividualsMerchCardAcrobatStudioBuyNow = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=BASE"]');
 
     this.faqSection = page.locator('div[class*="accordion-container"]');
     this.faqAccordionTriggers = this.faqSection.locator('button.accordion-trigger');

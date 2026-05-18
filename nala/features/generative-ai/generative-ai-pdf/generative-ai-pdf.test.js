@@ -3,6 +3,7 @@ import MerchCards from '../../../libs/blocks/merch-cards.js';
 import GenerativeAiPdfPage from './generative-ai-pdf.page.js';
 import { features } from './generative-ai-pdf.spec.js';
 import { checkPageLinks } from '../../../utils/link-checker.js';
+
 let gai;
 
 test.describe('Acrobat Generative AI PDF', () => {

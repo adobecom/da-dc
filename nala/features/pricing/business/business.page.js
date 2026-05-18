@@ -16,24 +16,16 @@ export default class PricingBusinessPage {
     );
     this.pricingPageBusinessMerchCards = this.pricingPageBusiness.locator('merch-card');
     this.pricingPageBusinessMerchCardAcrobatStandardForTeams = this.pricingPageBusinessMerchCards.nth(0);
-    this.pricingPageBusinessMerchCardAcrobatStandardForTeamsPrice =
-      this.pricingPageBusinessMerchCardAcrobatStandardForTeams.locator('span[is*="inline-price"]');
-    this.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow =
-      this.pricingPageBusinessMerchCardAcrobatStandardForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageBusinessMerchCardAcrobatStandardForTeamsPrice = this.pricingPageBusinessMerchCardAcrobatStandardForTeams.locator('span[is*="inline-price"]');
+    this.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow = this.pricingPageBusinessMerchCardAcrobatStandardForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
     this.pricingPageBusinessMerchCardAcrobatProForTeams = this.pricingPageBusinessMerchCards.nth(1);
-    this.pricingPageBusinessMerchCardAcrobatProForTeamsPrice =
-      this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('span[is*="inline-price"]');
-    this.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial =
-      this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow =
-      this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageBusinessMerchCardAcrobatProForTeamsPrice = this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('span[is*="inline-price"]');
+    this.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial = this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
+    this.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow = this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
     this.pricingPageBusinessMerchCardAcrobatStudioForTeams = this.pricingPageBusinessMerchCards.nth(2);
-    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsPrice =
-      this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('span[is*="inline-price"]');
-    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial =
-      this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow =
-      this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsPrice = this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('span[is*="inline-price"]');
+    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial = this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
+    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow = this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
 
     // Contact Sales CTA — inside editorial card; anchor card by `href*="acrobat/contact"` (no visible-text filter)
     this.contactSalesEditorialCard = page.locator('div[class*="editorial-card"]').filter({

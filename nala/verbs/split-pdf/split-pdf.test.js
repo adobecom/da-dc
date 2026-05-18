@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import { features } from './split-pdf.spec.js';
 import SplitPdf from './split-pdf.page.js';
 import { checkPageLinks } from '../../utils/link-checker.js';
+
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-split-pdf.pdf');
 
 let splitPdf;

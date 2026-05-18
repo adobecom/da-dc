@@ -15,7 +15,7 @@ const shouldSkip = (href, pageOrigin, currentPathname) => {
 };
 
 const fetchStatus = async (url) => {
-  const opts = { maxRedirects: 10, timeout: 30_000 };
+  const opts = { maxRedirects: 10, timeout: 30000 };
   try {
     const res = await axios.head(url, opts);
     return res.status;
