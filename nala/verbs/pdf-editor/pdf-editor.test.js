@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './pdf-editor.spec.js';
 import PdfEditor from './pdf-editor.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-pdf-editor.pdf');
 
