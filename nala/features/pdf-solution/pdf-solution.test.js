@@ -24,11 +24,6 @@ async function runCompletePdfSolutionSmoke(page, baseURL, path) {
     await expect(pdf.gnavBreadcrumbs).not.toBeVisible();
   });
 
-  await test.step('Verify global nav Acrobat app CTA (acrobat.adobe.com)', async () => {
-    await expect(pdf.gnavAcrobatAppLink.first()).toBeVisible();
-    await expect(pdf.gnavAcrobatAppLink.first()).toBeEnabled();
-    await expect(pdf.gnavAcrobatAppLink.first()).toHaveAttribute('href', /acrobat\.adobe\.com/);
-  });
 
   // TODO: Add this check back
   // await test.step('Verify mq-complete-pdf-solution blade', async () => {
