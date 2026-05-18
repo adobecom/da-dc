@@ -69,10 +69,15 @@ cd "$GITHUB_ACTION_PATH" || exit
 npm ci
 npx playwright install --with-deps
 
-# Run Playwright tests on the specific projects using root-level playwright.config.js
-# This will be changed later
-echo "*** Running tests on specific projects ***"
-npx playwright test --config=./playwright.config.js ${TAGS} ${EXCLUDE_TAGS} --project=da-dc-live-chromium --project=da-dc-live-firefox --project=da-dc-live-webkit ${REPORTER} || EXIT_STATUS=$?
+# Build project flags — BROWSER env selects a single browser, otherwise all three run
+if [[ -n "$BROWSER" ]]; then
+  PROJECT_FLAGS="--project=da-dc-live-${BROWSER}"
+else
+  PROJECT_FLAGS="--project=da-dc-live-chromium --project=da-dc-live-firefox --project=da-dc-live-webkit"
+fi
+
+echo "*** Running tests on: ${BROWSER:-"all browsers"} ***"
+npx playwright test --config=./playwright.config.js ${TAGS} ${EXCLUDE_TAGS} ${PROJECT_FLAGS} ${REPORTER} || EXIT_STATUS=$?
 
 # Check if tests passed or failed
 if [ $EXIT_STATUS -ne 0 ]; then

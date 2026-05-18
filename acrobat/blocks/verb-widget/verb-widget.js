@@ -44,6 +44,7 @@ const verbRedirMap = {
 const exhLimitCookieMap = {
   'to-pdf': 'cr_p_c',
   'pdf-to': 'ex_p_c',
+  'combine-pdf': 'cb_p_c',
   'compress-pdf': 'cm_p_ops',
   'rotate-pages': 'or_p_c',
   createpdf: 'cr_p_c',
@@ -55,213 +56,48 @@ const appEnvCookieMap = {
   prod: 'p_ac_',
 };
 
+const MB100 = 104857600;
+const MB250 = 262144000;
+const PDF_ONLY = ['.pdf'];
+const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
+const STUDENT_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt'];
+const SIGNED_IN_FILES = ['.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
+
+const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
+const MULTI_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, multipleFiles: true };
+const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
+const GENAI_MULTI = { ...MULTI_ALL, maxNumFiles: 100, uploadType: 'multifile-only', subCopy: true, genAI: true };
+const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
+
 export const LIMITS = {
-  fillsign: {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB', // 100 MB
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 1,
-    multipleFiles: false,
-    mobileApp: true,
-    typeOneLanding: true,
-  },
-  'number-pages': {
-    maxFileSize: 104857600, // 100 MB
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 1,
-    level: 0,
-    typeOneLanding: true,
-  },
-  'ocr-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '1 MB',
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 100,
-    multipleFiles: true,
-  },
+  fillsign: { ...SINGLE_PDF, mobileApp: true, typeOneLanding: true },
+  'ocr-pdf': { ...MULTI_PDF, maxNumFiles: 100 },
   'chat-pdf-student': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '1 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt'],
+    maxFileSize: MB100,
+    acceptedFiles: STUDENT_FILES,
     maxNumFiles: 100,
     multipleFiles: true,
     uploadType: 'multifile-only',
     subCopy: true,
     genAI: true,
   },
-  'chat-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '1 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    maxNumFiles: 100,
-    multipleFiles: true,
-    uploadType: 'multifile-only',
-    subCopy: true,
-    genAI: true,
-  },
-  'pdf-ai': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '1 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    maxNumFiles: 100,
-    multipleFiles: true,
-    uploadType: 'multifile-only',
-    subCopy: true,
-    genAI: true,
-  },
-  'summarize-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '1 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    maxNumFiles: 1,
-    subCopy: true,
-    genAI: true,
-  },
-  'split-pdf': {
-    maxFileSize: 104857600, // 1 GB
-    maxFileSizeFriendly: '1 GB',
-    acceptedFiles: ['.pdf'],
-    signedInAcceptedFiles: ['.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    maxNumFiles: 1,
-    typeOneLanding: true,
-  },
-  'combine-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB', // 100 MB
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 100,
-    multipleFiles: true,
-    uploadType: 'multifile-only',
-  },
-  'rotate-pages': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB', // 100 MB
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 100,
-    multipleFiles: true,
-    uploadType: 'multifile-only',
-  },
-  'protect-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB', // 100 MB
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 1,
-  },
-  'crop-pages': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '1 MB',
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 1,
-    level: 0,
-    typeOneLanding: true,
-  },
-  'add-comment': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '1 MB',
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 1,
-    typeOneLanding: true,
-    // neverRedirect: true,
-  },
-  'compress-pdf': {
-    maxFileSize: 2147483648,
-    maxFileSizeFriendly: '2 GB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    multipleFiles: true,
-    typeOneLanding: true,
-  },
-  'delete-pages': {
-    maxFileSize: 104857600, // 100 MB
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 1,
-  },
-  'insert-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 1,
-  },
-  'extract-pages': {
-    maxFileSize: 104857600, // 100 MB
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 1,
-  },
-  'reorder-pages': {
-    maxFileSize: 104857600, // 100 MB
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 1,
-  },
+  'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, subCopy: true, genAI: true },
+  'split-pdf': { ...SINGLE_PDF, signedInAcceptedFiles: SIGNED_IN_FILES, typeOneLanding: true },
+  'add-comment': { ...SINGLE_PDF, typeOneLanding: true },
+  'compress-pdf': { maxFileSize: 2147483648, acceptedFiles: ALL_FILES, multipleFiles: true, typeOneLanding: true },
   sendforsignature: {
-    maxFileSize: 5242880, // 5 MB
-    acceptedFiles: ['.pdf'],
+    maxFileSize: 5242880,
+    acceptedFiles: PDF_ONLY,
     maxNumFiles: 1,
     mobileApp: true,
   },
-  'pdf-to-word': {
-    maxFileSize: 262144000, // 250 MB
-    maxFileSizeFriendly: '250 MB',
-    acceptedFiles: ['.pdf'],
-    multipleFiles: true,
-  },
-  'pdf-to-excel': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf'],
-    multipleFiles: true,
-  },
-  'pdf-to-image': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf'],
-    multipleFiles: true,
-  },
-  'pdf-to-png': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf'],
-    multipleFiles: true,
-  },
-  'pdf-to-ppt': {
-    maxFileSize: 262144000, // 250 MB
-    maxFileSizeFriendly: '250 MB',
-    acceptedFiles: ['.pdf'],
-    multipleFiles: true,
-  },
-  createpdf: {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    multipleFiles: true,
-  },
-  'word-to-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    multipleFiles: true,
-  },
-  'jpg-to-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    multipleFiles: true,
-  },
-  'png-to-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    multipleFiles: true,
-  },
-  'excel-to-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    multipleFiles: true,
-  },
-  'ppt-to-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    multipleFiles: true,
-  },
+  ...group(['number-pages', 'crop-pages'], { ...SINGLE_PDF, level: 0, typeOneLanding: true }),
+  ...group(['protect-pdf', 'delete-pages', 'insert-pdf', 'extract-pages', 'reorder-pages'], SINGLE_PDF),
+  ...group(['chat-pdf', 'pdf-ai'], GENAI_MULTI),
+  ...group(['combine-pdf', 'rotate-pages'], { ...MULTI_PDF, maxNumFiles: 100, uploadType: 'multifile-only' }),
+  ...group(['pdf-to-excel', 'pdf-to-image', 'pdf-to-png'], MULTI_PDF),
+  ...group(['pdf-to-word', 'pdf-to-ppt'], { maxFileSize: MB250, acceptedFiles: PDF_ONLY, multipleFiles: true }),
+  ...group(['createpdf', 'word-to-pdf', 'jpg-to-pdf', 'png-to-pdf', 'excel-to-pdf', 'ppt-to-pdf'], MULTI_ALL),
 };
 
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';

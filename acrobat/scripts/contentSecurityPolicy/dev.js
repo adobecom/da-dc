@@ -26,6 +26,7 @@ const connectSrc = [
   'analytics.tiktok.com',
   'api.company-target.com/api/v2/',
   'api.iperceptions.com',
+  '*.contentsquare.net/',
   'c.go-mpulse.net',
   'cdn.cookielaw.org',
   'dc-api-dev.adobe.io',
@@ -129,6 +130,7 @@ const imgSrc = [
   '*.services.adobe.com',
   'alb.reddit.com/rp.gif',
   'bat.bing.com/action/',
+  '*.contentsquare.net/',
   'cdn.cookielaw.org',
   'cm.everesttech.net/cm/',
   'dpm.demdex.net',
@@ -221,6 +223,7 @@ const scriptSrc = [
   'tr.snapchat.com',
   '\'sha256-dg0pQ3tkJ9KWGwSBExDwP6bSUKm2FRzq/s0tHhkcDtk=\'', // for this repo
   '\'sha256-/B9aRx/bHjiUGWHC/33Ku1McTNnFGEiLwTJdRki4www=\'', // for acrobat subdomain dc-frictionless
+  't.contentsquare.net/ss/4451/2/uxa.js',
   ';',
 ];
 

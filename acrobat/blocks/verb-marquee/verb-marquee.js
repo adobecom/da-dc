@@ -1,34 +1,16 @@
 import { setLibs, isOldBrowser, loadPlaceholders, getEnv as getAppEnv } from '../../scripts/utils.js';
 
-/** Verbs supported by verb-marquee only; values mirror ../verb-widget/verb-widget.js LIMITS. */
+const MB100 = 104857600;
+const PDF_ONLY = ['.pdf'];
+const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
+const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
+const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
+const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
+
 export const LIMITS = {
-  fillsign: {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf'],
-    maxNumFiles: 1,
-    multipleFiles: false,
-    mobileApp: true,
-  },
-  'word-to-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    multipleFiles: true,
-  },
-  'jpg-to-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '100 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    multipleFiles: true,
-  },
-  'summarize-pdf': {
-    maxFileSize: 104857600, // 100 MB
-    maxFileSizeFriendly: '1 MB',
-    acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-    maxNumFiles: 1,
-    genAI: true,
-  },
+  fillsign: { ...SINGLE_PDF, mobileApp: true },
+  'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, genAI: true },
+  ...group(['word-to-pdf', 'jpg-to-pdf'], MULTI_ALL),
 };
 
 const miloLibs = setLibs('/libs');
@@ -57,7 +39,7 @@ const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.locatio
 const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 
 const lanaOptions = {
-  sampleRate: 100,
+  sampleRate: 1,
   tags: 'DC_Milo,Project Unity (DC)',
   severity: 'error',
 };
@@ -433,23 +415,25 @@ export default async function init(element) {
   const copy1Text = isMobileOrTabletViewport
     ? (window.mph?.[`verb-marquee-${VERB}-mobile-copy`] || window.mph?.[`verb-marquee-${VERB}-copy`] || '')
     : (window.mph?.[`verb-marquee-${VERB}-copy`] || '');
-  const copy2Text = isMobileOrTabletViewport
-    ? (window.mph?.[`verb-marquee-${VERB}-mobile-sub-copy`]
-      || window.mph?.[`verb-marquee-${VERB}-sub-copy`] || '')
-    : (window.mph?.[`verb-marquee-${VERB}-sub-copy`] || '');
-  const includeCopy2 = !!copy2Text;
+  const subCopies = ['', '-2']
+    .map((suffix) => {
+      const subCopyText = isMobileOrTabletViewport
+        ? (window.mph?.[`verb-marquee-${VERB}-mobile-sub-copy${suffix}`]
+          || window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '')
+        : (window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '');
+      if (!subCopyText) return null;
+      const el = createTag('p', { class: 'verb-marquee-copy-sub' });
+      const icon = createSvgElement('SUBCOPY_CHECK');
+      if (icon) {
+        icon.classList.add('verb-marquee-copy-sub-icon');
+        icon.setAttribute('aria-hidden', 'true');
+        el.appendChild(icon);
+      }
+      el.appendChild(createTag('span', { class: 'verb-marquee-copy-sub-label' }, subCopyText));
+      return el;
+    })
+    .filter(Boolean);
   const copy1 = createTag('p', { class: 'verb-marquee-copy' }, copy1Text);
-  let copy2 = null;
-  if (includeCopy2) {
-    copy2 = createTag('p', { class: 'verb-marquee-copy-sub' });
-    const subcopyIcon = createSvgElement('SUBCOPY_CHECK');
-    if (subcopyIcon) {
-      subcopyIcon.classList.add('verb-marquee-copy-sub-icon');
-      subcopyIcon.setAttribute('aria-hidden', 'true');
-      copy2.appendChild(subcopyIcon);
-    }
-    copy2.appendChild(createTag('span', { class: 'verb-marquee-copy-sub-label' }, copy2Text));
-  }
   const dropzone = createTag('div', {
     class: 'verb-marquee-dropzone',
     id: 'drop-zone',
@@ -612,7 +596,7 @@ export default async function init(element) {
     header,
     headingEl,
     copy1,
-    ...(copy2 ? [copy2] : []),
+    ...subCopies,
     dropzone,
     ...(fileInput ? [fileInput] : []),
     ...(omitFooterForMobileStore ? [] : [footer]),
@@ -667,7 +651,7 @@ export default async function init(element) {
       window.dispatchEvent(redirectReady);
       window.lana?.log(
         'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
-        { sampleRate: 5, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
+        { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
       );
     }, 3000);
     setCookie('UTS_Uploaded', Date.now(), cookieExp);
