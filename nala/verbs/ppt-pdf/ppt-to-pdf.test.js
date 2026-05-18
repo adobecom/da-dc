@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './ppt-to-pdf.spec.js';
 import PptToPdf from './ppt-to-pdf.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const pptFilePath = path.resolve(__dirname, '../../assets/1-PPT-ppt-pdf.pptx');
 
@@ -21,7 +22,7 @@ test.describe('Unity PPT to PDF test suite', () => {
 
     await test.step('step-1: Go to PPT to PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
-      await page.waitForLoadState('domcontentloaded');  
+      await page.waitForLoadState('domcontentloaded');
       // await expect(page).toHaveURL(`${baseURL}${features[0].path}${unityLibs}`);
     });
 
@@ -34,6 +35,10 @@ test.describe('Unity PPT to PDF test suite', () => {
       expect(actualText.trim()).toBe(data.verbHeading);
       await expect(await pptToPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await pptToPdf.verbCopy).toContainText(data.verbCopy);
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-3: Upload a sample PDF file', async () => {

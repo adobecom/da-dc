@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './crop-pdf.spec.js';
 import CropPdf from './crop-pdf.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-crop-pdf.pdf');
 
@@ -34,6 +35,10 @@ test.describe('Unity Crop PDF test suite', () => {
       expect(actualText.trim()).toBe(data.verbHeading);
       await expect(await cropPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await cropPdf.verbCopy).toContainText(data.verbCopy);
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-3: Upload a sample PDF file', async () => {

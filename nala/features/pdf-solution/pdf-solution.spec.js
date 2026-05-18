@@ -14,7 +14,7 @@ module.exports = {
       name: '@pdf-solution-edit-smoke',
       path: '/acrobat/complete-pdf-solution?ttid=edit-pdf',
       data: {},
-      tags: '@pdf-solution @edit-pdf @smoke @live',
+      tags: '@pdf-solution-ttid-edit-pdf @edit-pdf @smoke @live',
     },
   ],
 };

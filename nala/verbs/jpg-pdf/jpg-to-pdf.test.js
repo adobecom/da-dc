@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './jpg-to-pdf.spec.js';
 import JpgToPdf from './jpg-to-pdf.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const jpgFilePath = path.resolve(__dirname, '../../assets/1-JPG-jpg-pdf.jpg');
 
@@ -34,6 +35,10 @@ test.describe('Unity JPG to PDF test suite', () => {
       expect(actualText.trim()).toBe(data.verbHeading);
       await expect(await jpgToPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await jpgToPdf.verbCopy).toContainText(data.verbCopy);
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-3: Upload a sample PDF file', async () => {

@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './split-pdf.spec.js';
 import SplitPdf from './split-pdf.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-split-pdf.pdf');
 
@@ -34,6 +35,10 @@ test.describe('Unity Split PDF test suite', () => {
       expect(actualText.trim()).toBe(data.verbHeading);
       await expect(await splitPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await splitPdf.verbCopy).toContainText(data.verbCopy);
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-3: Upload a sample PDF file', async () => {

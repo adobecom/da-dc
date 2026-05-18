@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './excel-to-pdf.spec.js';
 import ExcelToPdf from './excel-to-pdf.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const excelFilePath = path.resolve(__dirname, '../../assets/1-Excel-excel-pdf.xlsx');
 
@@ -34,6 +35,10 @@ test.describe('Unity EXCEL to PDF test suite', () => {
       expect(actualText.trim()).toBe(data.verbHeading);
       await expect(await excelToPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await excelToPdf.verbCopy).toContainText(data.verbCopy);
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-3: Upload a sample PDF file', async () => {

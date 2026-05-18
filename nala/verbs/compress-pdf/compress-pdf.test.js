@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './compress-pdf.spec.js';
 import CompressPdf from './compress-pdf.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-compress-pdf.pdf');
 
@@ -23,6 +24,10 @@ test.describe('Unity Compress PDF test suite', () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
       await page.waitForLoadState('domcontentloaded');
       // await expect(page).toHaveURL(`${baseURL}${features[0].path}${unityLibs}`);
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-2: Verify Compress PDF content/specs', async () => {

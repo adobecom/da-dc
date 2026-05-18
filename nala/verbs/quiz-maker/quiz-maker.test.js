@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './quiz-maker.spec.js';
 import QuizMakerPage from './quiz-maker.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-split-pdf.pdf');
 
@@ -32,6 +33,10 @@ test.describe('Unity Quiz maker test suite', () => {
       expect(actualText.trim()).toBe(data.verbHeading);
       await expect(await quizMaker.verbTitle).toContainText(data.verbTitle);
       await expect(await quizMaker.verbCopy).toContainText(data.verbCopy);
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-3: Upload a sample PDF file', async () => {
