@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './png-to-pdf.spec.js';
 import PngToPdf from './png-to-pdf.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const pngFilePath = path.resolve(__dirname, '../../assets/1-PNG-png-pdf.png');
 
@@ -34,6 +35,10 @@ test.describe('Unity PNG to PDF test suite', () => {
       expect(actualText.trim()).toBe(data.verbHeading);
       await expect(await pngToPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await pngToPdf.verbCopy).toContainText(data.verbCopy);
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-3: Upload a sample PDF file', async () => {

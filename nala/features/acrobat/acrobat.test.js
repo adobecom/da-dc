@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import AcrobatPage from './acrobat.page.js';
 import { features } from './acrobat.spec.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/get-acrobat-support';
 
@@ -104,7 +105,7 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
 
       await acrobat.tabCompareIndividuals.click();
       await expect(acrobat.tabCompareIndividuals).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(600);
 
       await expect(acrobat.individualMerchCards.first()).toBeVisible();
       await expect(acrobat.individualMerchCards).toHaveCount(3);
@@ -142,7 +143,7 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
 
       await acrobat.tabCompareBusiness.click();
       await expect(acrobat.tabCompareBusiness).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(600);
 
       await expect(acrobat.businessMerchCards.first()).toBeVisible();
       await expect(acrobat.businessMerchCards).toHaveCount(2);
@@ -173,7 +174,7 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
 
       await acrobat.tabCompareStudentsAndTeachers.click();
       await expect(acrobat.tabCompareStudentsAndTeachers).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(600);
 
       await expect(acrobat.studentsAndTeachersMerchCards.first()).toBeVisible();
       await expect(acrobat.studentsAndTeachersMerchCards).toHaveCount(2);
@@ -258,6 +259,10 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

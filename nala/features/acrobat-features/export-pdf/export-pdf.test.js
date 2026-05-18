@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import ExportPdfPage from './export-pdf.page.js';
 import { features } from './export-pdf.spec.js';
-
+import { checkPageLinks } from '../../../utils/link-checker.js';
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/get-acrobat-support';
 
 let exportPdfPage;
@@ -222,6 +222,10 @@ test.describe('Acrobat Features — Export PDF', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

@@ -2,7 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './ai-chat-pdf.spec.js';
 import AiChatPdf from './ai-chat-pdf.page.js';
-
+import { checkPageLinks } from '../../utils/link-checker.js';
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-ai-chat-pdf.pdf');
 
 let aiChatPdf;
@@ -34,6 +34,10 @@ test.describe('Unity AI Chat PDF test suite', () => {
       expect(actualText.trim()).toBe(data.verbHeading);
       await expect(await aiChatPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await aiChatPdf.verbCopy).toContainText(data.verbCopy);
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-3: Upload a sample PDF file', async () => {

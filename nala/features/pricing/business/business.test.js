@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import PricingBusinessPage from './business.page.js';
 import { features } from './business.spec.js';
+import { checkPageLinks } from '../../../utils/link-checker.js';
 
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/acrobat-here-to-help-blade';
 
@@ -173,6 +174,10 @@ test.describe('Acrobat Pricing — Business', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

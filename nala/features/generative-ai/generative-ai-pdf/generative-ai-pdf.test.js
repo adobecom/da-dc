@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import MerchCards from '../../../libs/blocks/merch-cards.js';
 import GenerativeAiPdfPage from './generative-ai-pdf.page.js';
 import { features } from './generative-ai-pdf.spec.js';
-
+import { checkPageLinks } from '../../../utils/link-checker.js';
 let gai;
 
 test.describe('Acrobat Generative AI PDF', () => {
@@ -55,7 +55,114 @@ test.describe('Acrobat Generative AI PDF', () => {
     });
 
     await test.step('Verify merch card plans (compare tabs)', async () => {
-      await merchCards.verifyMerchCardPlans();
+      await expect(gai.merchCardPlans).toBeVisible();
+      await expect(gai.merchCardPlansTitle).toBeVisible();
+      await expect(gai.tabCompareIndividuals).toBeVisible();
+      await expect(gai.tabCompareIndividuals).toBeEnabled();
+      await expect(gai.tabCompareBusiness).toBeVisible();
+      await expect(gai.tabCompareBusiness).toBeEnabled();
+      await expect(gai.tabCompareStudentsAndTeachers).toBeVisible();
+      await expect(gai.tabCompareStudentsAndTeachers).toBeEnabled();
+
+      await gai.tabCompareIndividuals.click();
+      await expect(gai.tabCompareIndividuals).toHaveAttribute('aria-selected', 'true');
+      await page.waitForTimeout(400);
+
+      await expect(gai.individualMerchCards.first()).toBeVisible();
+      await expect(gai.individualMerchCards).toHaveCount(3);
+
+      await expect(gai.acrobatReaderPrice).toBeVisible();
+      await expect(gai.acrobatReaderLink.first()).toBeVisible();
+      await expect(gai.acrobatReaderLink.first()).toBeEnabled();
+
+      await expect(gai.acrobatProPrice).toBeVisible();
+      await expect(gai.acrobatProFreeTrial).toBeVisible();
+      await expect(gai.acrobatProFreeTrial).toBeEnabled();
+      await expect(gai.acrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
+      await expect(gai.acrobatProBuyNow).toBeVisible();
+      await expect(gai.acrobatProBuyNow).toBeEnabled();
+      await expect(gai.acrobatProBuyNow).toHaveAttribute('href', /ot=BASE/);
+
+      await expect(gai.acrobatStudioPrice).toBeVisible();
+      await expect(gai.acrobatStudioFreeTrial).toBeVisible();
+      await expect(gai.acrobatStudioFreeTrial).toBeEnabled();
+      await expect(gai.acrobatStudioFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
+      await expect(gai.acrobatStudioBuyNow).toBeVisible();
+      await expect(gai.acrobatStudioBuyNow).toBeEnabled();
+      await expect(gai.acrobatStudioBuyNow).toHaveAttribute('href', /ot=BASE/);
+
+      await expect(gai.individualMerchCardsPricingLink).toBeVisible();
+      await expect(gai.individualMerchCardsPricingLink).toBeEnabled();
+      await expect(gai.individualMerchCardsPricingLink).toHaveCount(1);
+
+      await expect(gai.merchIndividualsComparePlansLink).toBeVisible();
+      await expect(gai.merchIndividualsComparePlansLink).toBeEnabled();
+      await expect(gai.merchIndividualsComparePlansLink).toHaveAttribute(
+        'href',
+        /compare-versions|compare-pricing/,
+      );
+
+      await gai.tabCompareBusiness.click();
+      await expect(gai.tabCompareBusiness).toHaveAttribute('aria-selected', 'true');
+      await page.waitForTimeout(400);
+
+      await expect(gai.businessMerchCards.first()).toBeVisible();
+      await expect(gai.businessMerchCards).toHaveCount(2);
+
+      await expect(gai.acrobatProForTeamsPrice).toBeVisible();
+      await expect(gai.acrobatProForTeamsFreeTrial).toBeVisible();
+      await expect(gai.acrobatProForTeamsFreeTrial).toBeEnabled();
+      await expect(gai.acrobatProForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
+      await expect(gai.acrobatProForTeamsBuyNow).toBeVisible();
+      await expect(gai.acrobatProForTeamsBuyNow).toBeEnabled();
+      await expect(gai.acrobatProForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
+
+      await expect(gai.acrobatStudioForTeamsPrice).toBeVisible();
+      await expect(gai.acrobatStudioForTeamsFreeTrial).toBeVisible();
+      await expect(gai.acrobatStudioForTeamsFreeTrial).toBeEnabled();
+      await expect(gai.acrobatStudioForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
+      await expect(gai.acrobatStudioForTeamsBuyNow).toBeVisible();
+      await expect(gai.acrobatStudioForTeamsBuyNow).toBeEnabled();
+      await expect(gai.acrobatStudioForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
+
+      await expect(gai.businessMerchCardsPricingLink).toBeVisible();
+      await expect(gai.businessMerchCardsPricingLink).toBeEnabled();
+      await expect(gai.businessMerchCardsPricingLink).toHaveCount(1);
+
+      await expect(gai.merchBusinessViewPlansLink).toBeVisible();
+      await expect(gai.merchBusinessViewPlansLink).toBeEnabled();
+      await expect(gai.merchBusinessViewPlansLink).toHaveAttribute('href', /pricing\/business/);
+
+      await gai.tabCompareStudentsAndTeachers.click();
+      await expect(gai.tabCompareStudentsAndTeachers).toHaveAttribute('aria-selected', 'true');
+      await page.waitForTimeout(400);
+
+      await expect(gai.studentsAndTeachersMerchCards.first()).toBeVisible();
+      await expect(gai.studentsAndTeachersMerchCards).toHaveCount(2);
+
+      await expect(gai.acrobatProForStudentsAndTeachersPrice.first()).toBeVisible();
+      await expect(gai.acrobatProForStudentsAndTeachersFreeTrial).toBeVisible();
+      await expect(gai.acrobatProForStudentsAndTeachersFreeTrial).toBeEnabled();
+      await expect(gai.acrobatProForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
+      await expect(gai.acrobatProForStudentsAndTeachersBuyNow).toBeVisible();
+      await expect(gai.acrobatProForStudentsAndTeachersBuyNow).toBeEnabled();
+      await expect(gai.acrobatProForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
+
+      await expect(gai.creativeCloudForStudentsAndTeachersPrice.first()).toBeVisible();
+      await expect(gai.creativeCloudForStudentsAndTeachersFreeTrial).toBeVisible();
+      await expect(gai.creativeCloudForStudentsAndTeachersFreeTrial).toBeEnabled();
+      await expect(gai.creativeCloudForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
+      await expect(gai.creativeCloudForStudentsAndTeachersBuyNow).toBeVisible();
+      await expect(gai.creativeCloudForStudentsAndTeachersBuyNow).toBeEnabled();
+      await expect(gai.creativeCloudForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
+
+      await expect(gai.studentsAndTeachersPricingLink).toBeVisible();
+      await expect(gai.studentsAndTeachersPricingLink).toBeEnabled();
+      await expect(gai.studentsAndTeachersPricingLink).toHaveCount(1);
+
+      await expect(gai.merchStudentsViewPlansLink).toBeVisible();
+      await expect(gai.merchStudentsViewPlansLink).toBeEnabled();
+      await expect(gai.merchStudentsViewPlansLink).toHaveAttribute('href', /pricing\/students/);
     });
 
     await test.step('Verify existing Acrobat customer block', async () => {
@@ -99,6 +206,10 @@ test.describe('Acrobat Generative AI PDF', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

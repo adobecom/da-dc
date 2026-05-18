@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import BusinessPricingPlansPage from './business-pricing-plans.page.js';
 import { features } from './business-pricing-plans.spec.js';
-
+import { checkPageLinks } from '../../utils/link-checker.js';
 let pricingPlans;
 
 test.describe('Acrobat Business — Pricing plans', () => {
@@ -104,6 +104,10 @@ test.describe('Acrobat Business — Pricing plans', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

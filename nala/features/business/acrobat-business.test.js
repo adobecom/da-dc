@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import AcrobatBusinessPage from './acrobat-business.page.js';
 import { features } from './acrobat-business.spec.js';
-
+import { checkPageLinks } from '../../utils/link-checker.js';
 let acrobatBusiness;
 
 test.describe('Acrobat Business — Landing', () => {
@@ -144,6 +144,10 @@ test.describe('Acrobat Business — Landing', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

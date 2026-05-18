@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './add-pdf-number.spec.js';
 import AddPdfNumberPage from './add-pdf-number.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-AddPageNumbers-pdf.pdf');
 
@@ -35,6 +36,10 @@ test.describe('Unity Add PDF page number test suite', () => {
       await expect(await addPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await addPdf.verbCopy).toContainText(data.verbCopy);
     });
+
+      await test.step('Verify no link leads to 404', async () => {
+        await checkPageLinks(page, expect);
+      });
 
     await test.step('step-3: Upload a sample PDF file', async () => {
       const [fileChooser] = await Promise.all([

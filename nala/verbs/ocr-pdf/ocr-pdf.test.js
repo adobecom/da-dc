@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './ocr-pdf.spec.js';
 import OcrPdf from './ocr-pdf.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-ocr-pdf.pdf');
 
@@ -43,6 +44,10 @@ test.describe('Unity OCR PDF test suite', () => {
       } else {
         await expect(await ocrPdf.verbCopy).toContainText(data.verbCopy);
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-3: Upload a sample PDF file', async () => {

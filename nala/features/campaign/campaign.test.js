@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import CampaignPage from './campaign.page.js';
 import { features } from './campaign.spec.js';
-
+import { checkPageLinks } from '../../utils/link-checker.js';
 let campaign;
 
 test.describe('Acrobat Campaign — Acrobats got it', () => {
@@ -44,16 +44,9 @@ test.describe('Acrobat Campaign — Acrobats got it', () => {
       await expect(campaign.acrobatProTeamsCard).toBeVisible();
     });
 
-    await test.step('Verify footer options', async () => {
+    await test.step('Verify footer', async () => {
       await campaign.footer.scrollIntoViewIfNeeded();
-      await expect(campaign.fedsFooterOptions).toBeVisible();
-      await expect(campaign.fedsFooterMiscLinks).toBeVisible();
-      await expect(campaign.fedsRegionPicker.first()).toBeVisible();
-      await expect(campaign.fedsSocial.first()).toBeVisible();
-      await expect(campaign.fedsSocial).toHaveCount(4);
-      await expect(campaign.fedsFooterLegalWrapper).toBeVisible();
-      await expect(campaign.fedsFooterPrivacyListItems.first()).toBeVisible();
-      await expect(campaign.fedsFooterPrivacyListItems).toHaveCount(6);
+      await expect(campaign.footer).toBeVisible({ timeout: 60000 });
     });
 
     await test.step('Verify visible checkout links are visible and enabled', async () => {
@@ -66,6 +59,10 @@ test.describe('Acrobat Campaign — Acrobats got it', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

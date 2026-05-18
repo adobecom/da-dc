@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
 import GenerativeAiPdfStudentsPage from './generative-ai-pdf-students.page.js';
 import { features } from './generative-ai-pdf-students.spec.js';
-
+import { checkPageLinks } from '../../../utils/link-checker.js';
+  
 let gai;
 
 test.describe('Acrobat Generative AI PDF — Students', () => {
@@ -109,6 +110,10 @@ test.describe('Acrobat Generative AI PDF — Students', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

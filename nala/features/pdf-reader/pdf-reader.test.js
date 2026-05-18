@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import PdfReaderPage from './pdf-reader.page.js';
 import { features } from './pdf-reader.spec.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/get-acrobat-support';
 
@@ -231,6 +232,10 @@ test.describe('Acrobat PDF Reader Smoke Test', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

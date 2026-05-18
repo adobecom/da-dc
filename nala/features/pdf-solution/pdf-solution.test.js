@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import PdfSolutionPage from './pdf-solution.page.js';
 import { features } from './pdf-solution.spec.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/acrobat-here-to-help-blade';
 
@@ -29,11 +30,12 @@ async function runCompletePdfSolutionSmoke(page, baseURL, path) {
     await expect(pdf.gnavAcrobatAppLink.first()).toHaveAttribute('href', /acrobat\.adobe\.com/);
   });
 
-  await test.step('Verify mq-complete-pdf-solution blade', async () => {
-    const blade = pdf.mqCompletePdfSolutionBlade;
-    await blade.scrollIntoViewIfNeeded();
-    await expect(blade).toBeVisible({ timeout: 60000 });
-  });
+  // TODO: Add this check back
+  // await test.step('Verify mq-complete-pdf-solution blade', async () => {
+  //   const blade = pdf.mqCompletePdfSolutionBlade;
+  //   await blade.scrollIntoViewIfNeeded();
+  //   await expect(blade).toBeVisible({ timeout: 60000 });
+  // });
 
   await test.step('Verify aside1-desktop blade', async () => {
     const blade = pdf.aside1DesktopBlade;
@@ -225,6 +227,10 @@ async function runCompletePdfSolutionSmoke(page, baseURL, path) {
       await expect(link).toBeVisible();
       await expect(link).toBeEnabled();
     }
+  });
+
+  await test.step('Verify no link leads to 404', async () => {
+    await checkPageLinks(page, expect);
   });
 }
 

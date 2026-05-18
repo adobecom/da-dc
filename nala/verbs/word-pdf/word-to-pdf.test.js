@@ -2,7 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './word-to-pdf.spec.js';
 import WordToPdf from './word-to-pdf.page.js';
-
+import { checkPageLinks } from '../../utils/link-checker.js';
 const excelFilePath = path.resolve(__dirname, '../../assets/1-WORD-word-pdf.doc');
 
 let wordToPdf;
@@ -34,6 +34,10 @@ test.describe('Unity WORD to PDF test suite', () => {
       expect(actualText.trim()).toBe(data.verbHeading);
       await expect(await wordToPdf.verbTitle).toContainText(data.verbTitle);
       await expect(await wordToPdf.verbCopy).toContainText(data.verbCopy);
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-3: Upload a sample Word file', async () => {

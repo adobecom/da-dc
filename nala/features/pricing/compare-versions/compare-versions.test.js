@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import PricingCompareVersionsPage from './compare-versions.page.js';
 import { features } from './compare-versions.spec.js';
+import { checkPageLinks } from '../../../utils/link-checker.js';
 
 const CHECKOUT_OSI = 'ueZxdqCMpxWZewzvKQb5qmlffllcKzDkTj-kYwtKJ1c';
 
@@ -109,6 +110,10 @@ test.describe('Acrobat Pricing — Compare versions', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

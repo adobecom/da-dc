@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import AcrobatStandardPage from './acrobat-standard.page.js';
 import { features } from './acrobat-standard.spec.js';
-
+import { checkPageLinks } from '../../utils/link-checker.js';
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/get-acrobat-support';
 
 let acrobatStandard;
@@ -209,6 +209,10 @@ test.describe('Acrobat Standard Smoke Test', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

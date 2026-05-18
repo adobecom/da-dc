@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './flashcard-maker.spec.js';
 import FlashcardMakerPage from './flashcard-maker.page.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../test-files/testpdf.pdf');
 
@@ -21,6 +22,10 @@ test.describe('Unity Flashcard maker test suite', () => {
     await test.step('step-1: Go to Flashcard maker test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
       await page.waitForLoadState('domcontentloaded');
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-2: Verify Flashcard maker content/specs', async () => {

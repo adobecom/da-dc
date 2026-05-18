@@ -39,6 +39,10 @@ test.describe('Unity PDF Editor test suite', () => {
       await expect(await pdfEditor.verbCopy).toContainText(data.verbCopy);
     });
 
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
+    });
+
     await test.step('step-3: Upload a sample PDF file', async () => {
       const [fileChooser] = await Promise.all([
         page.waitForEvent('filechooser'),

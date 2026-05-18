@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import FreeTrialPage from './free-trial.page.js';
 import { features } from './free-trial.spec.js';
+import { checkPageLinks } from '../../utils/link-checker.js';
 
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/get-acrobat-support';
 
@@ -114,5 +115,10 @@ test.describe('Acrobat Free Trial Smoke Test', () => {
         await expect(link).toBeEnabled();
       }
     });
+
+    // TODO: Add this check back
+    // await test.step('Verify no link leads to 404', async () => {
+    //   await checkPageLinks(page, expect);
+    // });
   });
 });

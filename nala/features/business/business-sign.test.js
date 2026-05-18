@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import BusinessSignPage from './business-sign.page.js';
 import { features } from './business-sign.spec.js';
-
+import { checkPageLinks } from '../../utils/link-checker.js';
 let businessSign;
 
 test.describe('Acrobat Business — Sign', () => {
@@ -100,6 +100,10 @@ test.describe('Acrobat Business — Sign', () => {
     await test.step('Verify footer', async () => {
       await businessSign.footer.scrollIntoViewIfNeeded();
       await expect(businessSign.footer).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });

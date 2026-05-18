@@ -2,7 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './ai-summary-generator.spec.js';
 import AiSummaryGenerator from './ai-summary-generator.page.js';
-
+import { checkPageLinks } from '../../utils/link-checker.js';
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-ai-summary-generator.pdf');
 
 let aiSummaryGenerator;
@@ -34,6 +34,10 @@ test.describe('Unity AI Summary Generator test suite', () => {
       expect(actualText.trim()).toBe(data.verbHeading);
       await expect(await aiSummaryGenerator.verbTitle).toContainText(data.verbTitle);
       await expect(await aiSummaryGenerator.verbCopy).toContainText(data.verbCopy);
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
 
     await test.step('step-3: Upload a sample PDF file', async () => {

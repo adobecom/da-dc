@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import FeaturesPage from './features.page.js';
 import { features } from './features.spec.js';
+import { checkPageLinks } from '../../../utils/link-checker.js';
 
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/get-acrobat-support';
 
@@ -234,6 +235,10 @@ test.describe('Acrobat Features', () => {
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
       }
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
     });
   });
 });
