@@ -2,7 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './crop-pdf.spec.js';
 import CropPdf from './crop-pdf.page.js';
-import { checkPageLinks } from '../../utils/link-checker.js';
+import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-crop-pdf.pdf');
 

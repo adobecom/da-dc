@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import PricingStudentsPage from './students.page.js';
 import { features } from './students.spec.js';
-import { checkPageLinks } from '../../../utils/link-checker.js';
+import checkPageLinks from '../../../utils/link-checker.js';
 
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/acrobat-here-to-help-blade';
 
@@ -113,11 +113,10 @@ test.describe('Acrobat Pricing — Students', () => {
     });
 
     await test.step('Verify visible checkout links are visible and enabled', async () => {
-      const checkoutLinks = page.locator('a[is="checkout-link"]');
+      const checkoutLinks = page.locator('a[is="checkout-link"]').filter({ visible: true });
       const count = await checkoutLinks.count();
       for (let i = 0; i < count; i += 1) {
         const link = checkoutLinks.nth(i);
-        if (!(await link.isVisible())) continue;
         await link.scrollIntoViewIfNeeded();
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import OnlinePage from './online.page.js';
 import { features } from './online.spec.js';
-import { checkPageLinks } from '../../utils/link-checker.js';
+import checkPageLinks from '../../utils/link-checker.js';
 
 let onlinePage;
 

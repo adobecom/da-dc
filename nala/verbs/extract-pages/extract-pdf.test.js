@@ -2,7 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './extract-pdf.spec.js';
 import ExtractPages from './extract-pdf.page.js';
-import { checkPageLinks } from '../../utils/link-checker.js';
+import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-extract-pages-pdf.pdf');
 

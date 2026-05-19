@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import AcrobatProPage from './acrobat-pro.page.js';
 import { features } from './acrobat-pro.spec.js';
-import { checkPageLinks } from '../../utils/link-checker.js';
+import checkPageLinks from '../../utils/link-checker.js';
 
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/get-acrobat-support';
 
@@ -204,12 +204,11 @@ test.describe('Acrobat Pro Smoke Test', () => {
     });
 
     await test.step('Verify visible checkout links are visible and enabled', async () => {
-      const checkoutLinks = page.locator('a[is="checkout-link"]');
+      const checkoutLinks = page.locator('a[is="checkout-link"]').filter({ visible: true });
       const count = await checkoutLinks.count();
       for (let i = 0; i < count; i += 1) {
         const link = checkoutLinks.nth(i);
         // Hidden inactive tabs / collapsed panels: skip — scrollIntoViewIfNeeded times out when not visible.
-        if (!(await link.isVisible())) continue;
         await link.scrollIntoViewIfNeeded();
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();

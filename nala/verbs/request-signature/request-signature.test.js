@@ -2,7 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './request-signature.spec.js';
 import RequestSignature from './request-signature.page.js';
-import { checkPageLinks } from '../../utils/link-checker.js';
+import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-request-signature-pdf.pdf');
 

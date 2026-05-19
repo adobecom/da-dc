@@ -35,7 +35,7 @@ const fetchStatus = async (url) => {
   }
 };
 
-export async function checkPageLinks(page, expect) {
+async function checkPageLinks(page, expect) {
   await page.waitForLoadState('load', { timeout: 60000 });
   const pageOrigin = new URL(page.url()).origin;
   const currentPathname = new URL(page.url()).pathname;
@@ -52,9 +52,10 @@ export async function checkPageLinks(page, expect) {
       if (!raw) return '';
       try { return new URL(raw, b).href; } catch { return ''; }
     }, base);
-    if (!href || shouldSkip(href, pageOrigin, currentPathname) || seen.has(href)) continue;
-    seen.add(href);
-    hrefs.push(href);
+    if (href && !shouldSkip(href, pageOrigin, currentPathname) && !seen.has(href)) {
+      seen.add(href);
+      hrefs.push(href);
+    }
   }
 
   await Promise.all(hrefs.map(async (href) => {
@@ -62,3 +63,5 @@ export async function checkPageLinks(page, expect) {
     if (status !== null) expect(status, href).not.toBe(404);
   }));
 }
+
+export default checkPageLinks;

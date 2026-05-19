@@ -2,7 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './png-to-pdf.spec.js';
 import PngToPdf from './png-to-pdf.page.js';
-import { checkPageLinks } from '../../utils/link-checker.js';
+import checkPageLinks from '../../utils/link-checker.js';
 
 const pngFilePath = path.resolve(__dirname, '../../assets/1-PNG-png-pdf.png');
 

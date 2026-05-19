@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import BusinessSignPage from './business-sign.page.js';
 import { features } from './business-sign.spec.js';
-import { checkPageLinks } from '../../utils/link-checker.js';
+import checkPageLinks from '../../utils/link-checker.js';
 
 let businessSign;
 

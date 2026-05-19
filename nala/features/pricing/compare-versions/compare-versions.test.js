@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import PricingCompareVersionsPage from './compare-versions.page.js';
 import { features } from './compare-versions.spec.js';
-import { checkPageLinks } from '../../../utils/link-checker.js';
+import checkPageLinks from '../../../utils/link-checker.js';
 
 const CHECKOUT_OSI = 'ueZxdqCMpxWZewzvKQb5qmlffllcKzDkTj-kYwtKJ1c';
 
@@ -101,11 +101,10 @@ test.describe('Acrobat Pricing — Compare versions', () => {
     });
 
     await test.step('Verify visible checkout links are visible and enabled', async () => {
-      const checkoutLinks = page.locator('a[is="checkout-link"]');
+      const checkoutLinks = page.locator('a[is="checkout-link"]').filter({ visible: true });
       const count = await checkoutLinks.count();
       for (let i = 0; i < count; i += 1) {
         const link = checkoutLinks.nth(i);
-        if (!(await link.isVisible())) continue;
         await link.scrollIntoViewIfNeeded();
         await expect(link).toBeVisible();
         await expect(link).toBeEnabled();
