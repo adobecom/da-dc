@@ -24,7 +24,6 @@ async function runCompletePdfSolutionSmoke(page, baseURL, path) {
     await expect(pdf.gnavBreadcrumbs).not.toBeVisible();
   });
 
-
   // TODO: Add this check back
   // await test.step('Verify mq-complete-pdf-solution blade', async () => {
   //   const blade = pdf.mqCompletePdfSolutionBlade;
