@@ -374,10 +374,11 @@ async function loadAnalyticsAfterLCP(analyticsData) {
   const { verb, userAttempts } = analyticsData;
   try {
     const analyticsModule = await import('../../scripts/alloy/verb-widget.js');
-    const { default: verbAnalytics, reviewAnalytics, sendAnalyticsToSplunk } = analyticsModule;
+    const { default: verbAnalytics, reviewAnalytics, sendAnalyticsToSplunk, generateUploadGuid } = analyticsModule;
     window.analytics.verbAnalytics = verbAnalytics;
     window.analytics.reviewAnalytics = reviewAnalytics;
     window.analytics.sendAnalyticsToSplunk = sendAnalyticsToSplunk;
+    window.analytics.generateUploadGuid = generateUploadGuid;
     window.analytics.verbAnalytics('landing:shown', verb, { userAttempts });
     window.analytics.reviewAnalytics(verb);
   } catch (error) {
@@ -870,11 +871,13 @@ export default async function init(element) {
     const analyticsMap = {
       change: () => {
         exitFlag = false;
+        window.analytics.generateUploadGuid?.();
         handleAnalyticsEvent('choose-file:open', metadata, true, canSendDataToSplunk);
         registerTabCloseEvent(metadata, 'preuploading');
       },
       drop: () => {
         exitFlag = false;
+        window.analytics.generateUploadGuid?.();
         ['files-dropped', 'entry:clicked', 'discover:clicked'].forEach((analyticsEvent) => {
           handleAnalyticsEvent(analyticsEvent, metadata, true, canSendDataToSplunk);
         });

@@ -71,6 +71,13 @@ function eventData(metaData, { appReferrer: referrer, trackingId: tracking }) {
   };
 }
 
+let uploadGuid;
+
+export function generateUploadGuid() {
+  // eslint-disable-next-line compat/compat
+  uploadGuid = crypto.randomUUID();
+}
+
 function createPayloadForSplunk(metaData) {
   const {
     verb, eventName, noOfFiles, uploadTime, type, size, count, workflowStep,
@@ -111,6 +118,7 @@ function createPayloadForSplunk(metaData) {
       type: [`${localStorage['unity.user'] ? 'frictionless_return_user' : 'frictionless_new_user'}`],
       ...(userAttempts && { return_user_type: userAttempts }),
     },
+    upload: { guid: uploadGuid },
     error: errorData ? {
       type: errorData.code,
       ...(errorData.subCode && { subCode: errorData.subCode }),
