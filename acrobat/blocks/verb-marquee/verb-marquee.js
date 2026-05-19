@@ -668,6 +668,17 @@ export default async function init(element) {
   const setDraggingClass = (shouldToggle) => {
     dropzone.classList.toggle('dragging', !!shouldToggle);
   };
+  let outsideClickHandler = null;
+  const closeError = () => {
+    errorState.classList.remove('verb-marquee-error');
+    errorState.classList.add('hide');
+    errorStateText.textContent = '';
+    clearSrAlert();
+    if (outsideClickHandler) {
+      document.removeEventListener('click', outsideClickHandler);
+      outsideClickHandler = null;
+    }
+  };
   const handleError = (detail, logToLana = false, logOptions = {}) => {
     const { code, message, status, info = 'No additional info provided', accountType = 'Unknown account type' } = detail;
     if (message) {
@@ -676,6 +687,14 @@ export default async function init(element) {
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
       announceToScreenReader(message);
+      errorCloseBtn.focus();
+      setTimeout(() => {
+        if (outsideClickHandler) return;
+        outsideClickHandler = (e) => {
+          if (!errorState.contains(e.target)) closeError();
+        };
+        document.addEventListener('click', outsideClickHandler);
+      }, 0);
     }
     if (logToLana) {
       window.lana?.log(
@@ -683,11 +702,6 @@ export default async function init(element) {
         logOptions,
       );
     }
-    setTimeout(() => {
-      errorState.classList.remove('verb-marquee-error');
-      errorState.classList.add('hide');
-      errorStateText.textContent = '';
-    }, 5000);
   };
   if (useFileUpload && fileInput) {
     ctaButton.addEventListener('click', () => {
@@ -746,11 +760,15 @@ export default async function init(element) {
       window.analytics.verbAnalytics('choose-file:close', VERB, { userAttempts });
     });
   }
-  errorCloseBtn.addEventListener('click', () => {
-    errorState.classList.remove('verb-marquee-error');
-    errorState.classList.add('hide');
-    errorStateText.textContent = '';
-    clearSrAlert();
+  errorCloseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeError();
+  });
+  errorCloseBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      closeError();
+    }
   });
   function soloUpload() {
     if (!useFileUpload || !fileInput || !ctaButton) return;
