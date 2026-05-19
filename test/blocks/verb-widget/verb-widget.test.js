@@ -3,7 +3,7 @@ import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { delay } from '../../helpers/waitfor.js';
-import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
+import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
 
 const { default: init } = await import(
   '../../../acrobat/blocks/verb-widget/verb-widget.js'
@@ -109,9 +109,7 @@ describe('verb-widget block', () => {
     window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
 
     const clock = sinon.useFakeTimers();
-    block.dispatchEvent(new CustomEvent('unity:show-error-toast', {
-      detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false },
-    }));
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
 
     const errorState = block.querySelector('.error');
     expect(errorState.classList.contains('hide')).to.be.false;
@@ -129,9 +127,7 @@ describe('verb-widget block', () => {
 
     window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
 
-    block.dispatchEvent(new CustomEvent('unity:show-error-toast', {
-      detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false },
-    }));
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
 
     const errorState = block.querySelector('.error');
     expect(errorState.classList.contains('hide')).to.be.false;
@@ -150,9 +146,7 @@ describe('verb-widget block', () => {
 
     window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
 
-    block.dispatchEvent(new CustomEvent('unity:show-error-toast', {
-      detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false },
-    }));
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
 
     const errorState = block.querySelector('.error');
     expect(errorState.classList.contains('hide')).to.be.false;
@@ -170,9 +164,7 @@ describe('verb-widget block', () => {
 
     window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
 
-    block.dispatchEvent(new CustomEvent('unity:show-error-toast', {
-      detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false },
-    }));
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
 
     const errorState = block.querySelector('.error');
     const errorCloseBtn = block.querySelector('.verb-errorBtn');
@@ -191,9 +183,7 @@ describe('verb-widget block', () => {
 
     window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
 
-    block.dispatchEvent(new CustomEvent('unity:show-error-toast', {
-      detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false },
-    }));
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
 
     const errorState = block.querySelector('.error');
     const errorCloseBtn = block.querySelector('.verb-errorBtn');
@@ -278,9 +268,7 @@ describe('verb-widget block', () => {
     expect(verbAnalyticsCalls.length).to.be.greaterThan(0);
 
     expect(() => {
-      block.dispatchEvent(new CustomEvent('unity:track-analytics', {
-        detail: { event: 'unknown', data: {} },
-      }));
+      block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'unknown', data: {} } }));
     }).to.not.throw();
   });
 

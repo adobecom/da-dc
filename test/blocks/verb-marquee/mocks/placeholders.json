@@ -1,0 +1,17 @@
+{
+  "total": 10,
+  "offset": 0,
+  "limit": 10,
+  "data": [
+    { "key": "verb-widget-cta", "value": "Select a file" },
+    { "key": "verb-widget-word-to-pdf-dragndrop-text", "value": "or drag and drop a file" },
+    { "key": "verb-widget-word-to-pdf-file-limit", "value": "PDF or Word, up to 100 MB" },
+    { "key": "verb-marquee-legal", "value": "By using this service, you agree to the Adobe Terms of Use and Privacy Policy." },
+    { "key": "verb-marquee-legal-2", "value": "" },
+    { "key": "verb-widget-terms-of-use", "value": "Terms of Use" },
+    { "key": "verb-widget-privacy-policy", "value": "Privacy Policy" },
+    { "key": "verb-widget-tool-tip", "value": "Your files are secure with us." },
+    { "key": "verb-widget-privacy-policy-url", "value": "https://www.adobe.com/privacy/policy.html" },
+    { "key": "verb-widget-terms-of-use-url", "value": "https://www.adobe.com/legal/terms.html" }
+  ]
+}
