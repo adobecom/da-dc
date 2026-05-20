@@ -204,6 +204,10 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
       await expect(acrobat.merchStudentsViewPlansLink).toHaveAttribute('href', /pricing\/students/);
     });
 
+    await test.step('Verify Acrobat subscription features', async () => {
+      await expect(acrobat.acrobatSubscriptionFeature).toBeVisible();
+    })
+
     await test.step('Verify FAQ accordion', async () => {
       const { faqSection, faqAccordionTriggers } = acrobat;
       await expect(faqSection).toBeVisible();

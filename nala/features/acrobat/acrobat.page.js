@@ -83,6 +83,8 @@ export default class AcrobatPage {
       'a.con-button[href*="/acrobat/pricing/students"]',
     );
 
+    this.acrobatSubscriptionFeature = page.locator('div[data-path="/dc-shared/fragments/acrobat/acrobat-subscription-features"]');
+
     // FAQ accordion
     this.faqSection = page.locator('div[class*="accordion-container"]');
     this.faqAccordionTriggers = this.faqSection.locator('button.accordion-trigger');
