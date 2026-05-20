@@ -206,7 +206,7 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
 
     await test.step('Verify Acrobat subscription features', async () => {
       await expect(acrobat.acrobatSubscriptionFeature).toBeVisible();
-    })
+    });
 
     await test.step('Verify FAQ accordion', async () => {
       const { faqSection, faqAccordionTriggers } = acrobat;
