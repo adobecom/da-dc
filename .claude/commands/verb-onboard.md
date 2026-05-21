@@ -14,7 +14,7 @@ If any required input is missing, gather them now using `AskUserQuestion` before
 
 ## Step 1 — Gather & Confirm Inputs
 
-Ask the user to confirm **all three** of the following. You may batch them into one `AskUserQuestion` call.
+Ask the user to confirm the following. You may batch independent questions into one `AskUserQuestion` call.
 
 ### 1a. Block name
 
@@ -28,25 +28,57 @@ Options: `verb-widget`, `study-marquee`, `verb-marquee`
 
 Kebab-case string, e.g. `essay-writer`, `pdf-summarizer`. This becomes the CSS class on the block element and the key in `LIMITS`.
 
-### 1c. File-limit configuration
+### 1c. File-limit configuration — prompt every field individually
 
-Present these preset options. If none fit, collect individual fields.
+Ask the user for **each field** using `AskUserQuestion`. You may batch independent questions into one call, but all fields must be explicitly confirmed. Do not silently assume a preset — the user's answers drive the final config object.
 
-| Preset | maxFileSize | acceptedFiles | maxNumFiles | multipleFiles | uploadType | genAI |
-|--------|-------------|---------------|-------------|---------------|------------|-------|
-| `SINGLE_PDF` | 100 MB | `.pdf` only | 1 | false | — | false |
-| `MULTI_PDF` | 100 MB | `.pdf` only | unlimited | true | — | false |
-| `MULTI_ALL` | 100 MB | All types | unlimited | true | — | false |
-| `GENAI_MULTI` | 100 MB | All types | 100 | true | `multifile-only` | true |
-| `STUDY_GENAI` | 100 MB | Study types (.pdf/.doc/.docx/.xls/.xlsx/.ppt/.pptx/.rtf/.txt/.text/.vtt) | 100 | true | `multifile-only` | true |
-| `SINGLE_ALL` | 100 MB | All types | 1 | false | — | true |
-| Custom | user-specified | user-specified | user-specified | user-specified | user-specified | user-specified |
+**Field 1 — `maxFileSize`** (single-select)
+- 100 MB — `104857600` *(most common)*
+- 250 MB — `262144000`
+- 2 GB — `2147483648`
+- Custom — ask user to type the exact byte value
 
-Additional optional flags (ask only if the user selects `verb-widget`):
-- `mobileApp` — Show app-store link on mobile instead of file picker
-- `typeOneLanding` — Keep type1 accounts on the landing page
-- `level: 0` — Trial mode (no file picker, shows pricing CTA)
-- `subCopy` — Show sub-description text from placeholders
+**Field 2 — `acceptedFiles`** (multi-select)
+- All types — `.pdf .doc .docx .xml .ppt .pptx .xls .xlsx .rtf .txt .text .ai .form .bmp .gif .indd .jpeg .jpg .png .psd .tif .tiff` (maps to `ALL_FILES`)
+- PDF — `.pdf`
+- Word — `.doc`, `.docx`
+- PowerPoint — `.ppt`, `.pptx`
+- Excel — `.xls`, `.xlsx`
+- Images — `.bmp`, `.gif`, `.jpeg`, `.jpg`, `.png`, `.tif`, `.tiff`
+- Text — `.txt`, `.text`, `.rtf`
+- Study types — `.pdf .doc .docx .xls .xlsx .ppt .pptx .rtf .txt .text .vtt` (maps to `STUDENT_FILES`)
+
+Build the `acceptedFiles` array from the chosen groups. If "All types" is selected alone, use the `ALL_FILES` constant reference in code instead of an inline array. If "Study types" is selected alone, use `STUDENT_FILES`. Otherwise build a custom inline array.
+
+Also use this answer to set the `file-limit` placeholder value in Step 6 (e.g. `"PDF, Word, PPT, up to 100 MB"`).
+
+**Field 3 — `maxNumFiles`** (single-select)
+- 1 *(single-file verb)*
+- 100
+- Unlimited *(omit the field from the config object)*
+- Custom — ask user to type the number
+
+**Field 4 — `multipleFiles`** (single-select)
+- false — single file only
+- true — allow multiple files
+
+**Field 5 — `uploadType`** (single-select)
+- None *(omit field)*
+- `multifile-only` — required for verbs that use the multi-file uploader UI
+
+**Field 6 — `genAI`** (single-select)
+- false *(omit field)*
+- true — verb uses GenAI; adds terms-of-service acknowledgement to the UI
+
+**Field 7 — Additional flags** *(verb-widget only — ask only when block is `verb-widget`)*
+
+Ask as a multi-select, all optional:
+- `mobileApp` — show app-store link on mobile instead of file picker
+- `typeOneLanding` — keep type1 accounts on the landing page
+- `level: 0` — trial mode (no file picker, shows pricing CTA)
+- `subCopy` — show sub-description text from placeholders
+
+After collecting all answers, map them to the closest named constant if an exact match exists (e.g. `{ maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 }` → `SINGLE_PDF`) so the generated code stays readable. If no named constant matches, write the config inline.
 
 ### 1d. Verb icon SVG *(verb-widget only)*
 
@@ -63,9 +95,10 @@ Once received, validate it is well-formed SVG (starts with `<svg` and ends with 
 
 Summary format:
 ```
-Block:      <block-name>
-Verb:       <verb-name>
-Config:     { maxFileSize: ..., acceptedFiles: [...], ... }
+Block:         <block-name>
+Verb:          <verb-name>
+Config:        { maxFileSize: ..., acceptedFiles: [...], ... }
+Accepted files: <list of chosen extensions, or "All types">
 Files that will change:
   - acrobat/blocks/<block>/<block>.js                  (add LIMITS entry)
   - acrobat/blocks/verb-widget/icons/<verb>.svg         (new file — verb-widget only)
