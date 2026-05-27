@@ -49,7 +49,6 @@ test.describe('Unity Flashcard maker test suite', () => {
 
       await page.waitForURL(/acrobat\.adobe/, {
         timeout: 60000,
-        waitUntil: 'domcontentloaded',
       });
     });
   });

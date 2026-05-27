@@ -53,7 +53,6 @@ test.describe('Unity PDF Editor test suite', () => {
 
       await page.waitForURL(/acrobat\.adobe/, {
         timeout: 60000,
-        waitUntil: 'domcontentloaded',
       });
 
       // Verify the URL parameters

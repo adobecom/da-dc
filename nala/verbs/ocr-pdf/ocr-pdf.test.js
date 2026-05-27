@@ -59,7 +59,6 @@ test.describe('Unity OCR PDF test suite', () => {
 
       await page.waitForURL(/acrobat\.adobe/, {
         timeout: 60000,
-        waitUntil: 'domcontentloaded',
       });
 
       // Verify the URL parameters

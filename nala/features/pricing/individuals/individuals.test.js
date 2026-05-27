@@ -45,6 +45,7 @@ test.describe('Acrobat Pricing — Individuals', () => {
     });
 
     await test.step('Verify comparison table', async () => {
+      await page.waitForTimeout(5000);
       await pricing.comparisonTable.scrollIntoViewIfNeeded();
       await expect(pricing.comparisonTable).toBeVisible();
       await expect(pricing.comparisonTableHeadingRow).toBeVisible();

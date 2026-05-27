@@ -51,7 +51,6 @@ test.describe('Unity EXCEL to PDF test suite', () => {
 
       await page.waitForURL(/acrobat\.adobe/, {
         timeout: 60000,
-        waitUntil: 'domcontentloaded',
       });
 
       // Verify the URL parameters

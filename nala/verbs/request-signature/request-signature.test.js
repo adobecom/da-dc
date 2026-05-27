@@ -50,7 +50,6 @@ test.describe('Unity Request Signature Verb test suite', () => {
 
       await page.waitForURL(/acrobat\.adobe/, {
         timeout: 60000,
-        waitUntil: 'domcontentloaded',
       });
 
       // Verify the URL parameters
