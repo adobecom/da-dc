@@ -141,7 +141,7 @@ function buildWordToPdfEarlyPrefetchUrl() {
   const locale = localeMap[langFromPath] || 'en-us';
   const [languageCode, languageRegion] = locale.split('-');
   const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
-  const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A8e0aa192-d940-3fa6-b7b3-37706a5083d0%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
+  const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
   return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
 }
 
