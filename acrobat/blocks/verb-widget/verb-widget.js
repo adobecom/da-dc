@@ -1101,4 +1101,21 @@ export default async function init(element) {
       }));
     }
   });
+
+  if (VERB === 'word-to-pdf') {
+    const prefetchOnVisible = () => {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
+          observer.disconnect();
+        }
+      });
+      observer.observe(element);
+    };
+    if (document.readyState === 'complete') {
+      prefetchOnVisible();
+    } else {
+      window.addEventListener('load', prefetchOnVisible, { once: true });
+    }
+  }
 }
