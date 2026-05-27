@@ -7,7 +7,7 @@ module.exports = {
       name: '@generative-ai-students-smoke',
       path: '/acrobat/generative-ai-pdf/students',
       data: {},
-      tags: '@generative-ai @students @smoke @live',
+      tags: '@generative-ai @students @smoke @live @nopr',
     },
   ],
 };
