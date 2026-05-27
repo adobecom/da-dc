@@ -402,27 +402,17 @@ export default async function init(element) {
   const rightCol = createTag('div', { class: 'verb-marquee-col verb-marquee-col-right' });
   const header = createTag('div', { class: 'verb-marquee-header' });
   const iconWrapper = createTag('div', { class: 'acrobat-icon' });
-  if (COBRAND_LOCKUP_VERBS.includes(VERB)) {
-    const cobrandSvg = createSvgElement('COBRAND_LOCKUP');
-    if (cobrandSvg) {
-      cobrandSvg.classList.add('icon-cobrand-lockup');
-      cobrandSvg.setAttribute('aria-hidden', 'true');
-      iconWrapper.appendChild(cobrandSvg);
-    }
-    header.append(iconWrapper);
-  } else {
-    const widgetIconSvg = createSvgElement('WIDGET_ICON');
-    if (widgetIconSvg) {
-      widgetIconSvg.classList.add('icon-acrobat');
-      widgetIconSvg.setAttribute('aria-hidden', 'true');
-      iconWrapper.appendChild(widgetIconSvg);
-    }
-    const title = createTag('div', { class: 'verb-marquee-title' });
-    const adobeText = createTag('span', {}, 'Adobe');
-    const studySpaceText = createTag('span', {}, ' Acrobat');
-    title.append(adobeText, studySpaceText);
-    header.append(iconWrapper, title);
+  const widgetIconSvg = createSvgElement('WIDGET_ICON');
+  if (widgetIconSvg) {
+    widgetIconSvg.classList.add('icon-acrobat');
+    widgetIconSvg.setAttribute('aria-hidden', 'true');
+    iconWrapper.appendChild(widgetIconSvg);
   }
+  const title = createTag('div', { class: 'verb-marquee-title' });
+  const adobeText = createTag('span', {}, 'Adobe');
+  const studySpaceText = createTag('span', {}, ' Acrobat');
+  title.append(adobeText, studySpaceText);
+  header.append(iconWrapper, title);
   const headingEl = createTag('h1', { class: 'verb-marquee-heading' }, heading);
   const isMobileOrTabletViewport = window.innerWidth < 1200;
   const copy1Text = isMobileOrTabletViewport
