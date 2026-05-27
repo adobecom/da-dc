@@ -1,4 +1,5 @@
 import { setLibs, isOldBrowser, loadPlaceholders, getEnv as getAppEnv } from '../../scripts/utils.js';
+import { localeMap } from '../unity/unity.js';
 
 const MB100 = 104857600;
 const PDF_ONLY = ['.pdf'];
@@ -182,6 +183,15 @@ function initiatePrefetch(url) {
     prefetchNextPage(url);
     window.prefetchTargetUrl = url;
   }
+}
+
+function buildWordToPdfEarlyPrefetchUrl() {
+  const langFromPath = window.location.pathname.split('/')[1];
+  const locale = localeMap[langFromPath] || 'en-us';
+  const [languageCode, languageRegion] = locale.split('-');
+  const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
+  const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
+  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
 }
 
 function handleExit(event, verb, userObj, unloadFlag, workflowStep) {
@@ -733,6 +743,7 @@ export default async function init(element) {
       const { dataTransfer: { files } } = e;
       if (files.length > 0) {
         noOfFiles = files.length;
+        if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
       }
     });
     fileInput.addEventListener('click', () => {
@@ -754,6 +765,7 @@ export default async function init(element) {
       const { target: { files } } = data;
       if (files.length > 0) {
         noOfFiles = files.length;
+        if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
       }
     });
     fileInput.addEventListener('cancel', () => {
