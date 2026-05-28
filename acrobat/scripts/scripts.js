@@ -504,8 +504,12 @@ async function loadPage() {
   const unityLibs = !['.aem.', '.hlx.', '.stage.', 'local', '.da.'].some((i) => hostname.includes(i))
     ? UNITY_LIBS
     : `https://${unityBranch}${unityBranch.includes('--') ? '' : '--unity--adobecom'}.${unityEnv}.live/unitylibs`;
-  const { UNITY_BLOCKS, getUnityLibs, setUnityLibs } = await import(`${unityLibs}/scripts/utils.js`);
-  setUnityLibs(unityLibs, 'dc');
+  try {
+    const { setUnityLibs } = await import(`${unityLibs}/scripts/utils.js`);
+    setUnityLibs(unityLibs, 'dc');
+  } catch (e) {
+    window.lana?.log(`Failed to load Unity libs: ${e.message}`, { tags: 'DC_Milo', severity: 'warn' });
+  }
 
   // Milo and site styles
   if (!document.getElementById('inline-milo-styles')) {
@@ -530,10 +534,7 @@ async function loadPage() {
   setConfig({
     ...CONFIG,
     miloLibs,
-    externalLibs: [{
-      blocks: UNITY_BLOCKS,
-      base: `${getUnityLibs()}/blocks`,
-    }],
+    externalLibs: [{ blocks: ['unity-verb-marquee'], base: unityLibs }],
   });
 
   window.addEventListener('IMS:Ready', async () => {
