@@ -963,9 +963,8 @@ export default async function init(element) {
   window.prefetchTargetUrl = null;
 
   if (VERB === 'word-to-pdf') {
-    const earlyPrefetch = () => initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
-    document.addEventListener('click', earlyPrefetch, { once: true });
-    document.addEventListener('dragover', earlyPrefetch, { once: true });
+    document.addEventListener('click', () => initiatePrefetch(buildWordToPdfEarlyPrefetchUrl()), { once: true });
+    document.addEventListener('dragover', () => initiatePrefetch(buildWordToPdfEarlyPrefetchUrl()), { once: true });
   }
 
   element.parentNode.style.display = 'block';
