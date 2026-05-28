@@ -759,13 +759,17 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    setTimeout(() => {
+    if (VERB === 'word-to-pdf') {
       window.dispatchEvent(redirectReady);
-      window.lana?.log(
-        'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
-        { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
-      );
-    }, 3000);
+    } else {
+      setTimeout(() => {
+        window.dispatchEvent(redirectReady);
+        window.lana?.log(
+          'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
+          { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
+        );
+      }, 3000);
+    }
     setCookie('UTS_Uploaded', Date.now(), cookieExp);
     const calcUploadedTime = uploadedTime();
     const metadata = { ...data, uploadTime: calcUploadedTime, userAttempts: attempts };
@@ -795,6 +799,12 @@ export default async function init(element) {
   window.addEventListener('IMS:Ready', checkSignedInUser);
 
   window.prefetchTargetUrl = null;
+
+  if (VERB === 'word-to-pdf') {
+    const earlyPrefetch = () => initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
+    document.addEventListener('click', earlyPrefetch, { once: true });
+    document.addEventListener('dragover', earlyPrefetch, { once: true });
+  }
 
   element.parentNode.style.display = 'block';
 
