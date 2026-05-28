@@ -157,6 +157,7 @@ const STYLES = '/acrobat/styles/styles.css';
 
 // Use '/libs' if your live site maps '/libs' to milo's origin.
 const LIBS = '/libs';
+const UNITY_LIBS = '/unitylibs';
 
 const locales = {
   // Americas
@@ -496,6 +497,16 @@ async function loadPage() {
   // Setup Milo
   const miloLibs = setLibs(LIBS);
 
+  // Setup Unity libs
+  const { hostname, search } = window.location;
+  const unityBranch = new URLSearchParams(search).get('unitylibs') || 'main';
+  const unityEnv = hostname.includes('.hlx.') ? 'hlx' : 'aem';
+  const unityLibs = !['.aem.', '.hlx.', '.stage.', 'local', '.da.'].some((i) => hostname.includes(i))
+    ? UNITY_LIBS
+    : `https://${unityBranch}${unityBranch.includes('--') ? '' : '--unity--adobecom'}.${unityEnv}.live/unitylibs`;
+  const { UNITY_BLOCKS, getUnityLibs, setUnityLibs } = await import(`${unityLibs}/scripts/utils.js`);
+  setUnityLibs(unityLibs, 'dc');
+
   // Milo and site styles
   if (!document.getElementById('inline-milo-styles')) {
     const paths = [];
@@ -516,7 +527,14 @@ async function loadPage() {
     replacePlaceholdersWithImages(ietf, miloLibs);
   }
 
-  setConfig({ ...CONFIG, miloLibs });
+  setConfig({
+    ...CONFIG,
+    miloLibs,
+    externalLibs: [{
+      blocks: UNITY_BLOCKS,
+      base: `${getUnityLibs()}/blocks`,
+    }],
+  });
 
   window.addEventListener('IMS:Ready', async () => {
     const susiElems = document.querySelectorAll('a[href*="susi"]');
