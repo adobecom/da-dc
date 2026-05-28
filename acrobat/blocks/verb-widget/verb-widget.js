@@ -433,6 +433,8 @@ window.addEventListener('analyticsLoad', async ({ detail }) => {
 
   await loadAnalyticsAfterLCP(detail);
 
+  if (detail.verb === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
+
   const {
     verbAnalytics,
     reviewAnalytics,
@@ -825,7 +827,6 @@ export default async function init(element) {
     if (!files) return;
     noOfFiles = files.length;
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
   });
 
   button.addEventListener('cancel', () => {
@@ -846,7 +847,6 @@ export default async function init(element) {
     const { files } = event.dataTransfer;
     if (!files) return;
     noOfFiles = files.length;
-    if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
   });
 
   let outsideClickHandler = null;
@@ -1102,20 +1102,4 @@ export default async function init(element) {
     }
   });
 
-  if (VERB === 'word-to-pdf') {
-    const prefetchOnVisible = () => {
-      const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
-          observer.disconnect();
-        }
-      });
-      observer.observe(element);
-    };
-    if (document.readyState === 'complete') {
-      prefetchOnVisible();
-    } else {
-      window.addEventListener('load', prefetchOnVisible, { once: true });
-    }
-  }
 }
