@@ -835,7 +835,6 @@ export default async function init(element) {
     if (!files) return;
     noOfFiles = files.length;
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
   });
 
   button.addEventListener('cancel', () => {
@@ -856,7 +855,6 @@ export default async function init(element) {
     const { files } = event.dataTransfer;
     if (!files) return;
     noOfFiles = files.length;
-    if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
   });
 
   let outsideClickHandler = null;

@@ -747,7 +747,6 @@ export default async function init(element) {
       const { dataTransfer: { files } } = e;
       if (files.length > 0) {
         noOfFiles = files.length;
-        if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
       }
     });
     fileInput.addEventListener('click', () => {
@@ -769,7 +768,6 @@ export default async function init(element) {
       const { target: { files } } = data;
       if (files.length > 0) {
         noOfFiles = files.length;
-        if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
       }
     });
     fileInput.addEventListener('cancel', () => {
