@@ -113,8 +113,6 @@ const setDraggingClass = (widget, shouldToggle) => {
 };
 
 function prefetchTarget() {
-  if (window.prefetchTargetLoaded) return;
-  window.prefetchTargetLoaded = true;
   const iframe = document.createElement('iframe');
   iframe.src = window.prefetchTargetUrl;
   iframe.style.display = 'none';
@@ -144,7 +142,7 @@ function buildWordToPdfEarlyPrefetchUrl() {
   const [languageCode, languageRegion] = locale.split('-');
   const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
   const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
-  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf/av?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
+  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
 }
 
 function redDirLink(verb) {
@@ -761,17 +759,13 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    if (VERB === 'word-to-pdf') {
+    setTimeout(() => {
       window.dispatchEvent(redirectReady);
-    } else {
-      setTimeout(() => {
-        window.dispatchEvent(redirectReady);
-        window.lana?.log(
-          'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
-          { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
-        );
-      }, 3000);
-    }
+      window.lana?.log(
+        'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
+        { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
+      );
+    }, 3000);
     setCookie('UTS_Uploaded', Date.now(), cookieExp);
     const calcUploadedTime = uploadedTime();
     const metadata = { ...data, uploadTime: calcUploadedTime, userAttempts: attempts };
@@ -802,15 +796,6 @@ export default async function init(element) {
 
   window.prefetchTargetUrl = null;
 
-  if (VERB === 'word-to-pdf') {
-    const triggerEarlyPrefetch = () => {
-      initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
-      prefetchTarget();
-    };
-    document.addEventListener('click', triggerEarlyPrefetch, { once: true });
-    document.addEventListener('dragover', triggerEarlyPrefetch, { once: true });
-  }
-
   element.parentNode.style.display = 'block';
 
   widget.addEventListener('click', (e) => {
@@ -840,6 +825,7 @@ export default async function init(element) {
     if (!files) return;
     noOfFiles = files.length;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
   });
 
   button.addEventListener('cancel', () => {
@@ -860,6 +846,7 @@ export default async function init(element) {
     const { files } = event.dataTransfer;
     if (!files) return;
     noOfFiles = files.length;
+    if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
   });
 
   let outsideClickHandler = null;
