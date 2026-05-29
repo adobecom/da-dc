@@ -113,6 +113,8 @@ const setDraggingClass = (widget, shouldToggle) => {
 };
 
 function prefetchTarget() {
+  if (window.prefetchTargetLoaded) return;
+  window.prefetchTargetLoaded = true;
   const iframe = document.createElement('iframe');
   iframe.src = window.prefetchTargetUrl;
   iframe.style.display = 'none';
@@ -801,8 +803,12 @@ export default async function init(element) {
   window.prefetchTargetUrl = null;
 
   if (VERB === 'word-to-pdf') {
-    document.addEventListener('click', () => initiatePrefetch(buildWordToPdfEarlyPrefetchUrl()), { once: true });
-    document.addEventListener('dragover', () => initiatePrefetch(buildWordToPdfEarlyPrefetchUrl()), { once: true });
+    const triggerEarlyPrefetch = () => {
+      initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
+      prefetchTarget();
+    };
+    document.addEventListener('click', triggerEarlyPrefetch, { once: true });
+    document.addEventListener('dragover', triggerEarlyPrefetch, { once: true });
   }
 
   element.parentNode.style.display = 'block';
