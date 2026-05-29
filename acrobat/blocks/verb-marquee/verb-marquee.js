@@ -163,6 +163,8 @@ let tabClosureSent = false;
 let isUploading = false;
 
 function prefetchTarget() {
+  if (window.prefetchTargetLoaded) return;
+  window.prefetchTargetLoaded = true;
   const iframe = document.createElement('iframe');
   iframe.src = window.prefetchTargetUrl;
   iframe.style.display = 'none';
@@ -657,13 +659,17 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    setTimeout(() => {
+    if (VERB === 'word-to-pdf') {
       window.dispatchEvent(redirectReady);
-      window.lana?.log(
-        'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
-        { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
-      );
-    }, 3000);
+    } else {
+      setTimeout(() => {
+        window.dispatchEvent(redirectReady);
+        window.lana?.log(
+          'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
+          { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
+        );
+      }, 3000);
+    }
     setCookie('UTS_Uploaded', Date.now(), cookieExp);
     const calcUploadedTime = uploadedTime();
     const metadata = { ...data, uploadTime: calcUploadedTime, userAttempts: attempts };
@@ -743,7 +749,6 @@ export default async function init(element) {
       const { dataTransfer: { files } } = e;
       if (files.length > 0) {
         noOfFiles = files.length;
-        if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
       }
     });
     fileInput.addEventListener('click', () => {
@@ -765,7 +770,6 @@ export default async function init(element) {
       const { target: { files } } = data;
       if (files.length > 0) {
         noOfFiles = files.length;
-        if (VERB === 'word-to-pdf') initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
       }
     });
     fileInput.addEventListener('cancel', () => {
@@ -959,6 +963,16 @@ export default async function init(element) {
   await checkSignedInUser();
   window.addEventListener('IMS:Ready', checkSignedInUser);
   window.prefetchTargetUrl = null;
+
+  if (VERB === 'word-to-pdf') {
+    const triggerEarlyPrefetch = () => {
+      initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
+      prefetchTarget();
+    };
+    document.addEventListener('click', triggerEarlyPrefetch, { once: true });
+    document.addEventListener('dragover', triggerEarlyPrefetch, { once: true });
+  }
+
   element.parentNode.style.display = 'block';
   window.addEventListener('pageshow', (event) => {
     const historyTraversal = event.persisted
