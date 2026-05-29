@@ -164,11 +164,11 @@ let isUploading = false;
 
 function prefetchTarget() {
   if (window.prefetchTargetLoaded) return;
-  window.prefetchTargetLoaded = true;
   const iframe = document.createElement('iframe');
   iframe.src = window.prefetchTargetUrl;
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
+  window.prefetchTargetLoaded = true;
 }
 
 function prefetchNextPage(url) {
