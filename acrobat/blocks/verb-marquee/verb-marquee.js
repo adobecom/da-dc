@@ -292,9 +292,15 @@ function processMedia(mediaDiv) {
   return mediaDiv;
 }
 
-function getAuthoredSvgInfo(foregroundEl) {
+function getAuthoredSvgInfo(foregroundEl, headlineEl) {
   if (!foregroundEl) return null;
-  const svgImg = foregroundEl.querySelector('img[src$=".svg"]');
+  const headingCell = headlineEl
+    && [...foregroundEl.children].find((div) => div.contains(headlineEl));
+  const searchRoot = headingCell || foregroundEl;
+  const svgImg = [...searchRoot.querySelectorAll('img[src$=".svg"]')].find((img) => {
+    if (!headlineEl) return true;
+    return img.compareDocumentPosition(headlineEl) & Node.DOCUMENT_POSITION_FOLLOWING;
+  });
   if (!svgImg) return null;
   return { url: svgImg.getAttribute('src').trim(), altText: svgImg.getAttribute('alt') || '' };
 }
@@ -400,7 +406,7 @@ export default async function init(element) {
   if (text) {
     text.classList.add('text');
   }
-  const authoredSvg = getAuthoredSvgInfo(foreground);
+  const authoredSvg = getAuthoredSvgInfo(foreground, headline);
   const media = foreground.querySelector(':scope > div:not([class])');
   if (media) {
     processMedia(media);
