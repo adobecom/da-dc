@@ -294,18 +294,9 @@ function processMedia(mediaDiv) {
 
 function getAuthoredSvgInfo(foregroundEl) {
   if (!foregroundEl) return null;
-  const svgImg = foregroundEl.querySelector('img[src$=".svg"]');
+  const svgImg = foregroundEl.querySelector('img[src*=".svg"]');
   if (!svgImg) return null;
-  const url = svgImg.getAttribute('src');
-  let altText = '';
-  const pEl = svgImg.closest('p');
-  pEl?.childNodes.forEach((node) => {
-    if (node.nodeType === Node.TEXT_NODE) {
-      const match = node.nodeValue.match(/\|(.+)/);
-      if (match) altText = match[1].trim();
-    }
-  });
-  return { url, altText };
+  return { url: svgImg.getAttribute('src').trim(), altText: svgImg.getAttribute('alt') || '' };
 }
 
 export default async function init(element) {
