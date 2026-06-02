@@ -107,8 +107,7 @@
 }
 
 .verb-marquee-title-svg {
-  display: block;
-  height: 30px;
+  height: auto;
   width: auto;
 }
 
