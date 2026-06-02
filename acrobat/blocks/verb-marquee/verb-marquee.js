@@ -294,7 +294,7 @@ function processMedia(mediaDiv) {
 
 function getAuthoredSvgInfo(foregroundEl) {
   if (!foregroundEl) return null;
-  const svgImg = foregroundEl.querySelector('img[src*=".svg"]');
+  const svgImg = foregroundEl.querySelector('img[src$=".svg"]');
   if (!svgImg) return null;
   return { url: svgImg.getAttribute('src').trim(), altText: svgImg.getAttribute('alt') || '' };
 }
