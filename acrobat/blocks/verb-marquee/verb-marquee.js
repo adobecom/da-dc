@@ -297,10 +297,7 @@ function getAuthoredSvgInfo(foregroundEl, headlineEl) {
   const headingCell = headlineEl
     && [...foregroundEl.children].find((div) => div.contains(headlineEl));
   const searchRoot = headingCell || foregroundEl;
-  const svgImg = [...searchRoot.querySelectorAll('img[src$=".svg"]')].find((img) => {
-    if (!headlineEl) return true;
-    return img.compareDocumentPosition(headlineEl) & Node.DOCUMENT_POSITION_FOLLOWING;
-  });
+  const svgImg = searchRoot.querySelector('img[src$=".svg"]');
   if (!svgImg) return null;
   return { url: svgImg.getAttribute('src').trim(), altText: svgImg.getAttribute('alt') || '' };
 }
