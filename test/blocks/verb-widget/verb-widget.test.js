@@ -3,7 +3,7 @@ import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { delay } from '../../helpers/waitfor.js';
-import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
+import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
 
 const { default: init } = await import(
   '../../../acrobat/blocks/verb-widget/verb-widget.js'
@@ -98,6 +98,101 @@ describe('verb-widget block', () => {
     expect(window.lana.log.called).to.be.true;
   });
 
+  it('error toast does not auto-close after 5 seconds', async () => {
+    window.lana = { log: sinon.spy() };
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    const clock = sinon.useFakeTimers();
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
+
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    clock.tick(6000);
+    expect(errorState.classList.contains('hide')).to.be.false;
+  });
+
+  it('error toast closes when clicking outside the toast', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
+
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    await delay(50);
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.true;
+  });
+
+  it('error toast does not close on click inside toast', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
+
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    errorState.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.false;
+  });
+
+  it('error close button closes toast on Enter key', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
+
+    const errorState = block.querySelector('.error');
+    const errorCloseBtn = block.querySelector('.verb-errorBtn');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    errorCloseBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.true;
+  });
+
+  it('error close button closes toast on Space key', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
+
+    const errorState = block.querySelector('.error');
+    const errorCloseBtn = block.querySelector('.verb-errorBtn');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    errorCloseBtn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.true;
+  });
+
   it('track analytics', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
@@ -173,9 +268,7 @@ describe('verb-widget block', () => {
     expect(verbAnalyticsCalls.length).to.be.greaterThan(0);
 
     expect(() => {
-      block.dispatchEvent(new CustomEvent('unity:track-analytics', {
-        detail: { event: 'unknown', data: {} },
-      }));
+      block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'unknown', data: {} } }));
     }).to.not.throw();
   });
 

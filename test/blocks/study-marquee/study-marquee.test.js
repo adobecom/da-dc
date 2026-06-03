@@ -129,6 +129,100 @@ describe('study-marquee block', () => {
     expect(errorState.classList.contains('hide')).to.be.true;
   });
 
+  it('error toast does not auto-close after 5 seconds', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    const clock = sinon.useFakeTimers();
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
+
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    clock.tick(6000);
+    expect(errorState.classList.contains('hide')).to.be.false;
+  });
+
+  it('error toast closes when clicking outside the toast', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
+
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    await delay(50);
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.true;
+  });
+
+  it('error toast does not close on click inside toast', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
+
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    errorState.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.false;
+  });
+
+  it('error close button closes toast on Enter key', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
+
+    const errorState = block.querySelector('.error');
+    const errorCloseBtn = block.querySelector('.study-marquee-errorBtn');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    errorCloseBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.true;
+  });
+
+  it('error close button closes toast on Space key', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'error_generic', message: 'Test error', sendToSplunk: false } }));
+
+    const errorState = block.querySelector('.error');
+    const errorCloseBtn = block.querySelector('.study-marquee-errorBtn');
+    expect(errorState.classList.contains('hide')).to.be.false;
+
+    errorCloseBtn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+    expect(errorState.classList.contains('hide')).to.be.true;
+  });
+
   it('cookie_not_set error does not send to Splunk', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });

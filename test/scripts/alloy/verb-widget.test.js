@@ -1,8 +1,9 @@
+/* eslint-disable compat/compat */
 import { expect } from '@esm-bundle/chai';
 import * as sinon from 'sinon';
 
 const { default: init, sendAnalyticsToSplunk } = await import(
-  '../../../acrobat/scripts/alloy/verb-widget'
+  '../../../acrobat/scripts/alloy/verb-widget.js'
 );
 
 describe('Alloy verb-widget', () => {
@@ -23,9 +24,8 @@ describe('Alloy verb-widget', () => {
       return window.fetch.wrappedMethod.call(window, x);
     });
     xhr = sinon.useFakeXMLHttpRequest();
-    window._satellite = {
-      track: sinon.stub(),
-    };
+    // eslint-disable-next-line no-underscore-dangle
+    window._satellite = { track: sinon.stub() };
     window.lana = { log: sinon.stub() };
     window.adobeIMS = { getAccessToken: () => null, isSignedInUser: () => false };
     window.alloy_getIdentity = Promise.resolve({ identity: { ECID: 'test-ecid' } });
@@ -44,6 +44,7 @@ describe('Alloy verb-widget', () => {
 
     init(eventName, verb, metaData, documentUnloading);
 
+    // eslint-disable-next-line no-underscore-dangle
     expect(window._satellite.track.calledOnce).to.be.true;
   });
 

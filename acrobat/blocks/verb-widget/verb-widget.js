@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable compat/compat */
 import { setLibs, getEnv, isOldBrowser } from '../../scripts/utils.js';
+import { localeMap } from '../unity/unity.js';
 
 const miloLibs = setLibs('/libs');
 
@@ -112,10 +113,12 @@ const setDraggingClass = (widget, shouldToggle) => {
 };
 
 function prefetchTarget() {
+  if (window.prefetchTargetLoaded) return;
   const iframe = document.createElement('iframe');
   iframe.src = window.prefetchTargetUrl;
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
+  window.prefetchTargetLoaded = true;
 }
 
 function prefetchNextPage(url) {
@@ -133,6 +136,15 @@ function initiatePrefetch(url) {
     prefetchNextPage(url);
     window.prefetchTargetUrl = url;
   }
+}
+
+function buildWordToPdfEarlyPrefetchUrl() {
+  const langFromPath = window.location.pathname.split('/')[1];
+  const locale = localeMap[langFromPath] || 'en-us';
+  const [languageCode, languageRegion] = locale.split('-');
+  const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
+  const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
+  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
 }
 
 function redDirLink(verb) {
@@ -749,13 +761,17 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    setTimeout(() => {
+    if (VERB === 'word-to-pdf') {
       window.dispatchEvent(redirectReady);
-      window.lana?.log(
-        'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
-        { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
-      );
-    }, 3000);
+    } else {
+      setTimeout(() => {
+        window.dispatchEvent(redirectReady);
+        window.lana?.log(
+          'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
+          { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
+        );
+      }, 3000);
+    }
     setCookie('UTS_Uploaded', Date.now(), cookieExp);
     const calcUploadedTime = uploadedTime();
     const metadata = { ...data, uploadTime: calcUploadedTime, userAttempts: attempts };
@@ -785,6 +801,15 @@ export default async function init(element) {
   window.addEventListener('IMS:Ready', checkSignedInUser);
 
   window.prefetchTargetUrl = null;
+
+  if (VERB === 'word-to-pdf') {
+    const triggerEarlyPrefetch = () => {
+      initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
+      prefetchTarget();
+    };
+    document.addEventListener('click', triggerEarlyPrefetch, { once: true });
+    document.addEventListener('dragover', triggerEarlyPrefetch, { once: true });
+  }
 
   element.parentNode.style.display = 'block';
 
@@ -837,11 +862,26 @@ export default async function init(element) {
     noOfFiles = files.length;
   });
 
-  errorCloseBtn.addEventListener('click', () => {
+  let outsideClickHandler = null;
+  const closeError = () => {
     errorState.classList.remove('verb-error');
     errorState.classList.add('hide');
     errorStateText.textContent = '';
     clearSrAlert();
+    if (outsideClickHandler) {
+      document.removeEventListener('click', outsideClickHandler);
+      outsideClickHandler = null;
+    }
+  };
+  errorCloseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeError();
+  });
+  errorCloseBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      closeError();
+    }
   });
 
   element.addEventListener('unity:track-analytics', (e) => {
@@ -902,6 +942,14 @@ export default async function init(element) {
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
       announceToScreenReader(message);
+      errorCloseBtn.focus();
+      setTimeout(() => {
+        if (outsideClickHandler) return;
+        outsideClickHandler = (e) => {
+          if (!errorState.contains(e.target)) closeError();
+        };
+        document.addEventListener('click', outsideClickHandler);
+      }, 0);
     }
     if (logToLana) {
       window.lana?.log(
@@ -909,12 +957,6 @@ export default async function init(element) {
         logOptions,
       );
     }
-
-    setTimeout(() => {
-      errorState.classList.remove('verb-error');
-      errorState.classList.add('hide');
-      errorStateText.textContent = '';
-    }, 5000);
   };
 
   element.addEventListener('unity:show-error-toast', (e) => {
