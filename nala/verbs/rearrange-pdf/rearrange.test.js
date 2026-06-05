@@ -15,33 +15,101 @@ test.describe('Unity Rearrange PDF test suite', () => {
     rearrangePdf = new RearrangePdf(page);
   });
 
-  // Test 0 : Rearrange PDF Page Numbers
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 
-    await test.step('step-1: Go to Rearrange Pdf test page', async () => {
+    await test.step('Go to Rearrange PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
       await page.waitForLoadState('domcontentloaded');
-      // await expect(page).toHaveURL(`${baseURL}${features[0].path}${unityLibs}`);
+      await page.waitForTimeout(5000);
     });
 
-    await test.step('step-2: Verify Rearrange PDF verb content/specs', async () => {
-      await expect(await rearrangePdf.rearrangePdf).toBeVisible();
-      await expect(await rearrangePdf.dropZone).toBeVisible();
-      await expect(await rearrangePdf.verbImage).toBeVisible();
-      await expect(await rearrangePdf.acrobatIcon).toBeVisible();
+    await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
+      await rearrangePdf.gnav.waitFor({ state: 'visible' });
+      await expect(rearrangePdf.gnav).toBeVisible();
+      await expect(rearrangePdf.gnavBreadcrumbs).toBeVisible();
+    });
+
+    await test.step('Verify Rearrange PDF widget content/specs', async () => {
+      await expect(rearrangePdf.widget).toBeVisible();
+      await expect(rearrangePdf.dropZone).toBeVisible();
+      await expect(rearrangePdf.verbImage).toBeVisible();
+      await expect(rearrangePdf.acrobatIcon).toBeVisible();
       const actualText = await rearrangePdf.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(await rearrangePdf.verbTitle).toContainText(data.verbTitle);
-      await expect(await rearrangePdf.verbCopy).toContainText(data.verbCopy);
+      await expect(rearrangePdf.verbTitle).toContainText(data.verbTitle);
+      await expect(rearrangePdf.verbCopy).toContainText(data.verbCopy);
+      await expect(rearrangePdf.selectFilesButton).toBeVisible();
+      await expect(rearrangePdf.selectFilesButton).toBeEnabled();
+    });
+
+    await test.step('Verify how-to section', async () => {
+      await rearrangePdf.howToSection.scrollIntoViewIfNeeded();
+      await expect(rearrangePdf.howToSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify three-up section', async () => {
+      await rearrangePdf.threeUpSection.scrollIntoViewIfNeeded();
+      await expect(rearrangePdf.threeUpSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify FAQ accordion', async () => {
+      const { faqSection, faqAccordionTriggers } = rearrangePdf;
+      await faqSection.scrollIntoViewIfNeeded();
+      await expect(faqSection).toBeVisible({ timeout: 60000 });
+
+      const buttonCount = await faqAccordionTriggers.count();
+
+      for (let i = 0; i < buttonCount; i += 1) {
+        const button = faqAccordionTriggers.nth(i);
+        const ariaControls = await button.getAttribute('aria-controls');
+        const contentPanel = faqSection.locator(`#${ariaControls}`);
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'true');
+        await expect(contentPanel).toBeVisible();
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'false');
+      }
+    });
+
+    await test.step('Verify CaaS section', async () => {
+      await rearrangePdf.caasSection.scrollIntoViewIfNeeded();
+      await expect(rearrangePdf.caasSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify media block', async () => {
+      await rearrangePdf.mediaSection.scrollIntoViewIfNeeded();
+      await expect(rearrangePdf.mediaSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify ratings and reviews (RnR) block', async () => {
+      await rearrangePdf.rnrSection.scrollIntoViewIfNeeded();
+      await expect(rearrangePdf.rnrSection).toBeVisible({ timeout: 60000 });
+      await expect(rearrangePdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify columns section has 31 links', async () => {
+      const { columnsSection, columnsATags } = rearrangePdf;
+      await columnsSection.scrollIntoViewIfNeeded();
+      await expect(columnsSection).toBeVisible({ timeout: 60000 });
+      await expect(columnsATags).toHaveCount(31);
+      await expect(columnsATags.first()).toBeVisible();
+      await expect(columnsATags.first()).toBeEnabled();
+    });
+
+    await test.step('Verify footer', async () => {
+      await rearrangePdf.footer.scrollIntoViewIfNeeded();
+      await expect(rearrangePdf.footer).toBeVisible({ timeout: 60000 });
     });
 
     await test.step('Verify no link leads to 404', async () => {
       await checkPageLinks(page, expect);
     });
 
-    await test.step('step-3: Upload a sample PDF file', async () => {
+    await test.step('Upload a sample PDF file', async () => {
       const [fileChooser] = await Promise.all([
         page.waitForEvent('filechooser'),
         rearrangePdf.dropZone.click(),
@@ -52,7 +120,6 @@ test.describe('Unity Rearrange PDF test suite', () => {
         timeout: 60000,
       });
 
-      // Verify the URL parameters
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);
       const urlObj = new URL(currentUrl);

@@ -15,33 +15,100 @@ test.describe('Unity PDF to Word test suite', () => {
     pdfToWord = new PdfToWord(page);
   });
 
-  // Test 0 : PDF to word
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 
-    await test.step('step-1: Go to PDF to Word page numbers test page', async () => {
+    await test.step('Go to PDF to Word test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
       await page.waitForLoadState('domcontentloaded');
-      // await expect(page).toHaveURL(`${baseURL}${features[0].path}${unityLibs}`);
+      await page.waitForTimeout(5000);
     });
 
-    await test.step('step-2: Verify PDF to word content/specs', async () => {
-      await expect(await pdfToWord.widget).toBeVisible();
-      await expect(await pdfToWord.dropZone).toBeVisible();
-      await expect(await pdfToWord.verbImage).toBeVisible();
-      await expect(await pdfToWord.acrobatIcon).toBeVisible();
+    await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
+      await pdfToWord.gnav.waitFor({ state: 'visible' });
+      await expect(pdfToWord.gnav).toBeVisible();
+      await expect(pdfToWord.gnavBreadcrumbs).toBeVisible();
+    });
+
+    await test.step('Verify PDF to Word widget content/specs', async () => {
+      await expect(pdfToWord.widget).toBeVisible();
+      await expect(pdfToWord.dropZone).toBeVisible();
+      await expect(pdfToWord.verbImage).toBeVisible();
+      await expect(pdfToWord.acrobatIcon).toBeVisible();
       const actualText = await pdfToWord.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(await pdfToWord.verbTitle).toContainText(data.verbTitle);
-      await expect(await pdfToWord.verbCopy).toContainText(data.verbCopy);
+      await expect(pdfToWord.verbTitle).toContainText(data.verbTitle);
+      await expect(pdfToWord.verbCopy).toContainText(data.verbCopy);
+      await expect(pdfToWord.selectFilesButton).toBeVisible();
+    });
+
+    await test.step('Verify how-to section', async () => {
+      await pdfToWord.howToSection.scrollIntoViewIfNeeded();
+      await expect(pdfToWord.howToSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify three-up section', async () => {
+      await pdfToWord.threeUpSection.scrollIntoViewIfNeeded();
+      await expect(pdfToWord.threeUpSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify FAQ accordion', async () => {
+      const { faqSection, faqAccordionTriggers } = pdfToWord;
+      await faqSection.scrollIntoViewIfNeeded();
+      await expect(faqSection).toBeVisible({ timeout: 60000 });
+
+      const buttonCount = await faqAccordionTriggers.count();
+
+      for (let i = 0; i < buttonCount; i += 1) {
+        const button = faqAccordionTriggers.nth(i);
+        const ariaControls = await button.getAttribute('aria-controls');
+        const contentPanel = faqSection.locator(`#${ariaControls}`);
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'true');
+        await expect(contentPanel).toBeVisible();
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'false');
+      }
+    });
+
+    await test.step('Verify CaaS section', async () => {
+      await pdfToWord.caasSection.scrollIntoViewIfNeeded();
+      await expect(pdfToWord.caasSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify media block', async () => {
+      await pdfToWord.mediaSection.scrollIntoViewIfNeeded();
+      await expect(pdfToWord.mediaSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify ratings and reviews (RnR) block', async () => {
+      await pdfToWord.rnrSection.scrollIntoViewIfNeeded();
+      await expect(pdfToWord.rnrSection).toBeVisible({ timeout: 60000 });
+      await expect(pdfToWord.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify columns section has 31 links', async () => {
+      const { columnsSection, columnsATags } = pdfToWord;
+      await columnsSection.scrollIntoViewIfNeeded();
+      await expect(columnsSection).toBeVisible({ timeout: 60000 });
+      await expect(columnsATags).toHaveCount(31);
+      await expect(columnsATags.first()).toBeVisible();
+      await expect(columnsATags.first()).toBeEnabled();
+    });
+
+    await test.step('Verify footer', async () => {
+      await pdfToWord.footer.scrollIntoViewIfNeeded();
+      await expect(pdfToWord.footer).toBeVisible({ timeout: 60000 });
     });
 
     await test.step('Verify no link leads to 404', async () => {
       await checkPageLinks(page, expect);
     });
 
-    await test.step('step-3: Upload a sample PDF file', async () => {
+    await test.step('Upload a sample PDF file', async () => {
       const [fileChooser] = await Promise.all([
         page.waitForEvent('filechooser'),
         pdfToWord.dropZone.click(),
@@ -52,7 +119,6 @@ test.describe('Unity PDF to Word test suite', () => {
         timeout: 60000,
       });
 
-      // Verify the URL parameters
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);
       const urlObj = new URL(currentUrl);

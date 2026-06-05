@@ -10,38 +10,106 @@ let extractPages;
 
 const unityLibs = process.env.UNITY_LIBS || '';
 
-test.describe('Unity Rearrange PDF test suite', () => {
+test.describe('Unity Extract PDF Pages test suite', () => {
   test.beforeEach(async ({ page }) => {
     extractPages = new ExtractPages(page);
   });
 
-  // Test 0 : Extract PDF
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 
-    await test.step('step-1: Go to Extract Pages Pdf test page', async () => {
+    await test.step('Go to Extract PDF Pages test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
       await page.waitForLoadState('domcontentloaded');
-      // await expect(page).toHaveURL(`${baseURL}${features[0].path}${unityLibs}`);
+      await page.waitForTimeout(5000);
     });
 
-    await test.step('step-2: Verify Extract Pages PDF verb content/specs', async () => {
-      await expect(await extractPages.extractPages).toBeVisible();
-      await expect(await extractPages.dropZone).toBeVisible();
-      await expect(await extractPages.verbImage).toBeVisible();
-      await expect(await extractPages.acrobatIcon).toBeVisible();
+    await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
+      await extractPages.gnav.waitFor({ state: 'visible' });
+      await expect(extractPages.gnav).toBeVisible();
+      await expect(extractPages.gnavBreadcrumbs).toBeVisible();
+    });
+
+    await test.step('Verify Extract PDF Pages widget content/specs', async () => {
+      await expect(extractPages.widget).toBeVisible();
+      await expect(extractPages.dropZone).toBeVisible();
+      await expect(extractPages.verbImage).toBeVisible();
+      await expect(extractPages.acrobatIcon).toBeVisible();
       const actualText = await extractPages.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(await extractPages.verbTitle).toContainText(data.verbTitle);
-      await expect(await extractPages.verbCopy).toContainText(data.verbCopy);
+      await expect(extractPages.verbTitle).toContainText(data.verbTitle);
+      await expect(extractPages.verbCopy).toContainText(data.verbCopy);
+      await expect(extractPages.selectFilesButton).toBeVisible();
+      await expect(extractPages.selectFilesButton).toBeEnabled();
+    });
+
+    await test.step('Verify how-to section', async () => {
+      await extractPages.howToSection.scrollIntoViewIfNeeded();
+      await expect(extractPages.howToSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify three-up section', async () => {
+      await extractPages.threeUpSection.scrollIntoViewIfNeeded();
+      await expect(extractPages.threeUpSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify FAQ accordion', async () => {
+      const { faqSection, faqAccordionTriggers } = extractPages;
+      await faqSection.scrollIntoViewIfNeeded();
+      await expect(faqSection).toBeVisible({ timeout: 60000 });
+
+      const buttonCount = await faqAccordionTriggers.count();
+
+      for (let i = 0; i < buttonCount; i += 1) {
+        const button = faqAccordionTriggers.nth(i);
+        const ariaControls = await button.getAttribute('aria-controls');
+        const contentPanel = faqSection.locator(`#${ariaControls}`);
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'true');
+        await expect(contentPanel).toBeVisible();
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'false');
+      }
+    });
+
+    await test.step('Verify CaaS section', async () => {
+      await extractPages.caasSection.scrollIntoViewIfNeeded();
+      await expect(extractPages.caasSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify media block', async () => {
+      await extractPages.mediaSection.scrollIntoViewIfNeeded();
+      await expect(extractPages.mediaSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify ratings and reviews (RnR) block', async () => {
+      await extractPages.rnrSection.scrollIntoViewIfNeeded();
+      await expect(extractPages.rnrSection).toBeVisible({ timeout: 60000 });
+      await expect(extractPages.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify columns section has 31 links', async () => {
+      const { columnsSection, columnsATags } = extractPages;
+      await columnsSection.scrollIntoViewIfNeeded();
+      await expect(columnsSection).toBeVisible({ timeout: 60000 });
+      await expect(columnsATags).toHaveCount(31);
+      await expect(columnsATags.first()).toBeVisible();
+      await expect(columnsATags.first()).toBeEnabled();
+    });
+
+    await test.step('Verify footer', async () => {
+      await extractPages.footer.scrollIntoViewIfNeeded();
+      await expect(extractPages.footer).toBeVisible({ timeout: 60000 });
     });
 
     await test.step('Verify no link leads to 404', async () => {
       await checkPageLinks(page, expect);
     });
 
-    await test.step('step-3: Upload a sample PDF file', async () => {
+    await test.step('Upload a sample PDF file', async () => {
       const [fileChooser] = await Promise.all([
         page.waitForEvent('filechooser'),
         extractPages.dropZone.click(),
@@ -52,7 +120,6 @@ test.describe('Unity Rearrange PDF test suite', () => {
         timeout: 60000,
       });
 
-      // Verify the URL parameters
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);
       const urlObj = new URL(currentUrl);

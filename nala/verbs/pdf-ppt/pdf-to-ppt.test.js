@@ -15,33 +15,101 @@ test.describe('Unity PDF to PPT test suite', () => {
     pdfToPpt = new PdfToPpt(page);
   });
 
-  // Test 0 : PDF to PPT
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 
-    await test.step('step-1: Go to PDF to PPT test page', async () => {
+    await test.step('Go to PDF to PPT test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
       await page.waitForLoadState('domcontentloaded');
-      // await expect(page).toHaveURL(`${baseURL}${features[0].path}${unityLibs}`);
+      await page.waitForTimeout(5000);
     });
 
-    await test.step('step-2: Verify PDF to PPT content/specs', async () => {
-      await expect(await pdfToPpt.widget).toBeVisible();
-      await expect(await pdfToPpt.dropZone).toBeVisible();
-      await expect(await pdfToPpt.verbImage).toBeVisible();
-      await expect(await pdfToPpt.acrobatIcon).toBeVisible();
+    await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
+      await pdfToPpt.gnav.waitFor({ state: 'visible' });
+      await expect(pdfToPpt.gnav).toBeVisible();
+      await expect(pdfToPpt.gnavBreadcrumbs).toBeVisible();
+    });
+
+    await test.step('Verify PDF to PPT widget content/specs', async () => {
+      await expect(pdfToPpt.widget).toBeVisible();
+      await expect(pdfToPpt.dropZone).toBeVisible();
+      await expect(pdfToPpt.verbImage).toBeVisible();
+      await expect(pdfToPpt.acrobatIcon).toBeVisible();
       const actualText = await pdfToPpt.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(await pdfToPpt.verbTitle).toContainText(data.verbTitle);
-      await expect(await pdfToPpt.verbCopy).toContainText(data.verbCopy);
+      await expect(pdfToPpt.verbTitle).toContainText(data.verbTitle);
+      await expect(pdfToPpt.verbCopy).toContainText(data.verbCopy);
+      await expect(pdfToPpt.selectFilesButton).toBeVisible();
+      await expect(pdfToPpt.selectFilesButton).toBeEnabled();
+    });
+
+    await test.step('Verify how-to section', async () => {
+      await pdfToPpt.howToSection.scrollIntoViewIfNeeded();
+      await expect(pdfToPpt.howToSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify three-up section', async () => {
+      await pdfToPpt.threeUpSection.scrollIntoViewIfNeeded();
+      await expect(pdfToPpt.threeUpSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify FAQ accordion', async () => {
+      const { faqSection, faqAccordionTriggers } = pdfToPpt;
+      await faqSection.scrollIntoViewIfNeeded();
+      await expect(faqSection).toBeVisible({ timeout: 60000 });
+
+      const buttonCount = await faqAccordionTriggers.count();
+
+      for (let i = 0; i < buttonCount; i += 1) {
+        const button = faqAccordionTriggers.nth(i);
+        const ariaControls = await button.getAttribute('aria-controls');
+        const contentPanel = faqSection.locator(`#${ariaControls}`);
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'true');
+        await expect(contentPanel).toBeVisible();
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'false');
+      }
+    });
+
+    await test.step('Verify CaaS section', async () => {
+      await pdfToPpt.caasSection.scrollIntoViewIfNeeded();
+      await expect(pdfToPpt.caasSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify media block', async () => {
+      await pdfToPpt.mediaSection.scrollIntoViewIfNeeded();
+      await expect(pdfToPpt.mediaSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify ratings and reviews (RnR) block', async () => {
+      await pdfToPpt.rnrSection.scrollIntoViewIfNeeded();
+      await expect(pdfToPpt.rnrSection).toBeVisible({ timeout: 60000 });
+      await expect(pdfToPpt.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify columns section has 31 links', async () => {
+      const { columnsSection, columnsATags } = pdfToPpt;
+      await columnsSection.scrollIntoViewIfNeeded();
+      await expect(columnsSection).toBeVisible({ timeout: 60000 });
+      await expect(columnsATags).toHaveCount(31);
+      await expect(columnsATags.first()).toBeVisible();
+      await expect(columnsATags.first()).toBeEnabled();
+    });
+
+    await test.step('Verify footer', async () => {
+      await pdfToPpt.footer.scrollIntoViewIfNeeded();
+      await expect(pdfToPpt.footer).toBeVisible({ timeout: 60000 });
     });
 
     await test.step('Verify no link leads to 404', async () => {
       await checkPageLinks(page, expect);
     });
 
-    await test.step('step-3: Upload a sample PDF file', async () => {
+    await test.step('Upload a sample PDF file', async () => {
       const [fileChooser] = await Promise.all([
         page.waitForEvent('filechooser'),
         pdfToPpt.dropZone.click(),
@@ -52,7 +120,6 @@ test.describe('Unity PDF to PPT test suite', () => {
         timeout: 60000,
       });
 
-      // Verify the URL parameters
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);
       const urlObj = new URL(currentUrl);

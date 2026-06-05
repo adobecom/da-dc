@@ -15,33 +15,101 @@ test.describe('Unity Crop PDF test suite', () => {
     cropPdf = new CropPdf(page);
   });
 
-  // Test 0 : Crop PDF
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 
-    await test.step('step-1: Go to Crop Pdf test page', async () => {
+    await test.step('Go to Crop PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
       await page.waitForLoadState('domcontentloaded');
-      // await expect(page).toHaveURL(`${baseURL}${features[0].path}${unityLibs}`);
+      await page.waitForTimeout(5000);
     });
 
-    await test.step('step-2: Verify Crop Pdf content/specs', async () => {
-      await expect(await cropPdf.cropPdf).toBeVisible();
-      await expect(await cropPdf.dropZone).toBeVisible();
-      await expect(await cropPdf.verbImage).toBeVisible();
-      await expect(await cropPdf.acrobatIcon).toBeVisible();
+    await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
+      await cropPdf.gnav.waitFor({ state: 'visible' });
+      await expect(cropPdf.gnav).toBeVisible();
+      await expect(cropPdf.gnavBreadcrumbs).toBeVisible();
+    });
+
+    await test.step('Verify Crop PDF widget content/specs', async () => {
+      await expect(cropPdf.widget).toBeVisible();
+      await expect(cropPdf.dropZone).toBeVisible();
+      await expect(cropPdf.verbImage).toBeVisible();
+      await expect(cropPdf.acrobatIcon).toBeVisible();
       const actualText = await cropPdf.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(await cropPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(await cropPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(cropPdf.verbTitle).toContainText(data.verbTitle);
+      await expect(cropPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(cropPdf.selectFilesButton).toBeVisible();
+      await expect(cropPdf.selectFilesButton).toBeEnabled();
+    });
+
+    await test.step('Verify how-to section', async () => {
+      await cropPdf.howToSection.scrollIntoViewIfNeeded();
+      await expect(cropPdf.howToSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify three-up section', async () => {
+      await cropPdf.threeUpSection.scrollIntoViewIfNeeded();
+      await expect(cropPdf.threeUpSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify FAQ accordion', async () => {
+      const { faqSection, faqAccordionTriggers } = cropPdf;
+      await faqSection.scrollIntoViewIfNeeded();
+      await expect(faqSection).toBeVisible({ timeout: 60000 });
+
+      const buttonCount = await faqAccordionTriggers.count();
+
+      for (let i = 0; i < buttonCount; i += 1) {
+        const button = faqAccordionTriggers.nth(i);
+        const ariaControls = await button.getAttribute('aria-controls');
+        const contentPanel = faqSection.locator(`#${ariaControls}`);
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'true');
+        await expect(contentPanel).toBeVisible();
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'false');
+      }
+    });
+
+    await test.step('Verify CaaS section', async () => {
+      await cropPdf.caasSection.scrollIntoViewIfNeeded();
+      await expect(cropPdf.caasSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify media block', async () => {
+      await cropPdf.mediaSection.scrollIntoViewIfNeeded();
+      await expect(cropPdf.mediaSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify ratings and reviews (RnR) block', async () => {
+      await cropPdf.rnrSection.scrollIntoViewIfNeeded();
+      await expect(cropPdf.rnrSection).toBeVisible({ timeout: 60000 });
+      await expect(cropPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify columns section has 31 links', async () => {
+      const { columnsSection, columnsATags } = cropPdf;
+      await columnsSection.scrollIntoViewIfNeeded();
+      await expect(columnsSection).toBeVisible({ timeout: 60000 });
+      await expect(columnsATags).toHaveCount(31);
+      await expect(columnsATags.first()).toBeVisible();
+      await expect(columnsATags.first()).toBeEnabled();
+    });
+
+    await test.step('Verify footer', async () => {
+      await cropPdf.footer.scrollIntoViewIfNeeded();
+      await expect(cropPdf.footer).toBeVisible({ timeout: 60000 });
     });
 
     await test.step('Verify no link leads to 404', async () => {
       await checkPageLinks(page, expect);
     });
 
-    await test.step('step-3: Upload a sample PDF file', async () => {
+    await test.step('Upload a sample PDF file', async () => {
       const [fileChooser] = await Promise.all([
         page.waitForEvent('filechooser'),
         cropPdf.dropZone.click(),
@@ -52,7 +120,6 @@ test.describe('Unity Crop PDF test suite', () => {
         timeout: 60000,
       });
 
-      // Verify the URL parameters
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);
       const urlObj = new URL(currentUrl);
