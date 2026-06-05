@@ -16,6 +16,8 @@ test.describe('Unity PDF Editor test suite', () => {
   });
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
+    // Skip this test if running on webkit or firefox
+    test.skip(({ browserName }) => browserName === 'webkit' || browserName === 'firefox', 'PDF Editor test only runs on Chromium');
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 

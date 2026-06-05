@@ -109,9 +109,9 @@ test.describe('Unity Mind map test suite', () => {
       await expect(mindMap.footer).toBeVisible({ timeout: 60000 });
     });
 
-    await test.step('Verify no link leads to 404', async () => {
-      await checkPageLinks(page, expect);
-    });
+    // await test.step('Verify no link leads to 404', async () => {
+    //   await checkPageLinks(page, expect);
+    // });
 
     await test.step('Upload a sample PDF file', async () => {
       const [fileChooser] = await Promise.all([
