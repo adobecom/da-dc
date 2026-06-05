@@ -15,7 +15,7 @@ test.describe('Unity Add PDF page number test suite', () => {
     addPdf = new AddPdfNumberPage(page);
   });
 
-  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
+  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 
@@ -75,12 +75,15 @@ test.describe('Unity Add PDF page number test suite', () => {
       }
     });
 
-    // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
-    // await test.step('Verify CaaS section', async () => {
-    // await addPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
-    // await addPdf.caasSection.scrollIntoViewIfNeeded();
-    // await expect(addPdf.caasSection).toBeVisible({ timeout: 60000 });
-    // });
+    await test.step('Verify CaaS section', async () => {
+      if (browserName === 'chromium') {
+        // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
+        return;
+      }
+      await addPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
+      await addPdf.caasSection.scrollIntoViewIfNeeded();
+      await expect(addPdf.caasSection).toBeVisible({ timeout: 60000 });
+    });
 
 
     await test.step('Verify media block', async () => {

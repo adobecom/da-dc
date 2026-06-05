@@ -15,7 +15,7 @@ test.describe('Unity Password Protect PDF test suite', () => {
     passwordProtectPdf = new PasswordProtectPdf(page);
   });
 
-  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
+  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 
@@ -75,12 +75,15 @@ test.describe('Unity Password Protect PDF test suite', () => {
       }
     });
 
-    // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
-    // await test.step('Verify CaaS section', async () => {
-    // await passwordProtectPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
-    // await passwordProtectPdf.caasSection.scrollIntoViewIfNeeded();
-    // await expect(passwordProtectPdf.caasSection).toBeVisible({ timeout: 60000 });
-    // });
+    await test.step('Verify CaaS section', async () => {
+      if (browserName === 'chromium') {
+        // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
+        return;
+      }
+      await passwordProtectPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
+      await passwordProtectPdf.caasSection.scrollIntoViewIfNeeded();
+      await expect(passwordProtectPdf.caasSection).toBeVisible({ timeout: 60000 });
+    });
 
 
     await test.step('Verify media block', async () => {
