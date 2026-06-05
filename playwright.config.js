@@ -35,7 +35,7 @@ const config = {
   testMatch: '**/*.test.js',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 3 : 1,
+  retries: process.env.CI ? 1 : 1,
   workers: process.env.CI ? 7 : 3,
   reporter: process.env.CI
     ? [['github'], ['list'], ['./nala/utils/base-reporter.js']]
