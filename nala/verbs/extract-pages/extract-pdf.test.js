@@ -85,7 +85,6 @@ test.describe('Unity Extract PDF Pages test suite', () => {
       await expect(extractPages.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await extractPages.mediaSection.scrollIntoViewIfNeeded();
       await expect(extractPages.mediaSection).toBeVisible({ timeout: 60000 });

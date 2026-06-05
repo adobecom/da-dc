@@ -85,7 +85,6 @@ test.describe('Unity Crop PDF test suite', () => {
       await expect(cropPdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await cropPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(cropPdf.mediaSection).toBeVisible({ timeout: 60000 });

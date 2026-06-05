@@ -85,7 +85,6 @@ test.describe('Unity Rearrange PDF test suite', () => {
       await expect(rearrangePdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await rearrangePdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(rearrangePdf.mediaSection).toBeVisible({ timeout: 60000 });

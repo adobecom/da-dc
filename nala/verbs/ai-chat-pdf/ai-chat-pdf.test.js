@@ -112,7 +112,6 @@ test.describe('Unity AI Chat PDF test suite', () => {
       await expect(aiChatPdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await aiChatPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(aiChatPdf.mediaSection).toBeVisible({ timeout: 60000 });

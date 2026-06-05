@@ -85,7 +85,6 @@ test.describe('Unity PPT to PDF test suite', () => {
       await expect(pptToPdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await pptToPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(pptToPdf.mediaSection).toBeVisible({ timeout: 60000 });

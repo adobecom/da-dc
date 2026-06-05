@@ -85,7 +85,6 @@ test.describe('Unity Sign PDF test suite', () => {
       await expect(signPdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await signPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(signPdf.mediaSection).toBeVisible({ timeout: 60000 });

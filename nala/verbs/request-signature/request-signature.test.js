@@ -85,7 +85,6 @@ test.describe('Unity Request Signature test suite', () => {
       await expect(requestSignature.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await requestSignature.mediaSection.scrollIntoViewIfNeeded();
       await expect(requestSignature.mediaSection).toBeVisible({ timeout: 60000 });

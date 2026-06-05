@@ -85,7 +85,6 @@ test.describe('Unity Delete PDF test suite', () => {
       await expect(deletePdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await deletePdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(deletePdf.mediaSection).toBeVisible({ timeout: 60000 });

@@ -85,7 +85,6 @@ test.describe('Unity PDF to Excel test suite', () => {
       await expect(pdfToExcel.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await pdfToExcel.mediaSection.scrollIntoViewIfNeeded();
       await expect(pdfToExcel.mediaSection).toBeVisible({ timeout: 60000 });

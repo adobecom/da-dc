@@ -81,7 +81,6 @@ test.describe('Unity Flashcard maker test suite', () => {
       await studentSpacesHeading.scrollIntoViewIfNeeded();
       await expect(studentSpacesHeading).toBeVisible({ timeout: 60000 });
       await expect(carousels).toBeVisible({ timeout: 60000 });
-
     });
 
     await test.step('Verify FAQ accordion', async () => {

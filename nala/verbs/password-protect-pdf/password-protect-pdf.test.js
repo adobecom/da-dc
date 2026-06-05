@@ -85,7 +85,6 @@ test.describe('Unity Password Protect PDF test suite', () => {
       await expect(passwordProtectPdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await passwordProtectPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(passwordProtectPdf.mediaSection).toBeVisible({ timeout: 60000 });

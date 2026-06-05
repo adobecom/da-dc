@@ -94,7 +94,6 @@ test.describe('Unity Convert PDF test suite', () => {
       await expect(convertPdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await convertPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(convertPdf.mediaSection).toBeVisible({ timeout: 60000 });

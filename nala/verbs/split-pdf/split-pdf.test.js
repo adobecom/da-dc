@@ -85,7 +85,6 @@ test.describe('Unity Split PDF test suite', () => {
       await expect(splitPdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await splitPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(splitPdf.mediaSection).toBeVisible({ timeout: 60000 });

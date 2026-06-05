@@ -18,7 +18,6 @@ test.describe('Unity PDF Editor test suite', () => {
   });
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
-    
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 
@@ -97,7 +96,6 @@ test.describe('Unity PDF Editor test suite', () => {
       await pdfEditor.caasSection.scrollIntoViewIfNeeded();
       await expect(pdfEditor.caasSection).toBeVisible({ timeout: 60000 });
     });
-
 
     await test.step('Verify media block', async () => {
       await pdfEditor.mediaSection.scrollIntoViewIfNeeded();

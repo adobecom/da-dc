@@ -85,7 +85,6 @@ test.describe('Unity PDF to PNG test suite', () => {
       await expect(pdfToPng.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await pdfToPng.mediaSection.scrollIntoViewIfNeeded();
       await expect(pdfToPng.mediaSection).toBeVisible({ timeout: 60000 });

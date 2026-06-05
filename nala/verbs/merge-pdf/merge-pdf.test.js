@@ -90,7 +90,6 @@ test.describe('Unity Merge PDF test suite', () => {
       await expect(mergePdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await mergePdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(mergePdf.mediaSection).toBeVisible({ timeout: 60000 });

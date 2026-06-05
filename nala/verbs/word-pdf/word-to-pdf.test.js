@@ -85,7 +85,6 @@ test.describe('Unity WORD to PDF test suite', () => {
       await expect(wordToPdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await wordToPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(wordToPdf.mediaSection).toBeVisible({ timeout: 60000 });

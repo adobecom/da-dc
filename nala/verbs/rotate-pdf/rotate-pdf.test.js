@@ -85,7 +85,6 @@ test.describe('Unity Rotate PDF test suite', () => {
       await expect(rotatePdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await rotatePdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(rotatePdf.mediaSection).toBeVisible({ timeout: 60000 });

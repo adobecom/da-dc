@@ -85,7 +85,6 @@ test.describe('Unity PDF to JPG test suite', () => {
       await expect(pdfToJpg.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await pdfToJpg.mediaSection.scrollIntoViewIfNeeded();
       await expect(pdfToJpg.mediaSection).toBeVisible({ timeout: 60000 });

@@ -94,7 +94,6 @@ test.describe('Unity OCR PDF test suite', () => {
       await expect(ocrPdf.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await ocrPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(ocrPdf.mediaSection).toBeVisible({ timeout: 60000 });

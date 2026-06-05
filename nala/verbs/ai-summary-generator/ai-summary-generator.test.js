@@ -111,7 +111,6 @@ test.describe('Unity AI Summary Generator test suite', () => {
       await expect(aiSummaryGenerator.caasSection).toBeVisible({ timeout: 60000 });
     });
 
-
     await test.step('Verify media block', async () => {
       await aiSummaryGenerator.mediaSection.scrollIntoViewIfNeeded();
       await expect(aiSummaryGenerator.mediaSection).toBeVisible({ timeout: 60000 });
