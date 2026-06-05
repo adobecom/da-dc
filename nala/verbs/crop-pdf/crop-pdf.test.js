@@ -76,6 +76,7 @@ test.describe('Unity Crop PDF test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await cropPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await cropPdf.caasSection.scrollIntoViewIfNeeded();
       await expect(cropPdf.caasSection).toBeVisible({ timeout: 60000 });
     });

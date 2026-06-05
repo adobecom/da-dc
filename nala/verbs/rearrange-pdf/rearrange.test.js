@@ -76,6 +76,7 @@ test.describe('Unity Rearrange PDF test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await rearrangePdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await rearrangePdf.caasSection.scrollIntoViewIfNeeded();
       await expect(rearrangePdf.caasSection).toBeVisible({ timeout: 60000 });
     });

@@ -76,6 +76,7 @@ test.describe('Unity Split PDF test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await splitPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await splitPdf.caasSection.scrollIntoViewIfNeeded();
       await expect(splitPdf.caasSection).toBeVisible({ timeout: 60000 });
     });

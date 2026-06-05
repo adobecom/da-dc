@@ -76,6 +76,7 @@ test.describe('Unity Extract PDF Pages test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await extractPages.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await extractPages.caasSection.scrollIntoViewIfNeeded();
       await expect(extractPages.caasSection).toBeVisible({ timeout: 60000 });
     });

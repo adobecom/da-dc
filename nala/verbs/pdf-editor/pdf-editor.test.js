@@ -89,6 +89,7 @@ test.describe('Unity PDF Editor test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await pdfEditor.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await pdfEditor.caasSection.scrollIntoViewIfNeeded();
       await expect(pdfEditor.caasSection).toBeVisible({ timeout: 60000 });
     });

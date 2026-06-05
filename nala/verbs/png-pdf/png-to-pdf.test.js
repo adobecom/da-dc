@@ -76,6 +76,7 @@ test.describe('Unity PNG to PDF test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await pngToPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await pngToPdf.caasSection.scrollIntoViewIfNeeded();
       await expect(pngToPdf.caasSection).toBeVisible({ timeout: 60000 });
     });

@@ -76,6 +76,7 @@ test.describe('Unity Request Signature test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await requestSignature.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await requestSignature.caasSection.scrollIntoViewIfNeeded();
       await expect(requestSignature.caasSection).toBeVisible({ timeout: 60000 });
     });

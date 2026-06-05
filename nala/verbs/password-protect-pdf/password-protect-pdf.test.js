@@ -76,6 +76,7 @@ test.describe('Unity Password Protect PDF test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await passwordProtectPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await passwordProtectPdf.caasSection.scrollIntoViewIfNeeded();
       await expect(passwordProtectPdf.caasSection).toBeVisible({ timeout: 60000 });
     });

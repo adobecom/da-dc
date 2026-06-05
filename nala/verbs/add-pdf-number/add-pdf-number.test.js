@@ -76,6 +76,7 @@ test.describe('Unity Add PDF page number test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await addPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await addPdf.caasSection.scrollIntoViewIfNeeded();
       await expect(addPdf.caasSection).toBeVisible({ timeout: 60000 });
     });

@@ -76,6 +76,7 @@ test.describe('Unity PDF to PPT test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await pdfToPpt.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await pdfToPpt.caasSection.scrollIntoViewIfNeeded();
       await expect(pdfToPpt.caasSection).toBeVisible({ timeout: 60000 });
     });

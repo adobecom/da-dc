@@ -76,6 +76,7 @@ test.describe('Unity Rotate PDF test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await rotatePdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await rotatePdf.caasSection.scrollIntoViewIfNeeded();
       await expect(rotatePdf.caasSection).toBeVisible({ timeout: 60000 });
     });

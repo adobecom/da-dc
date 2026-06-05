@@ -85,6 +85,7 @@ test.describe('Unity Convert PDF test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await convertPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await convertPdf.caasSection.scrollIntoViewIfNeeded();
       await expect(convertPdf.caasSection).toBeVisible({ timeout: 60000 });
     });

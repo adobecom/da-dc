@@ -76,6 +76,7 @@ test.describe('Unity WORD to PDF test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await wordToPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await wordToPdf.caasSection.scrollIntoViewIfNeeded();
       await expect(wordToPdf.caasSection).toBeVisible({ timeout: 60000 });
     });

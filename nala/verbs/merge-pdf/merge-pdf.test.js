@@ -81,6 +81,7 @@ test.describe('Unity Merge PDF test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await mergePdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await mergePdf.caasSection.scrollIntoViewIfNeeded();
       await expect(mergePdf.caasSection).toBeVisible({ timeout: 60000 });
     });

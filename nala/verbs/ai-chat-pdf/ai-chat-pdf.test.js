@@ -103,6 +103,7 @@ test.describe('Unity AI Chat PDF test suite', () => {
     });
 
     await test.step('Verify CaaS section', async () => {
+      await aiChatPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
       await aiChatPdf.caasSection.scrollIntoViewIfNeeded();
       await expect(aiChatPdf.caasSection).toBeVisible({ timeout: 60000 });
     });
