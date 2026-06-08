@@ -555,6 +555,26 @@ async function loadPage() {
 
   await loadArea(document, false);
 
+  // Kaltura Mira floating widget — deferred until after page load to avoid impacting LCP/FID
+  if (getCustomMetadata('kaltura-mira') === 'floating') {
+    const loadWidget = async () => {
+      const [{ default: initKalturaMiraWidget }] = await Promise.all([
+        import('./kalturaMira/kalturaMira.js'),
+        new Promise((resolve) => {
+          loadStyle(`${CONFIG.codeRoot}/scripts/kalturaMira/kalturaMira.css`, resolve);
+        }),
+      ]);
+      initKalturaMiraWidget();
+    };
+    if (document.readyState === 'complete') {
+      (window.requestIdleCallback || ((fn) => setTimeout(fn, 200)))(loadWidget);
+    } else {
+      window.addEventListener('load', () => {
+        (window.requestIdleCallback || ((fn) => setTimeout(fn, 200)))(loadWidget);
+      }, { once: true });
+    }
+  }
+
   // Setup Logging
   const { default: lanaLogging } = await import('./dcLana.js');
   lanaLogging();
