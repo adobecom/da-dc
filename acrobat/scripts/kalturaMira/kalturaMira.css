@@ -9,14 +9,13 @@
 .kaltura-mira-widget-toggle {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
   background: #1473e6;
   color: #fff;
   border: none;
-  border-radius: 24px;
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
   transition: background 0.2s, box-shadow 0.2s;
@@ -25,6 +24,12 @@
 .kaltura-mira-widget-toggle:hover {
   background: #0d66d0;
   box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
+}
+
+.kaltura-mira-widget-toggle svg {
+  width: 26px;
+  height: 26px;
+  fill: #fff;
 }
 
 .kaltura-mira-widget-panel {
@@ -74,23 +79,15 @@
 
 @media (max-width: 480px) {
   #kaltura-mira-widget {
-    bottom: 0;
-    right: 0;
-    left: 0;
-  }
-
-  .kaltura-mira-widget-toggle {
-    width: 100%;
-    justify-content: center;
-    border-radius: 0;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
+    bottom: 16px;
+    right: 16px;
   }
 
   .kaltura-mira-widget-panel {
     position: fixed;
     inset: 0;
-    bottom: 48px; /* leave room for toggle */
+    bottom: 84px; /* clear the toggle button */
+    right: 0;
     width: 100%;
     height: auto;
     border-radius: 0;

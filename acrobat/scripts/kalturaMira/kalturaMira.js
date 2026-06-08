@@ -26,7 +26,10 @@ export default function initKalturaMiraWidget() {
   toggle.className = 'kaltura-mira-widget-toggle';
   toggle.setAttribute('aria-expanded', 'false');
   toggle.setAttribute('aria-controls', 'kaltura-mira-widget-panel');
-  toggle.textContent = 'Talk to a specialist';
+  toggle.setAttribute('aria-label', 'Open video specialist');
+  toggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/>
+  </svg>`;
 
   // Panel — hidden until toggled
   const panel = document.createElement('div');
