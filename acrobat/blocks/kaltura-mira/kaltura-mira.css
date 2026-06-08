@@ -1,0 +1,19 @@
+.kaltura-mira-block {
+  display: block;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.kaltura-mira-block iframe {
+  display: block;
+  width: 100%;
+  height: 700px;
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .kaltura-mira-block iframe {
+    height: 100svh;
+  }
+}

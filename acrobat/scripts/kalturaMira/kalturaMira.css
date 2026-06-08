@@ -1,0 +1,100 @@
+#kaltura-mira-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9000; /* below cookie banners (~9999) but above most content */
+  font-family: inherit;
+}
+
+.kaltura-mira-widget-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #1473e6;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.kaltura-mira-widget-toggle:hover {
+  background: #0d66d0;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
+}
+
+.kaltura-mira-widget-panel {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 0;
+  width: 420px;
+  height: 600px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 24%);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.kaltura-mira-widget-panel[hidden] {
+  display: none;
+}
+
+.kaltura-mira-widget-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background: rgb(0 0 0 / 40%);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+  transition: background 0.2s;
+}
+
+.kaltura-mira-widget-close:hover {
+  background: rgb(0 0 0 / 60%);
+}
+
+.kaltura-mira-widget-panel iframe {
+  flex: 1;
+  width: 100%;
+  border: none;
+}
+
+@media (max-width: 480px) {
+  #kaltura-mira-widget {
+    bottom: 0;
+    right: 0;
+    left: 0;
+  }
+
+  .kaltura-mira-widget-toggle {
+    width: 100%;
+    justify-content: center;
+    border-radius: 0;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+
+  .kaltura-mira-widget-panel {
+    position: fixed;
+    inset: 0;
+    bottom: 48px; /* leave room for toggle */
+    width: 100%;
+    height: auto;
+    border-radius: 0;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+}
