@@ -2,8 +2,13 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 9000; /* below cookie banners (~9999) but above most content */
+  z-index: 9000;
   font-family: inherit;
+}
+
+[dir="rtl"] #kaltura-mira-widget {
+  right: auto;
+  left: 24px;
 }
 
 .kaltura-mira-widget-toggle {
@@ -32,18 +37,32 @@
   fill: #fff;
 }
 
+/* Backdrop */
+.kaltura-mira-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 60%);
+  z-index: 8999;
+}
+
+.kaltura-mira-backdrop[hidden] {
+  display: none;
+}
+
+/* Modal */
 .kaltura-mira-widget-panel {
-  position: absolute;
-  bottom: calc(100% + 12px);
-  right: 0;
-  width: 420px;
-  height: 600px;
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(900px, 90vw);
+  height: min(650px, 90vh);
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgb(0 0 0 / 24%);
+  box-shadow: 0 16px 48px rgb(0 0 0 / 32%);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  z-index: 9000;
 }
 
 .kaltura-mira-widget-panel[hidden] {
@@ -52,15 +71,15 @@
 
 .kaltura-mira-widget-close {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
   background: rgb(0 0 0 / 40%);
   color: #fff;
   border: none;
   border-radius: 50%;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1;
   cursor: pointer;
   z-index: 1;
@@ -83,15 +102,16 @@
     right: 16px;
   }
 
+  [dir="rtl"] #kaltura-mira-widget {
+    right: auto;
+    left: 16px;
+  }
+
   .kaltura-mira-widget-panel {
-    position: fixed;
-    inset: 0;
-    bottom: 84px; /* clear the toggle button */
-    right: 0;
     width: 100%;
-    height: auto;
+    height: 100%;
     border-radius: 0;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
+    margin: 0;
+    inset: 0;
   }
 }

@@ -48,9 +48,15 @@ export default function initKalturaMiraWidget() {
   iframe.setAttribute('allow', 'camera; microphone; fullscreen');
   let iframeLoaded = false;
 
+  // Backdrop — clicking it closes the modal
+  const backdrop = document.createElement('div');
+  backdrop.className = 'kaltura-mira-backdrop';
+  backdrop.hidden = true;
+  backdrop.setAttribute('aria-hidden', 'true');
+
   panel.append(closeBtn, iframe);
   widget.append(toggle, panel);
-  document.body.append(widget);
+  document.body.append(backdrop, widget);
 
   function openPanel() {
     if (!iframeLoaded) {
@@ -58,12 +64,16 @@ export default function initKalturaMiraWidget() {
       iframeLoaded = true;
     }
     panel.hidden = false;
+    backdrop.hidden = false;
+    document.body.style.overflow = 'hidden';
     toggle.setAttribute('aria-expanded', 'true');
     closeBtn.focus();
   }
 
   function closePanel() {
     panel.hidden = true;
+    backdrop.hidden = true;
+    document.body.style.overflow = '';
     toggle.setAttribute('aria-expanded', 'false');
     toggle.focus();
   }
@@ -74,6 +84,7 @@ export default function initKalturaMiraWidget() {
   });
 
   closeBtn.addEventListener('click', closePanel);
+  backdrop.addEventListener('click', closePanel);
 
   // Close on Escape key
   widget.addEventListener('keydown', (e) => {
