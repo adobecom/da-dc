@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './jpg-to-pdf.spec.js';
 import JpgToPdf from './jpg-to-pdf.page.js';
+import checkPageLinks from '../../utils/link-checker.js';
 
 const jpgFilePath = path.resolve(__dirname, '../../assets/1-JPG-jpg-pdf.jpg');
 
@@ -14,29 +15,106 @@ test.describe('Unity JPG to PDF test suite', () => {
     jpgToPdf = new JpgToPdf(page);
   });
 
-  // Test 0 : JPG to PDF
-  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
+  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 
-    await test.step('step-1: Go to JPG to PDF test page', async () => {
+    await test.step('Go to JPG to PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
       await page.waitForLoadState('domcontentloaded');
-      // await expect(page).toHaveURL(`${baseURL}${features[0].path}${unityLibs}`);
+      await page.waitForTimeout(5000);
     });
 
-    await test.step('step-2: Verify JPG to PDF content/specs', async () => {
-      await expect(await jpgToPdf.widget).toBeVisible();
-      await expect(await jpgToPdf.dropZone).toBeVisible();
-      await expect(await jpgToPdf.verbImage).toBeVisible();
-      await expect(await jpgToPdf.acrobatIcon).toBeVisible();
+    await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
+      await jpgToPdf.gnav.waitFor({ state: 'visible' });
+      await expect(jpgToPdf.gnav).toBeVisible();
+      await expect(jpgToPdf.gnavBreadcrumbs).toBeVisible();
+    });
+
+    await test.step('Verify JPG to PDF widget content/specs', async () => {
+      await expect(jpgToPdf.widget).toBeVisible();
+      await expect(jpgToPdf.dropZone).toBeVisible();
+      await expect(jpgToPdf.verbImage).toBeVisible();
+      await expect(jpgToPdf.acrobatIcon).toBeVisible();
       const actualText = await jpgToPdf.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(await jpgToPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(await jpgToPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(jpgToPdf.verbTitle).toContainText(data.verbTitle);
+      await expect(jpgToPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(jpgToPdf.selectFilesButton).toBeVisible();
+      await expect(jpgToPdf.selectFilesButton).toBeEnabled();
     });
 
-    await test.step('step-3: Upload a sample PDF file', async () => {
+    await test.step('Verify how-to section', async () => {
+      await jpgToPdf.howToSection.scrollIntoViewIfNeeded();
+      await expect(jpgToPdf.howToSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify three-up section', async () => {
+      await jpgToPdf.threeUpSection.scrollIntoViewIfNeeded();
+      await expect(jpgToPdf.threeUpSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify FAQ accordion', async () => {
+      const { faqSection, faqAccordionTriggers } = jpgToPdf;
+      await faqSection.scrollIntoViewIfNeeded();
+      await expect(faqSection).toBeVisible({ timeout: 60000 });
+
+      const buttonCount = await faqAccordionTriggers.count();
+
+      for (let i = 0; i < buttonCount; i += 1) {
+        const button = faqAccordionTriggers.nth(i);
+        const ariaControls = await button.getAttribute('aria-controls');
+        const contentPanel = faqSection.locator(`#${ariaControls}`);
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'true');
+        await expect(contentPanel).toBeVisible();
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'false');
+      }
+    });
+
+    await test.step('Verify CaaS section', async () => {
+      if (browserName === 'chromium') {
+        // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
+        return;
+      }
+      await jpgToPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
+      await jpgToPdf.caasSection.scrollIntoViewIfNeeded();
+      await expect(jpgToPdf.caasSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify media block', async () => {
+      await jpgToPdf.mediaSection.scrollIntoViewIfNeeded();
+      await expect(jpgToPdf.mediaSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify ratings and reviews (RnR) block', async () => {
+      await jpgToPdf.rnrSection.scrollIntoViewIfNeeded();
+      await expect(jpgToPdf.rnrSection).toBeVisible({ timeout: 60000 });
+      await expect(jpgToPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify columns section has 31 links', async () => {
+      const { columnsSection, columnsATags } = jpgToPdf;
+      await columnsSection.scrollIntoViewIfNeeded();
+      await expect(columnsSection).toBeVisible({ timeout: 60000 });
+      await expect(columnsATags).toHaveCount(31);
+      await expect(columnsATags.first()).toBeVisible();
+      await expect(columnsATags.first()).toBeEnabled();
+    });
+
+    await test.step('Verify footer', async () => {
+      await jpgToPdf.footer.scrollIntoViewIfNeeded();
+      await expect(jpgToPdf.footer).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
+    });
+
+    await test.step('Upload a sample image file', async () => {
       const [fileChooser] = await Promise.all([
         page.waitForEvent('filechooser'),
         jpgToPdf.dropZone.click(),
@@ -45,10 +123,8 @@ test.describe('Unity JPG to PDF test suite', () => {
 
       await page.waitForURL(/acrobat\.adobe/, {
         timeout: 60000,
-        waitUntil: 'domcontentloaded',
       });
 
-      // Verify the URL parameters
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);
       const urlObj = new URL(currentUrl);

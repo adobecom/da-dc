@@ -301,6 +301,7 @@ export default class BasePage {
   }
 
   async verifyFooter() {
+    await this.footer.scrollIntoViewIfNeeded();
     await expect(this.footer).toBeVisible();
     await expect(this.fedsMenuContent).toBeVisible();
     await expect(this.fedsMenuColumns.first()).toBeVisible();
@@ -316,6 +317,7 @@ export default class BasePage {
   }
 
   async verifyFooterOptions() {
+    await this.footer.scrollIntoViewIfNeeded();
     await expect(this.fedsFooterOptions).toBeVisible();
     await expect(this.fedsFooterMiscLinks).toBeVisible();
     await expect(this.fedsRegionPicker.first()).toBeVisible();

@@ -1,10 +1,18 @@
-import BasePage from '../../libs/basepage.js';
-
-export default class OnlinePage extends BasePage {
+/**
+ * Locators for `/acrobat/online`.
+ * @see https://www.adobe.com/acrobat/online.html
+ */
+export default class OnlinePage {
   constructor(page) {
-    super(page);
-    this.heroTitle = this.page.locator('h1').first();
-    this.gnav = this.page.locator('header.global-navigation');
-    this.footer = this.page.locator('footer');
+    this.page = page;
+
+    this.gnav = page.locator('nav.feds-topnav');
+    this.footer = page.locator('footer[class="global-footer"]');
+
+    /** Hero (“Do your best work online with Adobe Acrobat”). */
+    this.heroMarqueeSection = page.locator('div[class*="hero-marquee"]');
+
+    /** Product / verb tiles (“Try 25+ powerful PDF and e-signing tools for free”). */
+    this.editorialCards = page.locator('div[class*="editorial-card"]');
   }
 }
