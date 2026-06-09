@@ -115,6 +115,7 @@ export default async function init(el) {
   const verbWidget = el.closest('.section')?.querySelector('.verb-widget');
   const studyMarquee = el.closest('.section')?.querySelector('.study-marquee');
   const verbMarquee = el.closest('.section')?.querySelector('.verb-marquee');
+  const expressBlock = el.closest('.section')?.querySelector('.express');
   if (verbWidget) {
     const { LIMITS: VERB_WIDGET_LIMITS } = await import('../verb-widget/verb-widget.js');
     Object.assign(LIMITS, VERB_WIDGET_LIMITS);
@@ -127,7 +128,11 @@ export default async function init(el) {
     const { LIMITS: VERB_MARQUEE_LIMITS } = await import('../verb-marquee/verb-marquee.js');
     Object.assign(LIMITS, VERB_MARQUEE_LIMITS);
   }
-  const widgetBlock = verbWidget || studyMarquee || verbMarquee;
+  if (expressBlock) {
+    const { LIMITS: EXPRESS_LIMITS } = await import('../express/express.js');
+    Object.assign(LIMITS, EXPRESS_LIMITS);
+  }
+  const widgetBlock = verbWidget || studyMarquee || verbMarquee || expressBlock;
   const verb = (widgetBlock && [...widgetBlock.classList].find((cn) => LIMITS[cn])) || element.classList[1].replace('icon-', '');
   if (mobileApp && LIMITS[verb]?.mobileApp) return;
 
