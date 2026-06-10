@@ -14,7 +14,7 @@ export const LIMITS = {
   fillsign: { ...SINGLE_PDF, mobileApp: true },
   'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, genAI: true },
   'resume-builder': { maxFileSize: MB20, acceptedFiles: DOC_ONLY, maxNumFiles: 1, genAI: true },
-  ...group(['word-to-pdf', 'jpg-to-pdf'], MULTI_ALL),
+  ...group(['word-to-pdf', 'jpg-to-pdf', 'image-to-pdf', 'bmp-to-pdf', 'gif-to-pdf', 'tiff-to-pdf', 'indd-to-pdf', 'psd-to-pdf', 'ai-to-pdf'], MULTI_ALL),
 };
 
 const miloLibs = setLibs('/libs');
