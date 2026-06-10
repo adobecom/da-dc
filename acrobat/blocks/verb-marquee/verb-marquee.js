@@ -9,7 +9,11 @@ const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.x
 const ALL_FILES_WITH_HEIC = [...ALL_FILES, '.heic'];
 const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
 const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
-const MULTI_ALL_HEIC = { maxFileSize: MB100, acceptedFiles: ALL_FILES_WITH_HEIC, multipleFiles: true };
+const MULTI_ALL_HEIC = {
+  maxFileSize: MB100,
+  acceptedFiles: ALL_FILES_WITH_HEIC,
+  multipleFiles: true,
+};
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
 export const LIMITS = {
