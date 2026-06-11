@@ -6,14 +6,8 @@ const MB20 = 20971520;
 const PDF_ONLY = ['.pdf'];
 const DOC_ONLY = ['.pdf', '.doc', '.docx'];
 const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
-const ALL_FILES_WITH_HEIC = [...ALL_FILES, '.heic'];
 const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
 const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
-const MULTI_ALL_HEIC = {
-  maxFileSize: MB100,
-  acceptedFiles: ALL_FILES_WITH_HEIC,
-  multipleFiles: true,
-};
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
 export const LIMITS = {
@@ -21,7 +15,6 @@ export const LIMITS = {
   'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, genAI: true },
   'resume-builder': { maxFileSize: MB20, acceptedFiles: DOC_ONLY, maxNumFiles: 1, genAI: true },
   ...group(['word-to-pdf', 'jpg-to-pdf'], MULTI_ALL),
-  ...group(['image-to-pdf', 'bmp-to-pdf', 'gif-to-pdf', 'tiff-to-pdf', 'indd-to-pdf', 'psd-to-pdf', 'ai-to-pdf'], MULTI_ALL_HEIC),
 };
 
 const miloLibs = setLibs('/libs');
