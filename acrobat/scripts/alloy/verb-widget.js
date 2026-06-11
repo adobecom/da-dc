@@ -182,10 +182,6 @@ export function createEventObject(eventName, verb, metaData, trackingParams, doc
           dcweb: eventDataPayload,
           dcweb2: eventDataPayload,
         },
-        app: {
-          appName: 'ACROBAT_WEB_FRICTIONLESS',
-          appVersion: '1.0',
-        },
       },
     },
   };
