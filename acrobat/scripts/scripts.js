@@ -208,7 +208,7 @@ const locales = {
   ch_it: { ietf: 'it-CH', tk: 'bbf5pok.css' },
   tr: { ietf: 'tr-TR', tk: 'aaz7dvd.css' },
   ae_en: { ietf: 'ar-EN', tk: 'pps7abe.css', dir: 'ltr', base: '' },
-  uk: { ietf: 'en-GB', tk: 'pps7abe.css', base: '' },
+  uk: { ietf: 'en-GB', tk: 'pps7abe.css' },
   at: { ietf: 'de-AT', tk: 'vin7zsi.css' },
   cz: { ietf: 'cs-CZ', tk: 'aaz7dvd.css' },
   bg: { ietf: 'bg-BG', tk: 'aaz7dvd.css' },
@@ -219,9 +219,9 @@ const locales = {
   mena_ar: { ietf: 'ar', tk: 'dis2dpj.css', dir: 'rtl' },
   sa_ar: { ietf: 'ar-SA', tk: 'nwq1mna.css', dir: 'rtl' },
   // Asia Pacific
-  au: { ietf: 'en-AU', tk: 'pps7abe.css', base: '' },
+  au: { ietf: 'en-AU', tk: 'pps7abe.css' },
   hk_en: { ietf: 'en-HK', tk: 'pps7abe.css', base: '' },
-  in: { ietf: 'en-IN', tk: 'pps7abe.css', base: '' },
+  in: { ietf: 'en-IN', tk: 'pps7abe.css' },
   id_id: { ietf: 'id-ID', tk: 'czc0mun.css' },
   id_en: { ietf: 'en-ID', tk: 'pps7abe.css', base: '' },
   my_ms: { ietf: 'ms-MY', tk: 'sxj4tvo.css' },
@@ -256,7 +256,7 @@ const locales = {
   gr_el: { ietf: 'el-GR', tk: 'fnx0rsr.css' }, // Greece (Greek)
   el: { ietf: 'el', tk: 'aaz7dvd.css' },
   vn_vi: { ietf: 'vi-VN', tk: 'jii8bki.css' },
-  vn_en: { ietf: 'en-VN', tk: 'pps7abe.css' },
+  vn_en: { ietf: 'en-VN', tk: 'pps7abe.css', base: '' },
 };
 
 // Add any config options.
