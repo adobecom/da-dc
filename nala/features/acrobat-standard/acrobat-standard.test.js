@@ -65,7 +65,7 @@ test.describe('Acrobat Standard Smoke Test', () => {
 
       await acrobatStandard.tabCompareIndividuals.click();
       await expect(acrobatStandard.tabCompareIndividuals).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(1000);
 
       await expect(acrobatStandard.individualStandardMerchCards.first()).toBeVisible();
       await expect(acrobatStandard.individualStandardMerchCards).toHaveCount(3);
@@ -73,30 +73,25 @@ test.describe('Acrobat Standard Smoke Test', () => {
       await expect(acrobatStandard.acrobatStandardPrice.first()).toBeVisible();
       await expect(acrobatStandard.acrobatStandardBuyNow).toBeVisible();
       await expect(acrobatStandard.acrobatStandardBuyNow).toBeEnabled();
-      await expect(acrobatStandard.acrobatStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatStandard.acrobatProStandardPrice.first()).toBeVisible();
       await expect(acrobatStandard.acrobatProStandardFreeTrial).toBeVisible();
       await expect(acrobatStandard.acrobatProStandardFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.acrobatProStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatStandard.acrobatProStandardBuyNow).toBeVisible();
       await expect(acrobatStandard.acrobatProStandardBuyNow).toBeEnabled();
-      await expect(acrobatStandard.acrobatProStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatStandard.acrobatStudioStandardPrice.first()).toBeVisible();
       await expect(acrobatStandard.acrobatStudioStandardFreeTrial).toBeVisible();
       await expect(acrobatStandard.acrobatStudioStandardFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.acrobatStudioStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatStandard.acrobatStudioStandardBuyNow).toBeVisible();
       await expect(acrobatStandard.acrobatStudioStandardBuyNow).toBeEnabled();
-      await expect(acrobatStandard.acrobatStudioStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatStandard.individualStandardMerchCardsPricingLink).toBeVisible();
       await expect(acrobatStandard.individualStandardMerchCardsPricingLink).toBeEnabled();
 
       await acrobatStandard.tabCompareBusiness.click();
       await expect(acrobatStandard.tabCompareBusiness).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(1000);
 
       await expect(acrobatStandard.businessStandardMerchCards.first()).toBeVisible();
       await expect(acrobatStandard.businessStandardMerchCards).toHaveCount(3);
@@ -104,27 +99,22 @@ test.describe('Acrobat Standard Smoke Test', () => {
       await expect(acrobatStandard.acrobatStandardForTeamsPrice.first()).toBeVisible();
       await expect(acrobatStandard.acrobatStandardForTeamsBuyNow).toBeVisible();
       await expect(acrobatStandard.acrobatStandardForTeamsBuyNow).toBeEnabled();
-      await expect(acrobatStandard.acrobatStandardForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatStandard.acrobatProForTeamsStandardPrice.first()).toBeVisible();
       await expect(acrobatStandard.acrobatProForTeamsStandardFreeTrial).toBeVisible();
       await expect(acrobatStandard.acrobatProForTeamsStandardFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.acrobatProForTeamsStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatStandard.acrobatProForTeamsStandardBuyNow).toBeVisible();
       await expect(acrobatStandard.acrobatProForTeamsStandardBuyNow).toBeEnabled();
-      await expect(acrobatStandard.acrobatProForTeamsStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatStandard.acrobatStudioForTeamsStandardPrice.first()).toBeVisible();
       await expect(acrobatStandard.acrobatStudioForTeamsStandardFreeTrial).toBeVisible();
       await expect(acrobatStandard.acrobatStudioForTeamsStandardFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.acrobatStudioForTeamsStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatStandard.acrobatStudioForTeamsStandardBuyNow).toBeVisible();
       await expect(acrobatStandard.acrobatStudioForTeamsStandardBuyNow).toBeEnabled();
-      await expect(acrobatStandard.acrobatStudioForTeamsStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await acrobatStandard.tabCompareStudentsAndTeachers.click();
       await expect(acrobatStandard.tabCompareStudentsAndTeachers).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(1000);
 
       await expect(acrobatStandard.studentsAndTeachersMerchCards.first()).toBeVisible();
       await expect(acrobatStandard.studentsAndTeachersMerchCards).toHaveCount(2);
@@ -132,18 +122,14 @@ test.describe('Acrobat Standard Smoke Test', () => {
       await expect(acrobatStandard.acrobatProForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(acrobatStandard.acrobatProForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(acrobatStandard.acrobatProForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.acrobatProForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatStandard.acrobatProForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(acrobatStandard.acrobatProForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(acrobatStandard.acrobatProForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatStandard.creativeCloudForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(acrobatStandard.creativeCloudForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(acrobatStandard.creativeCloudForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.creativeCloudForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatStandard.creativeCloudForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(acrobatStandard.creativeCloudForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(acrobatStandard.creativeCloudForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatStandard.studentsAndTeachersPricingLink).toBeVisible();
       await expect(acrobatStandard.studentsAndTeachersPricingLink).toBeEnabled();

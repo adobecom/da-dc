@@ -31,23 +31,23 @@ export default class AcrobatStandardPage {
     this.individualStandardMerchCardAcrobatStandard = this.individualStandardMerchCards.nth(0);
     this.acrobatStandardPrice = this.individualStandardMerchCardAcrobatStandard.locator('span[is*="inline-price"]');
     this.acrobatStandardBuyNow = this.individualStandardMerchCardAcrobatStandard.locator(
-      'a[is*="checkout-link"][href*="ot=BASE"]',
+      'a[data-wcs-osi="QgYu51CVY2wKyFEqMuvec4N1tc1OaCypeKJjT5n2-Fc"]',
     );
     this.individualStandardMerchCardAcrobatPro = this.individualStandardMerchCards.nth(1);
     this.acrobatProStandardPrice = this.individualStandardMerchCardAcrobatPro.locator('span[is*="inline-price"]');
     this.acrobatProStandardFreeTrial = this.individualStandardMerchCardAcrobatPro.locator(
-      'a[is*="checkout-link"][href*="ot=TRIAL"]',
+      'a[data-wcs-osi="-lYm-YaTSZoUgv1gzqCgybgFotLqRsLwf8CgYdvdnsQ"]',
     );
     this.acrobatProStandardBuyNow = this.individualStandardMerchCardAcrobatPro.locator(
-      'a[is*="checkout-link"][href*="ot=BASE"]',
+      'a[data-wcs-osi="vQmS1H18A6_kPd0tYBgKnp-TQIF0GbT6p8SH8rWcLMs"]',
     );
     this.individualStandardMerchCardAcrobatStudio = this.individualStandardMerchCards.nth(2);
     this.acrobatStudioStandardPrice = this.individualStandardMerchCardAcrobatStudio.locator('span[is*="inline-price"]');
     this.acrobatStudioStandardFreeTrial = this.individualStandardMerchCardAcrobatStudio.locator(
-      'a[is*="checkout-link"][href*="ot=TRIAL"]',
+      'a[data-wcs-osi="x0LkInr7lGkqK8dcTFS_Pc6oHauo_g7N_4yWT_gLn20"]',
     );
     this.acrobatStudioStandardBuyNow = this.individualStandardMerchCardAcrobatStudio.locator(
-      'a[is*="checkout-link"][href*="ot=BASE"]',
+      'a[data-wcs-osi="V3W0kzf4e6M2Ht1hP9ZAt3dQNmhuDFrmYmEPlE2SlG0"]',
     );
     this.individualStandardMerchCardsPricingLink = this.individualStandardMerchCardsContainer.locator(
       'div[class="body-m action-area"] a',
@@ -62,31 +62,31 @@ export default class AcrobatStandardPage {
       'span[is*="inline-price"]',
     );
     this.acrobatStandardForTeamsBuyNow = this.businessStandardMerchCardAcrobatStandardForTeams.locator(
-      'a[is*="checkout-link"][href*="ot=BASE"]',
+      'a[data-wcs-osi="AW-jV275GNYtPao6Q7XWENqyv_Stkc1BbzF7ak2u1dk"]',
     );
     this.businessStandardMerchCardAcrobatProForTeams = this.businessStandardMerchCards.nth(1);
     this.acrobatProForTeamsStandardPrice = this.businessStandardMerchCardAcrobatProForTeams.locator(
       'span[is*="inline-price"]',
     );
     this.acrobatProForTeamsStandardFreeTrial = this.businessStandardMerchCardAcrobatProForTeams.locator(
-      'a[is*="checkout-link"][href*="ot=TRIAL"]',
+      'a[data-wcs-osi="8Lr09qx_PHqAJUwvUNiof4FFFEKjsR1TTbvBUncV2b0"]',
     );
     this.acrobatProForTeamsStandardBuyNow = this.businessStandardMerchCardAcrobatProForTeams.locator(
-      'a[is*="checkout-link"][href*="ot=BASE"]',
+      'a[data-wcs-osi="vV01ci-KLH6hYdRfUKMBFx009hdpxZcIRG1-BY_PutE"]',
     );
     this.businessStandardMerchCardAcrobatStudioForTeams = this.businessStandardMerchCards.nth(2);
     this.acrobatStudioForTeamsStandardPrice = this.businessStandardMerchCardAcrobatStudioForTeams.locator(
       'span[is*="inline-price"]',
     );
     this.acrobatStudioForTeamsStandardFreeTrial = this.businessStandardMerchCardAcrobatStudioForTeams.locator(
-      'a[is*="checkout-link"][href*="ot=TRIAL"]',
+      'a[data-wcs-osi="PVhDPYXq4fsy15OdlEE-XyIlvcxaPMxGs73pw39Cx-s"]',
     );
     this.acrobatStudioForTeamsStandardBuyNow = this.businessStandardMerchCardAcrobatStudioForTeams.locator(
-      'a[is*="checkout-link"][href*="ot=BASE"]',
+      'a[data-wcs-osi="SfkorgyrBAsqBVpyKddQQEn6jR0ItBohpXc74sZcKHg"]',
     );
 
     this.studentsAndTeachersContainer = page.locator(
-      'div[data-path="/dc-shared/fragments/merch-cards/acrobat-students-and-teachers"]',
+      'div[data-path="/dc-shared/fragments/merch-cards/acrobat-students-and-teachers-abm"]',
     );
     this.studentsAndTeachersMerchCards = this.studentsAndTeachersContainer.locator('merch-card');
     this.acrobatProForStudentsAndTeachers = this.studentsAndTeachersMerchCards.nth(0);
@@ -94,20 +94,20 @@ export default class AcrobatStandardPage {
       'p[slot="heading-m-price"] span[is*="inline-price"]',
     );
     this.acrobatProForStudentsAndTeachersFreeTrial = this.acrobatProForStudentsAndTeachers.locator(
-      'a[is*="checkout-link"][href*="ot=TRIAL"]',
+      'a[data-wcs-osi="WJLr3TF4T4qyJIGZTsDf9KPbTfxA7qAgStpaF2IgYao"]',
     );
     this.acrobatProForStudentsAndTeachersBuyNow = this.acrobatProForStudentsAndTeachers.locator(
-      'a[is*="checkout-link"][href*="ot=BASE"]',
+      'a[data-wcs-osi="ZZQMV2cU-SWQoDxuznonUFMRdxSyTr4J3fB77YBNakY"]',
     );
     this.creativeCloudForStudentsAndTeachers = this.studentsAndTeachersMerchCards.nth(1);
     this.creativeCloudForStudentsAndTeachersPrice = this.creativeCloudForStudentsAndTeachers.locator(
       'p[slot="heading-m-price"] span[is*="inline-price"]',
     );
     this.creativeCloudForStudentsAndTeachersFreeTrial = this.creativeCloudForStudentsAndTeachers.locator(
-      'a[is*="checkout-link"][href*="ot=TRIAL"]',
+      'a[data-wcs-osi="OQ1oCm1tZG35Gj7LCrkGeOOdUMfVlC7xx-7ml-CTWIE"]',
     );
     this.creativeCloudForStudentsAndTeachersBuyNow = this.creativeCloudForStudentsAndTeachers.locator(
-      'a[is*="checkout-link"][href*="ot=BASE"]',
+      'a[data-wcs-osi="Hnk2P6L5wYhnpZLFYTW5upuk2Y3AJXlso8VGWQ0l2TI"]',
     );
     this.studentsAndTeachersPricingLink = this.studentsAndTeachersContainer.locator(
       'div[class="body-m action-area"] a',
