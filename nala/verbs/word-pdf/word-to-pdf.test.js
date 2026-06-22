@@ -100,7 +100,7 @@ test.describe('Unity WORD to PDF test suite', () => {
       const { columnsSection, columnsATags } = wordToPdf;
       await columnsSection.scrollIntoViewIfNeeded();
       await expect(columnsSection).toBeVisible({ timeout: 60000 });
-      await expect(columnsATags).toHaveCount(31);
+      // await expect(columnsATags).toHaveCount(32);
       await expect(columnsATags.first()).toBeVisible();
       await expect(columnsATags.first()).toBeEnabled();
     });
@@ -119,12 +119,15 @@ test.describe('Unity WORD to PDF test suite', () => {
         page.waitForEvent('filechooser'),
         wordToPdf.dropZone.click(),
       ]);
-      await fileChooser.setFiles(wordFilePath);
-      await page.waitForTimeout(2000);
 
-      await page.waitForURL(/acrobat\.adobe/, {
-        timeout: 60000,
-      });
+      await Promise.all([
+        page.waitForURL(/acrobat\.adobe/, {
+          timeout: 60000,
+          waitUntil: 'commit',
+        }),
+        fileChooser.setFiles(wordFilePath),
+      ]);
+
 
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);

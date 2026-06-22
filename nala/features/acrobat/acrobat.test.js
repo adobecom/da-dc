@@ -36,7 +36,7 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
 
     await test.step('Verify carousel', async () => {
       const { carousel, carouselSlides, carouselNext, carouselPrevious, carouselIndicators } = acrobat;
-
+      await page.waitForTimeout(1000);
       await carousel.scrollIntoViewIfNeeded();
       await expect(carousel).toBeVisible();
       // Slides/indicators often hydrate after paint — wait before counting.

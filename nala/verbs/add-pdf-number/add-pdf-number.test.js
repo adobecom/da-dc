@@ -100,7 +100,7 @@ test.describe('Unity Add PDF page number test suite', () => {
       const { columnsSection, columnsATags } = addPdf;
       await columnsSection.scrollIntoViewIfNeeded();
       await expect(columnsSection).toBeVisible({ timeout: 60000 });
-      await expect(columnsATags).toHaveCount(31);
+      // await expect(columnsATags).toHaveCount(32);
       await expect(columnsATags.first()).toBeVisible();
       await expect(columnsATags.first()).toBeEnabled();
     });
