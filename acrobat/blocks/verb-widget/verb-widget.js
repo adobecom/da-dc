@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable compat/compat */
 import { setLibs, getEnv, isOldBrowser } from '../../scripts/utils.js';
+import { localeMap } from '../unity/unity.js';
 
 const miloLibs = setLibs('/libs');
 
@@ -35,6 +36,13 @@ const verbRedirMap = {
   'insert-pdf': 'insert',
   'compress-pdf': 'compress',
   'png-to-pdf': 'jpgtopdf',
+  'image-to-pdf': 'jpgtopdf',
+  'bmp-to-pdf': 'jpgtopdf',
+  'gif-to-pdf': 'jpgtopdf',
+  'tiff-to-pdf': 'jpgtopdf',
+  'indd-to-pdf': 'jpgtopdf',
+  'psd-to-pdf': 'jpgtopdf',
+  'ai-to-pdf': 'jpgtopdf',
   'number-pages': 'number',
   'ocr-pdf': 'ocr',
   'chat-pdf': 'chat',
@@ -60,12 +68,18 @@ const MB100 = 104857600;
 const MB250 = 262144000;
 const PDF_ONLY = ['.pdf'];
 const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
+const ALL_FILES_WITH_HEIC = [...ALL_FILES, '.heic'];
 const STUDENT_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt'];
 const SIGNED_IN_FILES = ['.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
 
 const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
 const MULTI_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, multipleFiles: true };
 const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
+const MULTI_ALL_HEIC = {
+  maxFileSize: MB100,
+  acceptedFiles: ALL_FILES_WITH_HEIC,
+  multipleFiles: true,
+};
 const GENAI_MULTI = { ...MULTI_ALL, maxNumFiles: 100, uploadType: 'multifile-only', subCopy: true, genAI: true };
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
@@ -98,6 +112,7 @@ export const LIMITS = {
   ...group(['pdf-to-excel', 'pdf-to-image', 'pdf-to-png'], MULTI_PDF),
   ...group(['pdf-to-word', 'pdf-to-ppt'], { maxFileSize: MB250, acceptedFiles: PDF_ONLY, multipleFiles: true }),
   ...group(['createpdf', 'word-to-pdf', 'jpg-to-pdf', 'png-to-pdf', 'excel-to-pdf', 'ppt-to-pdf'], MULTI_ALL),
+  ...group(['image-to-pdf', 'bmp-to-pdf', 'gif-to-pdf', 'tiff-to-pdf', 'indd-to-pdf', 'psd-to-pdf', 'ai-to-pdf'], MULTI_ALL_HEIC),
 };
 
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
@@ -112,10 +127,12 @@ const setDraggingClass = (widget, shouldToggle) => {
 };
 
 function prefetchTarget() {
+  if (window.prefetchTargetLoaded) return;
   const iframe = document.createElement('iframe');
   iframe.src = window.prefetchTargetUrl;
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
+  window.prefetchTargetLoaded = true;
 }
 
 function prefetchNextPage(url) {
@@ -133,6 +150,15 @@ function initiatePrefetch(url) {
     prefetchNextPage(url);
     window.prefetchTargetUrl = url;
   }
+}
+
+function buildWordToPdfEarlyPrefetchUrl() {
+  const langFromPath = window.location.pathname.split('/')[1];
+  const locale = localeMap[langFromPath] || 'en-us';
+  const [languageCode, languageRegion] = locale.split('-');
+  const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
+  const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
+  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
 }
 
 function redDirLink(verb) {
@@ -749,13 +775,17 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    setTimeout(() => {
+    if (VERB === 'word-to-pdf') {
       window.dispatchEvent(redirectReady);
-      window.lana?.log(
-        'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
-        { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
-      );
-    }, 3000);
+    } else {
+      setTimeout(() => {
+        window.dispatchEvent(redirectReady);
+        window.lana?.log(
+          'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
+          { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
+        );
+      }, 3000);
+    }
     setCookie('UTS_Uploaded', Date.now(), cookieExp);
     const calcUploadedTime = uploadedTime();
     const metadata = { ...data, uploadTime: calcUploadedTime, userAttempts: attempts };
@@ -785,6 +815,15 @@ export default async function init(element) {
   window.addEventListener('IMS:Ready', checkSignedInUser);
 
   window.prefetchTargetUrl = null;
+
+  if (VERB === 'word-to-pdf') {
+    const triggerEarlyPrefetch = () => {
+      initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
+      prefetchTarget();
+    };
+    document.addEventListener('click', triggerEarlyPrefetch, { once: true });
+    document.addEventListener('dragover', triggerEarlyPrefetch, { once: true });
+  }
 
   element.parentNode.style.display = 'block';
 
@@ -837,11 +876,26 @@ export default async function init(element) {
     noOfFiles = files.length;
   });
 
-  errorCloseBtn.addEventListener('click', () => {
+  let outsideClickHandler = null;
+  const closeError = () => {
     errorState.classList.remove('verb-error');
     errorState.classList.add('hide');
     errorStateText.textContent = '';
     clearSrAlert();
+    if (outsideClickHandler) {
+      document.removeEventListener('click', outsideClickHandler);
+      outsideClickHandler = null;
+    }
+  };
+  errorCloseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeError();
+  });
+  errorCloseBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      closeError();
+    }
   });
 
   element.addEventListener('unity:track-analytics', (e) => {
@@ -902,6 +956,14 @@ export default async function init(element) {
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
       announceToScreenReader(message);
+      errorCloseBtn.focus();
+      setTimeout(() => {
+        if (outsideClickHandler) return;
+        outsideClickHandler = (e) => {
+          if (!errorState.contains(e.target)) closeError();
+        };
+        document.addEventListener('click', outsideClickHandler);
+      }, 0);
     }
     if (logToLana) {
       window.lana?.log(
@@ -909,12 +971,6 @@ export default async function init(element) {
         logOptions,
       );
     }
-
-    setTimeout(() => {
-      errorState.classList.remove('verb-error');
-      errorState.classList.add('hide');
-      errorStateText.textContent = '';
-    }, 5000);
   };
 
   element.addEventListener('unity:show-error-toast', (e) => {

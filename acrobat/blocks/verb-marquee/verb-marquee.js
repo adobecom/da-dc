@@ -1,7 +1,10 @@
 import { setLibs, isOldBrowser, loadPlaceholders, getEnv as getAppEnv } from '../../scripts/utils.js';
+import { localeMap } from '../unity/unity.js';
 
 const MB100 = 104857600;
+const MB20 = 20971520;
 const PDF_ONLY = ['.pdf'];
+const DOC_ONLY = ['.pdf', '.doc', '.docx'];
 const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
 const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
 const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
@@ -10,6 +13,7 @@ const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; ret
 export const LIMITS = {
   fillsign: { ...SINGLE_PDF, mobileApp: true },
   'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, genAI: true },
+  'resume-builder': { maxFileSize: MB20, acceptedFiles: DOC_ONLY, maxNumFiles: 1, genAI: true },
   ...group(['word-to-pdf', 'jpg-to-pdf'], MULTI_ALL),
 };
 
@@ -68,7 +72,9 @@ function createSvgElement(iconName) {
 
 const getCTA = (verb) => {
   const verbConfig = LIMITS[verb];
-  return window.mph?.[`verb-widget-cta-${verbConfig?.uploadType}`] || window.mph?.['verb-widget-cta'] || '';
+  return window.mph?.[`verb-marquee-${verb}-upload-cta`]
+    || window.mph?.[`verb-widget-cta-${verbConfig?.uploadType}`]
+    || window.mph?.['verb-widget-cta'] || '';
 };
 
 function isMobileDevice() {
@@ -162,10 +168,12 @@ let tabClosureSent = false;
 let isUploading = false;
 
 function prefetchTarget() {
+  if (window.prefetchTargetLoaded) return;
   const iframe = document.createElement('iframe');
   iframe.src = window.prefetchTargetUrl;
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
+  window.prefetchTargetLoaded = true;
 }
 
 function prefetchNextPage(url) {
@@ -182,6 +190,15 @@ function initiatePrefetch(url) {
     prefetchNextPage(url);
     window.prefetchTargetUrl = url;
   }
+}
+
+function buildWordToPdfEarlyPrefetchUrl() {
+  const langFromPath = window.location.pathname.split('/')[1];
+  const locale = localeMap[langFromPath] || 'en-us';
+  const [languageCode, languageRegion] = locale.split('-');
+  const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
+  const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
+  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
 }
 
 function handleExit(event, verb, userObj, unloadFlag, workflowStep) {
@@ -288,6 +305,16 @@ function processMedia(mediaDiv) {
   return mediaDiv;
 }
 
+function getAuthoredSvgInfo(foregroundEl, headlineEl) {
+  if (!foregroundEl) return null;
+  const headingCell = headlineEl
+    && [...foregroundEl.children].find((div) => div.contains(headlineEl));
+  const searchRoot = headingCell || foregroundEl;
+  const svgImg = searchRoot.querySelector('img[src$=".svg"]');
+  if (!svgImg) return null;
+  return { url: svgImg.getAttribute('src').trim(), altText: svgImg.getAttribute('alt') || '' };
+}
+
 export default async function init(element) {
   ({ createTag, getConfig, loadStyle } = (await import(`${miloLibs}/utils/utils.js`)));
   ({ decorateBlockBg } = (await import(`${miloLibs}/utils/decorate.js`)));
@@ -389,6 +416,7 @@ export default async function init(element) {
   if (text) {
     text.classList.add('text');
   }
+  const authoredSvg = getAuthoredSvgInfo(foreground, headline);
   const media = foreground.querySelector(':scope > div:not([class])');
   if (media) {
     processMedia(media);
@@ -398,18 +426,27 @@ export default async function init(element) {
   const leftCol = createTag('div', { class: 'verb-marquee-col verb-marquee-col-left' });
   const rightCol = createTag('div', { class: 'verb-marquee-col verb-marquee-col-right' });
   const header = createTag('div', { class: 'verb-marquee-header' });
-  const iconWrapper = createTag('div', { class: 'acrobat-icon' });
-  const widgetIconSvg = createSvgElement('WIDGET_ICON');
-  if (widgetIconSvg) {
-    widgetIconSvg.classList.add('icon-acrobat');
-    widgetIconSvg.setAttribute('aria-hidden', 'true');
-    iconWrapper.appendChild(widgetIconSvg);
+  if (authoredSvg) {
+    const svgImg = createTag('img', {
+      src: authoredSvg.url,
+      alt: authoredSvg.altText,
+      class: 'verb-marquee-title-svg',
+    });
+    header.append(svgImg);
+  } else {
+    const iconWrapper = createTag('div', { class: 'acrobat-icon' });
+    const widgetIconSvg = createSvgElement('WIDGET_ICON');
+    if (widgetIconSvg) {
+      widgetIconSvg.classList.add('icon-acrobat');
+      widgetIconSvg.setAttribute('aria-hidden', 'true');
+      iconWrapper.appendChild(widgetIconSvg);
+    }
+    const title = createTag('div', { class: 'verb-marquee-title' });
+    const adobeText = createTag('span', {}, 'Adobe');
+    const studySpaceText = createTag('span', {}, ' Acrobat');
+    title.append(adobeText, studySpaceText);
+    header.append(iconWrapper, title);
   }
-  const title = createTag('div', { class: 'verb-marquee-title' });
-  const adobeText = createTag('span', {}, 'Adobe');
-  const studySpaceText = createTag('span', {}, ' Acrobat');
-  title.append(adobeText, studySpaceText);
-  header.append(iconWrapper, title);
   const headingEl = createTag('h1', { class: 'verb-marquee-heading' }, heading);
   const isMobileOrTabletViewport = window.innerWidth < 1200;
   const copy1Text = isMobileOrTabletViewport
@@ -647,13 +684,17 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    setTimeout(() => {
+    if (VERB === 'word-to-pdf') {
       window.dispatchEvent(redirectReady);
-      window.lana?.log(
-        'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
-        { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
-      );
-    }, 3000);
+    } else {
+      setTimeout(() => {
+        window.dispatchEvent(redirectReady);
+        window.lana?.log(
+          'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
+          { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
+        );
+      }, 3000);
+    }
     setCookie('UTS_Uploaded', Date.now(), cookieExp);
     const calcUploadedTime = uploadedTime();
     const metadata = { ...data, uploadTime: calcUploadedTime, userAttempts: attempts };
@@ -668,6 +709,17 @@ export default async function init(element) {
   const setDraggingClass = (shouldToggle) => {
     dropzone.classList.toggle('dragging', !!shouldToggle);
   };
+  let outsideClickHandler = null;
+  const closeError = () => {
+    errorState.classList.remove('verb-marquee-error');
+    errorState.classList.add('hide');
+    errorStateText.textContent = '';
+    clearSrAlert();
+    if (outsideClickHandler) {
+      document.removeEventListener('click', outsideClickHandler);
+      outsideClickHandler = null;
+    }
+  };
   const handleError = (detail, logToLana = false, logOptions = {}) => {
     const { code, message, status, info = 'No additional info provided', accountType = 'Unknown account type' } = detail;
     if (message) {
@@ -676,6 +728,14 @@ export default async function init(element) {
       errorState.classList.remove('hide');
       errorStateText.textContent = message;
       announceToScreenReader(message);
+      errorCloseBtn.focus();
+      setTimeout(() => {
+        if (outsideClickHandler) return;
+        outsideClickHandler = (e) => {
+          if (!errorState.contains(e.target)) closeError();
+        };
+        document.addEventListener('click', outsideClickHandler);
+      }, 0);
     }
     if (logToLana) {
       window.lana?.log(
@@ -683,11 +743,6 @@ export default async function init(element) {
         logOptions,
       );
     }
-    setTimeout(() => {
-      errorState.classList.remove('verb-marquee-error');
-      errorState.classList.add('hide');
-      errorStateText.textContent = '';
-    }, 5000);
   };
   if (useFileUpload && fileInput) {
     ctaButton.addEventListener('click', () => {
@@ -746,11 +801,15 @@ export default async function init(element) {
       window.analytics.verbAnalytics('choose-file:close', VERB, { userAttempts });
     });
   }
-  errorCloseBtn.addEventListener('click', () => {
-    errorState.classList.remove('verb-marquee-error');
-    errorState.classList.add('hide');
-    errorStateText.textContent = '';
-    clearSrAlert();
+  errorCloseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeError();
+  });
+  errorCloseBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      closeError();
+    }
   });
   function soloUpload() {
     if (!useFileUpload || !fileInput || !ctaButton) return;
@@ -899,7 +958,7 @@ export default async function init(element) {
     }
     const { codeRoot = '/acrobat' } = getConfig() || {};
     loadStyle(`${codeRoot}/blocks/verb-widget/verb-widget.css`);
-    const headingForWidget = heading || window.mph?.[`verb-widget-${VERB}-title`] || '\u00a0';
+    const headingForWidget = heading || window.mph?.[`verb-widget-${VERB}-title`] || ' ';
     const widgetRoot = createTag('div', { class: `verb-widget ${VERB}` });
     widgetRoot.dataset.dcInjectedFromMarquee = 'true';
     widgetRoot.append(createTag('div', {}, headingForWidget));
@@ -929,6 +988,16 @@ export default async function init(element) {
   await checkSignedInUser();
   window.addEventListener('IMS:Ready', checkSignedInUser);
   window.prefetchTargetUrl = null;
+
+  if (VERB === 'word-to-pdf') {
+    const triggerEarlyPrefetch = () => {
+      initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
+      prefetchTarget();
+    };
+    document.addEventListener('click', triggerEarlyPrefetch, { once: true });
+    document.addEventListener('dragover', triggerEarlyPrefetch, { once: true });
+  }
+
   element.parentNode.style.display = 'block';
   window.addEventListener('pageshow', (event) => {
     const historyTraversal = event.persisted
