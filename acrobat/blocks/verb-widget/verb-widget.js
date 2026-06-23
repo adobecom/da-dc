@@ -512,6 +512,13 @@ export default async function init(element) {
 
   const isMobile = isMobileDevice();
   const isTablet = isTabletDevice();
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const IOS_UNKNOWN_EXTS = new Set(['.ai', '.psd', '.indd', '.form']);
+  const getAcceptValue = (verb) => {
+    const accepted = LIMITS[verb]?.acceptedFiles;
+    if (isIOS && accepted?.some((ext) => IOS_UNKNOWN_EXTS.has(ext))) return '*/*';
+    return accepted;
+  };
 
   const { locale } = getConfig();
   const ppURL = window.mph['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
@@ -573,7 +580,7 @@ export default async function init(element) {
 
   const button = createTag('input', {
     type: 'file',
-    accept: LIMITS[VERB]?.acceptedFiles,
+    accept: getAcceptValue(VERB),
     id: 'file-upload',
     class: 'hide',
     'aria-hidden': true,
