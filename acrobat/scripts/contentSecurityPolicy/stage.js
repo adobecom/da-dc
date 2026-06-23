@@ -61,6 +61,7 @@ const connectSrc = [
   'facebook.com',
   'px.ads.linkedin.com',
   'tr6.snapchat.com',
+  'd1cs8rv7y10x0a.cloudfront.net',
   ';',
 ];
 
