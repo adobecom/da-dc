@@ -14,7 +14,7 @@ export const LIMITS = {
   fillsign: { ...SINGLE_PDF, mobileApp: true },
   'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, genAI: true },
   'resume-builder': { maxFileSize: MB20, acceptedFiles: DOC_ONLY, maxNumFiles: 1, genAI: true },
-  ...group(['word-to-pdf', 'jpg-to-pdf'], MULTI_ALL),
+  ...group(['word-to-pdf', 'jpg-to-pdf'], { ...MULTI_ALL, noRedirectTimeout: true }),
 };
 
 const miloLibs = setLibs('/libs');
@@ -684,7 +684,7 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    if (VERB === 'word-to-pdf') {
+    if (LIMITS[VERB]?.noRedirectTimeout) {
       window.dispatchEvent(redirectReady);
     } else {
       setTimeout(() => {
