@@ -9,7 +9,11 @@ module.exports = {
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Flashcard maker',
-        verbCopy: 'Study better and faster with flashcards in Student Spaces. Turn class notes, readings, or files into study tools for free. No download required.',
+        verbCopy: 'Upload your class materials to create flashcards. Start for free, no sign-up or credit card required.',
+        sectionCounts: {
+          threeUp: 1,
+          twoUp: 2,
+        },
       },
       tags: '@flashcard-maker-test @smoke @regression @unity',
     },

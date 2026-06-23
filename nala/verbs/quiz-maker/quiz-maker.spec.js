@@ -9,7 +9,11 @@ module.exports = {
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Quiz maker',
-        verbCopy: 'Create quizzes and practice tests quickly with Student Spaces for free. No sign-up or credit card required.',
+        verbCopy: 'Upload your class materials to create a quiz or practice test. Start for free, no sign-up or credit card required.',
+        sectionCounts: {
+          threeUp: 1,
+          twoUp: 2,
+        },
       },
       tags: '@quiz-maker-test @smoke @regression @unity',
     },
