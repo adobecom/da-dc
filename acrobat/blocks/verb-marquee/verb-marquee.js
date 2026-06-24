@@ -14,7 +14,7 @@ export const LIMITS = {
   fillsign: { ...SINGLE_PDF, mobileApp: true },
   'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, genAI: true },
   'resume-builder': { maxFileSize: MB20, acceptedFiles: DOC_ONLY, maxNumFiles: 1, genAI: true },
-  ...group(['word-to-pdf', 'jpg-to-pdf'], MULTI_ALL),
+  ...group(['word-to-pdf', 'jpg-to-pdf'], { ...MULTI_ALL, noRedirectTimeout: true }),
 };
 
 const miloLibs = setLibs('/libs');
@@ -198,7 +198,7 @@ function buildWordToPdfEarlyPrefetchUrl() {
   const [languageCode, languageRegion] = locale.split('-');
   const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
   const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
-  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
+  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf/av?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
 }
 
 function handleExit(event, verb, userObj, unloadFlag, workflowStep) {
@@ -684,7 +684,7 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    if (VERB === 'word-to-pdf') {
+    if (LIMITS[VERB]?.noRedirectTimeout) {
       window.dispatchEvent(redirectReady);
     } else {
       setTimeout(() => {

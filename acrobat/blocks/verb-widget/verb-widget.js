@@ -111,7 +111,8 @@ export const LIMITS = {
   ...group(['combine-pdf', 'rotate-pages'], { ...MULTI_PDF, maxNumFiles: 100, uploadType: 'multifile-only' }),
   ...group(['pdf-to-excel', 'pdf-to-image', 'pdf-to-png'], MULTI_PDF),
   ...group(['pdf-to-word', 'pdf-to-ppt'], { maxFileSize: MB250, acceptedFiles: PDF_ONLY, multipleFiles: true }),
-  ...group(['createpdf', 'word-to-pdf', 'jpg-to-pdf', 'png-to-pdf', 'excel-to-pdf', 'ppt-to-pdf'], MULTI_ALL),
+  ...group(['createpdf', 'png-to-pdf', 'excel-to-pdf', 'ppt-to-pdf'], MULTI_ALL),
+  ...group(['word-to-pdf', 'jpg-to-pdf'], { ...MULTI_ALL, noRedirectTimeout: true }),
   ...group(['image-to-pdf', 'bmp-to-pdf', 'gif-to-pdf', 'tiff-to-pdf', 'indd-to-pdf', 'psd-to-pdf', 'ai-to-pdf'], MULTI_ALL_HEIC),
 };
 
@@ -158,7 +159,7 @@ function buildWordToPdfEarlyPrefetchUrl() {
   const [languageCode, languageRegion] = locale.split('-');
   const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
   const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
-  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
+  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf/av?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
 }
 
 function redDirLink(verb) {
@@ -512,6 +513,13 @@ export default async function init(element) {
 
   const isMobile = isMobileDevice();
   const isTablet = isTabletDevice();
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const IOS_UNKNOWN_EXTS = new Set(['.ai', '.psd', '.indd', '.form']);
+  const getAcceptValue = (verb) => {
+    const accepted = LIMITS[verb]?.acceptedFiles;
+    if (isIOS && accepted?.some((ext) => IOS_UNKNOWN_EXTS.has(ext))) return '*/*';
+    return accepted;
+  };
 
   const { locale } = getConfig();
   const ppURL = window.mph['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
@@ -573,7 +581,7 @@ export default async function init(element) {
 
   const button = createTag('input', {
     type: 'file',
-    accept: LIMITS[VERB]?.acceptedFiles,
+    accept: getAcceptValue(VERB),
     id: 'file-upload',
     class: 'hide',
     'aria-hidden': true,
@@ -775,7 +783,7 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    if (VERB === 'word-to-pdf') {
+    if (LIMITS[VERB]?.noRedirectTimeout) {
       window.dispatchEvent(redirectReady);
     } else {
       setTimeout(() => {

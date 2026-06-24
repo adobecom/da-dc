@@ -78,6 +78,11 @@ Ask as a multi-select, all optional:
 - `level: 0` — trial mode (no file picker, shows pricing CTA)
 - `subCopy` — show sub-description text from placeholders
 
+**Field 8 — `noRedirectTimeout`** *(all blocks)*
+
+- false *(omit field)* — after upload, `redirectReady` is dispatched after a 3-second timeout, giving Adobe Analytics time to fire its done callback first (default for most verbs)
+- true — `redirectReady` is dispatched immediately on upload, skipping the 3-second wait (use when the verb handles its own redirect timing, e.g. `word-to-pdf`, `jpg-to-pdf`)
+
 After collecting all answers, map them to the closest named constant if an exact match exists (e.g. `{ maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 }` → `SINGLE_PDF`) so the generated code stays readable. If no named constant matches, write the config inline.
 
 ### 1d. Verb icon SVG *(verb-widget only)*
@@ -152,6 +157,11 @@ The LIMITS object spans roughly lines 72–101. Add the new verb entry inside it
 
 Check whether an existing `group()` call uses the same config — if so, add the new verb to that array instead of creating a new entry.
 
+If `noRedirectTimeout` is true, spread it into the config:
+```js
+'<verb>': { ...MULTI_ALL, noRedirectTimeout: true },
+```
+
 ### study-marquee — `acrobat/blocks/study-marquee/study-marquee.js`
 
 Line 35. Add the new verb name to the existing array:
@@ -178,9 +188,16 @@ The LIMITS object is at lines 10–14. Same pattern as verb-widget:
 export const LIMITS = {
   fillsign: { ...SINGLE_PDF, mobileApp: true },
   'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, genAI: true },
-  ...group(['word-to-pdf', 'jpg-to-pdf'], MULTI_ALL),
+  ...group(['word-to-pdf', 'jpg-to-pdf'], { ...MULTI_ALL, noRedirectTimeout: true }),
   '<verb>': <config>,   // ← add here
 };
+```
+
+If `noRedirectTimeout` is true for the new verb, spread it into the config object. If the new verb shares a `group()` call with existing verbs that also have `noRedirectTimeout: true`, add it to that group array. Otherwise create a new entry or group with the flag included:
+```js
+'<verb>': { ...MULTI_ALL, noRedirectTimeout: true },
+// or
+...group(['existing-verb', '<verb>'], { ...MULTI_ALL, noRedirectTimeout: true }),
 ```
 
 ---
