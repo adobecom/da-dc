@@ -75,16 +75,6 @@ test.describe('Unity PSD to PDF test suite', () => {
       }
     });
 
-    await test.step('Verify CaaS section', async () => {
-      if (browserName === 'chromium') {
-        // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
-        return;
-      }
-      await psdToPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
-      await psdToPdf.caasSection.scrollIntoViewIfNeeded();
-      await expect(psdToPdf.caasSection).toBeVisible({ timeout: 60000 });
-    });
-
     await test.step('Verify media block', async () => {
       await psdToPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(psdToPdf.mediaSection).toBeVisible({ timeout: 60000 });

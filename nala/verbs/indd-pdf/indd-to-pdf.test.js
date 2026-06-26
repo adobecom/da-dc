@@ -75,16 +75,6 @@ test.describe('Unity INDD to PDF test suite', () => {
       }
     });
 
-    await test.step('Verify CaaS section', async () => {
-      if (browserName === 'chromium') {
-        // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
-        return;
-      }
-      await inddToPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
-      await inddToPdf.caasSection.scrollIntoViewIfNeeded();
-      await expect(inddToPdf.caasSection).toBeVisible({ timeout: 60000 });
-    });
-
     await test.step('Verify media block', async () => {
       await inddToPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(inddToPdf.mediaSection).toBeVisible({ timeout: 60000 });

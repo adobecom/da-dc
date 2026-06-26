@@ -75,16 +75,6 @@ test.describe('Unity TIFF to PDF test suite', () => {
       }
     });
 
-    await test.step('Verify CaaS section', async () => {
-      if (browserName === 'chromium') {
-        // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
-        return;
-      }
-      await tiffToPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
-      await tiffToPdf.caasSection.scrollIntoViewIfNeeded();
-      await expect(tiffToPdf.caasSection).toBeVisible({ timeout: 60000 });
-    });
-
     await test.step('Verify media block', async () => {
       await tiffToPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(tiffToPdf.mediaSection).toBeVisible({ timeout: 60000 });

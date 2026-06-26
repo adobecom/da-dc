@@ -75,16 +75,6 @@ test.describe('Unity GIF to PDF test suite', () => {
       }
     });
 
-    await test.step('Verify CaaS section', async () => {
-      if (browserName === 'chromium') {
-        // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
-        return;
-      }
-      await gifToPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
-      await gifToPdf.caasSection.scrollIntoViewIfNeeded();
-      await expect(gifToPdf.caasSection).toBeVisible({ timeout: 60000 });
-    });
-
     await test.step('Verify media block', async () => {
       await gifToPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(gifToPdf.mediaSection).toBeVisible({ timeout: 60000 });

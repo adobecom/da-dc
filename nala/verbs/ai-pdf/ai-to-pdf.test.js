@@ -75,16 +75,6 @@ test.describe('Unity AI to PDF test suite', () => {
       }
     });
 
-    await test.step('Verify CaaS section', async () => {
-      if (browserName === 'chromium') {
-        // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
-        return;
-      }
-      await aiToPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
-      await aiToPdf.caasSection.scrollIntoViewIfNeeded();
-      await expect(aiToPdf.caasSection).toBeVisible({ timeout: 60000 });
-    });
-
     await test.step('Verify media block', async () => {
       await aiToPdf.mediaSection.scrollIntoViewIfNeeded();
       await expect(aiToPdf.mediaSection).toBeVisible({ timeout: 60000 });

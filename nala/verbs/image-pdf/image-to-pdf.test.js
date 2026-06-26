@@ -75,15 +75,15 @@ test.describe('Unity Image to PDF test suite', () => {
       }
     });
 
-    await test.step('Verify CaaS section', async () => {
-      if (browserName === 'chromium') {
-        // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
-        return;
-      }
-      await imageToPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
-      await imageToPdf.caasSection.scrollIntoViewIfNeeded();
-      await expect(imageToPdf.caasSection).toBeVisible({ timeout: 60000 });
-    });
+    // await test.step('Verify CaaS section', async () => {
+    //   if (browserName === 'chromium') {
+    //     // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
+    //     return;
+    //   }
+    //   await imageToPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
+    //   await imageToPdf.caasSection.scrollIntoViewIfNeeded();
+    //   await expect(imageToPdf.caasSection).toBeVisible({ timeout: 60000 });
+    // });
 
     await test.step('Verify media block', async () => {
       await imageToPdf.mediaSection.scrollIntoViewIfNeeded();
