@@ -619,7 +619,7 @@ export default async function init(element) {
   const errorState = createTag('div', { class: 'error hide' });
   const errorStateText = createTag('p', { class: 'verb-errorText' });
   const errorIcon = createTag('div', { class: 'verb-errorIcon' });
-  const errorCloseBtn = createTag('div', { class: 'verb-errorBtn', role: 'button', tabindex: '0', 'aria-label': 'Close error' });
+  const errorCloseBtn = createTag('button', { class: 'verb-errorBtn', type: 'button', 'aria-label': 'Close error' });
   const srAlert = { announceTimer: null, cleanupTimer: null };
   const clearSrAlert = () => {
     clearTimeout(srAlert.announceTimer);
@@ -836,7 +836,7 @@ export default async function init(element) {
   element.parentNode.style.display = 'block';
 
   widget.addEventListener('click', (e) => {
-    if (e.srcElement.classList.value.includes('error')) { return; }
+    if (e.target.closest('.verb-errorBtn, .error')) { return; }
     if (e.srcElement.classList.value.includes('demo')) { return; }
     if (openFilePicker === true) { button.click(); }
   });
