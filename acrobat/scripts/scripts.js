@@ -207,7 +207,7 @@ const locales = {
   se: { ietf: 'sv-SE', tk: 'fpk1pcd.css' },
   ch_it: { ietf: 'it-CH', tk: 'bbf5pok.css' },
   tr: { ietf: 'tr-TR', tk: 'aaz7dvd.css' },
-  ae_en: { ietf: 'ar-EN', tk: 'pps7abe.css', dir: 'ltr', base: '' },
+  ae_en: { ietf: 'en', tk: 'pps7abe.css', dir: 'ltr', base: '' },
   uk: { ietf: 'en-GB', tk: 'pps7abe.css' },
   at: { ietf: 'de-AT', tk: 'vin7zsi.css' },
   cz: { ietf: 'cs-CZ', tk: 'aaz7dvd.css' },
