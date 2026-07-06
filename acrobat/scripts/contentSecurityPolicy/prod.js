@@ -61,6 +61,7 @@ const connectSrc = [
   'main--unity--adobecom.hlx.page',
   'main--unity--adobecom.aem.live',
   'main--unity--adobecom.aem.page',
+  'd2txqegjuzimaf.cloudfront.net',
   ';',
 ];
 

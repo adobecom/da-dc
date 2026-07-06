@@ -60,6 +60,7 @@ const connectSrc = [
   'px.ads.linkedin.com',
   'tr6.snapchat.com',
   'ad.doubleclick.net',
+  'd1cs8rv7y10x0a.cloudfront.net',
   ';',
 ];
 

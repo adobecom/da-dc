@@ -36,6 +36,13 @@ const verbRedirMap = {
   'insert-pdf': 'insert',
   'compress-pdf': 'compress',
   'png-to-pdf': 'jpgtopdf',
+  'image-to-pdf': 'jpgtopdf',
+  'bmp-to-pdf': 'jpgtopdf',
+  'gif-to-pdf': 'jpgtopdf',
+  'tiff-to-pdf': 'jpgtopdf',
+  'indd-to-pdf': 'jpgtopdf',
+  'psd-to-pdf': 'jpgtopdf',
+  'ai-to-pdf': 'jpgtopdf',
   'number-pages': 'number',
   'ocr-pdf': 'ocr',
   'chat-pdf': 'chat',
@@ -61,12 +68,18 @@ const MB100 = 104857600;
 const MB250 = 262144000;
 const PDF_ONLY = ['.pdf'];
 const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
+const ALL_FILES_WITH_HEIC = [...ALL_FILES, '.heic'];
 const STUDENT_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt'];
 const SIGNED_IN_FILES = ['.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
 
 const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
 const MULTI_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, multipleFiles: true };
 const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
+const MULTI_ALL_HEIC = {
+  maxFileSize: MB100,
+  acceptedFiles: ALL_FILES_WITH_HEIC,
+  multipleFiles: true,
+};
 const GENAI_MULTI = { ...MULTI_ALL, maxNumFiles: 100, uploadType: 'multifile-only', subCopy: true, genAI: true };
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
@@ -98,7 +111,9 @@ export const LIMITS = {
   ...group(['combine-pdf', 'rotate-pages'], { ...MULTI_PDF, maxNumFiles: 100, uploadType: 'multifile-only' }),
   ...group(['pdf-to-excel', 'pdf-to-image', 'pdf-to-png'], MULTI_PDF),
   ...group(['pdf-to-word', 'pdf-to-ppt'], { maxFileSize: MB250, acceptedFiles: PDF_ONLY, multipleFiles: true }),
-  ...group(['createpdf', 'word-to-pdf', 'jpg-to-pdf', 'png-to-pdf', 'excel-to-pdf', 'ppt-to-pdf'], MULTI_ALL),
+  ...group(['createpdf', 'png-to-pdf', 'excel-to-pdf', 'ppt-to-pdf'], MULTI_ALL),
+  ...group(['word-to-pdf', 'jpg-to-pdf'], { ...MULTI_ALL, noRedirectTimeout: true }),
+  ...group(['image-to-pdf', 'bmp-to-pdf', 'gif-to-pdf', 'tiff-to-pdf', 'indd-to-pdf', 'psd-to-pdf', 'ai-to-pdf'], MULTI_ALL_HEIC),
 };
 
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
@@ -144,7 +159,7 @@ function buildWordToPdfEarlyPrefetchUrl() {
   const [languageCode, languageRegion] = locale.split('-');
   const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
   const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
-  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
+  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf/av?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
 }
 
 function redDirLink(verb) {
@@ -498,6 +513,13 @@ export default async function init(element) {
 
   const isMobile = isMobileDevice();
   const isTablet = isTabletDevice();
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const IOS_UNKNOWN_EXTS = new Set(['.ai', '.psd', '.indd', '.form']);
+  const getAcceptValue = (verb) => {
+    const accepted = LIMITS[verb]?.acceptedFiles;
+    if (isIOS && accepted?.some((ext) => IOS_UNKNOWN_EXTS.has(ext))) return '*/*';
+    return accepted;
+  };
 
   const { locale } = getConfig();
   const ppURL = window.mph['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
@@ -559,7 +581,7 @@ export default async function init(element) {
 
   const button = createTag('input', {
     type: 'file',
-    accept: LIMITS[VERB]?.acceptedFiles,
+    accept: getAcceptValue(VERB),
     id: 'file-upload',
     class: 'hide',
     'aria-hidden': true,
@@ -761,7 +783,7 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    if (VERB === 'word-to-pdf') {
+    if (LIMITS[VERB]?.noRedirectTimeout) {
       window.dispatchEvent(redirectReady);
     } else {
       setTimeout(() => {

@@ -7,7 +7,7 @@ module.exports = {
       path: '/acrobat/online/rearrange-pdf',
       data: {
         verbTitle: 'Adobe Acrobat',
-        verbHeading: 'Rearrange PDF pages',
+        verbHeading: 'Organize PDF pages',
         verbCopy: 'Drag and drop a PDF to reorder or rearrange the pages.',
       },
       tags: '@rearrange-pdf @smoke @regression @unity',

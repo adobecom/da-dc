@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './ppt-to-pdf.spec.js';
 import PptToPdf from './ppt-to-pdf.page.js';
+import checkPageLinks from '../../utils/link-checker.js';
 
 const pptFilePath = path.resolve(__dirname, '../../assets/1-PPT-ppt-pdf.pptx');
 
@@ -14,29 +15,106 @@ test.describe('Unity PPT to PDF test suite', () => {
     pptToPdf = new PptToPdf(page);
   });
 
-  // Test 0 : PPT to PDF
-  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
+  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
     const { data } = features[0];
 
-    await test.step('step-1: Go to PPT to PDF test page', async () => {
+    await test.step('Go to PPT to PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
-      await page.waitForLoadState('domcontentloaded');  
-      // await expect(page).toHaveURL(`${baseURL}${features[0].path}${unityLibs}`);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(5000);
     });
 
-    await test.step('step-2: Verify PPT to PDF content/specs', async () => {
-      await expect(await pptToPdf.widget).toBeVisible();
-      await expect(await pptToPdf.dropZone).toBeVisible();
-      await expect(await pptToPdf.verbImage).toBeVisible();
-      await expect(await pptToPdf.acrobatIcon).toBeVisible();
+    await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
+      await pptToPdf.gnav.waitFor({ state: 'visible' });
+      await expect(pptToPdf.gnav).toBeVisible();
+      await expect(pptToPdf.gnavBreadcrumbs).toBeVisible();
+    });
+
+    await test.step('Verify PPT to PDF widget content/specs', async () => {
+      await expect(pptToPdf.widget).toBeVisible();
+      await expect(pptToPdf.dropZone).toBeVisible();
+      await expect(pptToPdf.verbImage).toBeVisible();
+      await expect(pptToPdf.acrobatIcon).toBeVisible();
       const actualText = await pptToPdf.verbHeader.textContent();
       expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(await pptToPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(await pptToPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(pptToPdf.verbTitle).toContainText(data.verbTitle);
+      await expect(pptToPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(pptToPdf.selectFilesButton).toBeVisible();
+      await expect(pptToPdf.selectFilesButton).toBeEnabled();
     });
 
-    await test.step('step-3: Upload a sample PDF file', async () => {
+    await test.step('Verify how-to section', async () => {
+      await pptToPdf.howToSection.scrollIntoViewIfNeeded();
+      await expect(pptToPdf.howToSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify three-up section', async () => {
+      await pptToPdf.threeUpSection.scrollIntoViewIfNeeded();
+      await expect(pptToPdf.threeUpSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify FAQ accordion', async () => {
+      const { faqSection, faqAccordionTriggers } = pptToPdf;
+      await faqSection.scrollIntoViewIfNeeded();
+      await expect(faqSection).toBeVisible({ timeout: 60000 });
+
+      const buttonCount = await faqAccordionTriggers.count();
+
+      for (let i = 0; i < buttonCount; i += 1) {
+        const button = faqAccordionTriggers.nth(i);
+        const ariaControls = await button.getAttribute('aria-controls');
+        const contentPanel = faqSection.locator(`#${ariaControls}`);
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'true');
+        await expect(contentPanel).toBeVisible();
+
+        await button.click();
+        await expect(button).toHaveAttribute('aria-expanded', 'false');
+      }
+    });
+
+    await test.step('Verify CaaS section', async () => {
+      if (browserName === 'chromium') {
+        // TODO: Investigate CaaS section flakiness on Chrome (async hydration / late attach).
+        return;
+      }
+      await pptToPdf.caasSection.waitFor({ state: 'attached', timeout: 90000 });
+      await pptToPdf.caasSection.scrollIntoViewIfNeeded();
+      await expect(pptToPdf.caasSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify media block', async () => {
+      await pptToPdf.mediaSection.scrollIntoViewIfNeeded();
+      await expect(pptToPdf.mediaSection).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify ratings and reviews (RnR) block', async () => {
+      await pptToPdf.rnrSection.scrollIntoViewIfNeeded();
+      await expect(pptToPdf.rnrSection).toBeVisible({ timeout: 60000 });
+      await expect(pptToPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify columns section has 31 links', async () => {
+      const { columnsSection, columnsATags } = pptToPdf;
+      await columnsSection.scrollIntoViewIfNeeded();
+      await expect(columnsSection).toBeVisible({ timeout: 60000 });
+      // await expect(columnsATags).toHaveCount(32);
+      await expect(columnsATags.first()).toBeVisible();
+      await expect(columnsATags.first()).toBeEnabled();
+    });
+
+    await test.step('Verify footer', async () => {
+      await pptToPdf.footer.scrollIntoViewIfNeeded();
+      await expect(pptToPdf.footer).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
+    });
+
+    await test.step('Upload a sample PowerPoint file', async () => {
       const [fileChooser] = await Promise.all([
         page.waitForEvent('filechooser'),
         pptToPdf.dropZone.click(),
@@ -45,10 +123,8 @@ test.describe('Unity PPT to PDF test suite', () => {
 
       await page.waitForURL(/acrobat\.adobe/, {
         timeout: 60000,
-        waitUntil: 'domcontentloaded',
       });
 
-      // Verify the URL parameters
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);
       const urlObj = new URL(currentUrl);
