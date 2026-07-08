@@ -44,6 +44,7 @@ function getSessionID() {
 function eventData(metaData, { appReferrer: referrer, trackingId: tracking }) {
   const {
     verb, eventName, errorInfo = '', noOfFiles, uploadTime, type, size, count, userAttempts,
+    pageCount,
   } = metaData;
 
   return {
@@ -52,7 +53,7 @@ function eventData(metaData, { appReferrer: referrer, trackingId: tracking }) {
       ...(noOfFiles ? { no_of_files: noOfFiles } : {}),
       ...(uploadTime ? { uploadTime } : {}),
     },
-    content: { type, size, count, fileType: type, totalSize: size },
+    content: { type, size, count, fileType: type, totalSize: size, ...(pageCount ? { pageCount } : {}) },
     source: {
       user_agent: navigator.userAgent,
       lang: document.documentElement.lang,
@@ -75,6 +76,7 @@ function createPayloadForSplunk(metaData) {
   const {
     verb, eventName, noOfFiles, uploadTime, type, size, count, workflowStep,
     uploadType, userAttempts, errorData, chunkUploadAttempt, chunkNumber, assetId, maxRetryCount,
+    pageCount,
   } = metaData;
 
   return {
@@ -93,6 +95,7 @@ function createPayloadForSplunk(metaData) {
       totalSize: size,
       ...(workflowStep && { workflowStep }),
       ...(noOfFiles && { no_of_files: noOfFiles }),
+      ...(pageCount && { pageCount }),
       ...(chunkUploadAttempt && { chunkUploadAttempt }),
       ...(chunkNumber && { chunkNumber }),
       ...(assetId && { assetId }),
