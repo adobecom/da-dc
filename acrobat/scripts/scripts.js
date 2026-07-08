@@ -207,17 +207,17 @@ const locales = {
   se: { ietf: 'sv-SE', tk: 'fpk1pcd.css' },
   ch_it: { ietf: 'it-CH', tk: 'bbf5pok.css' },
   tr: { ietf: 'tr-TR', tk: 'aaz7dvd.css' },
-  ae_en: { ietf: 'ar-EN', tk: 'pps7abe.css', dir: 'ltr', base: '' },
+  ae_en: { ietf: 'en', tk: 'pps7abe.css', dir: 'ltr', base: '' },
   uk: { ietf: 'en-GB', tk: 'pps7abe.css' },
   at: { ietf: 'de-AT', tk: 'vin7zsi.css' },
   cz: { ietf: 'cs-CZ', tk: 'aaz7dvd.css' },
   bg: { ietf: 'bg-BG', tk: 'aaz7dvd.css' },
   ru: { ietf: 'ru-RU', tk: 'aaz7dvd.css' },
   ua: { ietf: 'uk-UA', tk: 'aaz7dvd.css' },
-  il_he: { ietf: 'he', tk: 'nwq1mna.css', dir: 'rtl' },
-  ae_ar: { ietf: 'ar-AE', tk: 'nwq1mna.css', dir: 'rtl' },
+  il_he: { ietf: 'he', tk: 'nle2tdz.css', dir: 'rtl' },
+  ae_ar: { ietf: 'ar-AE', tk: 'dis2dpj.css', dir: 'rtl' },
   mena_ar: { ietf: 'ar', tk: 'dis2dpj.css', dir: 'rtl' },
-  sa_ar: { ietf: 'ar-SA', tk: 'nwq1mna.css', dir: 'rtl' },
+  sa_ar: { ietf: 'ar-SA', tk: 'dis2dpj.css', dir: 'rtl' },
   // Asia Pacific
   au: { ietf: 'en-AU', tk: 'pps7abe.css' },
   hk_en: { ietf: 'en-HK', tk: 'pps7abe.css', base: '' },
@@ -247,9 +247,9 @@ const locales = {
   ec: { ietf: 'es-EC', tk: 'oln4yqj.css' }, // Ecuador (Spanish Latin America)
   pr: { ietf: 'es-PR', tk: 'oln4yqj.css' }, // Puerto Rico (Spanish Latin America)
   gt: { ietf: 'es-GT', tk: 'oln4yqj.css' }, // Guatemala (Spanish Latin America)
-  eg_ar: { ietf: 'ar-EG', tk: 'nwq1mna.css', dir: 'rtl' }, // Egypt (Arabic)
-  kw_ar: { ietf: 'ar-KW', tk: 'nwq1mna.css', dir: 'rtl' }, // Kuwait (Arabic)
-  qa_ar: { ietf: 'ar-QA', tk: 'nwq1mna.css', dir: 'rtl' }, // Quatar (Arabic)
+  eg_ar: { ietf: 'ar-EG', tk: 'dis2dpj.css', dir: 'rtl' }, // Egypt (Arabic)
+  kw_ar: { ietf: 'ar-KW', tk: 'dis2dpj.css', dir: 'rtl' }, // Kuwait (Arabic)
+  qa_ar: { ietf: 'ar-QA', tk: 'dis2dpj.css', dir: 'rtl' }, // Quatar (Arabic)
   eg_en: { ietf: 'en-EG', tk: 'pps7abe.css', base: '' }, // Egypt (GB English)
   kw_en: { ietf: 'en-KW', tk: 'pps7abe.css', base: '' }, // Kuwait (GB English)
   qa_en: { ietf: 'en-QA', tk: 'pps7abe.css', base: '' }, // Qatar (GB English)
@@ -355,8 +355,8 @@ const CONFIG = {
   uniqueSiteId: 'da-dc',
   mepLingoCountryToRegion: {
     africa: ['ke', 'mu', 'ng', 'za'],
-    la: ['bo', 'cr', 'do', 'ec', 'gt', 'pa', 'pr', 'py', 'sv', 'uy', 've', 'ar', 'co', 'cl', 'mx', 'pe'],
-    mena_en: ['bh', 'dz', 'iq', 'ir', 'jo', 'lb', 'ly', 'om', 'ps', 'sy', 'tn', 'ye'],
+    la: ['ag', 'ar', 'bo', 'cl', 'co', 'cr', 'cu', 'do', 'ec', 'gt', 'hn', 'mx', 'ni', 'pa', 'pe', 'pr', 'py', 'sv', 'uy', 've'],
+    mena_en: ['ae', 'af', 'bh', 'dz', 'eg', 'iq', 'ir', 'jo', 'kw', 'lb', 'ly', 'ma', 'om', 'ps', 'qa', 'sa', 'sy', 'tn', 'ye'],
   },
   imsScope: 'AdobeID,openid,gnav,pps.read,firefly_api,additional_info.roles,read_organizations,account_cluster.read',
 };
