@@ -165,7 +165,10 @@ async function loadAnalyticsAfterLCP(analyticsData) {
   try {
     const analyticsModule = await import('../../scripts/alloy/verb-widget.js');
     const {
-      default: verbAnalytics, reviewAnalytics, sendAnalyticsToSplunk, generateUploadGuid,
+      default: verbAnalytics,
+      reviewAnalytics,
+      sendAnalyticsToSplunk,
+      generateUploadGuid,
     } = analyticsModule;
     window.analytics.verbAnalytics = verbAnalytics;
     window.analytics.reviewAnalytics = reviewAnalytics;
