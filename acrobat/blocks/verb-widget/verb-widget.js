@@ -68,23 +68,19 @@ const MB100 = 104857600;
 const MB250 = 262144000;
 const PDF_ONLY = ['.pdf'];
 const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
-const ALL_FILES_WITH_HEIC = [...ALL_FILES, '.heic'];
 const STUDENT_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt'];
 const SIGNED_IN_FILES = ['.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
-// Image + office document types accepted by most to-PDF verbs (no specialty formats: PSD, AI, INDD)
 const COMMON_TO_PDF_FILES = ['.jpg', '.jpeg', '.png', '.heic', '.tif', '.tiff', '.bmp', '.gif', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text'];
-// createpdf additionally accepts specialty formats
 const CREATEPDF_FILES = [...COMMON_TO_PDF_FILES, '.psd', '.ai', '.indd'];
 
 const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
 const MULTI_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, multipleFiles: true };
 const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
-const MULTI_ALL_HEIC = {
+const MULTI_COMMON_TO_PDF = {
   maxFileSize: MB100,
-  acceptedFiles: ALL_FILES_WITH_HEIC,
+  acceptedFiles: COMMON_TO_PDF_FILES,
   multipleFiles: true,
 };
-const MULTI_COMMON_TO_PDF = { maxFileSize: MB100, acceptedFiles: COMMON_TO_PDF_FILES, multipleFiles: true };
 const GENAI_MULTI = { ...MULTI_ALL, maxNumFiles: 100, uploadType: 'multifile-only', subCopy: true, genAI: true };
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
