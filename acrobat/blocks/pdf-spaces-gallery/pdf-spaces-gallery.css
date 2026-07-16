@@ -1,0 +1,114 @@
+.pdf-spaces-gallery {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 16px;
+  box-sizing: border-box;
+}
+
+.pdf-spaces-gallery:empty {
+  display: none;
+}
+
+.pdf-spaces-gallery .pdf-spaces-cards {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, calc(25% - 12px));
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-block: 8px 16px;
+  scrollbar-width: none;
+}
+
+.pdf-spaces-gallery .pdf-spaces-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.pdf-spaces-gallery::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 48px;
+  background: linear-gradient(to right, rgb(255 255 255 / 0%), rgb(255 255 255 / 90%));
+  pointer-events: none;
+}
+
+.pdf-spaces-gallery .pdf-spaces-cards .editorial-card {
+  scroll-snap-align: start;
+  background: #fafafa;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-spaces-gallery .pdf-spaces-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 16px 8px;
+}
+
+.pdf-spaces-gallery .pdf-spaces-text > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pdf-spaces-gallery .pdf-spaces-cta {
+  margin-top: auto;
+  padding: 0 16px 16px;
+}
+
+.pdf-spaces-gallery .pdf-spaces-cta > div {
+  padding-top: 12px;
+  border-top: 1px solid #d8d8d8;
+}
+
+/* Hide the raw "--- #B6B6B6" separator hint (we render the line via border-top). */
+.pdf-spaces-gallery .pdf-spaces-cta p:first-child {
+  display: none;
+}
+
+/* Hide the raw "#fafafa" bg hint that would otherwise render as visible text. */
+.pdf-spaces-gallery .pdf-spaces-bg {
+  display: none;
+}
+
+.pdf-spaces-gallery .editorial-card picture {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.pdf-spaces-gallery .editorial-card picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Placeholder swaps object-fit so the neutral SVG isn't stretched. */
+.pdf-spaces-gallery .editorial-card .pdf-spaces-placeholder-img {
+  object-fit: contain;
+  padding: 32px;
+  background: #f5f5f5;
+}
+
+@media (max-width: 600px) {
+  .pdf-spaces-gallery {
+    padding-inline: 8px;
+  }
+
+  .pdf-spaces-gallery .pdf-spaces-cards {
+    grid-auto-columns: minmax(240px, 85%);
+  }
+}
