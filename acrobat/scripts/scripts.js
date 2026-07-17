@@ -264,7 +264,7 @@ const CONFIG = {
   codeRoot: '/acrobat',
   contentRoot: '/dc-shared',
   imsClientId: 'acrobatmilo',
-  commerce: { 
+  commerce: {
     checkoutClientId: 'doc_cloud',
     'wcs-api-key': 'wcms-commerce-ims-ro-user-milo-dc',
   },
