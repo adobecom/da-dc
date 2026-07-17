@@ -2,12 +2,16 @@ import { setLibs, isOldBrowser, loadPlaceholders } from '../../scripts/utils.js'
 import { localeMap } from '../unity/unity.js';
 
 const MB100 = 104857600;
-// Shared limits for jpg-to-pdf and word-to-pdf
-const LIMITS = {
+const VERB_LIMITS = {
   maxFileSize: MB100,
   acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
   multipleFiles: true,
   noRedirectTimeout: true,
+};
+
+export const LIMITS = {
+  'jpg-to-pdf': VERB_LIMITS,
+  'word-to-pdf': VERB_LIMITS,
 };
 
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
@@ -415,7 +419,7 @@ export default async function init(element) {
 
   const fileInput = createTag('input', {
     type: 'file',
-    accept: LIMITS.acceptedFiles,
+    accept: LIMITS[VERB]?.acceptedFiles,
     id: 'file-upload',
     class: 'hide',
     'aria-hidden': 'true',

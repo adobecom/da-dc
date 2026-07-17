@@ -127,7 +127,12 @@ export default async function init(el) {
     const { LIMITS: VERB_MARQUEE_LIMITS } = await import('../verb-marquee/verb-marquee.js');
     Object.assign(LIMITS, VERB_MARQUEE_LIMITS);
   }
-  const widgetBlock = verbWidget || studyMarquee || verbMarquee;
+  const verbMarquee2 = el.closest('.section')?.querySelector('.verb-marquee-2');
+  if (verbMarquee2) {
+    const { LIMITS: VERB_MARQUEE_2_LIMITS } = await import('../verb-marquee-2/verb-marquee-2.js');
+    Object.assign(LIMITS, VERB_MARQUEE_2_LIMITS);
+  }
+  const widgetBlock = verbWidget || studyMarquee || verbMarquee || verbMarquee2;
   const verb = (widgetBlock && [...widgetBlock.classList].find((cn) => LIMITS[cn])) || element.classList[1].replace('icon-', '');
   if (mobileApp && LIMITS[verb]?.mobileApp) return;
 
