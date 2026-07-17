@@ -597,12 +597,14 @@
   }
 
   .vm2-benefits {
-    flex-wrap: wrap;
-    gap: 8px 14px;
-    justify-content: center;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 12px 0;
   }
 
   .vm2-benefit {
-    font-size: 12px;
+    font-size: 13px;
   }
 }
