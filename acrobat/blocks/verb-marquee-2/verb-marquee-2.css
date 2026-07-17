@@ -1,0 +1,608 @@
+.verb-marquee-2 {
+  position: relative;
+  padding: 40px 16px;
+  overflow: hidden;
+  color: var(--color-black, #2c2c2c);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #f5eeff 0%, #fdf5ff 30%, #fff 60%);
+}
+
+.verb-marquee-2 .foreground {
+  max-width: var(--grid-container-width);
+  min-width: var(--grid-container-width);
+  margin: 0 auto;
+}
+
+.vm2-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Header: icon + "Adobe Acrobat" */
+.vm2-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.vm2-acrobat-icon {
+  display: inline-flex;
+  width: 31.5px;
+  height: 30.414px;
+  flex-shrink: 0;
+}
+
+.vm2-acrobat-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.vm2-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--color-black, #2c2c2c);
+  line-height: 1.25;
+}
+
+.vm2-title-svg {
+  height: auto;
+  width: auto;
+}
+
+/* Heading */
+.vm2-heading {
+  font-family: "Adobe Clean Black", var(--body-font-family);
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -2.16px;
+  color: var(--color-black, #2c2c2c);
+  margin: 0;
+  text-align: center;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Subtitle */
+.vm2-subtitle {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #3d3d3d;
+  margin: 0;
+  text-align: center;
+  margin-top: -8px;
+}
+
+/* Dropzone */
+.vm2-dropzone {
+  width: 100%;
+  border: 1.5px dashed #adadad;
+  border-radius: 16px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.vm2-dropzone:hover,
+.vm2-dropzone.dragging,
+.verb-marquee-2.dragging-block .vm2-dropzone {
+  border-color: #1473E6;
+  background-color: #f0f7ff;
+}
+
+.verb-marquee-2.dragging-block {
+  outline: none;
+}
+
+.verb-marquee-2.dragging-block::before {
+  display: none;
+}
+
+/* Media inside dropzone */
+.vm2-dropzone-media {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.vm2-dropzone-media .asset {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.vm2-dropzone-media picture,
+.vm2-dropzone-media .asset picture {
+  width: 100%;
+  display: flex;
+  line-height: 0;
+}
+
+.vm2-dropzone-media img,
+.vm2-dropzone-media picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* CTA button */
+.vm2-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background-color: #1473E6;
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.vm2-cta:hover {
+  background-color: #0D66D0;
+}
+
+.vm2-cta .upload-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vm2-cta-solo {
+  display: inline-flex;
+  padding: 9px 18px;
+  min-width: auto;
+  font-size: 16px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.vm2-cta-solo:hover {
+  text-decoration: none;
+  color: #fff;
+}
+
+/* Mobile CTA (app store / trial) */
+.vm2-mobile-cta {
+  display: inline-flex;
+  padding: 12px 24px;
+  border-radius: 100px;
+  background: #1473e6;
+  color: #fff;
+  font-weight: 700;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: pre-wrap;
+  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.vm2-mobile-cta:hover,
+.vm2-mobile-cta:active {
+  background-color: #0054b6;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Drag text — always shown (unlike verb-marquee which hides on mobile) */
+.vm2-drag {
+  font-weight: 700;
+  font-size: 16px;
+  color: #3d3d3d;
+  margin: 0;
+  text-align: center;
+}
+
+/* File limit text */
+.vm2-file-limit {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #767676;
+  margin: 0;
+  text-align: center;
+}
+
+/* Benefits row — always single line */
+.vm2-benefits {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0 20px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.vm2-benefit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #505050;
+  line-height: 1.4;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.vm2-benefit-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  flex-shrink: 0;
+  color: #505050;
+}
+
+.vm2-benefit-icon path,
+.vm2-benefit-icon line,
+.vm2-benefit-icon rect {
+  stroke: currentcolor;
+}
+
+/* Footer */
+.vm2-footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.vm2-legal {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #767676;
+  margin: 0;
+  text-align: center;
+  flex: 0 1 auto;
+  max-width: 520px;
+}
+
+.vm2-legal a,
+.vm2-legal-url {
+  color: var(--link-color, #0265DC);
+  text-decoration: underline;
+}
+
+.vm2-legal a:hover,
+.vm2-legal-url:hover {
+  color: var(--link-hover-color, #0054b6);
+}
+
+/* Info tooltip button */
+.verb-marquee-2 .info-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  min-height: 18px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 2px;
+  padding: 0;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.verb-marquee-2 .info-icon:hover {
+  opacity: 0.8;
+}
+
+.verb-marquee-2 .info-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.verb-marquee-2 .milo-tooltip {
+  position: relative;
+  text-decoration: none;
+  border-bottom: none;
+  min-width: 24px;
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  justify-content: center;
+}
+
+.verb-marquee-2 .milo-tooltip::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  max-width: 200px;
+  padding: 10px;
+  border-radius: 5px;
+  background: #0469E3;
+  color: #fff;
+  text-align: left;
+  display: none;
+  z-index: 8;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  width: max-content;
+}
+
+.verb-marquee-2 .milo-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  border: 8px solid #0469E3;
+  border-color: #0469E3 transparent transparent;
+  display: none;
+  z-index: 8;
+}
+
+.verb-marquee-2 .milo-tooltip:hover::before,
+.verb-marquee-2 .milo-tooltip:focus::before,
+.verb-marquee-2 .milo-tooltip:hover::after,
+.verb-marquee-2 .milo-tooltip:focus::after {
+  display: block;
+}
+
+/* Background */
+.verb-marquee-2 .background {
+  position: absolute;
+  inset: 0;
+}
+
+.verb-marquee-2 .background img,
+.verb-marquee-2 .background video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Hidden utility */
+.verb-marquee-2 .hide {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Error state */
+.vm2-error-active {
+  cursor: default;
+  background: #D31510;
+  max-width: 435px;
+  color: white;
+  position: absolute;
+  top: 60px;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  font-size: 14px;
+  font-weight: 400;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  z-index: 5;
+  border-radius: 4px;
+}
+
+.vm2-error-text {
+  border-right: 1px solid rgb(255 255 255 / 20%);
+  padding: 0;
+  margin: 0;
+  margin-right: 8px;
+  padding-right: 16px;
+  max-width: 324px;
+  margin-left: 8px;
+  min-width: 100px;
+}
+
+.vm2-error-btn {
+  align-self: self-start;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: block;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.vm2-error-icon {
+  align-self: self-start;
+  width: 18px;
+  height: 18px;
+  margin-left: 8px;
+  margin-right: 4px;
+  margin-top: 7px;
+}
+
+.vm2-error-icon::after {
+  content: '';
+  background-image: url('/acrobat/img/icons/ui/alert.svg');
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+/* When the upsell/SUSI widget is injected, hide the main block content */
+.verb-marquee-2:has(.verb-widget.upsell) > .background,
+.verb-marquee-2:has(.verb-widget.upsell) > .foreground {
+  display: none;
+}
+
+.verb-marquee-2:has(.verb-widget.upsell) > .error {
+  display: none;
+}
+
+.verb-marquee-2:has(.verb-widget.upsell) {
+  padding: 0;
+  background: none;
+}
+
+/* Tablet: 600px+ */
+@media screen and (min-width: 600px) {
+  .verb-marquee-2 {
+    padding: 64px 16px;
+  }
+
+  .vm2-heading {
+    font-size: 64px;
+    letter-spacing: -2.88px;
+  }
+
+  .vm2-subtitle {
+    font-size: 20px;
+  }
+
+  .vm2-benefit {
+    font-size: 14px;
+  }
+
+  .vm2-benefits {
+    flex-wrap: nowrap;
+    gap: 0 20px;
+  }
+}
+
+/* Desktop: 900px+ */
+@media screen and (min-width: 900px) {
+  .verb-marquee-2 {
+    padding: 80px 40px;
+  }
+
+  .vm2-container {
+    gap: 28px;
+  }
+}
+
+/* Large desktop: 1200px+ */
+@media screen and (min-width: 1200px) {
+  .verb-marquee-2 {
+    padding: 80px;
+  }
+
+  .vm2-heading {
+    font-size: 80px;
+    letter-spacing: -3.6px;
+  }
+
+  .vm2-subtitle {
+    font-size: 22px;
+    margin-top: -12px;
+  }
+
+  .vm2-container {
+    gap: 32px;
+  }
+
+  .vm2-dropzone {
+    padding: 40px 24px;
+    gap: 16px;
+  }
+
+  .vm2-dropzone-media {
+    width: 120px;
+    height: 120px;
+  }
+
+  .vm2-benefits {
+    gap: 0 32px;
+  }
+
+  .vm2-benefit {
+    font-size: 14px;
+  }
+}
+
+/* Mobile error state */
+@media screen and (max-width: 600px) {
+  .vm2-error-active {
+    max-width: calc(100% - 32px);
+    top: 50px;
+    padding: 6px;
+  }
+
+  .vm2-error-text {
+    font-size: 12px;
+    max-width: none;
+    padding-right: 12px;
+    margin-right: 6px;
+    margin-left: 6px;
+    min-width: auto;
+  }
+
+  .vm2-error-icon {
+    width: 16px;
+    height: 16px;
+    margin-left: 6px;
+    margin-right: 2px;
+    margin-top: 5px;
+  }
+
+  .vm2-error-icon::after {
+    width: 16px;
+    height: 16px;
+  }
+
+  .vm2-error-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .vm2-benefits {
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    justify-content: center;
+  }
+
+  .vm2-benefit {
+    font-size: 12px;
+  }
+}
