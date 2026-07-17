@@ -266,7 +266,7 @@ const CONFIG = {
   imsClientId: 'acrobatmilo',
   commerce: { 
     checkoutClientId: 'doc_cloud',
-    'wcs-api-key': 'wcms-commerce-ims-ro-user-milo-dc', 
+    'wcs-api-key': 'wcms-commerce-ims-ro-user-milo-dc',
   },
   local: {
     edgeConfigId: 'e065836d-be57-47ef-b8d1-999e1657e8fd',
