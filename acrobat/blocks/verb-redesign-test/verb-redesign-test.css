@@ -1,4 +1,6 @@
 .verb-redesign-test {
+  --consonant-button-accent-action-bg: #3b63fb;
+  --consonant-button-accent-action-bg-hover: #2d55e8;
   position: relative;
   padding: 40px 16px;
   overflow: hidden;
@@ -155,26 +157,26 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 24px;
-  background-color: #1473E6;
+  padding: 12px 24px 14px;
+  background-color: var(--consonant-button-accent-action-bg);
   color: #fff;
   border: none;
   border-radius: 100px;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
-  line-height: 1.4;
+  line-height: 24px;
   cursor: pointer;
   transition: background-color 0.2s ease;
   white-space: nowrap;
 }
 
 .vm2-cta:hover {
-  background-color: #0D66D0;
+  background-color: var(--consonant-button-accent-action-bg-hover);
 }
 
 .vm2-cta .upload-icon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -222,6 +224,7 @@
 
 /* Drag text — always shown (unlike verb-marquee which hides on mobile) */
 .vm2-drag {
+  display: none;
   font-weight: 700;
   font-size: 16px;
   color: #3d3d3d;
@@ -566,6 +569,10 @@
 
 /* Large desktop: 1200px+ */
 @media screen and (min-width: 1200px) {
+  .vm2-drag {
+    display: block;
+  }
+
   .verb-redesign-test {
     padding: 80px;
   }
@@ -741,13 +748,6 @@
   text-align: left;
 }
 
-.verb-redesign-test.challenger1 .vm2-cta {
-  background-color: #3b63fb;
-}
-
-.verb-redesign-test.challenger1 .vm2-cta:hover {
-  background-color: #2d55e8;
-}
 
 .verb-redesign-test.challenger1 .vm2-benefit {
   font-size: 18px;
@@ -928,5 +928,73 @@
   .verb-redesign-test.challenger1 .vm2-drag,
   .verb-redesign-test.challenger1 .vm2-file-limit {
     text-align: center;
+  }
+}
+
+
+:root:has(main .verb-redesign-test) {
+  main {
+    .text-block [class*="heading-"] {
+      line-height: 1;
+      font-weight: 800;
+      font-size: 36px;
+      font-family: "Adobe Clean ExtraBold", var(--body-font-family);
+      letter-spacing: -0.04em;
+    }
+
+    .editorial-card [class*="heading-"],
+    .icon-block [class*="heading-"] {
+      font-family: "Adobe Clean ExtraBold", var(--body-font-family);
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+      font-size: 20px;
+    }
+
+    .icon-block [class*="heading-"] {
+      letter-spacing: -0.035em;
+    }
+
+    .media.medium-compact [class*="heading-"] {
+      font-family: "Adobe Clean ExtraBold", var(--body-font-family);
+      font-weight: 800;
+      letter-spacing: -1.44px;
+    }
+
+    .rnr-title,
+    .rnr-summary-container,
+    .rnr-summary-average,
+    .rnr-summary-outOf,
+    .rnr-summary-votes {
+      font-family: "Adobe Clean ExtraBold", var(--body-font-family);
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    @media screen and (max-width: 1199px) {
+      .media.medium-compact [class*="heading-"] {
+        font-size: 32px;
+        letter-spacing: -1.28px;
+      }
+    }
+
+    @media screen and (min-width: 600px) and (max-width: 1199px) {
+      .text-block [class*="heading-"] {
+        line-height: 0.98;
+        font-size: 42px;
+      }
+    }
+
+    @media screen and (min-width: 1200px) {
+      .text-block [class*="heading-"] {
+        line-height: 0.98;
+        font-size: 48px;
+      }
+
+      .editorial-card [class*="heading-"],
+      .icon-block [class*="heading-"] {
+        font-size: 24px;
+      }
+    }
   }
 }
