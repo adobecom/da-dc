@@ -641,6 +641,10 @@
   gap: 32px;
 }
 
+.verb-redesign-test.challenger1 .vm2-footer {
+  gap: 16px;
+}
+
 .verb-redesign-test.challenger1 .vm2-dropzone {
   flex-direction: row;
   align-items: center;
@@ -648,13 +652,14 @@
   gap: 40px;
   padding: 40px 60px;
   border-radius: 15px;
+  border-color: #747474;
 }
 
 .verb-redesign-test.challenger1 .vm2-text-col {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 16px;
+  gap: 24px;
   flex: 1;
   min-width: 0;
 }
@@ -670,7 +675,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
+  gap: 16px;
 }
 
 .verb-redesign-test.challenger1 .vm2-text-col .vm2-header {
@@ -702,6 +707,7 @@
 
 .verb-redesign-test.challenger1 .vm2-benefit {
   font-size: 18px;
+  color: #161616;
 }
 
 .verb-redesign-test.challenger1 .vm2-dropzone-media {
@@ -779,11 +785,20 @@
 .verb-redesign-test.challenger2 .vm2-heading {
   font-size: 44px;
   letter-spacing: -1.98px;
+  margin-top: -8px;
+}
+
+.verb-redesign-test.challenger2 .vm2-subtitle {
+  margin-top: -16px;
 }
 
 .verb-redesign-test.challenger2 .vm2-benefit {
   font-size: 18px;
   color: #161616;
+}
+
+.verb-redesign-test.challenger2 .vm2-footer {
+  gap: 16px;
 }
 
 @media screen and (max-width: 599px) {
@@ -802,10 +817,25 @@
   }
 }
 
+@media screen and (min-width: 900px) {
+  .verb-redesign-test.challenger2 .vm2-heading {
+    margin-top: -12px;
+  }
+
+  .verb-redesign-test.challenger2 .vm2-subtitle {
+    margin-top: -20px;
+  }
+}
+
 @media screen and (min-width: 1200px) {
   .verb-redesign-test.challenger2 .vm2-heading {
     font-size: 56px;
     letter-spacing: -2.52px;
+    margin-top: -16px;
+  }
+
+  .verb-redesign-test.challenger2 .vm2-subtitle {
+    margin-top: -24px;
   }
 }
 
