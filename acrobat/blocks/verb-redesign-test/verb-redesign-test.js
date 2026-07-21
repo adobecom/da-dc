@@ -21,25 +21,11 @@ const exhLimitCookieMap = { 'to-pdf': 'cr_p_c' };
 const appEnvCookieMap = { stage: 's_ta_', prod: 'p_ac_' };
 
 const DEFAULTS = {
-  subtitle: {
-    'jpg-to-pdf': 'Turn your images into PDFs for free.',
-    'word-to-pdf': 'Convert Word documents to PDFs for free.',
-  },
-  cta: 'Select a file',
-  dragText: {
-    'jpg-to-pdf': 'or drag and drop here',
-    'word-to-pdf': 'or drag and drop here',
-  },
-  fileLimit: {
-    'jpg-to-pdf': '(JPG, BMP, PNG or any image file)',
-    'word-to-pdf': '(DOC, DOCX or PDF)',
-  },
-  benefits: [
-    'No credit card needed.',
-    'Secure by Adobe trusted globally',
-    'File deleted unless you save',
-    '4.8 ★★★★★ User Ratings',
-  ],
+  subtitle: { 'jpg-to-pdf': '', 'word-to-pdf': '' },
+  cta: '',
+  dragText: { 'jpg-to-pdf': '', 'word-to-pdf': '' },
+  fileLimit: { 'jpg-to-pdf': '', 'word-to-pdf': '' },
+  benefits: ['', '', '', ''],
 };
 
 const miloLibs = setLibs('/libs');
@@ -225,7 +211,7 @@ window.addEventListener('analyticsLoad', async ({ detail }) => {
   const { verbAnalytics, reviewAnalytics, sendAnalyticsToSplunk } = window.analytics;
   if (verbAnalytics === stubVerb || reviewAnalytics === stubReview || sendAnalyticsToSplunk === stubSend) {
     window.lana?.log(
-      'Analytics failed to initialize correctly: some methods remain no-ops on verb-marquee-2 block',
+      'Analytics failed to initialize correctly: some methods remain no-ops on verb-redesign-test block',
       lanaOptions,
     );
   }
@@ -261,8 +247,8 @@ function getAuthoredSvgInfo(foregroundEl, headlineEl) {
 function buildBenefitsRow(verb) {
   const benefits = BENEFIT_ICON_KEYS
     .map((iconKey, i) => {
-      const text = window.mph?.[`verb-marquee-2-${verb}-highlight-${i + 1}`]
-        || window.mph?.[`verb-marquee-2-highlight-${i + 1}`]
+      const text = window.mph?.[`verb-redesign-test-${verb}-highlight-${i + 1}`]
+        || window.mph?.[`verb-redesign-test-highlight-${i + 1}`]
         || DEFAULTS.benefits[i]
         || '';
       if (!text) return null;
@@ -295,9 +281,10 @@ export default async function init(element) {
   }
 
   window.mph = window.mph || {};
-  await loadPlaceholders(['verb-marquee-2', 'verb-marquee', 'verb-widget']);
+  await loadPlaceholders(['verb-redesign-test', 'verb-marquee', 'verb-widget']);
 
   const VERB = element.classList[1];
+  const isChallenger1 = element.classList.contains('challenger1');
   const userAttempts = getVerbKey(`${VERB}_attempts`);
   let noOfFiles = null;
 
@@ -377,8 +364,8 @@ export default async function init(element) {
 
   const headingEl = createTag('h1', { class: 'vm2-heading' }, heading);
 
-  const subtitleText = window.mph?.[`verb-marquee-2-${VERB}-subtitle`]
-    || window.mph?.['verb-marquee-2-subtitle']
+  const subtitleText = window.mph?.[`verb-redesign-test-${VERB}-subtitle`]
+    || window.mph?.['verb-redesign-test-subtitle']
     || DEFAULTS.subtitle[VERB]
     || '';
   const subtitleEl = subtitleText ? createTag('p', { class: 'vm2-subtitle' }, subtitleText) : null;
@@ -386,14 +373,15 @@ export default async function init(element) {
   // Build dropzone
   const dropzone = createTag('div', { class: 'vm2-dropzone', id: 'drop-zone' });
 
+  let mediaWrapper = null;
   if (media) {
-    const mediaWrapper = createTag('div', { class: 'vm2-dropzone-media' });
+    mediaWrapper = createTag('div', { class: 'vm2-dropzone-media' });
     while (media.firstChild) mediaWrapper.appendChild(media.firstChild);
-    dropzone.appendChild(mediaWrapper);
+    if (!isChallenger1) dropzone.appendChild(mediaWrapper);
   }
 
-  const ctaButtonLabel = window.mph?.[`verb-marquee-2-${VERB}-upload-cta`]
-    || window.mph?.['verb-marquee-2-cta']
+  const ctaButtonLabel = window.mph?.[`verb-redesign-test-${VERB}-upload-cta`]
+    || window.mph?.['verb-redesign-test-cta']
     || DEFAULTS.cta;
   const ctaButton = createTag('button', {
     class: 'vm2-cta',
@@ -408,11 +396,11 @@ export default async function init(element) {
   }
   ctaButton.appendChild(createTag('span', { class: 'vm2-cta-label' }, ctaButtonLabel));
 
-  const dragText = createTag('p', { class: 'vm2-drag' }, window.mph?.[`verb-marquee-2-${VERB}-dragndrop-text`] || DEFAULTS.dragText[VERB] || '');
+  const dragText = createTag('p', { class: 'vm2-drag' }, window.mph?.[`verb-redesign-test-${VERB}-dragndrop-text`] || DEFAULTS.dragText[VERB] || '');
   const fileLimitText = createTag('p', {
     class: 'vm2-file-limit',
     id: 'file-upload-description',
-  }, window.mph?.[`verb-marquee-2-${VERB}-file-limit`] || DEFAULTS.fileLimit[VERB] || '');
+  }, window.mph?.[`verb-redesign-test-${VERB}-file-limit`] || DEFAULTS.fileLimit[VERB] || '');
 
   dropzone.append(ctaButton, dragText, fileLimitText);
 
@@ -469,10 +457,10 @@ export default async function init(element) {
   const ppURL = window.mph?.['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
   const touURL = window.mph?.['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
   const mph = window.mph || {};
-  const legalPart1 = mph['verb-marquee-2-legal'] || '';
-  const legalPart2 = mph['verb-marquee-2-legal-2'] || '';
+  const legalPart1 = mph['verb-redesign-test-legal'] || '';
+  const legalPart2 = mph['verb-redesign-test-legal-2'] || '';
   const legalCombined = [legalPart1, legalPart2].filter(Boolean).join(' ').trim();
-  const legalInitial = legalCombined || mph['verb-marquee-2-legal-text'] || '';
+  const legalInitial = legalCombined || mph['verb-redesign-test-legal-text'] || '';
   const legalText = createTag('p', { class: 'vm2-legal' }, legalInitial);
 
   if (legalText.textContent) {
@@ -499,18 +487,36 @@ export default async function init(element) {
   infoIcon.appendChild(createTag('span', { id: 'info-tooltip-text', class: 'hide' }, tooltipContent));
   footer.append(legalText, infoIcon);
 
-  // Assemble centered layout
   const benefitsRow = buildBenefitsRow(VERB);
   const container = createTag('div', { class: 'vm2-container' });
-  container.append(
-    header,
-    headingEl,
-    ...(subtitleEl ? [subtitleEl] : []),
-    dropzone,
-    fileInput,
-    ...(benefitsRow ? [benefitsRow] : []),
-    footer,
-  );
+
+  if (isChallenger1) {
+    // Challenger 1: dropzone is the flex-row — text col on left, image on right
+    // Split text into top (header/heading/subtitle) and bottom (CTA/drag/file)
+    // so on mobile we can insert the image between them via CSS order
+    const textBottom = createTag('div', { class: 'vm2-text-bottom' });
+    while (dropzone.firstChild) textBottom.appendChild(dropzone.firstChild);
+    const textTop = createTag('div', { class: 'vm2-text-top' });
+    textTop.append(header, headingEl, ...(subtitleEl ? [subtitleEl] : []));
+    const textCol = createTag('div', { class: 'vm2-text-col' });
+    textCol.append(textTop, textBottom);
+    dropzone.append(textCol);
+    if (mediaWrapper) dropzone.append(mediaWrapper);
+    container.append(dropzone, fileInput, ...(benefitsRow ? [benefitsRow] : []), footer);
+  } else {
+    // Challenger 2: centered layout — heading + subtitle above the dropzone,
+    // image inside the dropzone
+    container.append(
+      header,
+      headingEl,
+      ...(subtitleEl ? [subtitleEl] : []),
+      dropzone,
+      fileInput,
+      ...(benefitsRow ? [benefitsRow] : []),
+      footer,
+    );
+  }
+
   foreground.innerHTML = '';
   foreground.append(container);
   element.append(errorState);
@@ -776,7 +782,7 @@ export default async function init(element) {
       await initVerbWidget(widgetRoot);
     } catch (error) {
       window.lana?.log(
-        `Error Code: Unknown, Status: 'Unknown', Message: verb-widget init from verb-marquee-2 failed: ${error.message}`,
+        `Error Code: Unknown, Status: 'Unknown', Message: verb-widget init from verb-redesign-test failed: ${error.message}`,
         lanaOptions,
       );
       widgetRoot.remove();

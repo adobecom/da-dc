@@ -132,7 +132,12 @@ export default async function init(el) {
     const { LIMITS: VERB_MARQUEE_2_LIMITS } = await import('../verb-marquee-2/verb-marquee-2.js');
     Object.assign(LIMITS, VERB_MARQUEE_2_LIMITS);
   }
-  const widgetBlock = verbWidget || studyMarquee || verbMarquee || verbMarquee2;
+  const verbRedesignTest = el.closest('.section')?.querySelector('.verb-redesign-test');
+  if (verbRedesignTest) {
+    const { LIMITS: VERB_REDESIGN_TEST_LIMITS } = await import('../verb-redesign-test/verb-redesign-test.js');
+    Object.assign(LIMITS, VERB_REDESIGN_TEST_LIMITS);
+  }
+  const widgetBlock = verbWidget || studyMarquee || verbMarquee || verbMarquee2 || verbRedesignTest;
   const verb = (widgetBlock && [...widgetBlock.classList].find((cn) => LIMITS[cn])) || element.classList[1].replace('icon-', '');
   if (mobileApp && LIMITS[verb]?.mobileApp) return;
 
