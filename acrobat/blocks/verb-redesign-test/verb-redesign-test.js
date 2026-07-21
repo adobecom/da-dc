@@ -16,7 +16,6 @@ export const LIMITS = {
 
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
 
-// Both jpg-to-pdf and word-to-pdf match the 'to-pdf' pattern in exhLimitCookieMap
 const exhLimitCookieMap = { 'to-pdf': 'cr_p_c' };
 const appEnvCookieMap = { stage: 's_ta_', prod: 'p_ac_' };
 
@@ -358,7 +357,6 @@ export default async function init(element) {
     window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: VERB, userAttempts } }));
   });
 
-  // Read authored content
   const children = element.querySelectorAll(':scope > div');
   const foreground = children[children.length - 1];
   foreground.classList.add('foreground', 'container');
@@ -375,7 +373,6 @@ export default async function init(element) {
   const media = foreground.querySelector(':scope > div:not([class])');
   if (media) processMedia(media);
 
-  // Build header
   const header = createTag('div', { class: 'vm2-header' });
   if (authoredSvg) {
     header.append(createTag('img', { src: authoredSvg.url, alt: authoredSvg.altText, class: 'vm2-title-svg' }));
@@ -401,7 +398,6 @@ export default async function init(element) {
     || '';
   const subtitleEl = subtitleText ? createTag('p', { class: 'vm2-subtitle' }, subtitleText) : null;
 
-  // Build dropzone
   const dropzone = createTag('div', { class: 'vm2-dropzone', id: 'drop-zone' });
 
   let mediaWrapper = null;
@@ -445,7 +441,6 @@ export default async function init(element) {
     multiple: '',
   });
 
-  // Error state
   const errorState = createTag('div', {
     class: 'error hide',
     role: 'alert',
@@ -482,7 +477,6 @@ export default async function init(element) {
   }
   errorState.append(errorIcon, errorStateText, errorCloseBtn);
 
-  // Legal footer
   const footer = createTag('div', { class: 'vm2-footer' });
   const { locale } = getConfig();
   const ppURL = window.mph?.['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
@@ -522,9 +516,6 @@ export default async function init(element) {
   const container = createTag('div', { class: 'vm2-container' });
 
   if (isChallenger1) {
-    // Challenger 1: dropzone is the flex-row — text col on left, image on right
-    // Split text into top (header/heading/subtitle) and bottom (CTA/drag/file)
-    // so on mobile we can insert the image between them via CSS order
     const textBottom = createTag('div', { class: 'vm2-text-bottom' });
     while (dropzone.firstChild) textBottom.appendChild(dropzone.firstChild);
     const textTop = createTag('div', { class: 'vm2-text-top' });
@@ -535,8 +526,6 @@ export default async function init(element) {
     if (mediaWrapper) dropzone.append(mediaWrapper);
     container.append(dropzone, fileInput, ...(benefitsRow ? [benefitsRow] : []), footer);
   } else {
-    // Challenger 2: centered layout — heading + subtitle above the dropzone,
-    // image inside the dropzone
     container.append(
       header,
       headingEl,
@@ -551,8 +540,6 @@ export default async function init(element) {
   foreground.innerHTML = '';
   foreground.append(container);
   element.append(errorState);
-
-  // --- Event handling ---
 
   function handleAnalyticsEvent(eventName, metadata = {}, documentUnloading = true, canSendDataToSplunk = true) {
     window.analytics.verbAnalytics(eventName, VERB, metadata, documentUnloading);
@@ -811,7 +798,6 @@ export default async function init(element) {
   });
 
   const { cookie } = document;
-  // Both jpg-to-pdf and word-to-pdf end with 'to-pdf', matching the exhLimitCookieMap pattern
   const limitCookie = exhLimitCookieMap[VERB.match(/to-pdf$/)?.[0]];
   const cookiePrefix = appEnvCookieMap[DC_ENV] || '';
   const isLimitExhausted = limitCookie && cookie.includes(`${cookiePrefix}${limitCookie}`);

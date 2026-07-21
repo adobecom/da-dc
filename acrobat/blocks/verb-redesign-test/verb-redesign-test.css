@@ -26,7 +26,6 @@
   margin: 0 auto;
 }
 
-/* Header: icon + "Adobe Acrobat" */
 .vm2-header {
   display: flex;
   align-items: center;
@@ -59,7 +58,6 @@
   width: auto;
 }
 
-/* Heading */
 .vm2-heading {
   font-family: "Adobe Clean Black", var(--body-font-family);
   font-size: 48px;
@@ -74,7 +72,6 @@
   hyphens: auto;
 }
 
-/* Subtitle */
 .vm2-subtitle {
   font-size: 20px;
   font-weight: 400;
@@ -85,7 +82,6 @@
   margin-top: -8px;
 }
 
-/* Dropzone */
 .vm2-dropzone {
   width: 100%;
   border: 1.5px dashed #adadad;
@@ -117,7 +113,6 @@
   display: none;
 }
 
-/* Media inside dropzone */
 .vm2-dropzone-media {
   width: 120px;
   height: 120px;
@@ -151,7 +146,6 @@
   display: block;
 }
 
-/* CTA button */
 .vm2-cta {
   display: inline-flex;
   align-items: center;
@@ -196,7 +190,6 @@
   color: #fff;
 }
 
-/* Mobile CTA (app store / trial) */
 .vm2-mobile-cta {
   display: inline-flex;
   padding: 12px 24px;
@@ -222,7 +215,6 @@
   text-decoration: none;
 }
 
-/* Drag text — always shown (unlike verb-marquee which hides on mobile) */
 .vm2-drag {
   display: none;
   font-weight: 700;
@@ -232,7 +224,6 @@
   text-align: center;
 }
 
-/* File limit text */
 .vm2-file-limit {
   font-size: 13px;
   line-height: 1.4;
@@ -241,7 +232,6 @@
   text-align: center;
 }
 
-/* Benefits row */
 .vm2-benefits {
   display: flex;
   flex-wrap: wrap;
@@ -277,7 +267,6 @@
   stroke: currentcolor;
 }
 
-/* Footer */
 .vm2-footer {
   display: flex;
   align-items: center;
@@ -314,7 +303,6 @@
   color: var(--link-hover-color, #0054b6);
 }
 
-/* Info tooltip button */
 .verb-redesign-test .info-icon {
   display: flex;
   align-items: center;
@@ -405,7 +393,6 @@
   }
 }
 
-/* Background */
 .verb-redesign-test .background {
   position: absolute;
   inset: 0;
@@ -418,7 +405,6 @@
   object-fit: cover;
 }
 
-/* Hidden utility */
 .verb-redesign-test .hide {
   position: absolute;
   width: 1px;
@@ -431,7 +417,6 @@
   border: 0;
 }
 
-/* Error state */
 .vm2-error-active {
   cursor: default;
   background: #D31510;
@@ -493,7 +478,6 @@
   height: 18px;
 }
 
-/* When the upsell/SUSI widget is injected, hide the main block content */
 .verb-redesign-test:has(.verb-widget.upsell) > .background,
 .verb-redesign-test:has(.verb-widget.upsell) > .foreground {
   display: none;
@@ -508,7 +492,6 @@
   background: none;
 }
 
-/* Tablet: 600px+ */
 @media screen and (min-width: 600px) {
   .verb-redesign-test {
     padding: 64px 16px;
@@ -531,12 +514,6 @@
     font-size: 14px;
   }
 
-  .vm2-benefits {
-    flex-wrap: wrap;
-    gap: 14px 32px;
-    justify-content: center;
-  }
-
   .verb-redesign-test .vm2-benefits {
     display: flex;
     flex-wrap: wrap;
@@ -548,7 +525,6 @@
   }
 }
 
-/* Desktop: 900px+ */
 @media screen and (min-width: 900px) {
   .verb-redesign-test {
     padding: 80px 40px;
@@ -567,7 +543,6 @@
   }
 }
 
-/* Large desktop: 1200px+ */
 @media screen and (min-width: 1200px) {
   .vm2-drag {
     display: block;
@@ -604,20 +579,6 @@
     gap: 16px;
   }
 
-  .vm2-dropzone-media {
-    width: 120px;
-    height: 120px;
-  }
-
-  .vm2-benefits {
-    flex-wrap: nowrap;
-    gap: 0 32px;
-  }
-
-  .vm2-benefit {
-    font-size: 14px;
-  }
-
   .verb-redesign-test .vm2-benefits {
     flex-wrap: nowrap;
     gap: 0 32px;
@@ -626,7 +587,6 @@
   }
 }
 
-/* Mobile error state */
 @media screen and (max-width: 600px) {
   .vm2-error-active {
     max-width: calc(100% - 32px);
@@ -676,18 +636,11 @@
   }
 }
 
-/* ============================================
-   CHALLENGER 1: side-by-side layout
-   Dropzone is the flex-row — text col left,
-   image right — both inside the dashed box
-   ============================================ */
-
 .verb-redesign-test.challenger1 .vm2-container {
   align-items: stretch;
   gap: 32px;
 }
 
-/* Dropzone becomes a flex-row container */
 .verb-redesign-test.challenger1 .vm2-dropzone {
   flex-direction: row;
   align-items: center;
@@ -697,7 +650,6 @@
   border-radius: 15px;
 }
 
-/* Left text column */
 .verb-redesign-test.challenger1 .vm2-text-col {
   display: flex;
   flex-direction: column;
@@ -748,12 +700,10 @@
   text-align: left;
 }
 
-
 .verb-redesign-test.challenger1 .vm2-benefit {
   font-size: 18px;
 }
 
-/* Image: right side, inside the dashed box */
 .verb-redesign-test.challenger1 .vm2-dropzone-media {
   flex-shrink: 0;
   width: 194px;
@@ -774,7 +724,6 @@
   object-fit: contain;
 }
 
-/* Tablet 600–1199px: clamp scales from compact at 600px to Figma-spec at 768px */
 @media screen and (min-width: 600px) and (max-width: 1199px) {
   .verb-redesign-test.challenger1 {
     padding: 48px 16px;
@@ -800,7 +749,6 @@
   }
 }
 
-/* Desktop 1200px+ */
 @media screen and (min-width: 1200px) {
   .verb-redesign-test.challenger1 .vm2-dropzone {
     padding: 60px;
@@ -822,47 +770,29 @@
   }
 }
 
-/* ============================================
-   CHALLENGER 2 specific overrides
-   ============================================ */
-
-/* Dropzone: darker dashed border, 15px radius, uniform 40px padding */
 .verb-redesign-test.challenger2 .vm2-dropzone {
   border: 1px dashed #747474;
   border-radius: 15px;
   padding: 40px;
 }
 
-/* Heading + subtitle base (mobile) */
 .verb-redesign-test.challenger2 .vm2-heading {
   font-size: 44px;
   letter-spacing: -1.98px;
 }
 
-.verb-redesign-test.challenger2 .vm2-subtitle {
-  font-size: 20px;
-}
-
-/* Benefits: larger text, darker color */
 .verb-redesign-test.challenger2 .vm2-benefit {
   font-size: 18px;
   color: #161616;
 }
 
-/* Mobile (<600px): benefits gap 16px */
 @media screen and (max-width: 599px) {
   .verb-redesign-test.challenger2 .vm2-benefits {
     gap: 16px 0;
   }
 }
 
-/* Tablet (600px+) */
 @media screen and (min-width: 600px) {
-  .verb-redesign-test.challenger2 .vm2-heading {
-    font-size: 44px;
-    letter-spacing: -1.98px;
-  }
-
   .verb-redesign-test.challenger2 .vm2-subtitle {
     font-size: 24px;
   }
@@ -872,19 +802,13 @@
   }
 }
 
-/* Desktop (1200px+) */
 @media screen and (min-width: 1200px) {
   .verb-redesign-test.challenger2 .vm2-heading {
     font-size: 56px;
     letter-spacing: -2.52px;
   }
-
-  .verb-redesign-test.challenger2 .vm2-subtitle {
-    font-size: 24px;
-  }
 }
 
-/* Mobile: column layout — header/heading/subtitle → image → CTA/drag/file, all centered */
 @media screen and (max-width: 599px) {
   .verb-redesign-test.challenger1 .vm2-dropzone {
     flex-direction: column;
@@ -893,7 +817,6 @@
     gap: 0;
   }
 
-  /* Dissolve text col so its children become direct flex items in the dropzone */
   .verb-redesign-test.challenger1 .vm2-text-col {
     display: contents;
   }
@@ -930,7 +853,6 @@
     text-align: center;
   }
 }
-
 
 :root:has(main .verb-redesign-test) {
   main {
