@@ -671,7 +671,7 @@ export default async function init(element) {
     exitFlag = false;
     setCookie('UTS_Uploading', Date.now());
     handleAnalyticsEvent('job:uploading', filesData, false);
-    if (files.length > 1) handleAnalyticsEvent('job:multi-file-uploading', filesData, false);
+    if (LIMITS[VERB]?.multipleFiles) handleAnalyticsEvent('job:multi-file-uploading', filesData, false);
 
     progressContainer.classList.remove('hide');
     ctaButton.classList.add('hide');
@@ -697,8 +697,9 @@ export default async function init(element) {
       setUser();
 
       const uploadTime = getUploadTime();
-      handleAnalyticsEvent('job:uploaded', { ...filesData, assetId: ids[0], uploadTime }, false);
-      if (files.length > 1) handleAnalyticsEvent('job:multi-file-uploaded', filesData, false);
+      const uploadedMetadata = { ...filesData, assetId: ids[0], uploadTime };
+      handleAnalyticsEvent('job:uploaded', uploadedMetadata, false);
+      if (LIMITS[VERB]?.multipleFiles) handleAnalyticsEvent('job:multi-file-uploaded', uploadedMetadata, false);
 
       setProgress(1, 'Done');
 
@@ -714,6 +715,20 @@ export default async function init(element) {
       dispatchError('error_generic', err.message || 'Failed to store file. Please try again.', filesData);
     }
   }
+
+  fileInput.addEventListener('click', () => {
+    [
+      'filepicker:shown',
+      'dropzone:choose-file-clicked',
+      'files-selected',
+      'entry:clicked',
+      'discover:clicked',
+    ].forEach((evt) => window.analytics.verbAnalytics(evt, VERB, { userAttempts }));
+  });
+
+  fileInput.addEventListener('cancel', () => {
+    window.analytics.verbAnalytics('choose-file:close', VERB, { userAttempts });
+  });
 
   fileInput.addEventListener('change', ({ target: { files } }) => {
     if (!files?.length) return;
