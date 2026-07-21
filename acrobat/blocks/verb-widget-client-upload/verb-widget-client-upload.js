@@ -4,6 +4,10 @@ const miloLibs = setLibs('/libs');
 
 let createTag;
 let getConfig;
+let loadBlock;
+let getMetadata;
+let loadIms;
+let loadScript;
 
 const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 
@@ -14,6 +18,55 @@ const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.x
 
 const LIMITS = {
   'image-to-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true },
+};
+
+const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
+
+const fallBack = 'https://www.adobe.com/go/acrobat-overview';
+
+const verbRedirMap = {
+  createpdf: 'createpdf',
+  'crop-pages': 'crop',
+  'delete-pages': 'deletepages',
+  'extract-pages': 'extract',
+  'combine-pdf': 'combine',
+  'protect-pdf': 'protect',
+  'add-comment': 'addcomment',
+  'pdf-to-image': 'pdftoimage',
+  'reorder-pages': 'reorderpages',
+  sendforsignature: 'sendforsignature',
+  'rotate-pages': 'rotatepages',
+  fillsign: 'fillsign',
+  'split-pdf': 'split',
+  'insert-pdf': 'insert',
+  'compress-pdf': 'compress',
+  'png-to-pdf': 'jpgtopdf',
+  'image-to-pdf': 'jpgtopdf',
+  'bmp-to-pdf': 'jpgtopdf',
+  'gif-to-pdf': 'jpgtopdf',
+  'tiff-to-pdf': 'jpgtopdf',
+  'indd-to-pdf': 'createpdf',
+  'psd-to-pdf': 'createpdf',
+  'ai-to-pdf': 'createpdf',
+  'number-pages': 'number',
+  'ocr-pdf': 'ocr',
+  'chat-pdf': 'chat',
+  'chat-pdf-student': 'study',
+};
+
+const exhLimitCookieMap = {
+  'to-pdf': 'cr_p_c',
+  'pdf-to': 'ex_p_c',
+  'combine-pdf': 'cb_p_c',
+  'compress-pdf': 'cm_p_ops',
+  'rotate-pages': 'or_p_c',
+  createpdf: 'cr_p_c',
+  'ocr-pdf': 'ocr_p_c',
+};
+
+const appEnvCookieMap = {
+  stage: 's_ta_',
+  prod: 'p_ac_',
 };
 
 const MIME_TYPES = {
@@ -43,6 +96,74 @@ const ICONS = {
   INFO_ICON: '<svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g opacity="0.8"><path d="M9.00078 7.0748C9.59449 7.0748 10.0758 6.59351 10.0758 5.9998C10.0758 5.4061 9.59449 4.9248 9.00078 4.9248C8.40707 4.9248 7.92578 5.4061 7.92578 5.9998C7.92578 6.59351 8.40707 7.0748 9.00078 7.0748Z" fill="#222222"/><path fill-rule="evenodd" clip-rule="evenodd" d="M10.167 12H10V8.2C10 8.14696 9.97893 8.09609 9.94142 8.05858C9.90391 8.02107 9.85304 8 9.8 8H7.833C7.833 8 7.25 8.016 7.25 8.5C7.25 8.984 7.833 9 7.833 9H8V12H7.833C7.833 12 7.25 12.016 7.25 12.5C7.25 12.984 7.833 13 7.833 13H10.167C10.167 13 10.75 12.984 10.75 12.5C10.75 12.016 10.167 12 10.167 12Z" fill="#222222"/><path fill-rule="evenodd" clip-rule="evenodd" d="M9.00078 1.0498C7.42842 1.0498 5.89137 1.51606 4.584 2.38962C3.27663 3.26318 2.25766 4.5048 1.65594 5.95747C1.05423 7.41014 0.896789 9.00862 1.20354 10.5508C1.51029 12.0929 2.26746 13.5095 3.37929 14.6213C4.49111 15.7331 5.90767 16.4903 7.44982 16.797C8.99197 17.1038 10.5904 16.9464 12.0431 16.3446C13.4958 15.7429 14.7374 14.724 15.611 13.4166C16.4845 12.1092 16.9508 10.5722 16.9508 8.9998C16.9508 6.89133 16.1132 4.86922 14.6223 3.37831C13.1314 1.88739 11.1093 1.0498 9.00078 1.0498ZM9.00078 15.9558C7.62502 15.9558 6.28015 15.5478 5.13624 14.7835C3.99233 14.0192 3.10076 12.9328 2.57428 11.6618C2.0478 10.3907 1.91004 8.99209 2.17844 7.64276C2.44684 6.29342 3.10934 5.05398 4.08215 4.08117C5.05496 3.10836 6.2944 2.44586 7.64374 2.17746C8.99307 1.90906 10.3917 2.04682 11.6627 2.5733C12.9338 3.09978 14.0202 3.99135 14.7845 5.13526C15.5488 6.27917 15.9568 7.62404 15.9568 8.9998C15.9568 10.8447 15.2239 12.6139 13.9194 13.9184C12.6149 15.2229 10.8456 15.9558 9.00078 15.9558Z" fill="#222222"/></g></svg>',
   CLOSE_ICON: '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_15746_2423)"><g clip-path="url(#clip1_15746_2423)"><path fill-rule="evenodd" clip-rule="evenodd" d="M17.2381 15.9994L19.6944 13.5434C19.8586 13.3793 19.9509 13.1566 19.9509 12.9245C19.951 12.6923 19.8588 12.4696 19.6946 12.3054C19.5305 12.1412 19.3078 12.0489 19.0757 12.0488C18.8435 12.0488 18.6208 12.141 18.4566 12.3051L16.0002 14.7615L13.5435 12.3051C13.3793 12.141 13.1566 12.0489 12.9245 12.049C12.6923 12.0491 12.4697 12.1414 12.3057 12.3056C12.1416 12.4698 12.0495 12.6925 12.0496 12.9246C12.0497 13.1568 12.142 13.3794 12.3062 13.5434L14.7622 15.9994L12.3062 18.4555C12.1427 18.6197 12.051 18.8421 12.0512 19.0738C12.0515 19.3055 12.1436 19.5277 12.3074 19.6916C12.4711 19.8556 12.6933 19.9478 12.925 19.9482C13.1567 19.9486 13.3791 19.8571 13.5435 19.6938L16.0002 17.2374L18.4566 19.6938C18.6208 19.8579 18.8435 19.9501 19.0756 19.9501C19.3078 19.95 19.5305 19.8577 19.6946 19.6935C19.8588 19.5293 19.9509 19.3066 19.9509 19.0745C19.9509 18.8423 19.8586 18.6196 19.6944 18.4555L17.2381 15.9994Z" fill="white"/></g></g><defs><clipPath id="clip0_15746_2423"><rect width="8" height="8" fill="white" transform="translate(12 12)"/></clipPath><clipPath id="clip1_15746_2423"><rect width="8" height="8" fill="white" transform="translate(12 12)"/></clipPath></defs></svg>',
 };
+
+function isMobileDevice() {
+  return /android|iphone|ipod|blackberry|windows phone/i.test(navigator.userAgent);
+}
+
+function isTabletDevice() {
+  const ua = navigator.userAgent.toLowerCase();
+  const isIPadOS = navigator.userAgent.includes('Mac') && 'ontouchend' in document && !/iphone|ipod/i.test(ua);
+  return isIPadOS || /ipad|android(?!.*mobile)/i.test(ua);
+}
+
+function redDirLink(verb) {
+  const hostname = window?.location?.hostname;
+  const ENV = getEnv();
+  if (hostname !== 'www.adobe.com' && hostname !== 'sign.ing' && hostname !== 'edit.ing') {
+    return `https://www.adobe.com/go/acrobat-${verbRedirMap[verb] || verb.split('-').join('')}-${ENV}`;
+  }
+  return `https://www.adobe.com/go/acrobat-${verbRedirMap[verb] || verb.split('-').join('')}` || fallBack;
+}
+
+function redDir(verb) {
+  window.location.href = redDirLink(verb);
+}
+
+async function loadGoogleLogin() {
+  if (window.adobeIMS?.isSignedInUser()) return;
+  const { default: initGoogleLogin } = await import(`${miloLibs}/features/google-login.js`);
+  initGoogleLogin(loadIms, getMetadata, loadScript, getConfig);
+}
+
+async function showUpSell(verb, element) {
+  const headline = window.mph?.[`verb-widget-upsell-headline-${verb}`] || window.mph?.['verb-widget-upsell-headline'];
+  const headlineNopayment = window.mph?.['verb-widget-upsell-headline-nopayment'];
+  const bulletsHeading = window.mph?.['verb-widget-upsell-bullets-heading'];
+  const bullets = window.mph?.[`verb-widget-upsell-bullets-${verb}`] || window.mph?.['verb-widget-upsell-bullets'];
+
+  const headlineEl = createTag('h1', { class: 'verb-upsell-heading' }, headline);
+  const headingNopaymentEl = createTag('h1', { class: 'verb-upsell-heading verb-upsell-heading-nopayment' }, headlineNopayment);
+  const upsellBulletsHeading = createTag('p', { class: 'verb-upsell-bullets-heading' }, bulletsHeading);
+  const upsellBullets = createTag('ul', { class: 'verb-upsell-bullets' });
+  (bullets || '').split('\n').forEach((bullet) => upsellBullets.append(createTag('li', {}, bullet)));
+
+  const upsell = createTag('div', { class: 'verb-upsell' });
+  const upsellColumn = createTag('div', { class: 'verb-upsell-column' });
+
+  const socialContainer = createTag('div', { class: 'verb-upsell-social-container' });
+  const socialCta = createTag('div', { class: 'susi-light' });
+  socialCta.innerHTML = `<div><div>${redDirLink(verb)}</div></div>`;
+  socialContainer.append(socialCta);
+  await loadBlock(socialCta);
+
+  const upsellRow = createTag('div', { class: 'verb-row' });
+  upsellRow.append(upsellColumn, socialContainer);
+  upsell.append(upsellRow);
+  upsellColumn.append(headlineEl, headingNopaymentEl, upsellBulletsHeading, upsellBullets);
+
+  const upsellWidget = createTag('div', { class: 'verb-wrapper verb-upsell-active' });
+  const upsellContainer = createTag('div', { class: 'verb-container' });
+  upsellWidget.append(upsellContainer);
+  upsellContainer.append(upsell);
+
+  element.classList.add('upsell');
+  element.append(upsellWidget);
+
+  loadGoogleLogin();
+}
+
+const setUser = () => { localStorage.setItem('unity.user', 'true'); };
 
 const lanaOptions = { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'error' };
 
@@ -303,7 +424,9 @@ async function createSvgElement(iconName) {
 }
 
 export default async function init(element) {
-  ({ createTag, getConfig } = await import(`${miloLibs}/utils/utils.js`));
+  ({
+    createTag, getConfig, loadBlock, getMetadata, loadIms, loadScript,
+  } = await import(`${miloLibs}/utils/utils.js`));
 
   if (isOldBrowser()) {
     window.location.href = EOLBrowserPage;
@@ -320,6 +443,8 @@ export default async function init(element) {
   const VERB = element.classList[1];
   const limits = LIMITS[VERB] ?? LIMITS['image-to-pdf'];
   const userAttempts = getVerbKey(`${VERB}_attempts`);
+  const isMobile = isMobileDevice();
+  const isTablet = isTabletDevice();
 
   const heading = children[0]?.textContent ?? '';
   const subCopy = children[1]?.textContent ?? window.mph?.[`verb-widget-${VERB}-description`] ?? '';
@@ -402,7 +527,20 @@ export default async function init(element) {
     return text ? html.replace(text, `<a class="verb-legal-url" target="_blank" href="${url}">${text}</a>`) : html;
   }, `${window.mph?.['verb-widget-legal-2'] ?? ''} `);
   legalWrapper.append(legal, legalTwo);
+  if (isMobile) {
+    widget.classList.add('mobile');
+    infoIcon.classList.add('mobile');
+  } else if (isTablet) {
+    widget.classList.add('tablet');
+    infoIcon.classList.add('tablet');
+  }
+
   footer.append(iconSecurity, legalWrapper, infoIcon);
+
+  if (isMobile && !isTablet) {
+    iconSecurity.remove();
+    footer.prepend(infoIcon);
+  }
 
   errorState.append(errorIcon, errorText, closeErrorBtn);
   widgetLeft.append(widgetHeader, widgetHeading, widgetCopy, errorState, ctaButton, fileInput, progressContainer);
@@ -411,7 +549,40 @@ export default async function init(element) {
   widgetContainer.append(widgetRow);
   widget.append(widgetContainer);
   element.append(widget, footer);
+  element.classList.add('ready');
   element.parentNode.style.display = 'block';
+
+  async function checkSignedInUser() {
+    if (!window.adobeIMS?.isSignedInUser?.()) return;
+
+    element.classList.remove('upsell');
+    element.classList.add('signed-in');
+
+    let accountType;
+    try {
+      accountType = window.adobeIMS.getAccountType();
+    } catch {
+      accountType = (await window.adobeIMS.getProfile()).account_type;
+    }
+
+    if (accountType && LIMITS[VERB].neverRedirect) return;
+    if (accountType !== 'type1') redDir(VERB);
+    if (accountType === 'type1' && !LIMITS[VERB].typeOneLanding) redDir(VERB);
+  }
+
+  const { cookie } = document;
+  const limitCookie = exhLimitCookieMap[VERB] || exhLimitCookieMap[VERB.match(/^pdf-to|to-pdf$/)?.[0]];
+  const cookiePrefix = appEnvCookieMap[DC_ENV] || '';
+  const isLimitExhausted = limitCookie && cookie.includes(`${cookiePrefix}${limitCookie}`);
+
+  if (!window.adobeIMS?.isSignedInUser?.() && isLimitExhausted) {
+    await showUpSell(VERB, element);
+    window.analytics.verbAnalytics('upsell:shown', VERB, { userAttempts });
+    window.analytics.verbAnalytics('upsell-wall:shown', VERB, { userAttempts });
+  }
+
+  await checkSignedInUser();
+  window.addEventListener('IMS:Ready', checkSignedInUser);
 
   const setProgress = (ratio, label = '') => {
     const pct = Math.round(ratio * 100);
@@ -523,6 +694,7 @@ export default async function init(element) {
       exitFlag = true;
       isUploading = false;
       incrementVerbKey(`${VERB}_attempts`);
+      setUser();
 
       const uploadTime = getUploadTime();
       handleAnalyticsEvent('job:uploaded', { ...filesData, assetId: ids[0], uploadTime }, false);
@@ -530,15 +702,12 @@ export default async function init(element) {
 
       setProgress(1, 'Done');
 
-      const redirectBase = window.mph?.['verb-widget-client-upload-redirect'];
-      if (redirectBase) {
-        const params = new URLSearchParams({ fileId: ids.join(',') });
-        const redirectUrl = `${redirectBase}?${params}`;
-        handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
-        window.location.href = redirectUrl;
-      } else {
-        hideProgress();
-      }
+      const redirectBase = window.mph?.['verb-widget-client-upload-redirect']
+        || 'https://www.stage.adobe.com/acrobat/online.html';
+      const params = new URLSearchParams({ fileId: ids.join(',') });
+      const redirectUrl = `${redirectBase}?${params}`;
+      handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
+      window.location.href = redirectUrl;
     } catch (err) {
       isUploading = false;
       hideProgress();
