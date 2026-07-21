@@ -210,7 +210,7 @@ function validateFiles(files, verb) {
   const mph = window.mph ?? {};
 
   if (!limits || !files.length) {
-    return { valid: false, code: 'error_generic', message: mph['verb-widget-error-generic'] || 'No files selected.' };
+    return { valid: false, code: 'error_generic', message: mph['verb-widget-error-generic'] || 'Unable to process the request.' };
   }
 
   if (!limits.multipleFiles && !limits.maxNumFiles && files.length > 1) {
@@ -226,7 +226,7 @@ function validateFiles(files, verb) {
     return {
       valid: false,
       code: 'error_max_num_files',
-      message: mph['verb-widget-error-max-num-files'] || `Maximum ${maxFiles} file${maxFiles === 1 ? '' : 's'} allowed. You selected ${files.length}.`,
+      message: mph['verb-widget-error-max-num-files'] || 'Too many files selected.',
     };
   }
 
@@ -236,25 +236,25 @@ function validateFiles(files, verb) {
     return {
       valid: false,
       code: 'error_duplicate_asset',
-      message: mph['verb-widget-error-duplicate-asset'] || `Duplicate file: "${firstDuplicate}". Each file must have a unique name.`,
+      message: mph['verb-widget-error-duplicate-asset'] || 'Duplicate detected. Please rename file before uploading again.',
     };
   }
 
+  const multi = files.length > 1;
   for (const file of files) {
     if (file.size === 0) {
       return {
         valid: false,
         code: 'error_empty_file',
-        message: mph['verb-widget-error-empty-file'] || `"${file.name}" is empty.`,
+        message: mph['verb-widget-error-empty-file'] || (multi ? 'These files are empty.' : 'This file is empty.'),
       };
     }
 
     if (file.size > limits.maxFileSize) {
-      const mb = (limits.maxFileSize / 1024 / 1024).toFixed(0);
       return {
         valid: false,
         code: 'error_file_too_large',
-        message: mph['verb-widget-error-file-too-large'] || `"${file.name}" exceeds the ${mb} MB size limit.`,
+        message: mph['verb-widget-error-file-too-large'] || (multi ? 'These files are either too large or too complex to export.' : 'This file is either too large or too complex to export.'),
       };
     }
 
@@ -263,7 +263,7 @@ function validateFiles(files, verb) {
       return {
         valid: false,
         code: 'error_unsupported_type',
-        message: mph['verb-widget-error-unsupported-type'] || `"${file.name}" is not a supported file type.`,
+        message: mph['verb-widget-error-unsupported-type'] || (multi ? 'These files are in a format not supported for conversion to PDF.' : 'This file is in a format not supported for conversion to PDF.'),
       };
     }
 
@@ -272,7 +272,7 @@ function validateFiles(files, verb) {
       return {
         valid: false,
         code: 'error_unsupported_type',
-        message: mph['verb-widget-error-unsupported-type'] || `"${file.name}" doesn't appear to be a valid ${ext.slice(1).toUpperCase()} file.`,
+        message: mph['verb-widget-error-unsupported-type'] || (multi ? 'These files are in a format not supported for conversion to PDF.' : 'This file is in a format not supported for conversion to PDF.'),
       };
     }
   }

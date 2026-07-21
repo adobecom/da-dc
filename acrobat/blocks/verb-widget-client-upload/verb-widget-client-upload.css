@@ -205,46 +205,74 @@
 
 /* ── Error state ────────────────────────────────────────────────────────────── */
 
-.error {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  background: #fff4f4;
-  border: 1px solid #eb1000;
-  border-radius: 8px;
-  padding: var(--consonant-spacing-xxs) var(--consonant-spacing-xs);
-  margin-bottom: var(--consonant-spacing-s);
-}
-
 .error.hide {
   display: none;
 }
 
-.verb-errorText {
-  flex: 1;
-  font-family: var(--consonant-font-family);
+.verb-error {
+  cursor: default;
+  background: #D31510;
+  max-width: 435px;
+  color: white;
+  position: absolute;
+  top: 90px;
+  transform: translate(-50%, -50%);
+  left: 50%;
   font-size: 14px;
-  color: #eb1000;
+  font-weight: 400;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+}
+
+.close-icon {
+  position: relative;
+}
+
+.verb-errorText {
+  border-right: 1px solid rgb(255 255 255 / 20%);
+  padding: 0;
   margin: 0;
+  margin-right: 8px;
+  padding-right: 16px;
+  max-width: 324px;
+  margin-left: 8px;
+  min-width: 100px;
 }
 
 .verb-errorBtn {
+  align-self: self-start;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: block;
   background: none;
   border: none;
-  cursor: pointer;
-  font-size: 14px;
-  color: #eb1000;
-  padding: 0;
-  line-height: 1;
+  outline: none;
 }
 
-/* ── Progress bar ───────────────────────────────────────────────────────────── */
-/*
- * This section has no equivalent in verb-widget because Unity SDK manages
- * its own loading/progress UI inside the DC Hosted iframe.
- * In this client-side block we own the full upload lifecycle, so we build
- * our own progress indicator here.
- */
+.verb-errorIcon {
+  align-self: self-start;
+  width: 18px;
+  height: 18px;
+  margin-left: 8px;
+  margin-right: 4px;
+  margin-top: 7px;
+}
+
+.verb-errorIcon::after {
+  content: '';
+  background-image: url('/acrobat/img/icons/ui/alert.svg');
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+/* ── Progress bar ──────────────────────────────────────────────────────────── */
 
 .upload-progress {
   display: flex;
