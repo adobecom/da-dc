@@ -1,0 +1,351 @@
+/*
+ * verb-widget-client-upload.css
+ * Mirrors verb-widget layout/typography. Adds progress-bar styles.
+ */
+
+:root {
+  --consonant-font-family: 'Adobe Clean', adobe-clean, 'Trebuchet MS', sans-serif;
+  --consonant-color-white: #fff;
+  --consonant-color: #2c2c2c;
+  --consonant-color-gray-300: #d5d5d5;
+  --consonant-color-gray-700: #464646;
+  --consonant-link-color: #1473e6;
+  --consonant-link-color-hover: #0d66d0;
+
+  --consonant-spacing-xxs: 8px;
+  --consonant-spacing-xs: 16px;
+  --consonant-spacing-s: 24px;
+  --consonant-spacing-m: 32px;
+
+  --consonant-radius-xl: 20px;
+
+  --verb-wrapper-border-width: 3px;
+  --verb-wrapper-padding-y: var(--consonant-spacing-s);
+  --verb-wrapper-padding-x: var(--consonant-spacing-s);
+  --verb-wrapper-min-height: auto;
+  --verb-wrapper-width: 1008px;
+  --verb-wrapper-max-width: calc(var(--verb-wrapper-width) - ((var(--verb-wrapper-padding-x) * 2) + var(--verb-wrapper-border-width) * 2));
+
+  --verb-widget-padding: var(--consonant-spacing-m) var(--consonant-spacing-xs);
+  --verb-widget-min-height: 528px;
+  --verb-widget-image-width: 120px;
+
+  --consonant-heading-xxl-size: 36px;
+  --consonant-heading-xxl-fw: 700;
+  --consonant-body-m-size: 18px;
+  --consonant-body-xxs-size: 12px;
+  --consonant-button-l-label-size: 19px;
+
+  --gnav-height: 115px;
+  --footer-height: calc(72px + var(--consonant-spacing-s));
+
+  @media (min-width: 835px) {
+    --verb-widget-min-height: 360px;
+    --verb-wrapper-min-height: auto;
+    --verb-widget-padding: 32px 40px;
+    --verb-widget-image-width: 160px;
+    --verb-wrapper-padding-y: 40px;
+    --verb-wrapper-padding-x: 40px;
+  }
+
+  @media (min-width: 1200px) {
+    --verb-widget-padding: 32px 96px;
+    --verb-wrapper-min-height: 475px;
+    --verb-widget-image-width: 200px;
+    --verb-wrapper-padding-x: 96px;
+    --consonant-heading-xxl-size: 44px;
+  }
+
+  @media (min-width: 1392px) {
+    --verb-wrapper-width: 1200px;
+  }
+}
+
+/* ── Block shell ────────────────────────────────────────────────────────────── */
+
+.verb-widget-client-upload {
+  background-color: #fff;
+  background-image: linear-gradient(180deg, #eb1000 0%, #f79b94 46%, #fff 78%);
+  padding: var(--verb-widget-padding);
+  min-height: var(--verb-widget-min-height);
+  color: transparent;
+}
+
+.verb-widget-client-upload.ready {
+  color: initial;
+}
+
+/* ── Drop zone wrapper ──────────────────────────────────────────────────────── */
+
+.verb-wrapper {
+  max-width: var(--verb-wrapper-max-width);
+  padding: var(--verb-wrapper-padding-y) var(--verb-wrapper-padding-x);
+  border: var(--verb-wrapper-border-width) dashed var(--consonant-color-gray-300);
+  border-radius: var(--consonant-radius-xl);
+  min-height: var(--verb-wrapper-min-height);
+  background-color: #fff;
+  cursor: pointer;
+  margin-inline: auto;
+}
+
+.verb-wrapper:hover {
+  border-color: #909090;
+}
+
+.verb-wrapper.dragging {
+  background-color: #ecf5ff;
+  border: 3px solid #0265dc;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────────────────── */
+
+.verb-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 100%;
+}
+
+.verb-col {
+  flex: 100%;
+}
+
+.verb-col.right {
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Header (Acrobat icon + "Adobe Acrobat") ────────────────────────────────── */
+
+.verb-header {
+  display: flex;
+  align-items: center;
+  gap: var(--consonant-spacing-xxs);
+  margin-bottom: var(--consonant-spacing-xxs);
+}
+
+.acrobat-icon {
+  display: inline-flex;
+  width: 42px;
+  height: 40px;
+}
+
+.acrobat-icon svg,
+.icon-verb {
+  width: 100%;
+  height: 100%;
+}
+
+.verb-title {
+  font-family: var(--consonant-font-family);
+  font-size: var(--consonant-body-m-size);
+  font-weight: 700;
+  color: var(--consonant-color);
+}
+
+/* ── Heading ────────────────────────────────────────────────────────────────── */
+
+.verb-heading {
+  font-family: var(--consonant-font-family);
+  font-size: var(--consonant-heading-xxl-size);
+  font-weight: var(--consonant-heading-xxl-fw);
+  line-height: 125%;
+  color: var(--consonant-color);
+  margin: var(--consonant-spacing-xxs) 0 var(--consonant-spacing-s);
+}
+
+/* ── Body copy ──────────────────────────────────────────────────────────────── */
+
+.verb-copy {
+  font-family: var(--consonant-font-family);
+  font-size: var(--consonant-body-m-size);
+  line-height: 150%;
+  color: var(--consonant-color);
+  margin: 0 0 var(--consonant-spacing-s);
+}
+
+/* ── CTA button ─────────────────────────────────────────────────────────────── */
+
+.verb-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px 14px;
+  background: #1473e6;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  font-family: var(--consonant-font-family);
+  font-size: var(--consonant-button-l-label-size);
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: var(--consonant-spacing-s);
+  transition: background 0.15s;
+}
+
+.verb-cta:hover {
+  background: #0d66d0;
+}
+
+.verb-cta:disabled {
+  background: #747474;
+  cursor: default;
+}
+
+.upload-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.hide {
+  display: none !important;
+}
+
+/* ── Error state ────────────────────────────────────────────────────────────── */
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fff4f4;
+  border: 1px solid #eb1000;
+  border-radius: 8px;
+  padding: var(--consonant-spacing-xxs) var(--consonant-spacing-xs);
+  margin-bottom: var(--consonant-spacing-s);
+}
+
+.error.hide {
+  display: none;
+}
+
+.verb-errorText {
+  flex: 1;
+  font-family: var(--consonant-font-family);
+  font-size: 14px;
+  color: #eb1000;
+  margin: 0;
+}
+
+.verb-errorBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #eb1000;
+  padding: 0;
+  line-height: 1;
+}
+
+/* ── Progress bar ───────────────────────────────────────────────────────────── */
+/*
+ * This section has no equivalent in verb-widget because Unity SDK manages
+ * its own loading/progress UI inside the DC Hosted iframe.
+ * In this client-side block we own the full upload lifecycle, so we build
+ * our own progress indicator here.
+ */
+
+.upload-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--consonant-spacing-xxs);
+  margin-bottom: var(--consonant-spacing-s);
+}
+
+.upload-progress-label {
+  font-family: var(--consonant-font-family);
+  font-size: 14px;
+  color: var(--consonant-color-gray-700);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 340px;
+}
+
+.upload-progress-bar {
+  width: 100%;
+  max-width: 340px;
+  height: 6px;
+  background: var(--consonant-color-gray-300);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.upload-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #1473e6;
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+.upload-cancel-btn {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid var(--consonant-color-gray-300);
+  border-radius: 16px;
+  padding: 4px 14px;
+  font-family: var(--consonant-font-family);
+  font-size: 14px;
+  color: var(--consonant-color-gray-700);
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.upload-cancel-btn:hover {
+  border-color: #909090;
+}
+
+/* ── Image column ────────────────────────────────────────────────────────────── */
+
+.verb-image {
+  width: var(--verb-widget-image-width);
+}
+
+.verb-image svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────────────── */
+
+.verb-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--consonant-spacing-s);
+}
+
+.security-icon {
+  display: flex;
+  padding: 8.5px 11px;
+}
+
+.verb-legal-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.verb-legal {
+  display: inline-block;
+  color: var(--consonant-color-gray-700);
+  margin: 0;
+  font-size: var(--consonant-body-xxs-size);
+  line-height: 150%;
+}
+
+.verb-legal-two {
+  margin-top: 0;
+}
+
+.verb-legal-url {
+  text-decoration: underline;
+  color: var(--consonant-link-color);
+}
+
+.verb-legal-url:hover {
+  color: var(--consonant-link-color-hover);
+}
