@@ -53,7 +53,7 @@ const ICONS = {
   BENEFIT_STAR_ICON: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M10 2l2.09 4.26L17 7.27l-3.5 3.41.83 4.82L10 13.27l-4.33 2.23.83-4.82L3 7.27l4.91-.71L10 2z" fill="currentColor"/></svg>',
 };
 
-const BENEFIT_ICON_KEYS = ['BENEFIT_CARD_ICON', 'BENEFIT_SHIELD_ICON', 'BENEFIT_TRASH_ICON', 'BENEFIT_STAR_ICON'];
+const BENEFIT_ICON_KEYS = ['BENEFIT_CARD_ICON', 'BENEFIT_SHIELD_ICON', 'BENEFIT_TRASH_ICON', null];
 
 function createSvgElement(iconName) {
   const svgString = ICONS[iconName];
@@ -198,7 +198,7 @@ window.addEventListener('analyticsLoad', async ({ detail }) => {
     await Promise.race([
       new Promise((res) => {
         try {
-          const obs = new PerformanceObserver((list) => { if (list.getEntries().length > 0) res(); });
+          const obs = new PerformanceObserver((list) => { if (list.getEntries().length > 0) { obs.disconnect(); res(); } });
           obs.observe({ type: 'largest-contentful-paint', buffered: true });
         } catch { res(); }
       }),
@@ -278,6 +278,37 @@ export default async function init(element) {
   if (isOldBrowser()) {
     window.location.href = EOLBrowserPage;
     return;
+  }
+
+  const prerenderElement = document.querySelector('#prerender_verb-widget');
+  if (prerenderElement && window.PerformanceObserver) {
+    Promise.race([
+      new Promise((resolve) => {
+        try {
+          const lcpObserver = new PerformanceObserver((entries) => {
+            if (entries.getEntries().length > 0) {
+              prerenderElement.remove();
+              lcpObserver.disconnect();
+              resolve();
+            }
+          });
+          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+        } catch (error) {
+          prerenderElement.remove();
+          resolve();
+        }
+      }),
+      new Promise((resolve) => {
+        setTimeout(() => {
+          prerenderElement.remove();
+          resolve();
+        }, 3000);
+      }),
+    ]);
+  } else if (prerenderElement) {
+    setTimeout(() => {
+      prerenderElement.remove();
+    }, 3000);
   }
 
   window.mph = window.mph || {};
@@ -541,18 +572,33 @@ export default async function init(element) {
     prefetchTarget();
     const metadata = mergeData({ ...data, userAttempts: attempts });
     handleAnalyticsEvent('job:uploading', metadata, false, canSendDataToSplunk);
-    handleAnalyticsEvent('job:multi-file-uploading', metadata, false, canSendDataToSplunk);
+    if (LIMITS[VERB]?.multipleFiles) {
+      handleAnalyticsEvent('job:multi-file-uploading', metadata, false, canSendDataToSplunk);
+    }
     setCookie('UTS_Uploading', Date.now(), cookieExp);
     registerTabCloseEvent(metadata, 'uploading');
   }
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    window.dispatchEvent(redirectReady);
+    if (LIMITS[VERB]?.noRedirectTimeout) {
+      window.dispatchEvent(redirectReady);
+    } else {
+      setTimeout(() => {
+        window.dispatchEvent(redirectReady);
+        window.lana?.log(
+          'Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.',
+          { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'warning' },
+        );
+      }, 3000);
+    }
     setCookie('UTS_Uploaded', Date.now(), cookieExp);
-    const metadata = { ...data, uploadTime: uploadedTime(), userAttempts: attempts };
+    const calcUploadedTime = uploadedTime();
+    const metadata = { ...data, uploadTime: calcUploadedTime, userAttempts: attempts };
     handleAnalyticsEvent('job:uploaded', metadata, false, canSendDataToSplunk);
-    handleAnalyticsEvent('job:multi-file-uploaded', metadata, false, canSendDataToSplunk);
+    if (LIMITS[VERB]?.multipleFiles) {
+      handleAnalyticsEvent('job:multi-file-uploaded', metadata, false, canSendDataToSplunk);
+    }
     setUser();
     incrementVerbKey(`${VERB}_attempts`);
   }
@@ -628,7 +674,9 @@ export default async function init(element) {
       .forEach((analyticsEvent) => { window.analytics.verbAnalytics(analyticsEvent, VERB, { userAttempts }); });
   });
   fileInput.addEventListener('change', ({ target: { files } }) => {
-    if (files.length > 0) noOfFiles = files.length;
+    if (!files) return;
+    noOfFiles = files.length;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
   fileInput.addEventListener('cancel', () => {
     window.analytics.verbAnalytics('choose-file:close', VERB, { userAttempts });

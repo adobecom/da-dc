@@ -74,10 +74,10 @@
 
 /* Subtitle */
 .vm2-subtitle {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 400;
   line-height: 1.5;
-  color: #3d3d3d;
+  color: var(--color-black);
   margin: 0;
   text-align: center;
   margin-top: -8px;
@@ -255,7 +255,7 @@
   font-size: 13px;
   font-weight: 400;
   color: #505050;
-  line-height: 1.4;
+  line-height: 1.5;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -277,7 +277,7 @@
 /* Footer */
 .vm2-footer {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   gap: 8px;
   width: 100%;
@@ -289,9 +289,15 @@
   line-height: 1.5;
   color: #767676;
   margin: 0;
-  text-align: center;
+  text-align: left;
   flex: 0 1 auto;
   max-width: 520px;
+}
+
+@media screen and (min-width: 600px) {
+  .vm2-legal {
+    text-align: center;
+  }
 }
 
 .vm2-legal a,
@@ -316,7 +322,6 @@
   height: 18px;
   cursor: pointer;
   flex-shrink: 0;
-  margin-top: 2px;
   padding: 0;
   background: none;
   border: none;
@@ -380,6 +385,21 @@
 .verb-redesign-test .milo-tooltip:hover::after,
 .verb-redesign-test .milo-tooltip:focus::after {
   display: block;
+}
+
+@media screen and (max-width: 1199px) {
+  .verb-redesign-test .milo-tooltip.top::before {
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(-6px);
+    max-width: 200px;
+  }
+
+  .verb-redesign-test .milo-tooltip.top::after {
+    left: auto;
+    right: 4px;
+    transform: translateX(0) translateY(8px);
+  }
 }
 
 /* Background */
@@ -501,7 +521,7 @@
   }
 
   .vm2-subtitle {
-    font-size: 20px;
+    font-size: 24px;
   }
 
   .vm2-benefit {
@@ -519,7 +539,7 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 14px 32px;
-    max-width: 450px;
+    max-width: 540px;
     width: auto;
     margin: 0 auto;
   }
@@ -533,6 +553,10 @@
 
   .verb-redesign-test.challenger2 {
     padding: 56px 40px;
+  }
+
+  .verb-redesign-test.challenger1 {
+    padding: 48px 40px;
   }
 
   .vm2-container {
@@ -550,13 +574,17 @@
     padding: 56px 80px;
   }
 
+  .verb-redesign-test.challenger1 {
+    padding: 48px 80px;
+  }
+
   .vm2-heading {
     font-size: 80px;
     letter-spacing: -3.6px;
   }
 
   .vm2-subtitle {
-    font-size: 22px;
+    font-size: 24px;
     margin-top: -12px;
   }
 
@@ -636,7 +664,8 @@
   }
 
   .vm2-benefit {
-    font-size: 13px;
+    font-size: 18px;
+    line-height: 1.1;
   }
 }
 
@@ -648,6 +677,7 @@
 
 .verb-redesign-test.challenger1 .vm2-container {
   align-items: stretch;
+  gap: 32px;
 }
 
 /* Dropzone becomes a flex-row container */
@@ -657,6 +687,7 @@
   justify-content: space-between;
   gap: 40px;
   padding: 40px 60px;
+  border-radius: 15px;
 }
 
 /* Left text column */
@@ -673,7 +704,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 24px;
 }
 
 .verb-redesign-test.challenger1 .vm2-text-bottom {
@@ -689,25 +720,44 @@
 
 .verb-redesign-test.challenger1 .vm2-heading {
   text-align: left;
-  font-size: 40px;
-  letter-spacing: -1.6px;
+  font-size: 44px;
+  letter-spacing: -1.98px;
 }
 
 .verb-redesign-test.challenger1 .vm2-subtitle {
   text-align: left;
-  margin-top: 0;
+  margin-top: -16px;
+  font-size: 20px;
 }
 
-.verb-redesign-test.challenger1 .vm2-drag,
+.verb-redesign-test.challenger1 .vm2-drag {
+  text-align: left;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.54px;
+}
+
 .verb-redesign-test.challenger1 .vm2-file-limit {
   text-align: left;
+}
+
+.verb-redesign-test.challenger1 .vm2-cta {
+  background-color: #3b63fb;
+}
+
+.verb-redesign-test.challenger1 .vm2-cta:hover {
+  background-color: #2d55e8;
+}
+
+.verb-redesign-test.challenger1 .vm2-benefit {
+  font-size: 18px;
 }
 
 /* Image: right side, inside the dashed box */
 .verb-redesign-test.challenger1 .vm2-dropzone-media {
   flex-shrink: 0;
-  width: 200px;
-  height: 200px;
+  width: 194px;
+  height: 180px;
 }
 
 .verb-redesign-test.challenger1 .vm2-dropzone-media .asset,
@@ -724,21 +774,29 @@
   object-fit: contain;
 }
 
-/* Tablet 600–1199px */
+/* Tablet 600–1199px: clamp scales from compact at 600px to Figma-spec at 768px */
 @media screen and (min-width: 600px) and (max-width: 1199px) {
+  .verb-redesign-test.challenger1 {
+    padding: 48px 16px;
+  }
+
   .verb-redesign-test.challenger1 .vm2-dropzone {
-    padding: 32px 40px;
-    gap: 24px;
+    padding: clamp(32px, 7.8vw, 60px);
+    gap: clamp(32px, 7.3vw, 56px);
   }
 
   .verb-redesign-test.challenger1 .vm2-heading {
-    font-size: 36px;
-    letter-spacing: -1.4px;
+    font-size: clamp(36px, 5.7vw, 44px);
+    letter-spacing: -1.98px;
+  }
+
+  .verb-redesign-test.challenger1 .vm2-subtitle {
+    font-size: 24px;
   }
 
   .verb-redesign-test.challenger1 .vm2-dropzone-media {
-    width: 160px;
-    height: 160px;
+    width: clamp(194px, 28.6vw, 220px);
+    height: clamp(180px, 26.6vw, 204px);
   }
 }
 
@@ -750,13 +808,79 @@
   }
 
   .verb-redesign-test.challenger1 .vm2-heading {
-    font-size: 48px;
-    letter-spacing: -2px;
+    font-size: 64px;
+    letter-spacing: -2.88px;
+  }
+
+  .verb-redesign-test.challenger1 .vm2-subtitle {
+    font-size: 24px;
   }
 
   .verb-redesign-test.challenger1 .vm2-dropzone-media {
-    width: 240px;
-    height: 240px;
+    width: 256px;
+    height: 237px;
+  }
+}
+
+/* ============================================
+   CHALLENGER 2 specific overrides
+   ============================================ */
+
+/* Dropzone: darker dashed border, 15px radius, uniform 40px padding */
+.verb-redesign-test.challenger2 .vm2-dropzone {
+  border: 1px dashed #747474;
+  border-radius: 15px;
+  padding: 40px;
+}
+
+/* Heading + subtitle base (mobile) */
+.verb-redesign-test.challenger2 .vm2-heading {
+  font-size: 44px;
+  letter-spacing: -1.98px;
+}
+
+.verb-redesign-test.challenger2 .vm2-subtitle {
+  font-size: 20px;
+}
+
+/* Benefits: larger text, darker color */
+.verb-redesign-test.challenger2 .vm2-benefit {
+  font-size: 18px;
+  color: #161616;
+}
+
+/* Mobile (<600px): benefits gap 16px */
+@media screen and (max-width: 599px) {
+  .verb-redesign-test.challenger2 .vm2-benefits {
+    gap: 16px 0;
+  }
+}
+
+/* Tablet (600px+) */
+@media screen and (min-width: 600px) {
+  .verb-redesign-test.challenger2 .vm2-heading {
+    font-size: 44px;
+    letter-spacing: -1.98px;
+  }
+
+  .verb-redesign-test.challenger2 .vm2-subtitle {
+    font-size: 24px;
+  }
+
+  .verb-redesign-test.challenger2 .vm2-benefits {
+    gap: 24px 32px;
+  }
+}
+
+/* Desktop (1200px+) */
+@media screen and (min-width: 1200px) {
+  .verb-redesign-test.challenger2 .vm2-heading {
+    font-size: 56px;
+    letter-spacing: -2.52px;
+  }
+
+  .verb-redesign-test.challenger2 .vm2-subtitle {
+    font-size: 24px;
   }
 }
 
@@ -783,8 +907,8 @@
 
   .verb-redesign-test.challenger1 .vm2-dropzone-media {
     order: 2;
-    width: 160px;
-    height: 160px;
+    width: 194px;
+    height: 180px;
     align-self: center;
     margin-bottom: 16px;
   }
@@ -796,8 +920,8 @@
   }
 
   .verb-redesign-test.challenger1 .vm2-heading {
-    font-size: 32px;
-    letter-spacing: -1.2px;
+    font-size: 44px;
+    letter-spacing: -1.98px;
     text-align: left;
   }
 
