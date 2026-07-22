@@ -498,7 +498,7 @@
   }
 
   .verb-redesign-test.challenger2 {
-    padding: 56px 16px;
+    padding: 56px 64px;
   }
 
   .vm2-heading {
@@ -553,11 +553,11 @@
   }
 
   .verb-redesign-test.challenger2 {
-    padding: 56px 80px;
+    padding: 56px 120px;
   }
 
   .verb-redesign-test.challenger1 {
-    padding: 48px 80px;
+    padding: 48px 120px;
   }
 
   .vm2-heading {
@@ -634,6 +634,13 @@
     font-size: 18px;
     line-height: 1.1;
   }
+}
+
+.verb-redesign-test.challenger1 .foreground,
+.verb-redesign-test.challenger2 .foreground {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
 }
 
 .verb-redesign-test.challenger1 .vm2-container {
@@ -756,7 +763,13 @@
   }
 
   .verb-redesign-test.challenger1 .vm2-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 24px 32px;
+    max-width: 560px;
+    margin: 0 auto;
+    width: 100%;
   }
 }
 
@@ -779,6 +792,7 @@
     width: 256px;
     height: 237px;
   }
+
 }
 
 .verb-redesign-test.challenger2 .vm2-container {
@@ -842,8 +856,15 @@
   }
 
   .verb-redesign-test.challenger2 .vm2-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     margin-top: 0;
     gap: 24px 32px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
   }
 
   .verb-redesign-test.challenger2 .vm2-footer {
@@ -855,6 +876,12 @@
   .verb-redesign-test.challenger2 .vm2-heading {
     font-size: 56px;
     letter-spacing: -2.52px;
+  }
+
+  .verb-redesign-test.challenger2 .vm2-benefits {
+    display: flex;
+    max-width: none;
+    margin: 0;
   }
 }
 
