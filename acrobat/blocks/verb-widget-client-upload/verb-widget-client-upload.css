@@ -294,6 +294,12 @@ html[dir="rtl"] .verb-cta .upload-icon {
   background-color: var(--consonant-button-accent-action-bg-hover);
 }
 
+.verb-cta:disabled {
+  opacity: 0.6;
+  cursor: default;
+  pointer-events: none;
+}
+
 .verb-error {
   cursor: default;
   background: #D31510;

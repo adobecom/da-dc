@@ -604,14 +604,11 @@ export default async function init(element) {
     setCookie('UTS_Uploading', Date.now());
     handleAnalyticsEvent('job:uploading', filesData, false);
 
-    progressContainer.classList.remove('hide');
-    ctaButton.classList.add('hide');
-    setProgress(0, 'Encrypting…');
+    ctaButton.disabled = true;
+    ctaButton.querySelector('.verb-cta-label').textContent = window.mph?.['verb-widget-processing'] || 'Processing…';
 
     try {
-      const id = await encryptAndStore(file, {
-        onProgress: (ratio) => setProgress(ratio, `Encrypting… ${Math.round(ratio * 100)}%`),
-      });
+      const id = await encryptAndStore(file);
 
       const uploadTimestamp = Date.now();
       setCookie('UTS_Uploaded', uploadTimestamp);
@@ -624,8 +621,6 @@ export default async function init(element) {
       const uploadedMetadata = { ...filesData, assetId: id, uploadTime };
       handleAnalyticsEvent('job:uploaded', uploadedMetadata, false);
 
-      setProgress(1, 'Done');
-
       const redirectBase = window.mph?.['verb-widget-client-upload-redirect']
         || 'https://mwpw-197746--da-dc--adobecom.aem.page/acrobat/online';
       const [baseUrl, queryString] = redirectBase.split('?');
@@ -634,7 +629,8 @@ export default async function init(element) {
       window.location.href = redirectUrl;
     } catch (err) {
       isUploading = false;
-      hideProgress();
+      ctaButton.disabled = false;
+      ctaButton.querySelector('.verb-cta-label').textContent = ctaLabel;
       dispatchError('error_generic', err.message || 'Failed to store file. Please try again.', filesData);
     }
   }
