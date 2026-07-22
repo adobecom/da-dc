@@ -227,7 +227,7 @@
 .vm2-file-limit {
   font-size: 13px;
   line-height: 1.4;
-  color: #767676;
+  color: var(--color-black);
   margin: 0;
   text-align: center;
 }
@@ -699,6 +699,7 @@
   font-weight: 800;
   font-size: 18px;
   letter-spacing: -0.54px;
+  color: var(--color-black);
 }
 
 .verb-redesign-test.challenger1 .vm2-file-limit {
@@ -807,6 +808,13 @@
 
 .verb-redesign-test.challenger2 .vm2-benefits {
   margin-top: -8px;
+}
+
+.verb-redesign-test.challenger2 .vm2-drag {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-black);
+  letter-spacing: -0.59px;
 }
 
 .verb-redesign-test.challenger2 .vm2-benefit {
