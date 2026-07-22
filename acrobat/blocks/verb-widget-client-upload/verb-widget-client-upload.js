@@ -622,7 +622,7 @@ export default async function init(element) {
       handleAnalyticsEvent('job:uploaded', uploadedMetadata, false);
 
       const redirectBase = window.mph?.['verb-widget-client-upload-redirect']
-        || 'https://mwpw-197746--da-dc--adobecom.aem.page/acrobat/online';
+        || 'https://mwpw-197746--da-dc--adobecom.aem.live/acrobat/online';
       const [baseUrl, queryString] = redirectBase.split('?');
       const redirectUrl = `${baseUrl}?UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${queryString ? `&${queryString}` : ''}`;
       handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
