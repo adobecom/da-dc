@@ -627,7 +627,7 @@ export default async function init(element) {
       setProgress(1, 'Done');
 
       const redirectBase = window.mph?.['verb-widget-client-upload-redirect']
-        || 'https://www.stage.adobe.com/acrobat/online.html';
+        || 'https://mwpw-197746--da-dc--adobecom.aem.page/acrobat/online';
       const [baseUrl, queryString] = redirectBase.split('?');
       const redirectUrl = `${baseUrl}?UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${queryString ? `&${queryString}` : ''}`;
       handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
