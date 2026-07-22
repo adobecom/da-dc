@@ -11,13 +11,11 @@ let loadScript;
 
 const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 
-const MB100 = 104857600;
-const CHUNK_SIZE = 5 * 1024 * 1024;
-const CHUNK_THRESHOLD = 50 * 1024 * 1024;
-const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.bmp', '.gif', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
+const MB25 = 26214400;
+const ACCEPTED_FILES = ['.jpg', '.jpeg', '.png'];
 
 const LIMITS = {
-  'image-to-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true },
+  'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ACCEPTED_FILES, multipleFiles: false },
 };
 
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
@@ -70,23 +68,9 @@ const appEnvCookieMap = {
 };
 
 const MIME_TYPES = {
-  '.pdf': ['application/pdf'],
   '.jpg': ['image/jpeg'],
   '.jpeg': ['image/jpeg'],
   '.png': ['image/png'],
-  '.gif': ['image/gif'],
-  '.bmp': ['image/bmp'],
-  '.tif': ['image/tiff'],
-  '.tiff': ['image/tiff'],
-  '.doc': ['application/msword'],
-  '.docx': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
-  '.ppt': ['application/vnd.ms-powerpoint'],
-  '.pptx': ['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
-  '.xls': ['application/vnd.ms-excel'],
-  '.xlsx': ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
-  '.txt': ['text/plain'],
-  '.rtf': ['application/rtf', 'text/rtf'],
-  '.xml': ['text/xml', 'application/xml'],
 };
 
 const ICONS = {
@@ -266,64 +250,11 @@ async function storeEncryptedLocalFile(id, file) {
   db.close();
 }
 
-async function storeEncryptedLocalFileChunked(id, file, { onChunkDone } = {}) {
-  const key = await crypto.subtle.generateKey(
-    { name: 'AES-GCM', length: 256 },
-    true,
-    ['encrypt', 'decrypt'],
-  );
-  const rawKey = await crypto.subtle.exportKey('raw', key);
-
-  const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-  const chunks = [];
-
-  for (let i = 0; i < totalChunks; i++) {
-    const start = i * CHUNK_SIZE;
-    const end = Math.min(start + CHUNK_SIZE, file.size);
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const ciphertext = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv },
-      key,
-      await file.slice(start, end).arrayBuffer(),
-    );
-    chunks.push({ ciphertext, iv });
-    onChunkDone?.(end - start, i);
-  }
-
-  const db = await openIDB();
-  await new Promise((resolve, reject) => {
-    const tx = db.transaction(IDB_STORE, 'readwrite');
-    tx.objectStore(IDB_STORE).put({ chunks, rawKey, fileName: file.name, mimeType: file.type, chunked: true }, id);
-    tx.oncomplete = resolve;
-    tx.onerror = ({ target: { error } }) => reject(error);
-  });
-  db.close();
-}
-
-async function encryptAndStore(fileList, { onProgress, onChunkComplete } = {}) {
-  const totalSize = fileList.reduce((s, f) => s + f.size, 0);
-  let processed = 0;
-
-  return Promise.all(
-    fileList.map(async (file) => {
-      const id = crypto.randomUUID();
-      if (file.size >= CHUNK_THRESHOLD) {
-        await storeEncryptedLocalFileChunked(id, file, {
-          onChunkDone: (chunkBytes, chunkIndex) => {
-            processed += chunkBytes;
-            onProgress?.(processed / totalSize);
-            onChunkComplete?.(id, chunkIndex, file);
-          },
-        });
-      } else {
-        await storeEncryptedLocalFile(id, file);
-        processed += file.size;
-        onProgress?.(processed / totalSize);
-        onChunkComplete?.(id, 0, file);
-      }
-      return id;
-    }),
-  );
+async function encryptAndStore(file, { onProgress } = {}) {
+  const id = crypto.randomUUID();
+  await storeEncryptedLocalFile(id, file);
+  onProgress?.(1);
+  return id;
 }
 
 function validateFiles(files, verb) {
@@ -659,54 +590,46 @@ export default async function init(element) {
   async function startUpload(files) {
     hideError();
 
+    const [file] = files;
     const filesData = {
       userAttempts,
-      size: files.reduce((s, f) => s + f.size, 0),
-      type: getFileType(files),
-      count: files.length,
-      uploadType: files.length > 1 ? 'mfu' : 'sfu',
+      size: file.size,
+      type: file.type,
+      count: 1,
+      uploadType: 'sfu',
     };
 
     isUploading = true;
     exitFlag = false;
     setCookie('UTS_Uploading', Date.now());
     handleAnalyticsEvent('job:uploading', filesData, false);
-    if (LIMITS[VERB]?.multipleFiles) handleAnalyticsEvent('job:multi-file-uploading', filesData, false);
 
     progressContainer.classList.remove('hide');
     ctaButton.classList.add('hide');
     setProgress(0, 'Encrypting…');
 
     try {
-      const ids = await encryptAndStore(files, {
+      const id = await encryptAndStore(file, {
         onProgress: (ratio) => setProgress(ratio, `Encrypting… ${Math.round(ratio * 100)}%`),
-        onChunkComplete: (id, chunkIndex, file) => {
-          window.analytics.sendAnalyticsToSplunk('job:chunk-uploaded', VERB, {
-            ...filesData,
-            assetId: id,
-            chunkNumber: chunkIndex,
-            chunkUploadAttempt: 1,
-          }, getSplunkEndpoint());
-        },
       });
 
-      setCookie('UTS_Uploaded', Date.now());
+      const uploadTimestamp = Date.now();
+      setCookie('UTS_Uploaded', uploadTimestamp);
       exitFlag = true;
       isUploading = false;
       incrementVerbKey(`${VERB}_attempts`);
       setUser();
 
       const uploadTime = getUploadTime();
-      const uploadedMetadata = { ...filesData, assetId: ids[0], uploadTime };
+      const uploadedMetadata = { ...filesData, assetId: id, uploadTime };
       handleAnalyticsEvent('job:uploaded', uploadedMetadata, false);
-      if (LIMITS[VERB]?.multipleFiles) handleAnalyticsEvent('job:multi-file-uploaded', uploadedMetadata, false);
 
       setProgress(1, 'Done');
 
       const redirectBase = window.mph?.['verb-widget-client-upload-redirect']
         || 'https://www.stage.adobe.com/acrobat/online.html';
-      const params = new URLSearchParams({ fileId: ids.join(',') });
-      const redirectUrl = `${redirectBase}?${params}`;
+      const [baseUrl, queryString] = redirectBase.split('?');
+      const redirectUrl = `${baseUrl}?UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${queryString ? `&${queryString}` : ''}`;
       handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
       window.location.href = redirectUrl;
     } catch (err) {
