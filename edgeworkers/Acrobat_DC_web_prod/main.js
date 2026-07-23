@@ -48,6 +48,10 @@ export async function responseProvider(request) {
     firstPassRewriter.onElement('.study-marquee', el => {
       studyMarquee = true;
     });
+    let verbMarquee;
+    firstPassRewriter.onElement('.verb-marquee', el => {
+      verbMarquee = true;
+    });
     const nullWriter = new WritableStream({
       write() {},
       close() {},
@@ -77,7 +81,7 @@ export async function responseProvider(request) {
       delete responseHeaders[prop];
     }
 
-    return [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee];
+    return [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee];
   };
 
   const fetchResource = async path => {
@@ -152,13 +156,15 @@ export async function responseProvider(request) {
     });
   };
 
-  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, unityWorkflow, studyMarquee, prerenderTop) => {
+  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, unityWorkflow, studyMarquee, verbMarquee, prerenderTop) => {
     rewriter.onElement('head', el => {
       el.append(`<style id="inline-milo-styles">${miloStyles}</style>`);
       el.append(`<style id="inline-dc-styles">${dcStyles}</style>`);
       if (unityWorkflow) {
         if (studyMarquee) {
           el.append(`<style id="inline-study-marquee-styles">${studyMarqueeStyles}</style>`);
+        } else if (verbMarquee) {
+          el.append(`<style id="inline-verb-marquee-styles">${verbMarqueeStyles}</style>`);
         } else {
           el.append(`<style id="inline-verb-widget-styles">${verbWidgetStyles}</style>`);
         }
@@ -169,13 +175,14 @@ export async function responseProvider(request) {
 
   try {
     const [
-      [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee],
+      [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee],
       scripts,
       dcConverter,
       dcStyles,
       miloStyles,
       verbWidgetStyles,
-      studyMarqueeStyles
+      studyMarqueeStyles,
+      verbMarqueeStyles
     ] = await Promise.all([
       fetchFrictionlessPage(),
       fetchResource('/acrobat/scripts/scripts.js'),
@@ -183,11 +190,12 @@ export async function responseProvider(request) {
       fetchResource('/acrobat/styles/styles.css'),
       fetchResource('/libs/styles/styles.css'),
       fetchResource('/acrobat/blocks/verb-widget/verb-widget.css'),
-      fetchResource('/acrobat/blocks/study-marquee/study-marquee.css')
+      fetchResource('/acrobat/blocks/study-marquee/study-marquee.css'),
+      fetchResource('/acrobat/blocks/verb-marquee/verb-marquee.css')
     ]);
 
     await inlineScripts(unityWorkflow, mobileWidget, scripts, dcConverter);
-    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, unityWorkflow, studyMarquee, prerenderTop);
+    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, unityWorkflow, studyMarquee, verbMarquee, prerenderTop);
 
     const csp = contentSecurityPolicy(isProd, scriptHashes);
     const acrobat = isProd ? 'https://acrobat.adobe.com' : 'https://stage.acrobat.adobe.com';
@@ -212,6 +220,11 @@ export async function responseProvider(request) {
         headerLink = [...headerLink,
           `</acrobat/blocks/study-marquee/study-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/study-marquee/study-marquee.css>;rel="preload";as="style"`,
+        ];
+      } else if (verbMarquee) {
+        headerLink = [...headerLink,
+          `</acrobat/blocks/verb-marquee/verb-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</acrobat/blocks/verb-marquee/verb-marquee.css>;rel="preload";as="style"`,
         ];
       } else {
         headerLink = [...headerLink,

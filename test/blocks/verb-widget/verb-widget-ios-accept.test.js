@@ -21,10 +21,6 @@ const IOS_UNKNOWN_VERBS = [
   'psd-to-pdf',
   'ai-to-pdf',
   'indd-to-pdf',
-  'image-to-pdf',
-  'bmp-to-pdf',
-  'gif-to-pdf',
-  'tiff-to-pdf',
 ];
 
 describe('verb-widget iOS accept attribute tests', () => {
@@ -60,7 +56,7 @@ describe('verb-widget iOS accept attribute tests', () => {
     sinon.restore();
   });
 
-  it('iOS + iOS-unknown extensions → accept="*/*" for all new MULTI_ALL_HEIC verbs', async () => {
+  it('iOS + iOS-unknown extensions → accept="*/*" for specialty-format verbs (psd/ai/indd)', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
 
@@ -79,7 +75,7 @@ describe('verb-widget iOS accept attribute tests', () => {
     }
   });
 
-  it('non-iOS + iOS-unknown extensions → accept is NOT */* and includes .pdf', async () => {
+  it('non-iOS + psd-to-pdf → accept is NOT */* and includes only .psd', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
 
@@ -94,7 +90,8 @@ describe('verb-widget iOS accept attribute tests', () => {
 
     const accept = document.querySelector('#file-upload').getAttribute('accept');
     expect(accept).to.not.equal('*/*');
-    expect(accept).to.include('.pdf');
+    expect(accept).to.include('.psd');
+    expect(accept).to.not.include('.pdf');
   });
 
   it('iOS + PDF-only verb (fillsign) → normal accept, not */*', async () => {
@@ -122,7 +119,7 @@ describe('verb-widget iOS accept attribute tests', () => {
     }
   });
 
-  it('iOS + jpg-to-pdf (MULTI_ALL contains iOS-unknown exts) → accept="*/*"', async () => {
+  it('iOS + jpg-to-pdf (no iOS-unknown exts) → accept is NOT */* and includes image/doc types', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
 
@@ -136,6 +133,11 @@ describe('verb-widget iOS accept attribute tests', () => {
     await init(block);
 
     const accept = document.querySelector('#file-upload').getAttribute('accept');
-    expect(accept).to.equal('*/*');
+    expect(accept).to.not.equal('*/*');
+    expect(accept).to.include('.jpg');
+    expect(accept).to.include('.heic');
+    expect(accept).to.not.include('.psd');
+    expect(accept).to.not.include('.ai');
+    expect(accept).to.not.include('.indd');
   });
 });
