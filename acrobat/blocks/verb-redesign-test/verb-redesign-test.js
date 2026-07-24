@@ -192,12 +192,18 @@ async function loadAnalyticsAfterLCP({ verb, userAttempts }) {
 window.addEventListener('analyticsLoad', async ({ detail }) => {
   /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
   const delay = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
-  const { verbAnalytics: stubVerb, reviewAnalytics: stubReview, sendAnalyticsToSplunk: stubSend } = window.analytics;
+  const {
+    verbAnalytics: stubVerb,
+    reviewAnalytics: stubReview,
+    sendAnalyticsToSplunk: stubSend,
+  } = window.analytics;
   if (window.PerformanceObserver) {
     await Promise.race([
       new Promise((res) => {
         try {
-          const obs = new PerformanceObserver((list) => { if (list.getEntries().length > 0) { obs.disconnect(); res(); } });
+          const obs = new PerformanceObserver((list) => {
+            if (list.getEntries().length > 0) { obs.disconnect(); res(); }
+          });
           obs.observe({ type: 'largest-contentful-paint', buffered: true });
         } catch { res(); }
       }),
@@ -208,7 +214,8 @@ window.addEventListener('analyticsLoad', async ({ detail }) => {
   }
   await loadAnalyticsAfterLCP(detail);
   const { verbAnalytics, reviewAnalytics, sendAnalyticsToSplunk } = window.analytics;
-  if (verbAnalytics === stubVerb || reviewAnalytics === stubReview || sendAnalyticsToSplunk === stubSend) {
+  if (verbAnalytics === stubVerb
+    || reviewAnalytics === stubReview || sendAnalyticsToSplunk === stubSend) {
     window.lana?.log(
       'Analytics failed to initialize correctly: some methods remain no-ops on verb-redesign-test block',
       lanaOptions,
@@ -236,7 +243,8 @@ function processMedia(mediaDiv) {
 
 function getAuthoredSvgInfo(foregroundEl, headlineEl) {
   if (!foregroundEl) return null;
-  const headingCell = headlineEl && [...foregroundEl.children].find((div) => div.contains(headlineEl));
+  const headingCell = headlineEl
+    && [...foregroundEl.children].find((div) => div.contains(headlineEl));
   const searchRoot = headingCell || foregroundEl;
   const svgImg = searchRoot.querySelector('img[src$=".svg"]');
   if (!svgImg) return null;
@@ -492,7 +500,9 @@ export default async function init(element) {
     const createLegalLink = (label, url) => `<a class="vm2-legal-url" target="_blank" href="${url}">${label}</a>`;
     [['verb-widget-terms-of-use', touURL], ['verb-widget-privacy-policy', ppURL]].forEach(([key, url]) => {
       const linkText = window.mph?.[key];
-      if (linkText) legalText.innerHTML = legalText.innerHTML.replace(linkText, createLegalLink(linkText, url));
+      if (linkText) {
+        legalText.innerHTML = legalText.innerHTML.replace(linkText, createLegalLink(linkText, url));
+      }
     });
   }
 
@@ -541,7 +551,12 @@ export default async function init(element) {
   foreground.append(container);
   element.append(errorState);
 
-  function handleAnalyticsEvent(eventName, metadata = {}, documentUnloading = true, canSendDataToSplunk = true) {
+  function handleAnalyticsEvent(
+    eventName,
+    metadata = {},
+    documentUnloading = true,
+    canSendDataToSplunk = true,
+  ) {
     window.analytics.verbAnalytics(eventName, VERB, metadata, documentUnloading);
     if (!canSendDataToSplunk) return;
     window.analytics.sendAnalyticsToSplunk(eventName, VERB, metadata, getSplunkEndpoint());
@@ -658,7 +673,9 @@ export default async function init(element) {
   fileInput.addEventListener('click', () => {
     if (soloClicked) { soloClicked = false; return; }
     ['filepicker:shown', 'dropzone:choose-file-clicked', 'files-selected', 'entry:clicked', 'discover:clicked']
-      .forEach((analyticsEvent) => { window.analytics.verbAnalytics(analyticsEvent, VERB, { userAttempts }); });
+      .forEach((analyticsEvent) => {
+        window.analytics.verbAnalytics(analyticsEvent, VERB, { userAttempts });
+      });
   });
   fileInput.addEventListener('change', ({ target: { files } }) => {
     if (!files) return;
@@ -691,7 +708,9 @@ export default async function init(element) {
       labelElement.addEventListener('click', (data) => {
         soloClicked = true;
         ['filepicker:shown', 'cta:choose-file-clicked', 'files-selected', 'entry:clicked', 'discover:clicked']
-          .forEach((analyticsEvent) => { window.analytics.verbAnalytics(analyticsEvent, VERB, { ...data, userAttempts }); });
+          .forEach((analyticsEvent) => {
+            window.analytics.verbAnalytics(analyticsEvent, VERB, { ...data, userAttempts });
+          });
       });
     });
   }
@@ -775,7 +794,12 @@ export default async function init(element) {
       window.analytics.verbAnalytics(event, VERB, event === 'error' ? { errorInfo } : {});
     }
     if (canSendDataToSplunk) {
-      window.analytics.sendAnalyticsToSplunk(key, VERB, { ...metadata, errorData }, getSplunkEndpoint());
+      window.analytics.sendAnalyticsToSplunk(
+        key,
+        VERB,
+        { ...metadata, errorData },
+        getSplunkEndpoint(),
+      );
     }
     exitFlag = true;
   });
