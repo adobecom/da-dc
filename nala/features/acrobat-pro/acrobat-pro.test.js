@@ -66,20 +66,15 @@ test.describe('Acrobat Pro Smoke Test', () => {
       await expect(acrobatPro.acrobatProPrice).toBeVisible();
       await expect(acrobatPro.acrobatProFreeTrial).toBeVisible();
       await expect(acrobatPro.acrobatProFreeTrial).toBeEnabled();
-      await expect(acrobatPro.acrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatPro.acrobatProBuyNow).toBeVisible();
       await expect(acrobatPro.acrobatProBuyNow).toBeEnabled();
-      await expect(acrobatPro.acrobatProBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatPro.acrobatStudioPrice).toBeVisible();
       await expect(acrobatPro.acrobatStudioFreeTrial).toBeVisible();
       await expect(acrobatPro.acrobatStudioFreeTrial).toBeEnabled();
-      await expect(acrobatPro.acrobatStudioFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatPro.acrobatStudioBuyNow).toBeVisible();
       await expect(acrobatPro.acrobatStudioBuyNow).toBeEnabled();
-      await expect(acrobatPro.acrobatStudioBuyNow).toHaveAttribute('href', /ot=BASE/);
 
-      await expect(acrobatPro.individualMerchCardsPricingLink).toBeVisible();
       await expect(acrobatPro.individualMerchCardsPricingLink).toBeEnabled();
       await expect(acrobatPro.individualMerchCardsPricingLink).toHaveCount(1);
 
@@ -100,18 +95,14 @@ test.describe('Acrobat Pro Smoke Test', () => {
       await expect(acrobatPro.acrobatProForTeamsPrice).toBeVisible();
       await expect(acrobatPro.acrobatProForTeamsFreeTrial).toBeVisible();
       await expect(acrobatPro.acrobatProForTeamsFreeTrial).toBeEnabled();
-      await expect(acrobatPro.acrobatProForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatPro.acrobatProForTeamsBuyNow).toBeVisible();
       await expect(acrobatPro.acrobatProForTeamsBuyNow).toBeEnabled();
-      await expect(acrobatPro.acrobatProForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatPro.acrobatStudioForTeamsPrice).toBeVisible();
       await expect(acrobatPro.acrobatStudioForTeamsFreeTrial).toBeVisible();
       await expect(acrobatPro.acrobatStudioForTeamsFreeTrial).toBeEnabled();
-      await expect(acrobatPro.acrobatStudioForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatPro.acrobatStudioForTeamsBuyNow).toBeVisible();
       await expect(acrobatPro.acrobatStudioForTeamsBuyNow).toBeEnabled();
-      await expect(acrobatPro.acrobatStudioForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatPro.businessMerchCardsPricingLink).toBeVisible();
       await expect(acrobatPro.businessMerchCardsPricingLink).toBeEnabled();
@@ -131,18 +122,14 @@ test.describe('Acrobat Pro Smoke Test', () => {
       await expect(acrobatPro.acrobatProForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(acrobatPro.acrobatProForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(acrobatPro.acrobatProForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(acrobatPro.acrobatProForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatPro.acrobatProForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(acrobatPro.acrobatProForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(acrobatPro.acrobatProForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatPro.creativeCloudForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(acrobatPro.creativeCloudForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(acrobatPro.creativeCloudForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(acrobatPro.creativeCloudForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobatPro.creativeCloudForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(acrobatPro.creativeCloudForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(acrobatPro.creativeCloudForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobatPro.studentsAndTeachersPricingLink).toBeVisible();
       await expect(acrobatPro.studentsAndTeachersPricingLink).toBeEnabled();

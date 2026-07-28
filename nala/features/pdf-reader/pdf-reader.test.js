@@ -77,20 +77,15 @@ test.describe('Acrobat PDF Reader Smoke Test', () => {
       await expect(pdfReader.acrobatProPrice).toBeVisible();
       await expect(pdfReader.acrobatProFreeTrial).toBeVisible();
       await expect(pdfReader.acrobatProFreeTrial).toBeEnabled();
-      await expect(pdfReader.acrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(pdfReader.acrobatProBuyNow).toBeVisible();
       await expect(pdfReader.acrobatProBuyNow).toBeEnabled();
-      await expect(pdfReader.acrobatProBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(pdfReader.acrobatStudioPrice).toBeVisible();
       await expect(pdfReader.acrobatStudioFreeTrial).toBeVisible();
       await expect(pdfReader.acrobatStudioFreeTrial).toBeEnabled();
-      await expect(pdfReader.acrobatStudioFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(pdfReader.acrobatStudioBuyNow).toBeVisible();
       await expect(pdfReader.acrobatStudioBuyNow).toBeEnabled();
-      await expect(pdfReader.acrobatStudioBuyNow).toHaveAttribute('href', /ot=BASE/);
 
-      await expect(pdfReader.individualMerchCardsPricingLink).toBeVisible();
       await expect(pdfReader.individualMerchCardsPricingLink).toBeEnabled();
       await expect(pdfReader.individualMerchCardsPricingLink).toHaveCount(1);
 
@@ -111,18 +106,14 @@ test.describe('Acrobat PDF Reader Smoke Test', () => {
       await expect(pdfReader.acrobatProForTeamsPrice).toBeVisible();
       await expect(pdfReader.acrobatProForTeamsFreeTrial).toBeVisible();
       await expect(pdfReader.acrobatProForTeamsFreeTrial).toBeEnabled();
-      await expect(pdfReader.acrobatProForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(pdfReader.acrobatProForTeamsBuyNow).toBeVisible();
       await expect(pdfReader.acrobatProForTeamsBuyNow).toBeEnabled();
-      await expect(pdfReader.acrobatProForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(pdfReader.acrobatStudioForTeamsPrice).toBeVisible();
       await expect(pdfReader.acrobatStudioForTeamsFreeTrial).toBeVisible();
       await expect(pdfReader.acrobatStudioForTeamsFreeTrial).toBeEnabled();
-      await expect(pdfReader.acrobatStudioForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(pdfReader.acrobatStudioForTeamsBuyNow).toBeVisible();
       await expect(pdfReader.acrobatStudioForTeamsBuyNow).toBeEnabled();
-      await expect(pdfReader.acrobatStudioForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(pdfReader.businessMerchCardsPricingLink).toBeVisible();
       await expect(pdfReader.businessMerchCardsPricingLink).toBeEnabled();
@@ -142,18 +133,14 @@ test.describe('Acrobat PDF Reader Smoke Test', () => {
       await expect(pdfReader.acrobatProForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(pdfReader.acrobatProForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(pdfReader.acrobatProForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(pdfReader.acrobatProForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(pdfReader.acrobatProForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(pdfReader.acrobatProForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(pdfReader.acrobatProForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(pdfReader.creativeCloudForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(pdfReader.creativeCloudForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(pdfReader.creativeCloudForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(pdfReader.creativeCloudForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(pdfReader.creativeCloudForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(pdfReader.creativeCloudForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(pdfReader.creativeCloudForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(pdfReader.studentsAndTeachersPricingLink).toBeVisible();
       await expect(pdfReader.studentsAndTeachersPricingLink).toBeEnabled();

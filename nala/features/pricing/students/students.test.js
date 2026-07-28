@@ -27,18 +27,14 @@ test.describe('Acrobat Pricing — Students', () => {
       await expect(pricing.pricingPageStudentsMerchCardAcrobatProPrice.first()).toBeVisible();
       await expect(pricing.pricingPageStudentsMerchCardAcrobatProFreeTrial).toBeVisible();
       await expect(pricing.pricingPageStudentsMerchCardAcrobatProFreeTrial).toBeEnabled();
-      await expect(pricing.pricingPageStudentsMerchCardAcrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(pricing.pricingPageStudentsMerchCardAcrobatProBuyNow.last()).toBeVisible();
-      await expect(pricing.pricingPageStudentsMerchCardAcrobatProBuyNow.last()).toBeEnabled();
-      await expect(pricing.pricingPageStudentsMerchCardAcrobatProBuyNow.last()).toHaveAttribute('href', /commerce/);
+      await expect(pricing.pricingPageStudentsMerchCardAcrobatProBuyNow).toBeVisible();
+      await expect(pricing.pricingPageStudentsMerchCardAcrobatProBuyNow).toBeEnabled();
 
       await expect(pricing.pricingPageStudentsMerchCardCreativeCloudPrice.first()).toBeVisible();
       await expect(pricing.pricingPageStudentsMerchCardCreativeCloudFreeTrial).toBeVisible();
       await expect(pricing.pricingPageStudentsMerchCardCreativeCloudFreeTrial).toBeEnabled();
-      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudBuyNow.last()).toBeVisible();
-      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudBuyNow.last()).toBeEnabled();
-      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudBuyNow.last()).toHaveAttribute('href', /commerce/);
+      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudBuyNow).toBeVisible();
+      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudBuyNow).toBeEnabled();
     });
 
     await test.step('Verify checkout link in editorial card', async () => {

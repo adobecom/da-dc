@@ -24,7 +24,7 @@ export default class CampaignPage {
     );
     /** In-page anchor for the compare heading (`#compare-acrobat-plans`) */
     this.compareAcrobatPlansHeading = page.locator('div[id="compare-acrobat-plans"]');
-    this.campaignMerchCards = this.compareAcrobatPlansSection.locator('merch-card');
+    this.campaignMerchCards = this.compareAcrobatPlansSection.locator('merch-card').filter({ visible: true });
 
     this.acrobatProCard = this.campaignMerchCards.nth(0);
     this.acrobatProTeamsCard = this.campaignMerchCards.nth(1);

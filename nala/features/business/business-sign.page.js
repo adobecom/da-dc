@@ -28,6 +28,6 @@ export default class BusinessSignPage {
     this.businessSignMerchCardsContainer = page.locator(
       'div[data-path="/dc-shared/fragments/merch/acrobat/business/acrobat-studio-teams/merch-card-blade"]',
     );
-    this.businessSignMerchCards = this.businessSignMerchCardsContainer.locator('merch-card');
+    this.businessSignMerchCards = this.businessSignMerchCardsContainer.locator('merch-card').filter({ visible: true });
   }
 }

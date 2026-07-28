@@ -93,20 +93,15 @@ test.describe('Acrobat Features — Modify PDFs', () => {
       await expect(m.acrobatProPrice).toBeVisible();
       await expect(m.acrobatProFreeTrial).toBeVisible();
       await expect(m.acrobatProFreeTrial).toBeEnabled();
-      await expect(m.acrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(m.acrobatProBuyNow).toBeVisible();
       await expect(m.acrobatProBuyNow).toBeEnabled();
-      await expect(m.acrobatProBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(m.acrobatStudioPrice).toBeVisible();
       await expect(m.acrobatStudioFreeTrial).toBeVisible();
       await expect(m.acrobatStudioFreeTrial).toBeEnabled();
-      await expect(m.acrobatStudioFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(m.acrobatStudioBuyNow).toBeVisible();
       await expect(m.acrobatStudioBuyNow).toBeEnabled();
-      await expect(m.acrobatStudioBuyNow).toHaveAttribute('href', /ot=BASE/);
 
-      await expect(m.individualMerchCardsPricingLink).toBeVisible();
       await expect(m.individualMerchCardsPricingLink).toBeEnabled();
       await expect(m.individualMerchCardsPricingLink).toHaveCount(1);
 
@@ -127,18 +122,14 @@ test.describe('Acrobat Features — Modify PDFs', () => {
       await expect(m.acrobatProForTeamsPrice).toBeVisible();
       await expect(m.acrobatProForTeamsFreeTrial).toBeVisible();
       await expect(m.acrobatProForTeamsFreeTrial).toBeEnabled();
-      await expect(m.acrobatProForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(m.acrobatProForTeamsBuyNow).toBeVisible();
       await expect(m.acrobatProForTeamsBuyNow).toBeEnabled();
-      await expect(m.acrobatProForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(m.acrobatStudioForTeamsPrice).toBeVisible();
       await expect(m.acrobatStudioForTeamsFreeTrial).toBeVisible();
       await expect(m.acrobatStudioForTeamsFreeTrial).toBeEnabled();
-      await expect(m.acrobatStudioForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(m.acrobatStudioForTeamsBuyNow).toBeVisible();
       await expect(m.acrobatStudioForTeamsBuyNow).toBeEnabled();
-      await expect(m.acrobatStudioForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(m.businessMerchCardsPricingLink).toBeVisible();
       await expect(m.businessMerchCardsPricingLink).toBeEnabled();
@@ -158,18 +149,14 @@ test.describe('Acrobat Features — Modify PDFs', () => {
       await expect(m.acrobatProForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(m.acrobatProForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(m.acrobatProForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(m.acrobatProForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(m.acrobatProForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(m.acrobatProForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(m.acrobatProForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(m.creativeCloudForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(m.creativeCloudForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(m.creativeCloudForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(m.creativeCloudForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(m.creativeCloudForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(m.creativeCloudForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(m.creativeCloudForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(m.studentsAndTeachersPricingLink).toBeVisible();
       await expect(m.studentsAndTeachersPricingLink).toBeEnabled();

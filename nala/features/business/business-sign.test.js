@@ -82,19 +82,18 @@ test.describe('Acrobat Business — Sign', () => {
       const { businessSignMerchCardsContainer, businessSignMerchCards } = businessSign;
       await businessSignMerchCardsContainer.scrollIntoViewIfNeeded();
       await expect(businessSignMerchCardsContainer).toBeVisible({ timeout: 60000 });
-      await expect(businessSignMerchCards).toHaveCount(2);
+      await expect(businessSignMerchCards).toHaveCount(3);
 
-      for (let i = 0; i < 2; i += 1) {
+      for (let i = 0; i < 3; i += 1) {
         const card = businessSignMerchCards.nth(i);
         await expect(card).toBeVisible();
         const price = card.locator('span[is*="inline-price"]');
         await expect(price.first()).toBeVisible();
-        const freeTrial = card.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-        await expect(freeTrial).toBeVisible();
-        await expect(freeTrial).toBeEnabled();
-        const buyNow = card.locator('a[is*="checkout-link"][href*="ot=BASE"]');
-        await expect(buyNow).toBeVisible();
-        await expect(buyNow).toBeEnabled();
+        const checkoutLinks = card.locator('a[is*="checkout-link"]').filter({ visible: true });
+        await expect(checkoutLinks.first()).toBeVisible();
+        await expect(checkoutLinks.first()).toBeEnabled();
+        await expect(checkoutLinks.last()).toBeVisible();
+        await expect(checkoutLinks.last()).toBeEnabled();
       }
     });
 

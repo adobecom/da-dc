@@ -15,18 +15,18 @@ export default class PricingIndividualsPage {
     this.pricingPageIndividuals = page.locator(
       'div[data-path="/dc-shared/fragments/merch/acrobat/pricing/acrobat-individual-abm-merch-card-product"]',
     );
-    this.pricingPageIndividualsMerchCards = this.pricingPageIndividuals.locator('merch-card');
+    this.pricingPageIndividualsMerchCards = this.pricingPageIndividuals.locator('merch-card').filter({ visible: true });
     this.pricingPageIndividualsMerchCardAcrobatStandard = this.pricingPageIndividualsMerchCards.nth(0);
-    this.pricingPageIndividualsMerchCardAcrobatStandardPrice = this.pricingPageIndividualsMerchCardAcrobatStandard.locator('span[is*="inline-price"]');
-    this.pricingPageIndividualsMerchCardAcrobatStandardBuyNow = this.pricingPageIndividualsMerchCardAcrobatStandard.locator('a[is="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageIndividualsMerchCardAcrobatStandardPrice = this.pricingPageIndividualsMerchCardAcrobatStandard.locator('p[slot="heading-m-price"]');
+    this.pricingPageIndividualsMerchCardAcrobatStandardBuyNow = this.pricingPageIndividualsMerchCardAcrobatStandard.locator('a[is*="checkout-link"][data-wcs-osi="QgYu51CVY2wKyFEqMuvec4N1tc1OaCypeKJjT5n2-Fc"]');
     this.pricingPageIndividualsMerchCardAcrobatPro = this.pricingPageIndividualsMerchCards.nth(1);
-    this.pricingPageIndividualsMerchCardAcrobatProPrice = this.pricingPageIndividualsMerchCardAcrobatPro.locator('span[is*="inline-price"]');
-    this.pricingPageIndividualsMerchCardAcrobatProFreeTrial = this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageIndividualsMerchCardAcrobatProBuyNow = this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageIndividualsMerchCardAcrobatProPrice = this.pricingPageIndividualsMerchCardAcrobatPro.locator('p[slot="heading-m-price"]');
+    this.pricingPageIndividualsMerchCardAcrobatProFreeTrial = this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][data-wcs-osi="-lYm-YaTSZoUgv1gzqCgybgFotLqRsLwf8CgYdvdnsQ"]');
+    this.pricingPageIndividualsMerchCardAcrobatProBuyNow = this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][data-wcs-osi="vQmS1H18A6_kPd0tYBgKnp-TQIF0GbT6p8SH8rWcLMs"]');
     this.pricingPageIndividualsMerchCardAcrobatStudio = this.pricingPageIndividualsMerchCards.nth(2);
-    this.pricingPageIndividualsMerchCardAcrobatStudioPrice = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('span[is*="inline-price"]');
-    this.pricingPageIndividualsMerchCardAcrobatStudioFreeTrial = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageIndividualsMerchCardAcrobatStudioBuyNow = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageIndividualsMerchCardAcrobatStudioPrice = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('p[slot="heading-m-price"]');
+    this.pricingPageIndividualsMerchCardAcrobatStudioFreeTrial = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][data-wcs-osi="x0LkInr7lGkqK8dcTFS_Pc6oHauo_g7N_4yWT_gLn20"]');
+    this.pricingPageIndividualsMerchCardAcrobatStudioBuyNow = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][data-wcs-osi="V3W0kzf4e6M2Ht1hP9ZAt3dQNmhuDFrmYmEPlE2SlG0"]').filter({ visible: true });
 
     this.faqSection = page.locator('div[class*="accordion-container"]');
     this.faqAccordionTriggers = this.faqSection.locator('button.accordion-trigger');

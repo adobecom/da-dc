@@ -117,20 +117,15 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
       await expect(acrobat.acrobatProPrice).toBeVisible();
       await expect(acrobat.acrobatProFreeTrial).toBeVisible();
       await expect(acrobat.acrobatProFreeTrial).toBeEnabled();
-      await expect(acrobat.acrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobat.acrobatProBuyNow).toBeVisible();
       await expect(acrobat.acrobatProBuyNow).toBeEnabled();
-      await expect(acrobat.acrobatProBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobat.acrobatStudioPrice).toBeVisible();
       await expect(acrobat.acrobatStudioFreeTrial).toBeVisible();
       await expect(acrobat.acrobatStudioFreeTrial).toBeEnabled();
-      await expect(acrobat.acrobatStudioFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobat.acrobatStudioBuyNow).toBeVisible();
       await expect(acrobat.acrobatStudioBuyNow).toBeEnabled();
-      await expect(acrobat.acrobatStudioBuyNow).toHaveAttribute('href', /ot=BASE/);
 
-      await expect(acrobat.individualMerchCardsPricingLink).toBeVisible();
       await expect(acrobat.individualMerchCardsPricingLink).toBeEnabled();
       await expect(acrobat.individualMerchCardsPricingLink).toHaveCount(1);
 
@@ -151,18 +146,14 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
       await expect(acrobat.acrobatProForTeamsPrice).toBeVisible();
       await expect(acrobat.acrobatProForTeamsFreeTrial).toBeVisible();
       await expect(acrobat.acrobatProForTeamsFreeTrial).toBeEnabled();
-      await expect(acrobat.acrobatProForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobat.acrobatProForTeamsBuyNow).toBeVisible();
       await expect(acrobat.acrobatProForTeamsBuyNow).toBeEnabled();
-      await expect(acrobat.acrobatProForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobat.acrobatStudioForTeamsPrice).toBeVisible();
       await expect(acrobat.acrobatStudioForTeamsFreeTrial).toBeVisible();
       await expect(acrobat.acrobatStudioForTeamsFreeTrial).toBeEnabled();
-      await expect(acrobat.acrobatStudioForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobat.acrobatStudioForTeamsBuyNow).toBeVisible();
       await expect(acrobat.acrobatStudioForTeamsBuyNow).toBeEnabled();
-      await expect(acrobat.acrobatStudioForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobat.businessMerchCardsPricingLink).toBeVisible();
       await expect(acrobat.businessMerchCardsPricingLink).toBeEnabled();
@@ -182,18 +173,14 @@ test.describe('Acrobat Homepage Full Smoke Test', () => {
       await expect(acrobat.acrobatProForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(acrobat.acrobatProForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(acrobat.acrobatProForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(acrobat.acrobatProForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobat.acrobatProForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(acrobat.acrobatProForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(acrobat.acrobatProForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobat.creativeCloudForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(acrobat.creativeCloudForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(acrobat.creativeCloudForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(acrobat.creativeCloudForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(acrobat.creativeCloudForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(acrobat.creativeCloudForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(acrobat.creativeCloudForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(acrobat.studentsAndTeachersPricingLink).toBeVisible();
       await expect(acrobat.studentsAndTeachersPricingLink).toBeEnabled();

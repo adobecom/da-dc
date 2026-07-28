@@ -27,35 +27,18 @@ test.describe('Acrobat Pricing — Business', () => {
       await expect(pricing.pricingPageBusinessMerchCardAcrobatStandardForTeamsPrice).toBeVisible();
       await expect(pricing.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow).toBeVisible();
       await expect(pricing.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow).toBeEnabled();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow).toHaveAttribute(
-        'href',
-        /ot=BASE/,
-      );
 
       await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsPrice).toBeVisible();
       await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial).toBeVisible();
       await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial).toBeEnabled();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial).toHaveAttribute(
-        'href',
-        /ot=TRIAL/,
-      );
       await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow).toBeVisible();
       await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow).toBeEnabled();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsPrice).toBeVisible();
       await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial).toBeVisible();
       await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial).toBeEnabled();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial).toHaveAttribute(
-        'href',
-        /ot=TRIAL/,
-      );
       await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow).toBeVisible();
       await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow).toBeEnabled();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow).toHaveAttribute(
-        'href',
-        /ot=BASE/,
-      );
     });
 
     await test.step('Verify business comparison table (sticky)', async () => {

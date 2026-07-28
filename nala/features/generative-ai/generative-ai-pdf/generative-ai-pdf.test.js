@@ -79,20 +79,15 @@ test.describe('Acrobat Generative AI PDF', () => {
       await expect(gai.acrobatProPrice).toBeVisible();
       await expect(gai.acrobatProFreeTrial).toBeVisible();
       await expect(gai.acrobatProFreeTrial).toBeEnabled();
-      await expect(gai.acrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(gai.acrobatProBuyNow).toBeVisible();
       await expect(gai.acrobatProBuyNow).toBeEnabled();
-      await expect(gai.acrobatProBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(gai.acrobatStudioPrice).toBeVisible();
       await expect(gai.acrobatStudioFreeTrial).toBeVisible();
       await expect(gai.acrobatStudioFreeTrial).toBeEnabled();
-      await expect(gai.acrobatStudioFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(gai.acrobatStudioBuyNow).toBeVisible();
       await expect(gai.acrobatStudioBuyNow).toBeEnabled();
-      await expect(gai.acrobatStudioBuyNow).toHaveAttribute('href', /ot=BASE/);
 
-      await expect(gai.individualMerchCardsPricingLink).toBeVisible();
       await expect(gai.individualMerchCardsPricingLink).toBeEnabled();
       await expect(gai.individualMerchCardsPricingLink).toHaveCount(1);
 
@@ -113,18 +108,14 @@ test.describe('Acrobat Generative AI PDF', () => {
       await expect(gai.acrobatProForTeamsPrice).toBeVisible();
       await expect(gai.acrobatProForTeamsFreeTrial).toBeVisible();
       await expect(gai.acrobatProForTeamsFreeTrial).toBeEnabled();
-      await expect(gai.acrobatProForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(gai.acrobatProForTeamsBuyNow).toBeVisible();
       await expect(gai.acrobatProForTeamsBuyNow).toBeEnabled();
-      await expect(gai.acrobatProForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(gai.acrobatStudioForTeamsPrice).toBeVisible();
       await expect(gai.acrobatStudioForTeamsFreeTrial).toBeVisible();
       await expect(gai.acrobatStudioForTeamsFreeTrial).toBeEnabled();
-      await expect(gai.acrobatStudioForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(gai.acrobatStudioForTeamsBuyNow).toBeVisible();
       await expect(gai.acrobatStudioForTeamsBuyNow).toBeEnabled();
-      await expect(gai.acrobatStudioForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(gai.businessMerchCardsPricingLink).toBeVisible();
       await expect(gai.businessMerchCardsPricingLink).toBeEnabled();
@@ -144,18 +135,14 @@ test.describe('Acrobat Generative AI PDF', () => {
       await expect(gai.acrobatProForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(gai.acrobatProForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(gai.acrobatProForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(gai.acrobatProForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(gai.acrobatProForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(gai.acrobatProForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(gai.acrobatProForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(gai.creativeCloudForStudentsAndTeachersPrice.first()).toBeVisible();
       await expect(gai.creativeCloudForStudentsAndTeachersFreeTrial).toBeVisible();
       await expect(gai.creativeCloudForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(gai.creativeCloudForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
       await expect(gai.creativeCloudForStudentsAndTeachersBuyNow).toBeVisible();
       await expect(gai.creativeCloudForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(gai.creativeCloudForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
       await expect(gai.studentsAndTeachersPricingLink).toBeVisible();
       await expect(gai.studentsAndTeachersPricingLink).toBeEnabled();

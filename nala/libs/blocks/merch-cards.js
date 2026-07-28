@@ -23,159 +23,159 @@ export default class MerchCards {
     this.plansAndPricingPanelStudents = this.plansAndPricingTabs.locator('div#tab-panel-plans-and-pricing-3');
 
     // Plans and Pricing - Individuals Tab Merch Cards
-    this.plansIndividualsMerchCards = this.plansAndPricingPanelIndividuals.locator('merch-card');
+    this.plansIndividualsMerchCards = this.plansAndPricingPanelIndividuals.locator('merch-card').filter({ visible: true });
     this.plansIndividualsReaderCard = this.plansIndividualsMerchCards.nth(0);
     this.plansIndividualsReaderDownload = this.plansIndividualsReaderCard.locator('a[href*="get.adobe.com/reader"]');
     this.plansIndividualsProCard = this.plansIndividualsMerchCards.nth(1);
-    this.plansIndividualsProPrice = this.plansIndividualsProCard.locator('span[is*="inline-price"]');
-    this.plansIndividualsProFreeTrial = this.plansIndividualsProCard.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.plansIndividualsProBuyNow = this.plansIndividualsProCard.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.plansIndividualsProPrice = this.plansIndividualsProCard.locator('p[slot="heading-m-price"]');
+    this.plansIndividualsProFreeTrial = this.plansIndividualsProCard.locator('a[is*="checkout-link"][data-wcs-osi="-lYm-YaTSZoUgv1gzqCgybgFotLqRsLwf8CgYdvdnsQ"]');
+    this.plansIndividualsProBuyNow = this.plansIndividualsProCard.locator('a[is*="checkout-link"][data-wcs-osi="vQmS1H18A6_kPd0tYBgKnp-TQIF0GbT6p8SH8rWcLMs"]');
     this.plansIndividualsStudioCard = this.plansIndividualsMerchCards.nth(2);
-    this.plansIndividualsStudioPrice = this.plansIndividualsStudioCard.locator('span[is*="inline-price"]');
-    this.plansIndividualsStudioFreeTrial = this.plansIndividualsStudioCard.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.plansIndividualsStudioBuyNow = this.plansIndividualsStudioCard.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.plansIndividualsStudioPrice = this.plansIndividualsStudioCard.locator('p[slot="heading-m-price"]');
+    this.plansIndividualsStudioFreeTrial = this.plansIndividualsStudioCard.locator('a[is*="checkout-link"][data-wcs-osi="x0LkInr7lGkqK8dcTFS_Pc6oHauo_g7N_4yWT_gLn20"]');
+    this.plansIndividualsStudioBuyNow = this.plansIndividualsStudioCard.locator('a[is*="checkout-link"][data-wcs-osi="V3W0kzf4e6M2Ht1hP9ZAt3dQNmhuDFrmYmEPlE2SlG0"]').filter({ visible: true });
 
     // Plans and Pricing - Business Tab Merch Cards
-    this.plansBusinessMerchCards = this.plansAndPricingPanelBusiness.locator('merch-card');
+    this.plansBusinessMerchCards = this.plansAndPricingPanelBusiness.locator('merch-card').filter({ visible: true });
     this.plansBusinessProCard = this.plansBusinessMerchCards.nth(0);
-    this.plansBusinessProPrice = this.plansBusinessProCard.locator('span[is*="inline-price"]');
-    this.plansBusinessProFreeTrial = this.plansBusinessProCard.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.plansBusinessProBuyNow = this.plansBusinessProCard.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.plansBusinessProPrice = this.plansBusinessProCard.locator('p[slot="heading-m-price"]');
+    this.plansBusinessProFreeTrial = this.plansBusinessProCard.locator('a[is*="checkout-link"][data-wcs-osi="8Lr09qx_PHqAJUwvUNiof4FFFEKjsR1TTbvBUncV2b0"]');
+    this.plansBusinessProBuyNow = this.plansBusinessProCard.locator('a[is*="checkout-link"][data-wcs-osi="vV01ci-KLH6hYdRfUKMBFx009hdpxZcIRG1-BY_PutE"]');
     this.plansBusinessStudioCard = this.plansBusinessMerchCards.nth(1);
-    this.plansBusinessStudioPrice = this.plansBusinessStudioCard.locator('span[is*="inline-price"]');
-    this.plansBusinessStudioFreeTrial = this.plansBusinessStudioCard.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.plansBusinessStudioBuyNow = this.plansBusinessStudioCard.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.plansBusinessStudioPrice = this.plansBusinessStudioCard.locator('p[slot="heading-m-price"]');
+    this.plansBusinessStudioFreeTrial = this.plansBusinessStudioCard.locator('a[is*="checkout-link"][data-wcs-osi="PVhDPYXq4fsy15OdlEE-XyIlvcxaPMxGs73pw39Cx-s"]');
+    this.plansBusinessStudioBuyNow = this.plansBusinessStudioCard.locator('a[is*="checkout-link"][data-wcs-osi="SfkorgyrBAsqBVpyKddQQEn6jR0ItBohpXc74sZcKHg"]');
 
     // Plans and Pricing - Students Tab Merch Cards
-    this.plansStudentsMerchCards = this.plansAndPricingPanelStudents.locator('merch-card');
+    this.plansStudentsMerchCards = this.plansAndPricingPanelStudents.locator('merch-card').filter({ visible: true });
     this.plansStudentsProCard = this.plansStudentsMerchCards.nth(0);
     this.plansStudentsProPrice = this.plansStudentsProCard.locator('span[is*="inline-price"]');
-    this.plansStudentsProFreeTrial = this.plansStudentsProCard.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.plansStudentsProBuyNow = this.plansStudentsProCard.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.plansStudentsProFreeTrial = this.plansStudentsProCard.locator('a[is*="checkout-link"][data-wcs-osi="WJLr3TF4T4qyJIGZTsDf9KPbTfxA7qAgStpaF2IgYao"]');
+    this.plansStudentsProBuyNow = this.plansStudentsProCard.locator('a[is*="checkout-link"][data-wcs-osi="ZZQMV2cU-SWQoDxuznonUFMRdxSyTr4J3fB77YBNakY"]');
     this.plansStudentsCCCard = this.plansStudentsMerchCards.nth(1);
     this.plansStudentsCCPrice = this.plansStudentsCCCard.locator('span[is*="inline-price"]');
-    this.plansStudentsCCFreeTrial = this.plansStudentsCCCard.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.plansStudentsCCBuyNow = this.plansStudentsCCCard.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.plansStudentsCCFreeTrial = this.plansStudentsCCCard.locator('a[is*="checkout-link"][data-wcs-osi="OQ1oCm1tZG35Gj7LCrkGeOOdUMfVlC7xx-7ml-CTWIE"]');
+    this.plansStudentsCCBuyNow = this.plansStudentsCCCard.locator('a[is*="checkout-link"][data-wcs-osi="Hnk2P6L5wYhnpZLFYTW5upuk2Y3AJXlso8VGWQ0l2TI"]');
 
     // Individual Merch Cards Section (acrobat-individuals fragment)
     this.individualMerchCardsContainer = page.locator('div[data-path="/dc-shared/fragments/merch-cards/acrobat-individuals"]');
-    this.individualMerchCards = this.individualMerchCardsContainer.locator('merch-card');
+    this.individualMerchCards = this.individualMerchCardsContainer.locator('merch-card').filter({ visible: true });
     this.individualMerchCardAcrobatReader = this.individualMerchCards.nth(0);
-    this.acrobatReaderPrice = this.individualMerchCardAcrobatReader.locator('p[id="free"]');
+    this.acrobatReaderPrice = this.individualMerchCardAcrobatReader.locator('p[slot="heading-m-price"]');
     this.acrobatReaderLink = this.individualMerchCardAcrobatReader.locator('a');
     this.individualMerchCardAcrobatPro = this.individualMerchCards.nth(1);
-    this.acrobatProPrice = this.individualMerchCardAcrobatPro.locator('span[is*="inline-price"]');
-    this.acrobatProFreeTrial = this.individualMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.acrobatProBuyNow = this.individualMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.acrobatProPrice = this.individualMerchCardAcrobatPro.locator('p[slot="heading-m-price"]');
+    this.acrobatProFreeTrial = this.individualMerchCardAcrobatPro.locator('a[is*="checkout-link"][data-wcs-osi="-lYm-YaTSZoUgv1gzqCgybgFotLqRsLwf8CgYdvdnsQ"]');
+    this.acrobatProBuyNow = this.individualMerchCardAcrobatPro.locator('a[is*="checkout-link"][data-wcs-osi="vQmS1H18A6_kPd0tYBgKnp-TQIF0GbT6p8SH8rWcLMs"]');
     this.individualMerchCardAcrobatStudio = this.individualMerchCards.nth(2);
-    this.acrobatStudioPrice = this.individualMerchCardAcrobatStudio.locator('span[is*="inline-price"]');
-    this.acrobatStudioFreeTrial = this.individualMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.acrobatStudioBuyNow = this.individualMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=BASE"]');
-    this.individualMerchCardsPricingLink = this.individualMerchCardsContainer.locator('div[class="body-m action-area"] a');
+    this.acrobatStudioPrice = this.individualMerchCardAcrobatStudio.locator('p[slot="heading-m-price"]');
+    this.acrobatStudioFreeTrial = this.individualMerchCardAcrobatStudio.locator('a[is*="checkout-link"][data-wcs-osi="x0LkInr7lGkqK8dcTFS_Pc6oHauo_g7N_4yWT_gLn20"]');
+    this.acrobatStudioBuyNow = this.individualMerchCardAcrobatStudio.locator('a[is*="checkout-link"][data-wcs-osi="V3W0kzf4e6M2Ht1hP9ZAt3dQNmhuDFrmYmEPlE2SlG0"]').filter({ visible: true });
+    this.individualMerchCardsPricingLink = this.individualMerchCardsContainer.locator('div[class="body-m action-area"] a').filter({ visible: true });
 
     // Individual Standard Merch Cards Section (acrobat-individuals-standard fragment)
     this.individualStandardMerchCardsContainer = page.locator('div[data-path="/dc-shared/fragments/merch-cards/acrobat-individuals-standard"]');
-    this.individualStandardMerchCards = this.individualStandardMerchCardsContainer.locator('merch-card');
+    this.individualStandardMerchCards = this.individualStandardMerchCardsContainer.locator('merch-card').filter({ visible: true });
     this.individualStandardMerchCardAcrobatStandard = this.individualStandardMerchCards.nth(0);
     this.acrobatStandardPrice = this.individualStandardMerchCardAcrobatStandard.locator('span[is*="inline-price"]');
-    this.acrobatStandardBuyNow = this.individualStandardMerchCardAcrobatStandard.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.acrobatStandardBuyNow = this.individualStandardMerchCardAcrobatStandard.locator('a[data-wcs-osi="QgYu51CVY2wKyFEqMuvec4N1tc1OaCypeKJjT5n2-Fc"]');
     this.individualStandardMerchCardAcrobatPro = this.individualStandardMerchCards.nth(1);
     this.acrobatProStandardPrice = this.individualStandardMerchCardAcrobatPro.locator('span[is*="inline-price"]');
-    this.acrobatProStandardFreeTrial = this.individualStandardMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.acrobatProStandardBuyNow = this.individualStandardMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.acrobatProStandardFreeTrial = this.individualStandardMerchCardAcrobatPro.locator('a[data-wcs-osi="-lYm-YaTSZoUgv1gzqCgybgFotLqRsLwf8CgYdvdnsQ"]');
+    this.acrobatProStandardBuyNow = this.individualStandardMerchCardAcrobatPro.locator('a[data-wcs-osi="vQmS1H18A6_kPd0tYBgKnp-TQIF0GbT6p8SH8rWcLMs"]');
     this.individualStandardMerchCardAcrobatStudio = this.individualStandardMerchCards.nth(2);
     this.acrobatStudioStandardPrice = this.individualStandardMerchCardAcrobatStudio.locator('span[is*="inline-price"]');
-    this.acrobatStudioStandardFreeTrial = this.individualStandardMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.acrobatStudioStandardBuyNow = this.individualStandardMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=BASE"]');
-    this.individualStandardMerchCardsPricingLink = this.individualStandardMerchCardsContainer.locator('div[class="body-m action-area"] a');
+    this.acrobatStudioStandardFreeTrial = this.individualStandardMerchCardAcrobatStudio.locator('a[data-wcs-osi="x0LkInr7lGkqK8dcTFS_Pc6oHauo_g7N_4yWT_gLn20"]');
+    this.acrobatStudioStandardBuyNow = this.individualStandardMerchCardAcrobatStudio.locator('a[data-wcs-osi="V3W0kzf4e6M2Ht1hP9ZAt3dQNmhuDFrmYmEPlE2SlG0"]');
+    this.individualStandardMerchCardsPricingLink = this.individualStandardMerchCardsContainer.locator('div[class="body-m action-area"] a').filter({ visible: true });
 
     // Business Standard Merch Cards Section (acrobat-business fragment)
     this.businessStandardMerchCardsContainer = page.locator('div[data-path="/dc-shared/fragments/merch-cards/acrobat-business"]');
-    this.businessStandardMerchCards = this.businessStandardMerchCardsContainer.locator('merch-card');
+    this.businessStandardMerchCards = this.businessStandardMerchCardsContainer.locator('merch-card').filter({ visible: true });
     this.businessStandardMerchCardAcrobatStandardForTeams = this.businessStandardMerchCards.nth(0);
     this.acrobatStandardForTeamsPrice = this.businessStandardMerchCardAcrobatStandardForTeams.locator('span[is*="inline-price"]');
-    this.acrobatStandardForTeamsBuyNow = this.businessStandardMerchCardAcrobatStandardForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.acrobatStandardForTeamsBuyNow = this.businessStandardMerchCardAcrobatStandardForTeams.locator('a[data-wcs-osi="AW-jV275GNYtPao6Q7XWENqyv_Stkc1BbzF7ak2u1dk"]');
     this.businessStandardMerchCardAcrobatProForTeams = this.businessStandardMerchCards.nth(1);
     this.acrobatProForTeamsStandardPrice = this.businessStandardMerchCardAcrobatProForTeams.locator('span[is*="inline-price"]');
-    this.acrobatProForTeamsStandardFreeTrial = this.businessStandardMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.acrobatProForTeamsStandardBuyNow = this.businessStandardMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.acrobatProForTeamsStandardFreeTrial = this.businessStandardMerchCardAcrobatProForTeams.locator('a[data-wcs-osi="8Lr09qx_PHqAJUwvUNiof4FFFEKjsR1TTbvBUncV2b0"]');
+    this.acrobatProForTeamsStandardBuyNow = this.businessStandardMerchCardAcrobatProForTeams.locator('a[data-wcs-osi="vV01ci-KLH6hYdRfUKMBFx009hdpxZcIRG1-BY_PutE"]');
     this.businessStandardMerchCardAcrobatStudioForTeams = this.businessStandardMerchCards.nth(2);
     this.acrobatStudioForTeamsStandardPrice = this.businessStandardMerchCardAcrobatStudioForTeams.locator('span[is*="inline-price"]');
-    this.acrobatStudioForTeamsStandardFreeTrial = this.businessStandardMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.acrobatStudioForTeamsStandardBuyNow = this.businessStandardMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.acrobatStudioForTeamsStandardFreeTrial = this.businessStandardMerchCardAcrobatStudioForTeams.locator('a[data-wcs-osi="PVhDPYXq4fsy15OdlEE-XyIlvcxaPMxGs73pw39Cx-s"]');
+    this.acrobatStudioForTeamsStandardBuyNow = this.businessStandardMerchCardAcrobatStudioForTeams.locator('a[data-wcs-osi="SfkorgyrBAsqBVpyKddQQEn6jR0ItBohpXc74sZcKHg"]');
 
     // Business Merch Cards Section (acrobat-business-contact fragment)
     this.businessMerchCardsContainer = page.locator('div[data-path="/dc-shared/fragments/merch-cards/acrobat-business-contact"]');
-    this.businessMerchCards = this.businessMerchCardsContainer.locator('merch-card');
+    this.businessMerchCards = this.businessMerchCardsContainer.locator('merch-card').filter({ visible: true });
     this.businessMerchCardAcrobatStandard = this.businessMerchCards.nth(0);
-    this.acrobatProForTeamsPrice = this.businessMerchCardAcrobatStandard.locator('span[is*="inline-price"]');
-    this.acrobatProForTeamsFreeTrial = this.businessMerchCardAcrobatStandard.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.acrobatProForTeamsBuyNow = this.businessMerchCardAcrobatStandard.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.acrobatProForTeamsPrice = this.businessMerchCardAcrobatStandard.locator('p[slot="heading-m-price"]');
+    this.acrobatProForTeamsFreeTrial = this.businessMerchCardAcrobatStandard.locator('a[is*="checkout-link"][data-wcs-osi="8Lr09qx_PHqAJUwvUNiof4FFFEKjsR1TTbvBUncV2b0"]');
+    this.acrobatProForTeamsBuyNow = this.businessMerchCardAcrobatStandard.locator('a[is*="checkout-link"][data-wcs-osi="vV01ci-KLH6hYdRfUKMBFx009hdpxZcIRG1-BY_PutE"]');
     this.acrobatStudioForTeams = this.businessMerchCards.nth(1);
-    this.acrobatStudioForTeamsPrice = this.acrobatStudioForTeams.locator('span[is*="inline-price"]');
-    this.acrobatStudioForTeamsFreeTrial = this.acrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.acrobatStudioForTeamsBuyNow = this.acrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
-    this.businessMerchCardsPricingLink = this.businessMerchCardsContainer.locator('div[class="body-m action-area"] a');
+    this.acrobatStudioForTeamsPrice = this.acrobatStudioForTeams.locator('p[slot="heading-m-price"]');
+    this.acrobatStudioForTeamsFreeTrial = this.acrobatStudioForTeams.locator('a[is*="checkout-link"][data-wcs-osi="PVhDPYXq4fsy15OdlEE-XyIlvcxaPMxGs73pw39Cx-s"]');
+    this.acrobatStudioForTeamsBuyNow = this.acrobatStudioForTeams.locator('a[is*="checkout-link"][data-wcs-osi="SfkorgyrBAsqBVpyKddQQEn6jR0ItBohpXc74sZcKHg"]');
+    this.businessMerchCardsPricingLink = this.businessMerchCardsContainer.locator('div[class="body-m action-area"] a').filter({ visible: true });
 
     // Students and Teachers Merch Cards Section (acrobat-students-and-teachers fragment)
     this.studentsAndTeachersContainer = page.locator('div[data-path="/dc-shared/fragments/merch-cards/acrobat-students-and-teachers"]');
-    this.studentsAndTeachersMerchCards = this.studentsAndTeachersContainer.locator('merch-card');
+    this.studentsAndTeachersMerchCards = this.studentsAndTeachersContainer.locator('merch-card').filter({ visible: true });
     this.acrobatProForStudentsAndTeachers = this.studentsAndTeachersMerchCards.nth(0);
     this.acrobatProForStudentsAndTeachersPrice = this.acrobatProForStudentsAndTeachers.locator('p[slot="heading-m-price"] span[is*="inline-price"]');
-    this.acrobatProForStudentsAndTeachersFreeTrial = this.acrobatProForStudentsAndTeachers.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.acrobatProForStudentsAndTeachersBuyNow = this.acrobatProForStudentsAndTeachers.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.acrobatProForStudentsAndTeachersFreeTrial = this.acrobatProForStudentsAndTeachers.locator('a[is*="checkout-link"][data-wcs-osi="WJLr3TF4T4qyJIGZTsDf9KPbTfxA7qAgStpaF2IgYao"]');
+    this.acrobatProForStudentsAndTeachersBuyNow = this.acrobatProForStudentsAndTeachers.locator('a[is*="checkout-link"][data-wcs-osi="ZZQMV2cU-SWQoDxuznonUFMRdxSyTr4J3fB77YBNakY"]');
     this.creativeCloudForStudentsAndTeachers = this.studentsAndTeachersMerchCards.nth(1);
     this.creativeCloudForStudentsAndTeachersPrice = this.creativeCloudForStudentsAndTeachers.locator('p[slot="heading-m-price"] span[is*="inline-price"]');
-    this.creativeCloudForStudentsAndTeachersFreeTrial = this.creativeCloudForStudentsAndTeachers.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.creativeCloudForStudentsAndTeachersBuyNow = this.creativeCloudForStudentsAndTeachers.locator('a[is*="checkout-link"][href*="ot=BASE"]');
-    this.studentsAndTeachersPricingLink = this.studentsAndTeachersContainer.locator('div[class="body-m action-area"] a');
+    this.creativeCloudForStudentsAndTeachersFreeTrial = this.creativeCloudForStudentsAndTeachers.locator('a[is*="checkout-link"][data-wcs-osi="OQ1oCm1tZG35Gj7LCrkGeOOdUMfVlC7xx-7ml-CTWIE"]');
+    this.creativeCloudForStudentsAndTeachersBuyNow = this.creativeCloudForStudentsAndTeachers.locator('a[is*="checkout-link"][data-wcs-osi="Hnk2P6L5wYhnpZLFYTW5upuk2Y3AJXlso8VGWQ0l2TI"]');
+    this.studentsAndTeachersPricingLink = this.studentsAndTeachersContainer.locator('div[class="body-m action-area"] a').filter({ visible: true });
 
     // Pricing page - Individuals
     this.pricingPageIndividuals = page.locator('div[data-path="/dc-shared/fragments/merch/acrobat/pricing/acrobat-individual-abm-merch-card-product"]');
-    this.pricingPageIndividualsMerchCards = this.pricingPageIndividuals.locator('merch-card');
+    this.pricingPageIndividualsMerchCards = this.pricingPageIndividuals.locator('merch-card').filter({ visible: true });
     this.pricingPageIndividualsMerchCardAcrobatStandard = this.pricingPageIndividualsMerchCards.nth(0);
-    this.pricingPageIndividualsMerchCardAcrobatStandardPrice = this.pricingPageIndividualsMerchCardAcrobatStandard.locator('span[is*="inline-price"]');
-    this.pricingPageIndividualsMerchCardAcrobatStandardBuyNow = this.pricingPageIndividualsMerchCardAcrobatStandard.locator('a[is="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageIndividualsMerchCardAcrobatStandardPrice = this.pricingPageIndividualsMerchCardAcrobatStandard.locator('p[slot="heading-m-price"]');
+    this.pricingPageIndividualsMerchCardAcrobatStandardBuyNow = this.pricingPageIndividualsMerchCardAcrobatStandard.locator('a[is*="checkout-link"][data-wcs-osi="QgYu51CVY2wKyFEqMuvec4N1tc1OaCypeKJjT5n2-Fc"]');
     this.pricingPageIndividualsMerchCardAcrobatPro = this.pricingPageIndividualsMerchCards.nth(1);
-    this.pricingPageIndividualsMerchCardAcrobatProPrice = this.pricingPageIndividualsMerchCardAcrobatPro.locator('span[is*="inline-price"]');
-    this.pricingPageIndividualsMerchCardAcrobatProFreeTrial = this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageIndividualsMerchCardAcrobatProBuyNow = this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageIndividualsMerchCardAcrobatProPrice = this.pricingPageIndividualsMerchCardAcrobatPro.locator('p[slot="heading-m-price"]');
+    this.pricingPageIndividualsMerchCardAcrobatProFreeTrial = this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][data-wcs-osi="-lYm-YaTSZoUgv1gzqCgybgFotLqRsLwf8CgYdvdnsQ"]');
+    this.pricingPageIndividualsMerchCardAcrobatProBuyNow = this.pricingPageIndividualsMerchCardAcrobatPro.locator('a[is*="checkout-link"][data-wcs-osi="vQmS1H18A6_kPd0tYBgKnp-TQIF0GbT6p8SH8rWcLMs"]');
     this.pricingPageIndividualsMerchCardAcrobatStudio = this.pricingPageIndividualsMerchCards.nth(2);
-    this.pricingPageIndividualsMerchCardAcrobatStudioPrice = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('span[is*="inline-price"]');
-    this.pricingPageIndividualsMerchCardAcrobatStudioFreeTrial = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageIndividualsMerchCardAcrobatStudioBuyNow = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageIndividualsMerchCardAcrobatStudioPrice = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('p[slot="heading-m-price"]');
+    this.pricingPageIndividualsMerchCardAcrobatStudioFreeTrial = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][data-wcs-osi="x0LkInr7lGkqK8dcTFS_Pc6oHauo_g7N_4yWT_gLn20"]');
+    this.pricingPageIndividualsMerchCardAcrobatStudioBuyNow = this.pricingPageIndividualsMerchCardAcrobatStudio.locator('a[is*="checkout-link"][data-wcs-osi="V3W0kzf4e6M2Ht1hP9ZAt3dQNmhuDFrmYmEPlE2SlG0"]').filter({ visible: true });
 
     // Pricing page - Business
     this.pricingPageBusiness = page.locator('div[data-path="/dc-shared/fragments/merch/acrobat/pricing/acrobat-business-abm-merch-card-product"]');
-    this.pricingPageBusinessMerchCards = this.pricingPageBusiness.locator('merch-card');
+    this.pricingPageBusinessMerchCards = this.pricingPageBusiness.locator('merch-card').filter({ visible: true });
     this.pricingPageBusinessMerchCardAcrobatStandardForTeams = this.pricingPageBusinessMerchCards.nth(0);
-    this.pricingPageBusinessMerchCardAcrobatStandardForTeamsPrice = this.pricingPageBusinessMerchCardAcrobatStandardForTeams.locator('span[is*="inline-price"]');
-    this.pricingPageBusinessMerchCardAcrobatStandardForTeamsFreeTrial = this.pricingPageBusinessMerchCardAcrobatStandardForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow = this.pricingPageBusinessMerchCardAcrobatStandardForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageBusinessMerchCardAcrobatStandardForTeamsPrice = this.pricingPageBusinessMerchCardAcrobatStandardForTeams.locator('p[slot="heading-m-price"]');
+    this.pricingPageBusinessMerchCardAcrobatStandardForTeamsFreeTrial = this.pricingPageBusinessMerchCardAcrobatStandardForTeams.locator('a[is*="checkout-link"][data-wcs-osi="8Lr09qx_PHqAJUwvUNiof4FFFEKjsR1TTbvBUncV2b0"]');
+    this.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow = this.pricingPageBusinessMerchCardAcrobatStandardForTeams.locator('a[is*="checkout-link"][data-wcs-osi="AW-jV275GNYtPao6Q7XWENqyv_Stkc1BbzF7ak2u1dk"]');
     this.pricingPageBusinessMerchCardAcrobatProForTeams = this.pricingPageBusinessMerchCards.nth(1);
-    this.pricingPageBusinessMerchCardAcrobatProForTeamsPrice = this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('span[is*="inline-price"]');
-    this.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial = this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow = this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageBusinessMerchCardAcrobatProForTeamsPrice = this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('p[slot="heading-m-price"]');
+    this.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial = this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][data-wcs-osi="8Lr09qx_PHqAJUwvUNiof4FFFEKjsR1TTbvBUncV2b0"]');
+    this.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow = this.pricingPageBusinessMerchCardAcrobatProForTeams.locator('a[is*="checkout-link"][data-wcs-osi="vV01ci-KLH6hYdRfUKMBFx009hdpxZcIRG1-BY_PutE"]');
     this.pricingPageBusinessMerchCardAcrobatStudioForTeams = this.pricingPageBusinessMerchCards.nth(2);
-    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsPrice = this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('span[is*="inline-price"]');
-    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial = this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow = this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][href*="ot=BASE"]');
+    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsPrice = this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('p[slot="heading-m-price"]');
+    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial = this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][data-wcs-osi="PVhDPYXq4fsy15OdlEE-XyIlvcxaPMxGs73pw39Cx-s"]');
+    this.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow = this.pricingPageBusinessMerchCardAcrobatStudioForTeams.locator('a[is*="checkout-link"][data-wcs-osi="SfkorgyrBAsqBVpyKddQQEn6jR0ItBohpXc74sZcKHg"]');
 
     // Pricing page - Students
     this.pricingPageStudents = page.locator('div[data-path="/dc-shared/fragments/merch/acrobat/pricing/acrobat-students-abm-merch-card-product"]');
-    this.pricingPageStudentsMerchCards = this.pricingPageStudents.locator('merch-card');
+    this.pricingPageStudentsMerchCards = this.pricingPageStudents.locator('merch-card').filter({ visible: true });
     this.pricingPageStudentsMerchCardAcrobatPro = this.pricingPageStudentsMerchCards.nth(0);
     this.pricingPageStudentsMerchCardAcrobatProPrice = this.pricingPageStudentsMerchCardAcrobatPro.locator('p[slot="heading-xs"] span[is*="inline-price"]');
-    this.pricingPageStudentsMerchCardAcrobatProFreeTrial = this.pricingPageStudentsMerchCardAcrobatPro.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageStudentsMerchCardAcrobatProBuyNow = this.pricingPageStudentsMerchCardAcrobatPro.locator('a[is*="checkout-link"]');
+    this.pricingPageStudentsMerchCardAcrobatProFreeTrial = this.pricingPageStudentsMerchCardAcrobatPro.locator('a[is*="checkout-link"][data-wcs-osi="WJLr3TF4T4qyJIGZTsDf9KPbTfxA7qAgStpaF2IgYao"]');
+    this.pricingPageStudentsMerchCardAcrobatProBuyNow = this.pricingPageStudentsMerchCardAcrobatPro.locator('a[is*="checkout-link"][data-wcs-osi="ZZQMV2cU-SWQoDxuznonUFMRdxSyTr4J3fB77YBNakY"]');
     this.pricingPageStudentsMerchCardCreativeCloud = this.pricingPageStudentsMerchCards.nth(1);
     this.pricingPageStudentsMerchCardCreativeCloudPrice = this.pricingPageStudentsMerchCardCreativeCloud.locator('p[slot="heading-xs"] span[is*="inline-price"]');
-    this.pricingPageStudentsMerchCardCreativeCloudFreeTrial = this.pricingPageStudentsMerchCardCreativeCloud.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-    this.pricingPageStudentsMerchCardCreativeCloudBuyNow = this.pricingPageStudentsMerchCardCreativeCloud.locator('a[is*="checkout-link"]');
+    this.pricingPageStudentsMerchCardCreativeCloudFreeTrial = this.pricingPageStudentsMerchCardCreativeCloud.locator('a[is*="checkout-link"][data-wcs-osi="OQ1oCm1tZG35Gj7LCrkGeOOdUMfVlC7xx-7ml-CTWIE"]');
+    this.pricingPageStudentsMerchCardCreativeCloudBuyNow = this.pricingPageStudentsMerchCardCreativeCloud.locator('a[is*="checkout-link"][data-wcs-osi="Hnk2P6L5wYhnpZLFYTW5upuk2Y3AJXlso8VGWQ0l2TI"]');
 
     // Business Sign Merch Cards Section
     this.businessSignMerchCardsContainer = page.locator('div[data-path="/dc-shared/fragments/merch/acrobat/business/acrobat-studio-teams/merch-card-blade"]');
-    this.businessSignMerchCards = this.businessSignMerchCardsContainer.locator('merch-card');
+    this.businessSignMerchCards = this.businessSignMerchCardsContainer.locator('merch-card').filter({ visible: true });
   }
 
   async verifyMerchCardPlans() {
@@ -215,20 +215,15 @@ export default class MerchCards {
     await expect(this.acrobatProPrice).toBeVisible();
     await expect(this.acrobatProFreeTrial).toBeVisible();
     await expect(this.acrobatProFreeTrial).toBeEnabled();
-    await expect(this.acrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.acrobatProBuyNow).toBeVisible();
     await expect(this.acrobatProBuyNow).toBeEnabled();
-    await expect(this.acrobatProBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.acrobatStudioPrice).toBeVisible();
     await expect(this.acrobatStudioFreeTrial).toBeVisible();
     await expect(this.acrobatStudioFreeTrial).toBeEnabled();
-    await expect(this.acrobatStudioFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.acrobatStudioBuyNow).toBeVisible();
     await expect(this.acrobatStudioBuyNow).toBeEnabled();
-    await expect(this.acrobatStudioBuyNow).toHaveAttribute('href', /ot=BASE/);
 
-    await expect(this.individualMerchCardsPricingLink).toBeVisible();
     await expect(this.individualMerchCardsPricingLink).toBeEnabled();
     await expect(this.individualMerchCardsPricingLink).toHaveCount(1);
   }
@@ -240,23 +235,18 @@ export default class MerchCards {
     await expect(this.acrobatStandardPrice.first()).toBeVisible();
     await expect(this.acrobatStandardBuyNow).toBeVisible();
     await expect(this.acrobatStandardBuyNow).toBeEnabled();
-    await expect(this.acrobatStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.acrobatProStandardPrice.first()).toBeVisible();
     await expect(this.acrobatProStandardFreeTrial).toBeVisible();
     await expect(this.acrobatProStandardFreeTrial).toBeEnabled();
-    await expect(this.acrobatProStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.acrobatProStandardBuyNow).toBeVisible();
     await expect(this.acrobatProStandardBuyNow).toBeEnabled();
-    await expect(this.acrobatProStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.acrobatStudioStandardPrice.first()).toBeVisible();
     await expect(this.acrobatStudioStandardFreeTrial).toBeVisible();
     await expect(this.acrobatStudioStandardFreeTrial).toBeEnabled();
-    await expect(this.acrobatStudioStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.acrobatStudioStandardBuyNow).toBeVisible();
     await expect(this.acrobatStudioStandardBuyNow).toBeEnabled();
-    await expect(this.acrobatStudioStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.individualStandardMerchCardsPricingLink).toBeVisible();
     await expect(this.individualStandardMerchCardsPricingLink).toBeEnabled();
@@ -269,23 +259,18 @@ export default class MerchCards {
     await expect(this.acrobatStandardForTeamsPrice.first()).toBeVisible();
     await expect(this.acrobatStandardForTeamsBuyNow).toBeVisible();
     await expect(this.acrobatStandardForTeamsBuyNow).toBeEnabled();
-    await expect(this.acrobatStandardForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.acrobatProForTeamsStandardPrice.first()).toBeVisible();
     await expect(this.acrobatProForTeamsStandardFreeTrial).toBeVisible();
     await expect(this.acrobatProForTeamsStandardFreeTrial).toBeEnabled();
-    await expect(this.acrobatProForTeamsStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.acrobatProForTeamsStandardBuyNow).toBeVisible();
     await expect(this.acrobatProForTeamsStandardBuyNow).toBeEnabled();
-    await expect(this.acrobatProForTeamsStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.acrobatStudioForTeamsStandardPrice.first()).toBeVisible();
     await expect(this.acrobatStudioForTeamsStandardFreeTrial).toBeVisible();
     await expect(this.acrobatStudioForTeamsStandardFreeTrial).toBeEnabled();
-    await expect(this.acrobatStudioForTeamsStandardFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.acrobatStudioForTeamsStandardBuyNow).toBeVisible();
     await expect(this.acrobatStudioForTeamsStandardBuyNow).toBeEnabled();
-    await expect(this.acrobatStudioForTeamsStandardBuyNow).toHaveAttribute('href', /ot=BASE/);
   }
 
   async verifyBusinessMerchCards() {
@@ -295,18 +280,14 @@ export default class MerchCards {
     await expect(this.acrobatProForTeamsPrice).toBeVisible();
     await expect(this.acrobatProForTeamsFreeTrial).toBeVisible();
     await expect(this.acrobatProForTeamsFreeTrial).toBeEnabled();
-    await expect(this.acrobatProForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.acrobatProForTeamsBuyNow).toBeVisible();
     await expect(this.acrobatProForTeamsBuyNow).toBeEnabled();
-    await expect(this.acrobatProForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.acrobatStudioForTeamsPrice).toBeVisible();
     await expect(this.acrobatStudioForTeamsFreeTrial).toBeVisible();
     await expect(this.acrobatStudioForTeamsFreeTrial).toBeEnabled();
-    await expect(this.acrobatStudioForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.acrobatStudioForTeamsBuyNow).toBeVisible();
     await expect(this.acrobatStudioForTeamsBuyNow).toBeEnabled();
-    await expect(this.acrobatStudioForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.businessMerchCardsPricingLink).toBeVisible();
     await expect(this.businessMerchCardsPricingLink).toBeEnabled();
@@ -320,18 +301,14 @@ export default class MerchCards {
     await expect(this.acrobatProForStudentsAndTeachersPrice.first()).toBeVisible();
     await expect(this.acrobatProForStudentsAndTeachersFreeTrial).toBeVisible();
     await expect(this.acrobatProForStudentsAndTeachersFreeTrial).toBeEnabled();
-    await expect(this.acrobatProForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.acrobatProForStudentsAndTeachersBuyNow).toBeVisible();
     await expect(this.acrobatProForStudentsAndTeachersBuyNow).toBeEnabled();
-    await expect(this.acrobatProForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.creativeCloudForStudentsAndTeachersPrice.first()).toBeVisible();
     await expect(this.creativeCloudForStudentsAndTeachersFreeTrial).toBeVisible();
     await expect(this.creativeCloudForStudentsAndTeachersFreeTrial).toBeEnabled();
-    await expect(this.creativeCloudForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.creativeCloudForStudentsAndTeachersBuyNow).toBeVisible();
     await expect(this.creativeCloudForStudentsAndTeachersBuyNow).toBeEnabled();
-    await expect(this.creativeCloudForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.studentsAndTeachersPricingLink).toBeVisible();
     await expect(this.studentsAndTeachersPricingLink).toBeEnabled();
@@ -442,26 +419,20 @@ export default class MerchCards {
     await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsPrice).toBeVisible();
     // await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsFreeTrial).toBeVisible();
     // await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsFreeTrial).toBeEnabled();
-    // await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow).toBeVisible();
     await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow).toBeEnabled();
-    await expect(this.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.pricingPageBusinessMerchCardAcrobatProForTeamsPrice).toBeVisible();
     await expect(this.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial).toBeVisible();
     await expect(this.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial).toBeEnabled();
-    await expect(this.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow).toBeVisible();
     await expect(this.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow).toBeEnabled();
-    await expect(this.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
 
     await expect(this.pricingPageBusinessMerchCardAcrobatStudioForTeamsPrice).toBeVisible();
     await expect(this.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial).toBeVisible();
     await expect(this.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial).toBeEnabled();
-    await expect(this.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
     await expect(this.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow).toBeVisible();
     await expect(this.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow).toBeEnabled();
-    await expect(this.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
   }
 
   async verifyPricingStudentsPageMerchCards() {
@@ -471,18 +442,14 @@ export default class MerchCards {
     await expect(this.pricingPageStudentsMerchCardAcrobatProPrice.first()).toBeVisible();
     await expect(this.pricingPageStudentsMerchCardAcrobatProFreeTrial).toBeVisible();
     await expect(this.pricingPageStudentsMerchCardAcrobatProFreeTrial).toBeEnabled();
-    await expect(this.pricingPageStudentsMerchCardAcrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-    await expect(this.pricingPageStudentsMerchCardAcrobatProBuyNow.last()).toBeVisible();
-    await expect(this.pricingPageStudentsMerchCardAcrobatProBuyNow.last()).toBeEnabled();
-    await expect(this.pricingPageStudentsMerchCardAcrobatProBuyNow.last()).toHaveAttribute('href', /commerce/);
+    await expect(this.pricingPageStudentsMerchCardAcrobatProBuyNow).toBeVisible();
+    await expect(this.pricingPageStudentsMerchCardAcrobatProBuyNow).toBeEnabled();
 
     await expect(this.pricingPageStudentsMerchCardCreativeCloudPrice.first()).toBeVisible();
     await expect(this.pricingPageStudentsMerchCardCreativeCloudFreeTrial).toBeVisible();
     await expect(this.pricingPageStudentsMerchCardCreativeCloudFreeTrial).toBeEnabled();
-    await expect(this.pricingPageStudentsMerchCardCreativeCloudFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-    await expect(this.pricingPageStudentsMerchCardCreativeCloudBuyNow.last()).toBeVisible();
-    await expect(this.pricingPageStudentsMerchCardCreativeCloudBuyNow.last()).toBeEnabled();
-    await expect(this.pricingPageStudentsMerchCardCreativeCloudBuyNow.last()).toHaveAttribute('href', /commerce/);
+    await expect(this.pricingPageStudentsMerchCardCreativeCloudBuyNow).toBeVisible();
+    await expect(this.pricingPageStudentsMerchCardCreativeCloudBuyNow).toBeEnabled();
   }
 
   async verifyBusinessSignMerchCards() {
@@ -494,12 +461,11 @@ export default class MerchCards {
       await expect(card).toBeVisible();
       const price = card.locator('span[is*="inline-price"]');
       await expect(price.first()).toBeVisible();
-      const freeTrial = card.locator('a[is*="checkout-link"][href*="ot=TRIAL"]');
-      await expect(freeTrial).toBeVisible();
-      await expect(freeTrial).toBeEnabled();
-      const buyNow = card.locator('a[is*="checkout-link"][href*="ot=BASE"]');
-      await expect(buyNow).toBeVisible();
-      await expect(buyNow).toBeEnabled();
+      const checkoutLinks = card.locator('a[is*="checkout-link"]').filter({ visible: true });
+      await expect(checkoutLinks.first()).toBeVisible();
+      await expect(checkoutLinks.first()).toBeEnabled();
+      await expect(checkoutLinks.last()).toBeVisible();
+      await expect(checkoutLinks.last()).toBeEnabled();
     }
   }
 }

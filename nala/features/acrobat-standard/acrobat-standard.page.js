@@ -27,7 +27,7 @@ export default class AcrobatStandardPage {
     this.individualStandardMerchCardsContainer = page.locator(
       'div[data-path="/dc-shared/fragments/merch-cards/acrobat-individuals-standard"]',
     );
-    this.individualStandardMerchCards = this.individualStandardMerchCardsContainer.locator('merch-card');
+    this.individualStandardMerchCards = this.individualStandardMerchCardsContainer.locator('merch-card').filter({ visible: true });
     this.individualStandardMerchCardAcrobatStandard = this.individualStandardMerchCards.nth(0);
     this.acrobatStandardPrice = this.individualStandardMerchCardAcrobatStandard.locator('span[is*="inline-price"]');
     this.acrobatStandardBuyNow = this.individualStandardMerchCardAcrobatStandard.locator(
@@ -49,14 +49,12 @@ export default class AcrobatStandardPage {
     this.acrobatStudioStandardBuyNow = this.individualStandardMerchCardAcrobatStudio.locator(
       'a[data-wcs-osi="V3W0kzf4e6M2Ht1hP9ZAt3dQNmhuDFrmYmEPlE2SlG0"]',
     );
-    this.individualStandardMerchCardsPricingLink = this.individualStandardMerchCardsContainer.locator(
-      'div[class="body-m action-area"] a',
-    );
+    this.individualStandardMerchCardsPricingLink = this.individualStandardMerchCardsContainer.locator('div[class="body-m action-area"] a').filter({ visible: true });
 
     this.businessStandardMerchCardsContainer = page.locator(
       'div[data-path="/dc-shared/fragments/merch-cards/acrobat-business"]',
     );
-    this.businessStandardMerchCards = this.businessStandardMerchCardsContainer.locator('merch-card');
+    this.businessStandardMerchCards = this.businessStandardMerchCardsContainer.locator('merch-card').filter({ visible: true });
     this.businessStandardMerchCardAcrobatStandardForTeams = this.businessStandardMerchCards.nth(0);
     this.acrobatStandardForTeamsPrice = this.businessStandardMerchCardAcrobatStandardForTeams.locator(
       'span[is*="inline-price"]',
@@ -88,7 +86,7 @@ export default class AcrobatStandardPage {
     this.studentsAndTeachersContainer = page.locator(
       'div[data-path="/dc-shared/fragments/merch-cards/acrobat-students-and-teachers-abm"]',
     );
-    this.studentsAndTeachersMerchCards = this.studentsAndTeachersContainer.locator('merch-card');
+    this.studentsAndTeachersMerchCards = this.studentsAndTeachersContainer.locator('merch-card').filter({ visible: true });
     this.acrobatProForStudentsAndTeachers = this.studentsAndTeachersMerchCards.nth(0);
     this.acrobatProForStudentsAndTeachersPrice = this.acrobatProForStudentsAndTeachers.locator(
       'p[slot="heading-m-price"] span[is*="inline-price"]',
@@ -109,9 +107,7 @@ export default class AcrobatStandardPage {
     this.creativeCloudForStudentsAndTeachersBuyNow = this.creativeCloudForStudentsAndTeachers.locator(
       'a[data-wcs-osi="Hnk2P6L5wYhnpZLFYTW5upuk2Y3AJXlso8VGWQ0l2TI"]',
     );
-    this.studentsAndTeachersPricingLink = this.studentsAndTeachersContainer.locator(
-      'div[class="body-m action-area"] a',
-    );
+    this.studentsAndTeachersPricingLink = this.studentsAndTeachersContainer.locator('div[class="body-m action-area"] a').filter({ visible: true });
 
     this.acrobatProStandardIconBlock = page.locator(
       'div[data-path*="/dc-shared/fragments/acrobat/acrobat-pro-standard/icon-block"]',
