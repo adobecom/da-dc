@@ -395,6 +395,18 @@ async function createSvgElement(iconName) {
   return svgElement.cloneNode(true);
 }
 
+// Returns an authored verb image when present, else null (falls back to coded SVG).
+// Supports either an <img> or an <a> link pointing at an .svg.
+function getAuthoredVerbIcon(element) {
+  const img = element.querySelector('img');
+  if (img) return img;
+  const svgLink = element.querySelector('a[href$=".svg"]');
+  if (svgLink) {
+    return createTag('img', { src: svgLink.getAttribute('href'), alt: '' });
+  }
+  return null;
+}
+
 // Initialize analytics functions as no-ops until loaded
 window.analytics = {
   verbAnalytics: () => {},
@@ -540,6 +552,8 @@ export default async function init(element) {
     widgetSubHeading = children[1].textContent;
     widgetMobSubHeading = children[2].textContent;
   }
+  // If a verb image is authored in the block, use it instead of the coded icon.
+  const authoredIcon = getAuthoredVerbIcon(element);
   let noOfFiles = null;
   let openFilePicker = true;
   const userAttempts = getVerbKey(`${VERB}_attempts`);
@@ -593,11 +607,12 @@ export default async function init(element) {
     ...(LIMITS[VERB]?.multipleFiles && { multiple: '' }),
   });
   const widgetImage = createTag('div', { class: 'verb-image' });
-  const verbIconName = `${VERB}`;
-  const verbImageSvg = await createSvgElement(verbIconName);
+  const verbImageSvg = authoredIcon || await createSvgElement(`${VERB}`);
   if (verbImageSvg) {
     verbImageSvg.classList.add('icon-verb-image');
-    verbImageSvg.setAttribute('alt', window.mph[`verb-widget-${VERB}-alt`] || VERB);
+    if (!verbImageSvg.getAttribute('alt')) {
+      verbImageSvg.setAttribute('alt', window.mph[`verb-widget-${VERB}-alt`] || VERB);
+    }
     widgetImage.appendChild(verbImageSvg);
   }
 
