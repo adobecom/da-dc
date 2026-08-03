@@ -229,7 +229,7 @@ function openIDB() {
 async function storeEncryptedLocalFile(id, file) {
   const key = await crypto.subtle.generateKey(
     { name: 'AES-GCM', length: 256 },
-    true,
+    false,
     ['encrypt', 'decrypt'],
   );
   const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -238,12 +238,12 @@ async function storeEncryptedLocalFile(id, file) {
     key,
     await file.arrayBuffer(),
   );
-  const rawKey = await crypto.subtle.exportKey('raw', key);
 
+  const record = { ciphertext, iv, key, fileName: file.name, mimeType: file.type };
   const db = await openIDB();
   await new Promise((resolve, reject) => {
     const tx = db.transaction(IDB_STORE, 'readwrite');
-    tx.objectStore(IDB_STORE).put({ ciphertext, iv, rawKey, fileName: file.name, mimeType: file.type }, id);
+    tx.objectStore(IDB_STORE).put(record, id);
     tx.oncomplete = resolve;
     tx.onerror = ({ target: { error } }) => reject(error);
   });
