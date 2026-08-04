@@ -11,7 +11,7 @@ export default class PricingStudentsPage {
 
     // Merch — `/acrobat/pricing/students` ABM cards
     this.pricingPageStudents = page.locator(
-      'div[data-path="/dc-shared/fragments/merch/acrobat/pricing/acrobat-students-abm-merch-card-product"]',
+      'div[data-path="/dc-shared/fragments/merch/acrobat/pricing/students-pill-tabs"]',
     );
     this.pricingPageStudentsMerchCards = this.pricingPageStudents.locator('merch-card').filter({ visible: true });
     this.pricingPageStudentsMerchCardAcrobatPro = this.pricingPageStudentsMerchCards.nth(0);

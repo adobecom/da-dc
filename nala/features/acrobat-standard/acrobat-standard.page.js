@@ -25,7 +25,7 @@ export default class AcrobatStandardPage {
     this.tabCompareStudentsAndTeachers = this.merchCardPlans.locator('button[id="tab-compare-plans-3"]');
 
     this.individualStandardMerchCardsContainer = page.locator(
-      'div[data-path="/dc-shared/fragments/merch-cards/acrobat-individuals-standard"]',
+      'div[data-path="/dc-shared/fragments/merch-cards/acrobat-standard-individual-pill-tab"]',
     );
     this.individualStandardMerchCards = this.individualStandardMerchCardsContainer.locator('merch-card').filter({ visible: true });
     this.individualStandardMerchCardAcrobatStandard = this.individualStandardMerchCards.nth(0);
@@ -52,7 +52,7 @@ export default class AcrobatStandardPage {
     this.individualStandardMerchCardsPricingLink = this.individualStandardMerchCardsContainer.locator('div[class="body-m action-area"] a').filter({ visible: true });
 
     this.businessStandardMerchCardsContainer = page.locator(
-      'div[data-path="/dc-shared/fragments/merch-cards/acrobat-business"]',
+      'div[data-path="/dc-shared/fragments/merch-cards/acrobat-standard-business-pill-tab"]',
     );
     this.businessStandardMerchCards = this.businessStandardMerchCardsContainer.locator('merch-card').filter({ visible: true });
     this.businessStandardMerchCardAcrobatStandardForTeams = this.businessStandardMerchCards.nth(0);
@@ -84,7 +84,7 @@ export default class AcrobatStandardPage {
     );
 
     this.studentsAndTeachersContainer = page.locator(
-      'div[data-path="/dc-shared/fragments/merch-cards/acrobat-students-and-teachers-abm"]',
+      'div[data-path="/dc-shared/fragments/merch-cards/acrobat-standard-students-pill-tab"]',
     );
     this.studentsAndTeachersMerchCards = this.studentsAndTeachersContainer.locator('merch-card').filter({ visible: true });
     this.acrobatProForStudentsAndTeachers = this.studentsAndTeachersMerchCards.nth(0);
