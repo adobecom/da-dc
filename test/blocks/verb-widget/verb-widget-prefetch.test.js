@@ -8,7 +8,6 @@ const { default: init } = await import(
   '../../../acrobat/blocks/verb-widget/verb-widget.js'
 );
 
-// Verbs wired for early prefetch and the URL fragments each should produce.
 const PREFETCH_VERBS = [
   { verb: 'word-to-pdf', pathFragment: '/word-to-pdf/av?', clientLocation: 'word-to-pdf' },
   { verb: 'excel-to-pdf', pathFragment: '/excel-to-pdf?', clientLocation: 'excel-to-pdf' },
@@ -27,9 +26,6 @@ describe('verb-widget early prefetch', () => {
     document.head.innerHTML = await readFile({ path: './mocks/head.html' });
     window.adobeIMS = { isSignedInUser: () => false };
 
-    // Drain any `once` prefetch listeners left on `document` by a previous test
-    // (e.g. an unused dragover handler), then reset the module's window state so
-    // each test starts with no pending listeners and a clean slate.
     document.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     document.dispatchEvent(new DragEvent('dragover', { bubbles: true }));
     window.prefetchTargetUrl = null;
@@ -51,7 +47,6 @@ describe('verb-widget early prefetch', () => {
       const block = document.body.querySelector('.verb-widget');
       await init(block);
 
-      // No prefetch until the user interacts.
       expect(getPrefetchLinks()).to.have.lengthOf(0);
 
       document.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -63,7 +58,6 @@ describe('verb-widget early prefetch', () => {
       expect(href).to.include(`x_api_client_location=${clientLocation}`);
       expect(href).to.include('x_api_client_id=unity');
       expect(href).to.include('user=frictionless_return_user');
-      // Shared dummy asset used to warm the destination app.
       expect(href).to.include('assets=urn%3Aaaid%3Asc%3AUS%3A1111111');
     });
   });
