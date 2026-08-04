@@ -158,13 +158,26 @@ function initiatePrefetch(url) {
   }
 }
 
-function buildWordToPdfEarlyPrefetchUrl() {
+// Shared dummy asset used to warm the destination Acrobat web app before the real
+// upload. TODO(MWPW-202884): swap in per-verb sample assets once they are available.
+const EARLY_PREFETCH_DUMMY_ASSET = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
+
+// Per-verb configuration for the early prefetch of the destination Acrobat page.
+// `path` is the URL segment after the locale (word-to-pdf ships the `/av` app route).
+const EARLY_PREFETCH_CONFIG = {
+  'word-to-pdf': { path: 'word-to-pdf/av', clientLocation: 'word-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+  'excel-to-pdf': { path: 'excel-to-pdf', clientLocation: 'excel-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+  'ppt-to-pdf': { path: 'ppt-to-pdf', clientLocation: 'ppt-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+};
+
+function buildEarlyPrefetchUrl(verb) {
+  const config = EARLY_PREFETCH_CONFIG[verb];
+  if (!config) return null;
   const langFromPath = window.location.pathname.split('/')[1];
   const locale = localeMap[langFromPath] || 'en-us';
   const [languageCode, languageRegion] = locale.split('-');
   const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
-  const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
-  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf/av?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
+  return `https://${domain}/${languageRegion}/${languageCode}/${config.path}?x_api_client_id=unity&x_api_client_location=${config.clientLocation}&user=frictionless_return_user&attempts=2%2B#assets=${config.assets}`;
 }
 
 function redDirLink(verb) {
@@ -829,9 +842,9 @@ export default async function init(element) {
 
   window.prefetchTargetUrl = null;
 
-  if (VERB === 'word-to-pdf') {
+  if (EARLY_PREFETCH_CONFIG[VERB]) {
     const triggerEarlyPrefetch = () => {
-      initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
+      initiatePrefetch(buildEarlyPrefetchUrl(VERB));
       prefetchTarget();
     };
     document.addEventListener('click', triggerEarlyPrefetch, { once: true });
