@@ -16,7 +16,12 @@ let soloClicked;
 const fallBack = 'https://www.adobe.com/go/acrobat-overview';
 const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 const demoPath = 'blob/JTdCJTIyc291cmNlJTIyJTNBJTIyY2RuJTIyJTJDJTIyZmlsZVBhdGglMjIlM0ElMjIlMkZkYy1maWxlczItZHJvcGluJTJGZGVtby1maWxlcyUyRmVuLVVTJTJGY2hhdC1wZGYtZGVtby12NCUyRmNoYXQtcGRmLWRlbW8tdjQucGRmJTIyJTJDJTIyaXRlbU5hbWUlMjIlM0ElMjJBSSUyMEFzc2lzdGFudCUyMGRlbW8lMjBmaWxlLnBkZiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJjaGF0LXBkZi1kZW1vLXY0JTIyJTJDJTIyaXRlbVR5cGUlMjIlM0ElMjJhcHBsaWNhdGlvbiUyRnBkZiUyMiU3RA/?defaultRHPFeature=verb-qanda&x_api_client_id=ChatPDFTryDemoFile&x_api_client_location=chat_pdf&try-ai-demo=true&demo-mode=true&promoid=HHJ4X8CS&mv=product&mv2=acrobat-web';
-
+const EARLY_PREFETCH_DUMMY_ASSET = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
+const EARLY_PREFETCH_CONFIG = {
+  'word-to-pdf': { path: 'word-to-pdf/av', clientLocation: 'word-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+  'excel-to-pdf': { path: 'excel-to-pdf', clientLocation: 'excel-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+  'ppt-to-pdf': { path: 'ppt-to-pdf', clientLocation: 'ppt-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+};
 const redirectReady = new CustomEvent('DCUnity:RedirectReady');
 
 const verbRedirMap = {
@@ -157,18 +162,6 @@ function initiatePrefetch(url) {
     window.prefetchTargetUrl = url;
   }
 }
-
-// Shared dummy asset used to warm the destination Acrobat web app before the real
-// upload. TODO(MWPW-202884): swap in per-verb sample assets once they are available.
-const EARLY_PREFETCH_DUMMY_ASSET = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
-
-// Per-verb configuration for the early prefetch of the destination Acrobat page.
-// `path` is the URL segment after the locale (word-to-pdf ships the `/av` app route).
-const EARLY_PREFETCH_CONFIG = {
-  'word-to-pdf': { path: 'word-to-pdf/av', clientLocation: 'word-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
-  'excel-to-pdf': { path: 'excel-to-pdf', clientLocation: 'excel-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
-  'ppt-to-pdf': { path: 'ppt-to-pdf', clientLocation: 'ppt-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
-};
 
 function buildEarlyPrefetchUrl(verb) {
   const config = EARLY_PREFETCH_CONFIG[verb];
