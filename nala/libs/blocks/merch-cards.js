@@ -189,12 +189,18 @@ export default class MerchCards {
     await expect(this.tabCompareStudentsAndTeachers).toBeEnabled();
 
     await this.tabCompareIndividuals.click();
+    await expect(this.tabCompareIndividuals).toHaveAttribute('aria-selected', 'true');
+    await this.page.waitForTimeout(400);
     await this.verifyIndividualMerchCards();
 
     await this.tabCompareBusiness.click();
+    await expect(this.tabCompareBusiness).toHaveAttribute('aria-selected', 'true');
+    await this.page.waitForTimeout(400);
     await this.verifyBusinessMerchCards();
 
     await this.tabCompareStudentsAndTeachers.click();
+    await expect(this.tabCompareStudentsAndTeachers).toHaveAttribute('aria-selected', 'true');
+    await this.page.waitForTimeout(400);
     await this.verifyStudentsAndTeachersMerchCards();
   }
 

@@ -40,9 +40,9 @@ const verbRedirMap = {
   'bmp-to-pdf': 'jpgtopdf',
   'gif-to-pdf': 'jpgtopdf',
   'tiff-to-pdf': 'jpgtopdf',
-  'indd-to-pdf': 'jpgtopdf',
-  'psd-to-pdf': 'jpgtopdf',
-  'ai-to-pdf': 'jpgtopdf',
+  'indd-to-pdf': 'createpdf',
+  'psd-to-pdf': 'createpdf',
+  'ai-to-pdf': 'createpdf',
   'number-pages': 'number',
   'ocr-pdf': 'ocr',
   'chat-pdf': 'chat',
@@ -68,16 +68,17 @@ const MB100 = 104857600;
 const MB250 = 262144000;
 const PDF_ONLY = ['.pdf'];
 const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
-const ALL_FILES_WITH_HEIC = [...ALL_FILES, '.heic'];
 const STUDENT_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt'];
 const SIGNED_IN_FILES = ['.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
+const COMMON_TO_PDF_FILES = ['.jpg', '.jpeg', '.png', '.heic', '.tif', '.tiff', '.bmp', '.gif', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text'];
+const CREATEPDF_FILES = [...COMMON_TO_PDF_FILES, '.psd', '.ai', '.indd'];
 
 const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
 const MULTI_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, multipleFiles: true };
 const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
-const MULTI_ALL_HEIC = {
+const MULTI_COMMON_TO_PDF = {
   maxFileSize: MB100,
-  acceptedFiles: ALL_FILES_WITH_HEIC,
+  acceptedFiles: COMMON_TO_PDF_FILES,
   multipleFiles: true,
 };
 const GENAI_MULTI = { ...MULTI_ALL, maxNumFiles: 100, uploadType: 'multifile-only', subCopy: true, genAI: true };
@@ -111,8 +112,13 @@ export const LIMITS = {
   ...group(['combine-pdf', 'rotate-pages'], { ...MULTI_PDF, maxNumFiles: 100, uploadType: 'multifile-only' }),
   ...group(['pdf-to-excel', 'pdf-to-image', 'pdf-to-png'], MULTI_PDF),
   ...group(['pdf-to-word', 'pdf-to-ppt'], { maxFileSize: MB250, acceptedFiles: PDF_ONLY, multipleFiles: true }),
-  ...group(['createpdf', 'word-to-pdf', 'jpg-to-pdf', 'png-to-pdf', 'excel-to-pdf', 'ppt-to-pdf'], MULTI_ALL),
-  ...group(['image-to-pdf', 'bmp-to-pdf', 'gif-to-pdf', 'tiff-to-pdf', 'indd-to-pdf', 'psd-to-pdf', 'ai-to-pdf'], MULTI_ALL_HEIC),
+  createpdf: { maxFileSize: MB100, acceptedFiles: CREATEPDF_FILES, multipleFiles: true },
+  ...group(['png-to-pdf', 'excel-to-pdf', 'ppt-to-pdf'], MULTI_COMMON_TO_PDF),
+  ...group(['word-to-pdf', 'jpg-to-pdf'], { ...MULTI_COMMON_TO_PDF, noRedirectTimeout: true }),
+  ...group(['image-to-pdf', 'bmp-to-pdf', 'gif-to-pdf', 'tiff-to-pdf'], MULTI_COMMON_TO_PDF),
+  'psd-to-pdf': { maxFileSize: MB100, acceptedFiles: ['.psd'], multipleFiles: true },
+  'ai-to-pdf': { maxFileSize: MB100, acceptedFiles: ['.ai'], multipleFiles: true },
+  'indd-to-pdf': { maxFileSize: MB100, acceptedFiles: ['.indd'], multipleFiles: true },
 };
 
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
@@ -158,7 +164,7 @@ function buildWordToPdfEarlyPrefetchUrl() {
   const [languageCode, languageRegion] = locale.split('-');
   const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
   const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
-  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
+  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf/av?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
 }
 
 function redDirLink(verb) {
@@ -782,7 +788,7 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    if (VERB === 'word-to-pdf') {
+    if (LIMITS[VERB]?.noRedirectTimeout ?? true) {
       window.dispatchEvent(redirectReady);
     } else {
       setTimeout(() => {
