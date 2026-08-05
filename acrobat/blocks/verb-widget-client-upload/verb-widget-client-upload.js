@@ -208,11 +208,11 @@ window.addEventListener('analyticsLoad', async ({ detail }) => {
   await loadAnalyticsAfterLCP(detail.verb, detail.userAttempts);
 });
 
-const IDB_NAME = 'dc-file-transfer';
-const IDB_STORE = 'encrypted-files';
+export const IDB_NAME = 'dc-file-transfer';
+export const IDB_STORE = 'encrypted-files';
 const IDB_VERSION = 1;
 
-function openIDB() {
+export function openIDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(IDB_NAME, IDB_VERSION);
     req.onupgradeneeded = ({ target: { result: db } }) => {
@@ -225,7 +225,7 @@ function openIDB() {
   });
 }
 
-async function storeEncryptedLocalFile(id, file) {
+export async function storeEncryptedLocalFile(id, file) {
   const key = await crypto.subtle.generateKey(
     { name: 'AES-GCM', length: 256 },
     false,
@@ -249,13 +249,13 @@ async function storeEncryptedLocalFile(id, file) {
   db.close();
 }
 
-async function encryptAndStore(file) {
+export async function encryptAndStore(file) {
   const id = crypto.randomUUID();
   await storeEncryptedLocalFile(id, file);
   return id;
 }
 
-function validateFiles(files, verb) {
+export function validateFiles(files, verb) {
   const limits = LIMITS[verb];
   const mph = window.mph ?? {};
 
