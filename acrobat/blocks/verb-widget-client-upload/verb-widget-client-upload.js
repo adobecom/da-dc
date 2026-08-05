@@ -621,10 +621,11 @@ export default async function init(element) {
       const uploadedMetadata = { ...filesData, assetId: id, uploadTime };
       handleAnalyticsEvent('job:uploaded', uploadedMetadata, false);
 
-      const redirectBase = window.mph?.['verb-widget-client-upload-redirect']
-        || 'https://mwpw-197746--da-dc--adobecom.aem.live/acrobat/online';
+      const redirectBase = DC_ENV === 'prod'
+        ? 'https://www.adobe.com/acrobat-online/image-to-pdf.html'
+        : 'https://www.stage.adobe.com/acrobat-online/image-to-pdf.html';
       const [baseUrl, queryString] = redirectBase.split('?');
-      const redirectUrl = `${baseUrl}?clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${queryString ? `&${queryString}` : ''}`;
+      const redirectUrl = `${baseUrl}?clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${queryString ? `&${queryString}` : ''}&force_meteriq=true`;
       handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
       window.location.href = redirectUrl;
     } catch (err) {
