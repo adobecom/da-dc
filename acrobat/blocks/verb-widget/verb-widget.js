@@ -395,8 +395,6 @@ async function createSvgElement(iconName) {
   return svgElement.cloneNode(true);
 }
 
-// Returns an authored verb image when present, else null (falls back to coded SVG).
-// Supports either an <img> or an <a> link pointing at an .svg.
 function getAuthoredVerbIcon(element) {
   const img = element.querySelector('img');
   if (img) return img;
@@ -552,7 +550,6 @@ export default async function init(element) {
     widgetSubHeading = children[1].textContent;
     widgetMobSubHeading = children[2].textContent;
   }
-  // If a verb image is authored in the block, use it instead of the coded icon.
   const authoredIcon = getAuthoredVerbIcon(element);
   let noOfFiles = null;
   let openFilePicker = true;
