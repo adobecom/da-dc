@@ -622,8 +622,8 @@ export default async function init(element) {
       handleAnalyticsEvent('job:uploaded', uploadedMetadata, false);
 
       const redirectBase = DC_ENV === 'prod'
-        ? 'https://www.adobe.com/acrobat-online/image-to-pdf.html'
-        : 'https://www.stage.adobe.com/acrobat-online/image-to-pdf.html';
+        ? 'https://www.adobe.com/acrobat-online/jpg-to-pdf.html'
+        : 'https://www.stage.adobe.com/acrobat-online/jpg-to-pdf.html';
       const [baseUrl, queryString] = redirectBase.split('?');
       const redirectUrl = `${baseUrl}?clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${queryString ? `&${queryString}` : ''}&force_meteriq=true`;
       handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
