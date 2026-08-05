@@ -542,41 +542,6 @@ html[dir="rtl"] .verb-cta .upload-icon {
   }
 }
 
-/* ── Progress bar (client-upload only) ─────────────────────────────────────── */
-
-.upload-progress {
-  display: flex;
-  flex-direction: column;
-  gap: var(--consonant-spacing-xxs);
-  margin-bottom: var(--consonant-spacing-s);
-}
-
-.upload-progress-label {
-  font-size: 14px;
-  color: var(--consonant-color-gray-700);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 340px;
-}
-
-.upload-progress-bar {
-  width: 100%;
-  max-width: 340px;
-  height: 6px;
-  background: var(--consonant-color-gray-300);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.upload-progress-fill {
-  height: 100%;
-  width: 0%;
-  background: #1473e6;
-  border-radius: 3px;
-  transition: width 0.2s ease;
-}
-
 /* ── Signed-in / upsell states ─────────────────────────────────────────────── */
 
 .verb-widget-client-upload.signed-in .verb-footer {

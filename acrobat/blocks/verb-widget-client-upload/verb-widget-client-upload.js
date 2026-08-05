@@ -1,3 +1,4 @@
+/* eslint-disable compat/compat */
 import { setLibs, getEnv, isOldBrowser } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
@@ -14,9 +15,7 @@ const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 const MB25 = 26214400;
 const ACCEPTED_FILES = ['.jpg', '.jpeg', '.png'];
 
-const LIMITS = {
-  'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ACCEPTED_FILES, multipleFiles: false },
-};
+const LIMITS = { 'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ACCEPTED_FILES, multipleFiles: false } };
 
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
 
@@ -250,10 +249,9 @@ async function storeEncryptedLocalFile(id, file) {
   db.close();
 }
 
-async function encryptAndStore(file, { onProgress } = {}) {
+async function encryptAndStore(file) {
   const id = crypto.randomUUID();
   await storeEncryptedLocalFile(id, file);
-  onProgress?.(1);
   return id;
 }
 
@@ -420,13 +418,6 @@ export default async function init(element) {
     ...(limits.multipleFiles && { multiple: '' }),
   });
 
-  const progressContainer = createTag('div', { class: 'upload-progress hide' });
-  const progressLabel = createTag('div', { class: 'upload-progress-label' });
-  const progressBar = createTag('div', { class: 'upload-progress-bar' });
-  const progressFill = createTag('div', { class: 'upload-progress-fill' });
-  progressBar.append(progressFill);
-  progressContainer.append(progressLabel, progressBar);
-
   const widgetImage = createTag('div', { class: 'verb-image' });
   const verbImageSvg = await createSvgElement(VERB);
   if (verbImageSvg) {
@@ -446,7 +437,10 @@ export default async function init(element) {
   });
   const securityIconSvg = await createSvgElement('SECURITY_ICON');
   const infoIconSvg = await createSvgElement('INFO_ICON');
-  if (securityIconSvg) { iconSecurity.appendChild(securityIconSvg); infoIcon.appendChild(infoIconSvg); }
+  if (securityIconSvg) {
+    iconSecurity.appendChild(securityIconSvg);
+    infoIcon.appendChild(infoIconSvg);
+  }
   const legalWrapper = createTag('div', { class: 'verb-legal-wrapper' });
   const legal = createTag('p', { class: 'verb-legal' }, `${window.mph?.['verb-widget-legal'] ?? ''} `);
   const legalTwo = createTag('p', { class: 'verb-legal verb-legal-two' });
@@ -474,7 +468,14 @@ export default async function init(element) {
   }
 
   errorState.append(errorIcon, errorText, closeErrorBtn);
-  widgetLeft.append(widgetHeader, widgetHeading, widgetCopy, errorState, ctaButton, fileInput, progressContainer);
+  widgetLeft.append(
+    widgetHeader,
+    widgetHeading,
+    widgetCopy,
+    errorState,
+    ctaButton,
+    fileInput,
+  );
   widgetRight.append(widgetImage);
   widgetRow.append(widgetLeft, widgetRight);
   widgetContainer.append(widgetRow);
@@ -515,19 +516,6 @@ export default async function init(element) {
   await checkSignedInUser();
   window.addEventListener('IMS:Ready', checkSignedInUser);
 
-  const setProgress = (ratio, label = '') => {
-    const pct = Math.round(ratio * 100);
-    progressFill.style.width = `${pct}%`;
-    progressLabel.textContent = label || `${pct}%`;
-    progressFill.setAttribute('aria-valuenow', pct);
-  };
-
-  const hideProgress = () => {
-    progressContainer.classList.add('hide');
-    ctaButton.classList.remove('hide');
-    setProgress(0);
-  };
-
   const showError = (message) => {
     errorText.textContent = message;
     errorState.classList.remove('hide');
@@ -554,11 +542,6 @@ export default async function init(element) {
     const uploaded = parseInt(document.cookie.match(/UTS_Uploaded=([^;]*)/)?.[1], 10);
     if (Number.isNaN(uploading) || Number.isNaN(uploaded)) return 'N/A';
     return ((uploaded - uploading) / 1000).toFixed(1);
-  }
-
-  function getFileType(files) {
-    const types = [...new Set(files.map((f) => f.type))];
-    return types.length > 1 ? 'mixed' : types[0] || '';
   }
 
   const errorAnalyticsMap = {
@@ -655,7 +638,10 @@ export default async function init(element) {
     exitFlag = false;
     handleAnalyticsEvent('choose-file:open', { userAttempts }, true);
     const validation = validateFiles(files, VERB);
-    if (!validation.valid) { dispatchError(validation.code, validation.message, { userAttempts }); return; }
+    if (!validation.valid) {
+      dispatchError(validation.code, validation.message, { userAttempts });
+      return;
+    }
     startUpload(Array.from(files));
   });
 
@@ -681,7 +667,10 @@ export default async function init(element) {
       handleAnalyticsEvent(evt, { userAttempts }, true);
     });
     const validation = validateFiles(files, VERB);
-    if (!validation.valid) { dispatchError(validation.code, validation.message, { userAttempts }); return; }
+    if (!validation.valid) {
+      dispatchError(validation.code, validation.message, { userAttempts });
+      return;
+    }
     startUpload(Array.from(files));
   });
 
