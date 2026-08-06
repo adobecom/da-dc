@@ -188,7 +188,8 @@
   width: var(--verb-widget-image-width);
 }
 
-.verb-image svg {
+.verb-image svg,
+.verb-image img {
   display: block;
   width: 100%;
   height: 100%;
