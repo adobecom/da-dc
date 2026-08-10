@@ -607,8 +607,8 @@ export default async function init(element) {
       const redirectBase = DC_ENV === 'prod'
         ? 'https://www.adobe.com/acrobat-online/image-to-pdf.html'
         : 'https://www.stage.adobe.com/acrobat-online/image-to-pdf.html';
-      const [baseUrl, queryString] = redirectBase.split('?');
-      const redirectUrl = `${baseUrl}?clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${queryString ? `&${queryString}` : ''}`;
+      const originalParams = DC_ENV === 'stage' ? `${window.location.search.slice(1)}&` : '';
+      const redirectUrl = `${redirectBase}?${originalParams}clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}`;
       handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
       window.location.href = redirectUrl;
     } catch (err) {
