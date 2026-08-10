@@ -434,8 +434,14 @@ replaceDotMedia(document);
 // race. Fire-and-forget (never awaited by loadPage) so it can't hold up page load. Only
 // mas-geo.js is imported here — a dependency-free leaf module, so it never triggers a
 // merch.js/utils.js load. Best-effort and safe: the browser matches the preload by full
-// URL, so a miss (MEP-overridden id, or a geo-detected country that differs from the sync
-// guess) just wastes one preload — it can never surface a wrong price.
+// URL, so a miss (MEP-overridden id) just wastes one preload — it can never surface a
+// wrong price.
+//
+// On geo-detection pages we resolve the exact, supported-markets-clamped market first
+// (resolveMasMarket) — the same answer Milo lands on inside loadArea, but earlier. The only
+// wait is a small, cacheable supported-markets.json fetch; the detected country comes from
+// the Server-Timing geo header (no geo lookup). On non-geo pages it's a no-op and the
+// preload fires immediately off the page's own locale.
 (async function preloadFirstSectionMasFragments() {
   const firstSection = document.querySelector('main > div');
   const masLinks = firstSection
@@ -444,8 +450,9 @@ replaceDotMedia(document);
   if (!masLinks.length) return;
   try {
     const miloLibs = setLibs(LIBS);
-    const { preloadMasFragment } = await import(`${miloLibs}/blocks/merch/mas-geo.js`);
-    masLinks.forEach((a) => preloadMasFragment(a, { locale: { prefix } }));
+    const { preloadMasFragment, resolveMasMarket } = await import(`${miloLibs}/blocks/merch/mas-geo.js`);
+    const market = await resolveMasMarket({ locale: { prefix } });
+    masLinks.forEach((a) => preloadMasFragment(a, { locale: { prefix }, market }));
   } catch (e) {
     // Best-effort; never block page load.
   }
