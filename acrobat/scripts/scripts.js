@@ -430,6 +430,27 @@ replaceDotMedia(document);
   }
 }());
 
+// [MWPW-203232] Preload the first-section M@S fragment before Milo boots, to win the LCP
+// race. Fire-and-forget (never awaited by loadPage) so it can't hold up page load. Only
+// mas-geo.js is imported here — a dependency-free leaf module, so it never triggers a
+// merch.js/utils.js load. Best-effort and safe: the browser matches the preload by full
+// URL, so a miss (MEP-overridden id, or a geo-detected country that differs from the sync
+// guess) just wastes one preload — it can never surface a wrong price.
+(async function preloadFirstSectionMasFragments() {
+  const firstSection = document.querySelector('main > div');
+  const masLinks = firstSection
+    ? [...firstSection.querySelectorAll('a[href*="mas.adobe.com/studio.html"]')]
+    : [];
+  if (!masLinks.length) return;
+  try {
+    const miloLibs = setLibs(LIBS);
+    const { preloadMasFragment } = await import(`${miloLibs}/blocks/merch/mas-geo.js`);
+    masLinks.forEach((a) => preloadMasFragment(a, { locale: { prefix } }));
+  } catch (e) {
+    // Best-effort; never block page load.
+  }
+}());
+
 /*
  * ------------------------------------------------------------
  * Edit below at your own risk
