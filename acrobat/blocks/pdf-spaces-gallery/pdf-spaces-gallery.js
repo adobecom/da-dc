@@ -7,7 +7,8 @@ let loadBlock;
 let getConfig;
 
 const PDFSPACES_API_KEY = 'acrobatmiloguest';
-const DISCOVERY_URL = 'https://dc-api.adobe.io/discovery';
+const DISCOVERY_URL_PROD = 'https://dc-api.adobe.io/discovery';
+const DISCOVERY_URL_STAGE = 'https://dc-api-stage.adobe.io/discovery';
 const KWCOLLECTION_ID = 'curated';
 
 const VARIANTS = ['featured', 'productivity', 'lifestyle', 'all'];
@@ -79,7 +80,10 @@ async function fetchCuratedSpaces() {
     Authorization: `Bearer ${token}`,
   };
 
-  const discoveryResp = await fetch(DISCOVERY_URL, {
+  // The IMS token's issuing environment (prod vs stage) must match the API's
+  // environment — dc-api.adobe.io rejects stage-issued tokens outright.
+  const discoveryUrl = getConfig?.().env?.name === 'prod' ? DISCOVERY_URL_PROD : DISCOVERY_URL_STAGE;
+  const discoveryResp = await fetch(discoveryUrl, {
     headers: {
       ...baseHeaders,
       Accept: 'application/vnd.adobe.dc+json;profile="https://dc-api-v2.adobe.io/schemas/discovery_v1.json"',
