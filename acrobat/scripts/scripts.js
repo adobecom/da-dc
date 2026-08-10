@@ -448,10 +448,34 @@ replaceDotMedia(document);
     ? [...firstSection.querySelectorAll('a[href*="mas.adobe.com/studio.html"]')]
     : [];
   if (!masLinks.length) return;
+
+  // On geo-detection pages, start the supported-markets.json fetch NOW — same-origin and
+  // small, so it lands during the (cross-origin) mas-geo.js import instead of serializing
+  // behind it. The URL mirrors mas-geo.js's getMasMarketsUrl (stable federal path); the
+  // load-bearing GeoMap/clamp still lives only in mas-geo.js.
+  const params = new URLSearchParams(window.location.search);
+  const geoVal = (params.get('mas-geo-detection')
+    ?? document.querySelector('meta[name="mas-geo-detection"]')?.content)?.toLowerCase();
+  let marketsConfigPromise = null;
+  const marketsSource = params.get('marketsSource')
+    || document.querySelector('meta[name="marketssource"]')?.content;
+  if ((geoVal === 'on' || geoVal === 'true') && !marketsSource) {
+    const { origin } = window.location;
+    let root;
+    if (origin.includes('localhost') || origin.includes('.aem.') || origin.includes('.hlx.')) {
+      root = `https://main--federal--adobecom.aem.${origin.endsWith('.live') ? 'live' : 'page'}`;
+    } else {
+      root = origin.replace('.stage', '') === 'https://www.adobe.com' ? origin : 'https://www.adobe.com';
+    }
+    const marketsUrl = `${root}/federal/assets/supported-markets/supported-markets.json`;
+    marketsConfigPromise = fetch(marketsUrl).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  }
+
   try {
     const miloLibs = setLibs(LIBS);
     const { preloadMasFragment, resolveMasMarket } = await import(`${miloLibs}/blocks/merch/mas-geo.js`);
-    const market = await resolveMasMarket({ locale: { prefix } });
+    const marketsConfig = marketsConfigPromise ? await marketsConfigPromise : undefined;
+    const market = await resolveMasMarket({ locale: { prefix }, marketsConfig });
     masLinks.forEach((a) => preloadMasFragment(a, { locale: { prefix }, market }));
   } catch (e) {
     // Best-effort; never block page load.
