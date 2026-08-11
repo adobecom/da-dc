@@ -431,7 +431,7 @@ replaceDotMedia(document);
 }());
 
 /*
- * M@S fragment prefetch 
+ * M@S fragment prefetch
  * Wired as Milo's config.decorateArea in loadPage below, so it preloads the
  * first section's M@S fragment before the block would fetch it and the fetch stops blocking
  * LCP. Logic is inlined here and reuses loadLink.
