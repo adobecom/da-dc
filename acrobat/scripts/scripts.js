@@ -431,10 +431,10 @@ replaceDotMedia(document);
 }());
 
 /*
- * [MWPW-203232] M@S (Merch at Scale) fragment prefetch — mirrors the CC implementation
- * (MWPW-203258). Wired as Milo's config.decorateArea in loadPage below, so it preloads the
+ * M@S fragment prefetch 
+ * Wired as Milo's config.decorateArea in loadPage below, so it preloads the
  * first section's M@S fragment before the block would fetch it and the fetch stops blocking
- * LCP. Logic is inlined here (no cross-origin merch.js/mas-geo.js import) and reuses loadLink.
+ * LCP. Logic is inlined here and reuses loadLink.
  * Best-effort: the browser reuses a preload only on a full-URL match, so a miss just wastes
  * one request; the block always fetches its own correct URL, so it can never show a wrong price.
  */
@@ -665,7 +665,7 @@ async function loadPage() {
     replacePlaceholdersWithImages(ietf, miloLibs);
   }
 
-  // [MWPW-203232] Preload first-section M@S fragments so their fetch stops blocking LCP. Wired
+  // Preload first-section M@S fragments so their fetch stops blocking LCP. Wired
   // as Milo's decorateArea: our initial call scans the authored document, and Milo re-invokes
   // it per loaded fragment (with { fragmentLink }), catching a marquee that MEP swaps in.
   const decorateArea = (area, options) => scanForMasLinks(area, options, getConfig());
