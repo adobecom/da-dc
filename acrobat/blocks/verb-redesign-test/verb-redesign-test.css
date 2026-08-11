@@ -85,7 +85,7 @@
 
 .vm2-dropzone {
   width: 100%;
-  border: 1.5px dashed #adadad;
+  border: 2px dashed #adadad;
   border-radius: 16px;
   background: #fff;
   display: flex;
@@ -846,7 +846,7 @@
 }
 
 .verb-redesign-test.challenger2 .vm2-dropzone {
-  border: 1px dashed #747474;
+  border: 2px dashed #747474;
   border-radius: 15px;
   padding: 40px;
 }
