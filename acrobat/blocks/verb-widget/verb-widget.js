@@ -549,14 +549,16 @@ export default async function init(element) {
 
   const children = element.querySelectorAll(':scope > div');
   const VERB = element.classList[1];
-  const widgetHeading = createTag('h1', { class: 'verb-heading' }, children[0].textContent);
+  const authoredIcon = getAuthoredVerbIcon(element);
+  const iconSource = element.querySelector('img, a[href$=".svg"]');
+  const rows = [...children].filter((row) => !iconSource || !row.contains(iconSource));
+  const widgetHeading = createTag('h1', { class: 'verb-heading' }, rows[0].textContent);
   let widgetSubHeading = window.mph[`verb-widget-${VERB}-description`];
   let widgetMobSubHeading = window.mph[`verb-widget-${VERB}-mobile-description`];
-  if (children.length > 2) {
-    widgetSubHeading = children[1].textContent;
-    widgetMobSubHeading = children[2].textContent;
+  if (rows.length > 2) {
+    widgetSubHeading = rows[1].textContent;
+    widgetMobSubHeading = rows[2].textContent;
   }
-  const authoredIcon = getAuthoredVerbIcon(element);
   let noOfFiles = null;
   let openFilePicker = true;
   const userAttempts = getVerbKey(`${VERB}_attempts`);
