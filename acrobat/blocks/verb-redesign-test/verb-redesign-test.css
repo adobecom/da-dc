@@ -1,5 +1,5 @@
 .verb-redesign-test {
-  --consonant-button-accent-action-bg: #3b63fb;
+  --consonant-button-accent-action-bg: #147AF3;
   --consonant-button-accent-action-bg-hover: #2d55e8;
 
   position: relative;
@@ -85,7 +85,7 @@
 
 .vm2-dropzone {
   width: 100%;
-  border: 1.5px dashed #adadad;
+  border: 2px dashed #adadad;
   border-radius: 16px;
   background: #fff;
   display: flex;
@@ -99,7 +99,12 @@
   box-sizing: border-box;
 }
 
-.vm2-dropzone:hover,
+.vm2-dropzone:hover {
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--consonant-button-accent-action-bg);
+}
+
 .vm2-dropzone.dragging,
 .verb-redesign-test.dragging-block .vm2-dropzone {
   border-color: #1473E6;
@@ -841,9 +846,19 @@
 }
 
 .verb-redesign-test.challenger2 .vm2-dropzone {
-  border: 1px dashed #747474;
+  border: 2px dashed #747474;
   border-radius: 15px;
   padding: 40px;
+}
+
+/* Variant hover: overrides each challenger's own .vm2-dropzone border above.
+   Kept after those rules so the higher-specificity :hover wins and source order
+   stays ascending (stylelint no-descending-specificity). */
+.verb-redesign-test.challenger1 .vm2-dropzone:hover,
+.verb-redesign-test.challenger2 .vm2-dropzone:hover {
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--consonant-button-accent-action-bg);
 }
 
 .verb-redesign-test.challenger2 .vm2-dropzone-media {
