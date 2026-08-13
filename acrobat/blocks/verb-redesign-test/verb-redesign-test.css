@@ -326,13 +326,13 @@
   outline: none;
 }
 
-.verb-redesign-test .info-icon:hover svg {
-  opacity: 0.8;
-}
-
 .verb-redesign-test .info-icon svg {
   width: 18px;
   height: 18px;
+}
+
+.verb-redesign-test .info-icon:hover svg {
+  opacity: 0.8;
 }
 
 .verb-redesign-test .milo-tooltip {
