@@ -530,11 +530,13 @@ function getMasLocale(miloLocale) {
 function preloadMasFragment(a, config) {
   let url;
   try {
+    // eslint-disable-next-line compat/compat
     url = new URL(a.href);
   } catch {
     return;
   }
   if (url.hostname !== 'mas.adobe.com' || !url.pathname.endsWith('/studio.html')) return;
+  // eslint-disable-next-line compat/compat
   const params = new URLSearchParams(url.hash.replace(/^#/, ''));
   const fragment = params.get('fragment') || params.get('query');
   if (!fragment) return;
