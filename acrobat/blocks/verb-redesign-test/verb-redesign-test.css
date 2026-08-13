@@ -162,6 +162,7 @@
   color: #fff;
   border: none;
   border-radius: 100px;
+  font-family: var(--body-font-family);
   font-size: 19px;
   font-weight: 700;
   line-height: 24px;
@@ -325,13 +326,13 @@
   outline: none;
 }
 
-.verb-redesign-test .info-icon:hover svg {
-  opacity: 0.8;
-}
-
 .verb-redesign-test .info-icon svg {
   width: 18px;
   height: 18px;
+}
+
+.verb-redesign-test .info-icon:hover svg {
+  opacity: 0.8;
 }
 
 .verb-redesign-test .milo-tooltip {
