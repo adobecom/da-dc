@@ -456,12 +456,12 @@ async function frictionlessResponseProvider(request) {
       headerLink = [...headerLink,
         `<${codeRoot}/blocks/unity/unity.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${codeRoot}/blocks/unity/unity.css>;rel="preload";as="style"`,
-        `<${codeRoot}/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `<${codeRoot}/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
         `<${codeRoot}/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `<${request.path.split('/').filter(Boolean).length <= 1 ? '' : `/${first}`}${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`
+        `<${request.path.split('/').filter(Boolean).length <= 1 ? '' : `/${first}`}${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
+        `<${codeRoot}/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `<${codeRoot}/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`
       ];
     }
     headerLink = headerLink.join();
