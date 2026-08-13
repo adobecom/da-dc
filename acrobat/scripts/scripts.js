@@ -430,6 +430,138 @@ replaceDotMedia(document);
   }
 }());
 
+const MAS_FRAGMENT_API = 'https://www.adobe.com/mas/io/fragment';
+const DEFAULT_MAS_FRAGMENT_API_KEY = 'wcms-commerce-ims-ro-user-milo';
+const MAS_LINK_SELECTOR = 'a[href*="mas.adobe.com/studio.html"]';
+
+// Kept in sync with GeoMap in Milo's blocks/merch/merch.js.
+const MAS_GEO_MAP = {
+  ar: 'AR_es',
+  be_en: 'BE_en',
+  be_fr: 'BE_fr',
+  be_nl: 'BE_nl',
+  br: 'BR_pt',
+  ca: 'CA_en',
+  ch_de: 'CH_de',
+  ch_fr: 'CH_fr',
+  ch_it: 'CH_it',
+  cl: 'CL_es',
+  co: 'CO_es',
+  la: 'DO_es',
+  mx: 'MX_es',
+  pe: 'PE_es',
+  africa: 'MU_en',
+  dk: 'DK_da',
+  de: 'DE_de',
+  ee: 'EE_et',
+  eg_ar: 'EG_ar',
+  eg_en: 'EG_en',
+  es: 'ES_es',
+  fr: 'FR_fr',
+  gr_el: 'GR_el',
+  gr_en: 'GR_en',
+  ie: 'IE_en',
+  il_he: 'IL_he',
+  it: 'IT_it',
+  lv: 'LV_lv',
+  lt: 'LT_lt',
+  lu_de: 'LU_de',
+  lu_en: 'LU_en',
+  lu_fr: 'LU_fr',
+  my_en: 'MY_en',
+  my_ms: 'MY_ms',
+  hu: 'HU_hu',
+  mt: 'MT_en',
+  mena_en: 'DZ_en',
+  mena_ar: 'DZ_ar',
+  nl: 'NL_nl',
+  no: 'NO_nb',
+  pl: 'PL_pl',
+  pt: 'PT_pt',
+  ro: 'RO_ro',
+  si: 'SI_sl',
+  sk: 'SK_sk',
+  fi: 'FI_fi',
+  se: 'SE_sv',
+  tr: 'TR_tr',
+  uk: 'GB_en',
+  at: 'AT_de',
+  cz: 'CZ_cs',
+  bg: 'BG_bg',
+  ru: 'RU_ru',
+  ua: 'UA_uk',
+  au: 'AU_en',
+  in_en: 'IN_en',
+  in_hi: 'IN_hi',
+  id_en: 'ID_en',
+  id_id: 'ID_id',
+  nz: 'NZ_en',
+  sa_ar: 'SA_ar',
+  sa_en: 'SA_en',
+  sg: 'SG_en',
+  cn: 'CN_zh',
+  tw: 'TW_zh',
+  hk_zh: 'HK_zh',
+  jp: 'JP_ja',
+  kr: 'KR_ko',
+  za: 'ZA_en',
+  ng: 'NG_en',
+  cr: 'CR_es',
+  ec: 'EC_es',
+  pr: 'US_es',
+  gt: 'GT_es',
+  cis_en: 'TM_en',
+  cis_ru: 'TM_ru',
+  sea: 'SG_en',
+  th_en: 'TH_en',
+  th_th: 'TH_th',
+};
+
+const MAS_EXTRA_LOCALES = { pr: 'es_PR' };
+
+function getMasLocale(miloLocale) {
+  const geo = (miloLocale?.prefix || 'US_en').replace('/', '');
+  let [country = 'US', language = 'en'] = (MAS_GEO_MAP[geo] ?? geo).split('_', 2);
+  country = country.toUpperCase();
+  language = language.toLowerCase();
+  return { locale: MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`, country };
+}
+
+function preloadMasFragment(a, config) {
+  let url;
+  try {
+    // eslint-disable-next-line compat/compat
+    url = new URL(a.href);
+  } catch {
+    return;
+  }
+  if (url.hostname !== 'mas.adobe.com' || !url.pathname.endsWith('/studio.html')) return;
+  // eslint-disable-next-line compat/compat
+  const params = new URLSearchParams(url.hash.replace(/^#/, ''));
+  const fragment = params.get('fragment') || params.get('query');
+  if (!fragment) return;
+
+  const { locale, country } = getMasLocale(config?.locale);
+  const apiKey = config?.commerce?.['wcs-api-key'] ?? DEFAULT_MAS_FRAGMENT_API_KEY;
+  let endpoint = `${MAS_FRAGMENT_API}?id=${fragment}&api_key=${apiKey}&locale=${locale}`;
+  if (country && !locale.endsWith(`_${country}`)) endpoint += `&country=${country}`;
+
+  loadLink(endpoint, { rel: 'preload', as: 'fetch', crossorigin: 'anonymous', fetchpriority: 'low' });
+}
+
+function scanForMasLinks(area, options, config) {
+  const { fragmentLink } = options || {};
+  if (fragmentLink) {
+    if (fragmentLink.closest('.section')?.dataset.idx === '0') {
+      area?.querySelectorAll(MAS_LINK_SELECTOR).forEach((a) => preloadMasFragment(a, config));
+    }
+    return;
+  }
+  (area ?? document).querySelector('body > main > div')
+    ?.querySelectorAll(MAS_LINK_SELECTOR)
+    .forEach((a) => preloadMasFragment(a, config));
+}
+
 /*
  * ------------------------------------------------------------
  * Edit below at your own risk
@@ -511,7 +643,9 @@ async function loadPage() {
   }
 
   // Import base milo features and run them
-  const { loadArea, setConfig, loadLana, getMetadata, loadIms } = await import(`${miloLibs}/utils/utils.js`);
+  const {
+    loadArea, setConfig, loadLana, getMetadata, loadIms, getConfig,
+  } = await import(`${miloLibs}/utils/utils.js`);
   addLocale(ietf);
 
   if (getMetadata('commerce')) {
@@ -519,7 +653,12 @@ async function loadPage() {
     replacePlaceholdersWithImages(ietf, miloLibs);
   }
 
-  setConfig({ ...CONFIG, miloLibs });
+  // Preload first-section M@S fragments so their fetch stops blocking LCP. Wired
+  // as Milo's decorateArea: our initial call scans the authored document, and Milo re-invokes
+  // it per loaded fragment (with { fragmentLink }), catching a marquee that MEP swaps in.
+  const decorateArea = (area, options) => scanForMasLinks(area, options, getConfig());
+  setConfig({ ...CONFIG, miloLibs, decorateArea });
+  decorateArea();
 
   window.addEventListener('IMS:Ready', async () => {
     const susiElems = document.querySelectorAll('a[href*="susi"]');
