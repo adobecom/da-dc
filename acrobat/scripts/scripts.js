@@ -535,7 +535,6 @@ function preloadMasFragment(a, config) {
     return;
   }
   if (url.hostname !== 'mas.adobe.com' || !url.pathname.endsWith('/studio.html')) return;
-
   const params = new URLSearchParams(url.hash.replace(/^#/, ''));
   const fragment = params.get('fragment') || params.get('query');
   if (!fragment) return;
