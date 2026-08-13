@@ -430,14 +430,6 @@ replaceDotMedia(document);
   }
 }());
 
-/*
- * M@S fragment prefetch
- * Wired as Milo's config.decorateArea in loadPage below, so it preloads the
- * first section's M@S fragment before the block would fetch it and the fetch stops blocking
- * LCP. Logic is inlined here and reuses loadLink.
- * Best-effort: the browser reuses a preload only on a full-URL match, so a miss just wastes
- * one request; the block always fetches its own correct URL, so it can never show a wrong price.
- */
 const MAS_FRAGMENT_API = 'https://www.adobe.com/mas/io/fragment';
 const DEFAULT_MAS_FRAGMENT_API_KEY = 'wcms-commerce-ims-ro-user-milo';
 const MAS_LINK_SELECTOR = 'a[href*="mas.adobe.com/studio.html"]';
@@ -516,7 +508,7 @@ const MAS_GEO_MAP = {
   ng: 'NG_en',
   cr: 'CR_es',
   ec: 'EC_es',
-  pr: 'US_es', // not a typo, should be US
+  pr: 'US_es',
   gt: 'GT_es',
   cis_en: 'TM_en',
   cis_ru: 'TM_ru',
@@ -525,7 +517,6 @@ const MAS_GEO_MAP = {
   th_th: 'TH_th',
 };
 
-// Kept in sync with EXTRA_MAS_LOCALES in Milo's blocks/merch/merch.js.
 const MAS_EXTRA_LOCALES = { pr: 'es_PR' };
 
 function getMasLocale(miloLocale) {
@@ -555,9 +546,6 @@ function preloadMasFragment(a, config) {
   let endpoint = `${MAS_FRAGMENT_API}?id=${fragment}&api_key=${apiKey}&locale=${locale}`;
   if (country && !locale.endsWith(`_${country}`)) endpoint += `&country=${country}`;
 
-  // loadLink dedups by href, so the same fragment authored on several variant links in
-  // section 0 (mobile/tablet/desktop) preloads once. Low priority so it never competes with
-  // the LCP image.
   loadLink(endpoint, { rel: 'preload', as: 'fetch', crossorigin: 'anonymous', fetchpriority: 'low' });
 }
 
