@@ -325,7 +325,7 @@
   outline: none;
 }
 
-.verb-redesign-test .info-icon:hover {
+.verb-redesign-test .info-icon:hover svg {
   opacity: 0.8;
 }
 
