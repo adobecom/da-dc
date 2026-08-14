@@ -169,16 +169,4 @@ Most of the widget's text and links are **not** authored in the block. **In the 
 | `verb-widget-upsell-bullets-heading` | Upsell bullets heading |
 | `verb-widget-upsell-bullets` | Default upsell bullets |
 
-## Per-verb placeholder values (need a value for each new verb / reskin)
-
-| Placeholder key | Used for |
-|---|---|
-| `verb-widget-<verb>-description` | Desktop copy — used when copy is **not** authored in the block |
-| `verb-widget-<verb>-mobile-description` | Mobile copy — used when copy is **not** authored in the block |
-| `verb-widget-<verb>-sub-description` | Sub-copy — only for verbs that show sub-copy |
-| `verb-widget-<verb>-alt` | Default alt text for the verb image |
-| `verb-widget-<verb>-apple` / `verb-widget-<verb>-<store>` | App-store link — only for app-handoff verbs (e.g. fill & sign, request signatures) |
-| `verb-widget-upsell-headline-<verb>` | Optional per-verb upsell headline — falls back to the shared `verb-widget-upsell-headline` |
-| `verb-widget-upsell-bullets-<verb>` | Optional per-verb upsell bullets — falls back to the shared `verb-widget-upsell-bullets` |
-
-So when launching a new verb or doing a reskin, you typically only author the block plus the **per-verb** placeholder entries above; the **shared** values are inherited.
+So when launching a new verb or doing a reskin, the **shared** values above are inherited automatically and do not need re-authoring.
