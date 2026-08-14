@@ -141,3 +141,44 @@ Optionally add a `referrer-<page-name>` option, where `<page-name>` identifies t
 - [ ] The single cell reads `unity (workflow-acrobat, ...)`.
 - [ ] `workflow-acrobat` is always present.
 - [ ] Referrer is optional in general, **but mandatory for reskin verbs** — add `referrer-<page-name>` so a reskin reports under its own analytics value instead of the underlying verb name; otherwise it defaults to the verb name.
+
+---
+
+# Placeholder values reference
+
+Most of the widget's text and links are **not** authored in the block. **In the current state, we pull these values from the placeholders file** (`window.mph`) at runtime. Many of the keys are **shared across every verb**, so they only need to exist **once** in the placeholders file — you do **not** re-author them when launching a new verb or doing a reskin; they carry over automatically.
+
+## Shared placeholder values (verb-independent — author once, reused everywhere)
+
+| Placeholder key | Used for |
+|---|---|
+| `verb-widget-cta` | Default upload button label |
+| `verb-widget-cta-<uploadType>` | Upload button label variant per upload type (e.g. `multifile-only`) — shared by all verbs of that type |
+| `verb-widget-cta-demo` | "Try with a demo file" button label |
+| `verb-widget-cta-mobile` | Mobile app CTA label |
+| `verb-widget-cta-mobile-start-trial` | Mobile free-trial CTA label |
+| `verb-widget-legal` | Legal line 1 |
+| `verb-widget-legal-2` | Legal line 2 |
+| `verb-widget-legal-2-ai` | Legal line 2 for GenAI verbs |
+| `verb-widget-terms-of-use` / `verb-widget-terms-of-use-url` | Terms of Use link text / URL |
+| `verb-widget-privacy-policy` / `verb-widget-privacy-policy-url` | Privacy Policy link text / URL |
+| `verb-widget-genai-guidelines` / `verb-widget-genai-terms-url` | GenAI guidelines link text / URL |
+| `verb-widget-tool-tip` | Security info tooltip text |
+| `verb-widget-upsell-headline` | Default upsell headline |
+| `verb-widget-upsell-headline-nopayment` | Upsell headline (no-payment case) |
+| `verb-widget-upsell-bullets-heading` | Upsell bullets heading |
+| `verb-widget-upsell-bullets` | Default upsell bullets |
+
+## Per-verb placeholder values (need a value for each new verb / reskin)
+
+| Placeholder key | Used for |
+|---|---|
+| `verb-widget-<verb>-description` | Desktop copy — used when copy is **not** authored in the block |
+| `verb-widget-<verb>-mobile-description` | Mobile copy — used when copy is **not** authored in the block |
+| `verb-widget-<verb>-sub-description` | Sub-copy — only for verbs that show sub-copy |
+| `verb-widget-<verb>-alt` | Default alt text for the verb image |
+| `verb-widget-<verb>-apple` / `verb-widget-<verb>-<store>` | App-store link — only for app-handoff verbs (e.g. fill & sign, request signatures) |
+| `verb-widget-upsell-headline-<verb>` | Optional per-verb upsell headline — falls back to the shared `verb-widget-upsell-headline` |
+| `verb-widget-upsell-bullets-<verb>` | Optional per-verb upsell bullets — falls back to the shared `verb-widget-upsell-bullets` |
+
+So when launching a new verb or doing a reskin, you typically only author the block plus the **per-verb** placeholder entries above; the **shared** values are inherited.
