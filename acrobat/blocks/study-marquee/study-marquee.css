@@ -783,9 +783,6 @@
 
 @media screen and (min-width: 1200px) {
   .study-marquee.avalon {
-    width: 100vw;
-    max-width: 100vw;
-    margin-inline: calc(50% - 50vw);
     padding-block: var(--spacing-xl);
     padding-inline: 0;
   }
