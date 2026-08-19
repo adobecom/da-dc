@@ -368,6 +368,121 @@ describe('study-marquee block', () => {
     expect(hrefs.some((h) => h && h.includes('privacy'))).to.be.true;
   });
 
+  it('avalon: renders extra legal text before the current legal text', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.add('avalon');
+    await init(block);
+    await delay(100);
+    const footer = block.querySelector('.study-marquee-footer');
+    const extraLegal = footer.querySelector('.study-marquee-legal-extra');
+    const baseLegal = footer.querySelector('.study-marquee-legal:not(.study-marquee-legal-extra)');
+    expect(extraLegal).to.exist;
+    expect(extraLegal.textContent).to.contain('at least 13 years old');
+    // extra legal must come before the base legal text in DOM order
+    const position = extraLegal.compareDocumentPosition(baseLegal);
+    // eslint-disable-next-line no-bitwise
+    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).to.be.greaterThan(0);
+  });
+
+  it('avalon: cover media is a direct child of the block (hero-marquee media-cover)', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.add('avalon');
+    await init(block);
+    await delay(100);
+    const media = block.querySelector('.study-marquee-media');
+    expect(media).to.exist;
+    expect(media.parentElement).to.equal(block);
+    expect(block.querySelector('.study-marquee-col-right .study-marquee-media')).to.not.exist;
+  });
+
+  it('base variation keeps media inside the right column', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    expect(block.querySelector('.study-marquee-col-right .study-marquee-media')).to.exist;
+  });
+
+  it('base variation does not render the avalon extra legal text', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    expect(block.querySelector('.study-marquee-legal-extra')).to.not.exist;
+  });
+
+  it('CTA text: verb-specific placeholder overrides the default', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    window.mph['study-marquee-quiz-maker-upload-cta'] = 'Make my quiz';
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    const label = block.querySelector('.study-marquee-cta-label');
+    expect(label.textContent).to.equal('Make my quiz');
+    delete window.mph['study-marquee-quiz-maker-upload-cta'];
+  });
+
+  it('CTA text: falls back to the uploadType key when no verb-specific text', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    const label = block.querySelector('.study-marquee-cta-label');
+    expect(label.textContent).to.equal(window.mph['verb-widget-cta-multifile-only']);
+  });
+
+  it('resolves the verb when the avalon token precedes the verb class', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    window.mph['study-marquee-quiz-maker-upload-cta'] = 'Quiz specific CTA';
+    const block = document.body.querySelector('.study-marquee');
+    // author order: study-marquee avalon quiz-maker (avalon becomes classList[1])
+    block.classList.remove('quiz-maker');
+    block.classList.add('avalon');
+    block.classList.add('quiz-maker');
+    await init(block);
+    await delay(100);
+    // VERB must still resolve to quiz-maker (classList[2]), proven by the verb-specific CTA
+    const label = block.querySelector('.study-marquee-cta-label');
+    expect(label.textContent).to.equal('Quiz specific CTA');
+    delete window.mph['study-marquee-quiz-maker-upload-cta'];
+  });
+
+  it('avalon: verb-specific extra legal key overrides the generic', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    window.mph['study-marquee-quiz-maker-legal-extra'] = 'Verb-specific legal line';
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.add('avalon');
+    await init(block);
+    await delay(100);
+    const extra = block.querySelector('.study-marquee-legal-extra');
+    expect(extra).to.exist;
+    expect(extra.textContent).to.equal('Verb-specific legal line');
+    delete window.mph['study-marquee-quiz-maker-legal-extra'];
+  });
+
+  it('avalon: no extra legal element when no placeholder is authored', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const saved = window.mph['study-marquee-legal-extra'];
+    delete window.mph['study-marquee-legal-extra'];
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.add('avalon');
+    await init(block);
+    await delay(100);
+    expect(block.querySelector('.study-marquee-legal-extra')).to.not.exist;
+    window.mph['study-marquee-legal-extra'] = saved;
+  });
+
   it('upload button exists', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });

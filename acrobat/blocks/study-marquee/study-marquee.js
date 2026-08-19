@@ -50,7 +50,10 @@ function createSvgElement(iconName) {
 
 const getCTA = (verb) => {
   const verbConfig = LIMITS[verb];
-  return window.mph?.[`verb-widget-cta-${verbConfig?.uploadType}`] || window.mph?.['verb-widget-cta'] || '';
+  return window.mph?.[`study-marquee-${verb}-upload-cta`]
+    || window.mph?.[`verb-widget-cta-${verbConfig?.uploadType}`]
+    || window.mph?.['verb-widget-cta']
+    || '';
 };
 
 function getEnv() {
@@ -290,7 +293,8 @@ export default async function init(element) {
 
   window.mph = window.mph || {};
   await loadPlaceholders(['study', 'verb-widget']);
-  const VERB = element.classList[1];
+  const isAvalon = element.classList.contains('avalon');
+  const VERB = element.classList[1] === 'avalon' ? element.classList[2] : element.classList[1];
   // Initialize analytics - track attempts for analytics data (no UI changes based on attempts)
   const userAttempts = getVerbKey(`${VERB}_attempts`);
   let noOfFiles = null;
@@ -505,23 +509,33 @@ export default async function init(element) {
     class: 'hide',
   }, tooltipContent);
   infoIcon.appendChild(tooltipText);
+  if (isAvalon) {
+    const extraLegalText = window.mph?.[`study-marquee-${VERB}-legal-extra`]
+      || window.mph?.['study-marquee-legal-extra'] || '';
+    if (extraLegalText) {
+      const extraLegal = createTag('p', { class: 'study-marquee-legal study-marquee-legal-extra' }, extraLegalText);
+      footer.append(extraLegal);
+    }
+  }
   footer.append(legalText, infoIcon);
   dropzone.append(ctaButton, dragText, fileLimitText);
   const leftColChildren = [
     header, headingEl, copy1, ...(copy2Text ? [copy2] : []), dropzone, fileInput, footer,
   ];
   leftCol.append(...leftColChildren);
+  let mediaWrapper = null;
   if (media) {
-    const mediaWrapper = createTag('div', { class: 'study-marquee-media' });
+    mediaWrapper = createTag('div', { class: 'study-marquee-media' });
     while (media.firstChild) {
       mediaWrapper.appendChild(media.firstChild);
     }
-    rightCol.appendChild(mediaWrapper);
+    if (!isAvalon) rightCol.appendChild(mediaWrapper);
   }
   row.append(leftCol, rightCol);
   container.appendChild(row);
   foreground.innerHTML = '';
   foreground.append(container);
+  if (isAvalon && mediaWrapper) element.append(mediaWrapper);
   element.append(errorState);
 
   function handleAnalyticsEvent(
