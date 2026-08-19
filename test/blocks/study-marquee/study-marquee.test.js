@@ -368,7 +368,7 @@ describe('study-marquee block', () => {
     expect(hrefs.some((h) => h && h.includes('privacy'))).to.be.true;
   });
 
-  it('avalon: renders extra legal text before the current legal text', async () => {
+  it('avalon: appends extra legal text inline as a continuation of the main legal paragraph', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.study-marquee');
@@ -376,14 +376,13 @@ describe('study-marquee block', () => {
     await init(block);
     await delay(100);
     const footer = block.querySelector('.study-marquee-footer');
-    const extraLegal = footer.querySelector('.study-marquee-legal-extra');
     const baseLegal = footer.querySelector('.study-marquee-legal:not(.study-marquee-legal-extra)');
+    const extraLegal = footer.querySelector('.study-marquee-legal-extra');
     expect(extraLegal).to.exist;
     expect(extraLegal.textContent).to.contain('at least 13 years old');
-    // extra legal must come before the base legal text in DOM order
-    const position = extraLegal.compareDocumentPosition(baseLegal);
-    // eslint-disable-next-line no-bitwise
-    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).to.be.greaterThan(0);
+    // extra legal is an inline continuation within the main legal paragraph (not a separate block)
+    expect(extraLegal.tagName.toLowerCase()).to.equal('span');
+    expect(baseLegal.contains(extraLegal)).to.be.true;
   });
 
   it('avalon: cover media is a direct child of the block (hero-marquee media-cover)', async () => {
@@ -466,7 +465,7 @@ describe('study-marquee block', () => {
     await delay(100);
     const extra = block.querySelector('.study-marquee-legal-extra');
     expect(extra).to.exist;
-    expect(extra.textContent).to.equal('Verb-specific legal line');
+    expect(extra.textContent).to.contain('Verb-specific legal line');
     delete window.mph['study-marquee-quiz-maker-legal-extra'];
   });
 

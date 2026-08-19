@@ -513,8 +513,8 @@ export default async function init(element) {
     const extraLegalText = window.mph?.[`study-marquee-${VERB}-legal-extra`]
       || window.mph?.['study-marquee-legal-extra'] || '';
     if (extraLegalText) {
-      const extraLegal = createTag('p', { class: 'study-marquee-legal study-marquee-legal-extra' }, extraLegalText);
-      footer.append(extraLegal);
+      const extraLegal = createTag('span', { class: 'study-marquee-legal-extra' }, ` ${extraLegalText}`);
+      legalText.append(extraLegal);
     }
   }
   footer.append(legalText, infoIcon);

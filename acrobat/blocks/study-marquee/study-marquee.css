@@ -858,13 +858,11 @@
   }
 
   .study-marquee.avalon .study-marquee-footer {
-    flex-wrap: wrap;
-    row-gap: 10px;
+    align-items: center;
   }
 
-  .study-marquee.avalon .study-marquee-legal-extra {
-    flex: 0 0 100%;
-    width: 100%;
+  .study-marquee.avalon .info-icon {
+    margin-top: 0;
   }
 
   .study-marquee.avalon .study-marquee-media {
