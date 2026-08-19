@@ -523,10 +523,6 @@
   outline: none;
 }
 
-.verb-marquee .info-icon:hover {
-  opacity: 0.8;
-}
-
 .verb-marquee .info-icon svg {
   width: 18px;
   height: 18px;
