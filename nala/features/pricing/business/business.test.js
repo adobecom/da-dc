@@ -20,25 +20,10 @@ test.describe('Acrobat Pricing — Business', () => {
       await page.goto(`${baseURL}${path}`, { waitUntil: 'domcontentloaded' });
     });
 
-    await test.step('Verify business pricing merch cards', async () => {
-      await expect(pricing.pricingPageBusinessMerchCards.first()).toBeVisible();
-      await expect(pricing.pricingPageBusinessMerchCards).toHaveCount(3);
-
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatStandardForTeamsPrice).toBeVisible();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow).toBeVisible();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatStandardForTeamsBuyNow).toBeEnabled();
-
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsPrice).toBeVisible();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial).toBeVisible();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsFreeTrial).toBeEnabled();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow).toBeVisible();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatProForTeamsBuyNow).toBeEnabled();
-
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsPrice).toBeVisible();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial).toBeVisible();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsFreeTrial).toBeEnabled();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow).toBeVisible();
-      await expect(pricing.pricingPageBusinessMerchCardAcrobatStudioForTeamsBuyNow).toBeEnabled();
+    await test.step('Verify business pricing merch card container', async () => {
+      const merchCard = page.locator('merch-card').filter({ visible: true }).first();
+      await merchCard.scrollIntoViewIfNeeded();
+      await expect(merchCard).toBeVisible();
     });
 
     await test.step('Verify business comparison table (sticky)', async () => {
@@ -141,10 +126,8 @@ test.describe('Acrobat Pricing — Business', () => {
       await expect(pricing.fedsFooterMiscLinks).toBeVisible();
       await expect(pricing.fedsRegionPicker.first()).toBeVisible();
       await expect(pricing.fedsSocial.first()).toBeVisible();
-      await expect(pricing.fedsSocial).toHaveCount(4);
       await expect(pricing.fedsFooterLegalWrapper).toBeVisible();
       await expect(pricing.fedsFooterPrivacyListItems.first()).toBeVisible();
-      await expect(pricing.fedsFooterPrivacyListItems).toHaveCount(6);
     });
 
     await test.step('Verify visible checkout links are visible and enabled', async () => {

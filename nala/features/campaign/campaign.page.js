@@ -14,20 +14,10 @@ export default class CampaignPage {
     );
 
     /**
-     * “Compare Acrobat plans” block — reuses the standard `compare-acrobat-plans` merch fragment
-     * (see acrobat-pro / merch-cards). On this campaign only **two** `merch-card` rows render:
-     * Acrobat Pro (individual) and Acrobat Pro for teams (no Individuals/Business/Students tab strip).
+     * “Compare Acrobat plans” merch container — the merch-card-collection element
+     * (Acrobat Pro individual + Acrobat Pro for teams).
      * @see https://www.adobe.com/acrobat/campaign/acrobats-got-it.html
      */
-    this.compareAcrobatPlansSection = page.locator(
-      'div[class*="two-merch-cards"]',
-    );
-    /** In-page anchor for the compare heading (`#compare-acrobat-plans`) */
-    this.compareAcrobatPlansHeading = page.locator('div[id="compare-acrobat-plans"]');
-    this.campaignMerchCards = this.compareAcrobatPlansSection.locator('merch-card').filter({ visible: true });
-
-    this.acrobatProCard = this.campaignMerchCards.nth(0);
-    this.acrobatProTeamsCard = this.campaignMerchCards.nth(1);
 
     this.footer = page.locator('footer[class="global-footer"]');
     this.fedsFooterOptions = this.footer.locator('div[class*="feds-footer-options"]');
