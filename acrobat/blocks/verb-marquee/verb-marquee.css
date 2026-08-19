@@ -277,6 +277,7 @@
   color: #FFF;
   border: none;
   border-radius: 100px;
+  font-family: var(--body-font-family);
   font-size: 19px;
   line-height: 1.4;
   font-weight: 700;
