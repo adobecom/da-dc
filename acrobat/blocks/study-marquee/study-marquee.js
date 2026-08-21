@@ -22,17 +22,19 @@ const ICONS = {
 
 const MB100 = 104857600;
 const STUDY_FILES = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.rtf', '.txt', '.text', '.vtt'];
+const STUDY_GENAI = {
+  maxFileSize: MB100,
+  acceptedFiles: STUDY_FILES,
+  maxNumFiles: 100,
+  multipleFiles: true,
+  uploadType: 'multifile-only',
+  genAI: true,
+};
 const STUDY_GENAI_SINGLE = {
   maxFileSize: MB100,
   acceptedFiles: STUDY_FILES,
   maxNumFiles: 1,
   genAI: true,
-};
-const STUDY_GENAI = {
-  ...STUDY_GENAI_SINGLE,
-  maxNumFiles: 100,
-  multipleFiles: true,
-  uploadType: 'multifile-only',
 };
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
