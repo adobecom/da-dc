@@ -200,6 +200,24 @@ describe('study-marquee block', () => {
     expect(window.analytics.sendAnalyticsToSplunk.calledWith('error_acroform_not_supported')).to.be.true;
   });
 
+  it('maps scanned-document validation errors (single and multi) to analytics', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-stylize.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    ['validation_error_scanned_document', 'validation_error_scanned_document_multi'].forEach((code) => {
+      block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code, message: 'Scanned documents are not supported.', sendToSplunk: true } }));
+    });
+
+    expect(window.analytics.verbAnalytics.calledWith('error:scanned_document')).to.be.true;
+    expect(window.analytics.sendAnalyticsToSplunk.calledWith('error_scanned_document')).to.be.true;
+  });
+
   it('displays the error toast message for the new validation error codes', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });

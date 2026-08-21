@@ -761,6 +761,7 @@ export default async function init(element) {
       error_file_same_type: 'error:file_same_type',
       error_password_protected: 'error:password_protected',
       error_acroform_not_supported: 'error:acroform_not_supported',
+      error_scanned_document: 'error:scanned_document',
       error_fetch_redirect_url: 'error:fetch_redirect_url',
       error_finalize_asset: 'error:finalize_asset',
       error_verify_page_count: 'error:verify_page_count',
