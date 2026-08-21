@@ -53,23 +53,25 @@ describe('study-marquee block', () => {
     expect(LIMITS['mindmap-maker'].genAI).to.be.true;
   });
 
-  it('exports LIMITS for gen-presentation-v2 and interactive-report with study file types', () => {
+  it('exports LIMITS for gen-presentation-v2 and interactive-report as single-file study verbs', () => {
     expect(LIMITS).to.have.property('gen-presentation-v2');
     expect(LIMITS).to.have.property('interactive-report');
     ['gen-presentation-v2', 'interactive-report'].forEach((verb) => {
       expect(LIMITS[verb].acceptedFiles).to.be.an('array');
       expect(LIMITS[verb].acceptedFiles).to.deep.equal(LIMITS['flashcard-maker'].acceptedFiles);
       expect(LIMITS[verb].maxFileSize).to.equal(104857600);
-      expect(LIMITS[verb].multipleFiles).to.be.true;
+      expect(LIMITS[verb].maxNumFiles).to.equal(1);
+      expect(LIMITS[verb].multipleFiles).to.not.be.ok;
       expect(LIMITS[verb].genAI).to.be.true;
     });
   });
 
-  it('exports LIMITS for stylize with PDF-only file type', () => {
+  it('exports LIMITS for stylize as a single-file PDF-only verb', () => {
     expect(LIMITS).to.have.property('stylize');
     expect(LIMITS.stylize.acceptedFiles).to.deep.equal(['.pdf']);
     expect(LIMITS.stylize.maxFileSize).to.equal(104857600);
-    expect(LIMITS.stylize.multipleFiles).to.be.true;
+    expect(LIMITS.stylize.maxNumFiles).to.equal(1);
+    expect(LIMITS.stylize.multipleFiles).to.not.be.ok;
     expect(LIMITS.stylize.genAI).to.be.true;
   });
 

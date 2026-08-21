@@ -17,7 +17,7 @@
     },
     {
       "key": "study-widget-gen-presentation-v2-dragndrop-text",
-      "value": "or drag and drop files"
+      "value": "or drag and drop a file"
     },
     {
       "key": "study-widget-gen-presentation-v2-file-limit",
@@ -37,7 +37,7 @@
     },
     {
       "key": "study-widget-interactive-report-dragndrop-text",
-      "value": "or drag and drop files"
+      "value": "or drag and drop a file"
     },
     {
       "key": "study-widget-interactive-report-file-limit",
