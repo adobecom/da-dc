@@ -163,6 +163,54 @@ describe('study-marquee block', () => {
     expect(window.lana.log.called).to.be.true;
   });
 
+  it('maps password-protected validation errors (single and multi) to analytics', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    ['validation_error_password_protected', 'validation_error_password_protected_multi'].forEach((code) => {
+      block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code, message: 'This file is password protected.', sendToSplunk: true } }));
+    });
+
+    expect(window.analytics.verbAnalytics.calledWith('error:password_protected')).to.be.true;
+    expect(window.analytics.sendAnalyticsToSplunk.calledWith('error_password_protected')).to.be.true;
+  });
+
+  it('maps acroform-not-supported validation errors (single and multi) to analytics', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-stylize.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    ['validation_error_acroform_not_supported', 'validation_error_acroform_not_supported_multi'].forEach((code) => {
+      block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code, message: 'Forms are not supported.', sendToSplunk: true } }));
+    });
+
+    expect(window.analytics.verbAnalytics.calledWith('error:acroform_not_supported')).to.be.true;
+    expect(window.analytics.sendAnalyticsToSplunk.calledWith('error_acroform_not_supported')).to.be.true;
+  });
+
+  it('displays the error toast message for the new validation error codes', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'validation_error_password_protected', message: 'This file is password protected.', sendToSplunk: false } }));
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+    expect(block.querySelector('.study-marquee-error-text').textContent).to.equal('This file is password protected.');
+  });
+
   it('error close button hides error state', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
