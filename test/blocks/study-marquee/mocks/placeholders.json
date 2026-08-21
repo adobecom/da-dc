@@ -112,6 +112,10 @@
       "value": "By clicking Generate, you confirm you are at least 13 years old (or older if required by the laws in your country)."
     },
     {
+      "key": "study-marquee-avalon-legal",
+      "value": "Avalon legal: by using this service, you agree to the Adobe Terms of Use and Privacy Policy."
+    },
+    {
       "key": "verb-widget-terms-of-use",
       "value": "Terms of Use"
     },

@@ -485,7 +485,13 @@ export default async function init(element) {
   const ppURL = window.mph?.['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
   const touURL = window.mph?.['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
   const genAIurl = window.mph?.['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`;
-  const legalText = createTag('p', { class: 'study-marquee-legal' }, window.mph?.['study-marquee-legal-text'] || '');
+  const baseLegalText = window.mph?.['study-marquee-legal-text'] || '';
+  const legalTextContent = isAvalon
+    ? (window.mph?.[`study-marquee-avalon-${VERB}-legal`]
+      || window.mph?.['study-marquee-avalon-legal']
+      || baseLegalText)
+    : baseLegalText;
+  const legalText = createTag('p', { class: 'study-marquee-legal' }, legalTextContent);
   if (legalText.textContent) {
     const createLegalLink = (label, url) => `<a class="study-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
     const legalLinks = [
@@ -519,14 +525,6 @@ export default async function init(element) {
     class: 'hide',
   }, tooltipContent);
   infoIcon.appendChild(tooltipText);
-  if (isAvalon) {
-    const extraLegalText = window.mph?.[`study-marquee-${VERB}-legal-extra`]
-      || window.mph?.['study-marquee-legal-extra'] || '';
-    if (extraLegalText) {
-      const extraLegal = createTag('span', { class: 'study-marquee-legal-extra' }, ` ${extraLegalText}`);
-      legalText.append(extraLegal);
-    }
-  }
   footer.append(legalText, infoIcon);
   dropzone.append(ctaButton, dragText, fileLimitText);
   const leftColChildren = [

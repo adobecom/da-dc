@@ -469,21 +469,20 @@ describe('study-marquee block', () => {
     expect(hrefs.some((h) => h && h.includes('privacy'))).to.be.true;
   });
 
-  it('avalon: appends extra legal text inline as a continuation of the main legal paragraph', async () => {
+  it('avalon: loads the legal text from the avalon placeholder with decorated links', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.study-marquee');
     block.classList.add('avalon');
     await init(block);
     await delay(100);
-    const footer = block.querySelector('.study-marquee-footer');
-    const baseLegal = footer.querySelector('.study-marquee-legal:not(.study-marquee-legal-extra)');
-    const extraLegal = footer.querySelector('.study-marquee-legal-extra');
-    expect(extraLegal).to.exist;
-    expect(extraLegal.textContent).to.contain('at least 13 years old');
-    // extra legal is an inline continuation within the main legal paragraph (not a separate block)
-    expect(extraLegal.tagName.toLowerCase()).to.equal('span');
-    expect(baseLegal.contains(extraLegal)).to.be.true;
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal).to.exist;
+    expect(legal.textContent).to.contain(window.mph['study-marquee-avalon-legal']);
+    // links are decorated the same way as the base legal text
+    const links = legal.querySelectorAll('a.study-marquee-legal-url');
+    expect(links.length).to.equal(2);
+    expect([...links].map((a) => a.textContent)).to.include.members(['Terms of Use', 'Privacy Policy']);
   });
 
   it('avalon: cover media is a direct child of the block (hero-marquee media-cover)', async () => {
@@ -508,13 +507,15 @@ describe('study-marquee block', () => {
     expect(block.querySelector('.study-marquee-col-right .study-marquee-media')).to.exist;
   });
 
-  it('base variation does not render the avalon extra legal text', async () => {
+  it('base variation loads the base legal text, not the avalon placeholder', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.study-marquee');
     await init(block);
     await delay(100);
-    expect(block.querySelector('.study-marquee-legal-extra')).to.not.exist;
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal.textContent).to.not.contain('Avalon legal:');
+    expect(legal.textContent).to.contain('By using this service');
   });
 
   it('CTA text: verb-specific placeholder overrides the default', async () => {
@@ -556,31 +557,32 @@ describe('study-marquee block', () => {
     delete window.mph['study-marquee-quiz-maker-upload-cta'];
   });
 
-  it('avalon: verb-specific extra legal key overrides the generic', async () => {
+  it('avalon: verb-specific legal key overrides the generic avalon legal', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
-    window.mph['study-marquee-quiz-maker-legal-extra'] = 'Verb-specific legal line';
+    window.mph['study-marquee-avalon-quiz-maker-legal'] = 'Verb-specific avalon legal line';
     const block = document.body.querySelector('.study-marquee');
     block.classList.add('avalon');
     await init(block);
     await delay(100);
-    const extra = block.querySelector('.study-marquee-legal-extra');
-    expect(extra).to.exist;
-    expect(extra.textContent).to.contain('Verb-specific legal line');
-    delete window.mph['study-marquee-quiz-maker-legal-extra'];
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal.textContent).to.contain('Verb-specific avalon legal line');
+    expect(legal.textContent).to.not.contain(window.mph['study-marquee-avalon-legal']);
+    delete window.mph['study-marquee-avalon-quiz-maker-legal'];
   });
 
-  it('avalon: no extra legal element when no placeholder is authored', async () => {
+  it('avalon: falls back to the base legal text when no avalon placeholder is authored', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
-    const saved = window.mph['study-marquee-legal-extra'];
-    delete window.mph['study-marquee-legal-extra'];
+    const saved = window.mph['study-marquee-avalon-legal'];
+    delete window.mph['study-marquee-avalon-legal'];
     const block = document.body.querySelector('.study-marquee');
     block.classList.add('avalon');
     await init(block);
     await delay(100);
-    expect(block.querySelector('.study-marquee-legal-extra')).to.not.exist;
-    window.mph['study-marquee-legal-extra'] = saved;
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal.textContent).to.contain('By using this service');
+    window.mph['study-marquee-avalon-legal'] = saved;
   });
 
   it('upload button exists', async () => {
