@@ -53,10 +53,10 @@ describe('study-marquee block', () => {
     expect(LIMITS['mindmap-maker'].genAI).to.be.true;
   });
 
-  it('exports LIMITS for gen-presentation-v2 and interactive-reports with study file types', () => {
+  it('exports LIMITS for gen-presentation-v2 and interactive-report with study file types', () => {
     expect(LIMITS).to.have.property('gen-presentation-v2');
-    expect(LIMITS).to.have.property('interactive-reports');
-    ['gen-presentation-v2', 'interactive-reports'].forEach((verb) => {
+    expect(LIMITS).to.have.property('interactive-report');
+    ['gen-presentation-v2', 'interactive-report'].forEach((verb) => {
       expect(LIMITS[verb].acceptedFiles).to.be.an('array');
       expect(LIMITS[verb].acceptedFiles).to.deep.equal(LIMITS['flashcard-maker'].acceptedFiles);
       expect(LIMITS[verb].maxFileSize).to.equal(104857600);
@@ -83,13 +83,13 @@ describe('study-marquee block', () => {
     expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
   });
 
-  it('init interactive-reports block', async () => {
-    document.body.innerHTML = await readFile({ path: './mocks/body-interactive-reports.html' });
+  it('init interactive-report block', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-interactive-report.html' });
     const block = document.body.querySelector('.study-marquee');
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     await init(block);
-    expect(block.classList.contains('interactive-reports')).to.be.true;
+    expect(block.classList.contains('interactive-report')).to.be.true;
     expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
   });
 

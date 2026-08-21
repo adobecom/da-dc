@@ -33,7 +33,7 @@ const STUDY_GENAI = {
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
 export const LIMITS = {
-  ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker', 'gen-presentation-v2', 'interactive-reports'], STUDY_GENAI),
+  ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker', 'gen-presentation-v2', 'interactive-report'], STUDY_GENAI),
   stylize: { ...STUDY_GENAI, acceptedFiles: ['.pdf'] },
 };
 
