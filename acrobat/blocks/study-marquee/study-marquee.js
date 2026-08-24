@@ -38,6 +38,8 @@ const STUDY_GENAI_SINGLE = {
 };
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
+const SIGNED_IN_UPLOAD_VERBS = new Set(['gen-presentation-v2', 'interactive-report', 'stylize']);
+
 export const LIMITS = {
   ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI),
   ...group(['gen-presentation-v2', 'interactive-report'], STUDY_GENAI_SINGLE),
@@ -804,6 +806,7 @@ export default async function init(element) {
   });
 
   async function checkSignedInUser() {
+    if (SIGNED_IN_UPLOAD_VERBS.has(VERB)) return;
     if (!window.adobeIMS?.isSignedInUser?.()) return;
     let accountType;
     try {
