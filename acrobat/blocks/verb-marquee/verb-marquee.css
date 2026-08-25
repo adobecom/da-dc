@@ -277,6 +277,7 @@
   color: #FFF;
   border: none;
   border-radius: 100px;
+  font-family: var(--body-font-family);
   font-size: 19px;
   line-height: 1.4;
   font-weight: 700;
@@ -521,10 +522,6 @@
   background: none;
   border: none;
   outline: none;
-}
-
-.verb-marquee .info-icon:hover {
-  opacity: 0.8;
 }
 
 .verb-marquee .info-icon svg {
