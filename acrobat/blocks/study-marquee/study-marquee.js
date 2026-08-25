@@ -30,9 +30,21 @@ const STUDY_GENAI = {
   uploadType: 'multifile-only',
   genAI: true,
 };
+const STUDY_GENAI_SINGLE = {
+  maxFileSize: MB100,
+  acceptedFiles: STUDY_FILES,
+  maxNumFiles: 1,
+  genAI: true,
+};
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
-export const LIMITS = { ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI) };
+const SIGNED_IN_UPLOAD_VERBS = new Set(['gen-presentation-v2', 'interactive-report', 'stylize']);
+
+export const LIMITS = {
+  ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI),
+  ...group(['gen-presentation-v2', 'interactive-report'], STUDY_GENAI_SINGLE),
+  stylize: { ...STUDY_GENAI_SINGLE, acceptedFiles: ['.pdf'] },
+};
 
 function createSvgElement(iconName) {
   const svgString = ICONS[iconName];
@@ -475,7 +487,13 @@ export default async function init(element) {
   const ppURL = window.mph?.['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
   const touURL = window.mph?.['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
   const genAIurl = window.mph?.['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`;
-  const legalText = createTag('p', { class: 'study-marquee-legal' }, window.mph?.['study-marquee-legal-text'] || '');
+  const baseLegalText = window.mph?.['study-marquee-legal-text'] || '';
+  const legalTextContent = isAvalon
+    ? (window.mph?.[`study-marquee-avalon-${VERB}-legal`]
+      || window.mph?.['study-marquee-avalon-legal']
+      || baseLegalText)
+    : baseLegalText;
+  const legalText = createTag('p', { class: 'study-marquee-legal' }, legalTextContent);
   if (legalText.textContent) {
     const createLegalLink = (label, url) => `<a class="study-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
     const legalLinks = [
@@ -509,14 +527,6 @@ export default async function init(element) {
     class: 'hide',
   }, tooltipContent);
   infoIcon.appendChild(tooltipText);
-  if (isAvalon) {
-    const extraLegalText = window.mph?.[`study-marquee-${VERB}-legal-extra`]
-      || window.mph?.['study-marquee-legal-extra'] || '';
-    if (extraLegalText) {
-      const extraLegal = createTag('span', { class: 'study-marquee-legal-extra' }, ` ${extraLegalText}`);
-      legalText.append(extraLegal);
-    }
-  }
   footer.append(legalText, infoIcon);
   dropzone.append(ctaButton, dragText, fileLimitText);
   const leftColChildren = [
@@ -751,6 +761,9 @@ export default async function init(element) {
       error_duplicate_asset: 'error:duplicate_asset',
       warn_chunk_upload: 'warn:verb_upload_warn_chunk_upload',
       error_file_same_type: 'error:file_same_type',
+      error_password_protected: 'error:password_protected',
+      error_acroform_not_supported: 'error:acroform_not_supported',
+      error_scanned_document: 'error:scanned_document',
       error_fetch_redirect_url: 'error:fetch_redirect_url',
       error_finalize_asset: 'error:finalize_asset',
       error_verify_page_count: 'error:verify_page_count',
@@ -793,6 +806,7 @@ export default async function init(element) {
   });
 
   async function checkSignedInUser() {
+    if (SIGNED_IN_UPLOAD_VERBS.has(VERB)) return;
     if (!window.adobeIMS?.isSignedInUser?.()) return;
     let accountType;
     try {

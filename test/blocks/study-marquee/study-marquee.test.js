@@ -53,6 +53,59 @@ describe('study-marquee block', () => {
     expect(LIMITS['mindmap-maker'].genAI).to.be.true;
   });
 
+  it('exports LIMITS for gen-presentation-v2 and interactive-report as single-file study verbs', () => {
+    expect(LIMITS).to.have.property('gen-presentation-v2');
+    expect(LIMITS).to.have.property('interactive-report');
+    ['gen-presentation-v2', 'interactive-report'].forEach((verb) => {
+      expect(LIMITS[verb].acceptedFiles).to.be.an('array');
+      expect(LIMITS[verb].acceptedFiles).to.deep.equal(LIMITS['flashcard-maker'].acceptedFiles);
+      expect(LIMITS[verb].maxFileSize).to.equal(104857600);
+      expect(LIMITS[verb].maxNumFiles).to.equal(1);
+      expect(LIMITS[verb].multipleFiles).to.not.be.ok;
+      expect(LIMITS[verb].genAI).to.be.true;
+    });
+  });
+
+  it('exports LIMITS for stylize as a single-file PDF-only verb', () => {
+    expect(LIMITS).to.have.property('stylize');
+    expect(LIMITS.stylize.acceptedFiles).to.deep.equal(['.pdf']);
+    expect(LIMITS.stylize.maxFileSize).to.equal(104857600);
+    expect(LIMITS.stylize.maxNumFiles).to.equal(1);
+    expect(LIMITS.stylize.multipleFiles).to.not.be.ok;
+    expect(LIMITS.stylize.genAI).to.be.true;
+  });
+
+  it('init gen-presentation-v2 block', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.classList.contains('gen-presentation-v2')).to.be.true;
+    expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
+  });
+
+  it('init interactive-report block', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-interactive-report.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.classList.contains('interactive-report')).to.be.true;
+    expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
+  });
+
+  it('init stylize block', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-stylize.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.classList.contains('stylize')).to.be.true;
+    expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
+    expect(document.querySelector('.study-marquee #file-upload').getAttribute('accept')).to.equal('.pdf');
+  });
+
   it('init study-marquee', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
@@ -110,6 +163,72 @@ describe('study-marquee block', () => {
     expect(window.analytics.sendAnalyticsToSplunk.called).to.be.true;
 
     expect(window.lana.log.called).to.be.true;
+  });
+
+  it('maps password-protected validation errors (single and multi) to analytics', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    ['validation_error_password_protected', 'validation_error_password_protected_multi'].forEach((code) => {
+      block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code, message: 'This file is password protected.', sendToSplunk: true } }));
+    });
+
+    expect(window.analytics.verbAnalytics.calledWith('error:password_protected')).to.be.true;
+    expect(window.analytics.sendAnalyticsToSplunk.calledWith('error_password_protected')).to.be.true;
+  });
+
+  it('maps acroform-not-supported validation errors (single and multi) to analytics', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-stylize.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    ['validation_error_acroform_not_supported', 'validation_error_acroform_not_supported_multi'].forEach((code) => {
+      block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code, message: 'Forms are not supported.', sendToSplunk: true } }));
+    });
+
+    expect(window.analytics.verbAnalytics.calledWith('error:acroform_not_supported')).to.be.true;
+    expect(window.analytics.sendAnalyticsToSplunk.calledWith('error_acroform_not_supported')).to.be.true;
+  });
+
+  it('maps scanned-document validation errors (single and multi) to analytics', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-stylize.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    ['validation_error_scanned_document', 'validation_error_scanned_document_multi'].forEach((code) => {
+      block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code, message: 'Scanned documents are not supported.', sendToSplunk: true } }));
+    });
+
+    expect(window.analytics.verbAnalytics.calledWith('error:scanned_document')).to.be.true;
+    expect(window.analytics.sendAnalyticsToSplunk.calledWith('error_scanned_document')).to.be.true;
+  });
+
+  it('displays the error toast message for the new validation error codes', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'validation_error_password_protected', message: 'This file is password protected.', sendToSplunk: false } }));
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+    expect(block.querySelector('.study-marquee-error-text').textContent).to.equal('This file is password protected.');
   });
 
   it('error close button hides error state', async () => {
@@ -368,21 +487,20 @@ describe('study-marquee block', () => {
     expect(hrefs.some((h) => h && h.includes('privacy'))).to.be.true;
   });
 
-  it('avalon: appends extra legal text inline as a continuation of the main legal paragraph', async () => {
+  it('avalon: loads the legal text from the avalon placeholder with decorated links', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.study-marquee');
     block.classList.add('avalon');
     await init(block);
     await delay(100);
-    const footer = block.querySelector('.study-marquee-footer');
-    const baseLegal = footer.querySelector('.study-marquee-legal:not(.study-marquee-legal-extra)');
-    const extraLegal = footer.querySelector('.study-marquee-legal-extra');
-    expect(extraLegal).to.exist;
-    expect(extraLegal.textContent).to.contain('at least 13 years old');
-    // extra legal is an inline continuation within the main legal paragraph (not a separate block)
-    expect(extraLegal.tagName.toLowerCase()).to.equal('span');
-    expect(baseLegal.contains(extraLegal)).to.be.true;
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal).to.exist;
+    expect(legal.textContent).to.contain(window.mph['study-marquee-avalon-legal']);
+    // links are decorated the same way as the base legal text
+    const links = legal.querySelectorAll('a.study-marquee-legal-url');
+    expect(links.length).to.equal(2);
+    expect([...links].map((a) => a.textContent)).to.include.members(['Terms of Use', 'Privacy Policy']);
   });
 
   it('avalon: cover media is a direct child of the block (hero-marquee media-cover)', async () => {
@@ -407,13 +525,15 @@ describe('study-marquee block', () => {
     expect(block.querySelector('.study-marquee-col-right .study-marquee-media')).to.exist;
   });
 
-  it('base variation does not render the avalon extra legal text', async () => {
+  it('base variation loads the base legal text, not the avalon placeholder', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.study-marquee');
     await init(block);
     await delay(100);
-    expect(block.querySelector('.study-marquee-legal-extra')).to.not.exist;
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal.textContent).to.not.contain('Avalon legal:');
+    expect(legal.textContent).to.contain('By using this service');
   });
 
   it('CTA text: verb-specific placeholder overrides the default', async () => {
@@ -455,31 +575,32 @@ describe('study-marquee block', () => {
     delete window.mph['study-marquee-quiz-maker-upload-cta'];
   });
 
-  it('avalon: verb-specific extra legal key overrides the generic', async () => {
+  it('avalon: verb-specific legal key overrides the generic avalon legal', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
-    window.mph['study-marquee-quiz-maker-legal-extra'] = 'Verb-specific legal line';
+    window.mph['study-marquee-avalon-quiz-maker-legal'] = 'Verb-specific avalon legal line';
     const block = document.body.querySelector('.study-marquee');
     block.classList.add('avalon');
     await init(block);
     await delay(100);
-    const extra = block.querySelector('.study-marquee-legal-extra');
-    expect(extra).to.exist;
-    expect(extra.textContent).to.contain('Verb-specific legal line');
-    delete window.mph['study-marquee-quiz-maker-legal-extra'];
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal.textContent).to.contain('Verb-specific avalon legal line');
+    expect(legal.textContent).to.not.contain(window.mph['study-marquee-avalon-legal']);
+    delete window.mph['study-marquee-avalon-quiz-maker-legal'];
   });
 
-  it('avalon: no extra legal element when no placeholder is authored', async () => {
+  it('avalon: falls back to the base legal text when no avalon placeholder is authored', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
-    const saved = window.mph['study-marquee-legal-extra'];
-    delete window.mph['study-marquee-legal-extra'];
+    const saved = window.mph['study-marquee-avalon-legal'];
+    delete window.mph['study-marquee-avalon-legal'];
     const block = document.body.querySelector('.study-marquee');
     block.classList.add('avalon');
     await init(block);
     await delay(100);
-    expect(block.querySelector('.study-marquee-legal-extra')).to.not.exist;
-    window.mph['study-marquee-legal-extra'] = saved;
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal.textContent).to.contain('By using this service');
+    window.mph['study-marquee-avalon-legal'] = saved;
   });
 
   it('upload button exists', async () => {

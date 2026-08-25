@@ -828,6 +828,15 @@
     margin-bottom: 20px;
   }
 
+  .study-marquee.avalon .study-marquee-copy-sub {
+    font-size: var(--type-body-xl-size);
+    font-weight: 400;
+    line-height: var(--type-body-xl-lh);
+    margin-top: 0;
+    margin-bottom: 20px;
+    opacity: 0.9;
+  }
+
   .study-marquee.avalon .study-marquee-dropzone {
     margin-bottom: var(--spacing-s);
     padding: 22px 10px;
