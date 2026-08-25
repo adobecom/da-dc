@@ -563,7 +563,11 @@
   display: block;
   background: none;
   border: none;
-  outline: none;
+}
+
+.study-marquee-errorBtn:focus-visible {
+  box-shadow: 0 0 0 2px var(--consonant-color-white, #fff);
+  border-radius: 2px;
 }
 
 .study-marquee-errorIcon {
