@@ -877,6 +877,16 @@
     right: 0;
     top: 0;
     aspect-ratio: auto;
+    display: block;
+  }
+
+  .study-marquee.avalon .study-marquee-media h1,
+  .study-marquee.avalon .study-marquee-media a,
+  .study-marquee.avalon .study-marquee-media picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
   }
 
   .study-marquee.avalon .study-marquee-media picture img,
