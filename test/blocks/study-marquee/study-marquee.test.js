@@ -58,7 +58,11 @@ describe('study-marquee block', () => {
     expect(LIMITS).to.have.property('interactive-report');
     ['gen-presentation-v2', 'interactive-report'].forEach((verb) => {
       expect(LIMITS[verb].acceptedFiles).to.be.an('array');
-      expect(LIMITS[verb].acceptedFiles).to.deep.equal(LIMITS['flashcard-maker'].acceptedFiles);
+      // Extends the base study file types with email and image formats.
+      expect(LIMITS[verb].acceptedFiles).to.include.members(LIMITS['flashcard-maker'].acceptedFiles);
+      ['.eml', '.msg', '.jpg', '.jpeg', '.png', '.tif', '.tiff'].forEach((ext) => {
+        expect(LIMITS[verb].acceptedFiles).to.include(ext);
+      });
       expect(LIMITS[verb].maxFileSize).to.equal(104857600);
       expect(LIMITS[verb].maxNumFiles).to.equal(1);
       expect(LIMITS[verb].multipleFiles).to.not.be.ok;

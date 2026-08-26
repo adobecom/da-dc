@@ -22,6 +22,7 @@ const ICONS = {
 
 const MB100 = 104857600;
 const STUDY_FILES = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.rtf', '.txt', '.text', '.vtt'];
+const STUDY_FILES_EXTENDED = [...STUDY_FILES, '.eml', '.msg', '.jpg', '.jpeg', '.png', '.tif', '.tiff'];
 const STUDY_GENAI = {
   maxFileSize: MB100,
   acceptedFiles: STUDY_FILES,
@@ -32,7 +33,7 @@ const STUDY_GENAI = {
 };
 const STUDY_GENAI_SINGLE = {
   maxFileSize: MB100,
-  acceptedFiles: STUDY_FILES,
+  acceptedFiles: STUDY_FILES_EXTENDED,
   maxNumFiles: 1,
   genAI: true,
 };
