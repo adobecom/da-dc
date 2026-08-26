@@ -99,6 +99,26 @@ describe('study-marquee block', () => {
     expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
   });
 
+  it('renders extended accept attribute for gen-presentation-v2 and interactive-report', async () => {
+    const extendedTypes = ['.eml', '.msg', '.jpg', '.jpeg', '.png', '.tif', '.tiff'];
+    const cases = [
+      ['gen-presentation-v2', './mocks/body-gen-presentation-v2.html'],
+      ['interactive-report', './mocks/body-interactive-report.html'],
+    ];
+    for (const [verb, path] of cases) {
+      document.body.innerHTML = await readFile({ path });
+      const block = document.body.querySelector('.study-marquee');
+      const conf = getConfig();
+      setConfig({ ...conf, locale: { prefix: '' } });
+      await init(block);
+      const accept = document.querySelector('.study-marquee #file-upload').getAttribute('accept');
+      const acceptList = accept.split(',');
+      [...extendedTypes, '.pdf', '.docx'].forEach((ext) => {
+        expect(acceptList, `${verb} should accept ${ext}`).to.include(ext);
+      });
+    }
+  });
+
   it('init stylize block', async () => {
     document.body.innerHTML = await readFile({ path: './mocks/body-stylize.html' });
     const block = document.body.querySelector('.study-marquee');
