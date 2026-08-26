@@ -18,41 +18,43 @@ The `<verb-name>` determines which placeholder copy is used as a fallback and wh
 
 ## Rows
 
+The block is authored in two parts: a small **layout section** (background + the heading/media row) followed by any number of **labeled key/value rows** that carry the text.
+
 | Row | Content | Required? |
 | --- | --- | --- |
-| **Row 1 (optional background)** | A background image for the whole marquee. Omit this row if you do not want a background. | Optional |
-| **Last row (foreground)** | Two cells: the **text cell** (heading + copy, see below) and the **media cell** (the foreground image). | Required |
+| **Background** | One cell holding a background color (e.g. `#F0F0F0`) or a background image for the whole marquee. Omit this row if you do not want a background. | Optional |
+| **Heading + media** | Two cells: the **heading cell** (`H1`–`H6`) and the **media cell** (the foreground image). | Required |
+| **Labeled rows** | Any of the `con-block-row-*` rows below, each a two-cell row: the label in the first cell, the value in the second. Add only the rows you need, in any order. | Optional |
 
-If you include a background, it must be the **first** row; the **last** row is always treated as the foreground.
+If you include a background it must come **before** the heading/media row; the heading/media row is identified by the row that contains the heading.
 
-### Foreground — text cell
+### Labeled text rows
 
-Put the heading and all copy lines in the **same cell**, each on its own line. The block reads them in this order (every line is optional — leave a line blank to fall back to its placeholder):
+Each text value is authored as its own row: the first cell is the fixed label, the second cell is the value. **Only add the rows you want** — an omitted row (or a row with an empty value cell) is treated as "not authored".
 
-| Line | Content | Placeholder fallback |
+| Row label | Content | If not authored |
 | --- | --- | --- |
-| **Heading** (`H1`–`H6`) | Main title shown at the top | *(none — always author this)* |
-| **1. Desktop copy** | Supporting line shown on desktop (≥ 1200px) | `study-marquee-<verb>-copy` |
-| **2. Mobile copy** | Supporting line shown on mobile/tablet (< 1200px) | `study-marquee-<verb>-mobile-copy` |
-| **3. Desktop sub-copy** | Secondary line shown on desktop | `study-marquee-<verb>-sub-copy` |
-| **4. Mobile sub-copy** | Secondary line shown on mobile/tablet | `study-marquee-<verb>-mobile-sub-copy` |
-| **5. Legal** | Legal / consent line. Author any links directly in this line — they are kept as-is. | `study-marquee-legal-text` (links auto-inserted from `verb-widget-*` placeholders) |
-| **6. Tooltip** | Text shown in the info-icon tooltip next to the legal line | `verb-widget-tool-tip` |
+| `con-block-row-desktop-copy` | Supporting line shown on desktop (≥ 1200px) | Falls back to `study-marquee-<verb>-copy` |
+| `con-block-row-mobile-copy` | Supporting line shown on mobile/tablet (< 1200px) | Falls back to `study-marquee-<verb>-mobile-copy` (then desktop copy) |
+| `con-block-row-desktop-sub-copy` | Secondary line shown on desktop | **Omitted entirely — no placeholder fallback** |
+| `con-block-row-mobile-sub-copy` | Secondary line shown on mobile/tablet | **Omitted entirely — no placeholder fallback** |
+| `con-block-row-legal` | Legal / consent line. Author any links directly in the value cell — they are kept as-is. | Falls back to `study-marquee-legal-text` (links auto-inserted from `verb-widget-*` placeholders) |
+| `con-block-row-tooltip` | Text shown in the info-icon tooltip next to the legal line | Falls back to `verb-widget-tool-tip` |
 
 Notes:
 
-- **Only the heading and the media image are separate cells.** Everything else lives as ordered paragraphs inside the text cell, so the block can tell them apart by position (there are no labels — the authoring sample text indicates which line is which).
-- **Desktop vs mobile:** only one copy (and one sub-copy) is shown at a time based on the visitor's screen. If you author a desktop line but leave the mobile line blank, the desktop line is reused on mobile.
-- **Legal links:** when you author the legal line yourself, include the `<a>` links you want and they render exactly as written. When the legal line is left blank, the block builds it from the `study-marquee-legal-text` placeholder and auto-links Terms of Use, Privacy Policy, and (for gen-AI verbs) the gen-AI guidelines.
+- **Sub-copy is optional and has no placeholder fallback.** If you do not author the desktop/mobile sub-copy row (or leave its value blank), the sub-copy line is simply not rendered — you do **not** need to include an empty sub-copy row.
+- **Desktop vs mobile:** only one copy (and one sub-copy) is shown at a time based on the visitor's screen. If you author the desktop copy but leave the mobile copy blank, the desktop copy is reused on mobile.
+- **Legal links:** when you author the legal value yourself, include the `<a>` links you want and they render exactly as written. When the legal row is omitted, the block builds the line from the `study-marquee-legal-text` placeholder and auto-links Terms of Use, Privacy Policy, and (for gen-AI verbs) the gen-AI guidelines.
 
-### Foreground — media cell
+### Media cell
 
-Add the foreground image (a picture/image) in its own cell. It renders in the right column on desktop and below the text on mobile.
+Add the foreground image (a picture/image) in the second cell of the heading/media row. It renders in the right column on desktop and below the text on mobile.
 
 ## Placeholder fallback behavior
 
-- If you author every text line, **no placeholder file is loaded**.
-- If any line is missing, the block loads the `study` and `verb-widget` placeholder sheets and fills only the blank values.
+- Sub-copy never triggers a placeholder load — it is optional and simply omitted when absent.
+- The `study` and `verb-widget` placeholder sheets are loaded **only** when the copy, legal, **or** tooltip value is missing; if all three are authored, no placeholder file is loaded.
 - Placeholder keys are shared with the original Study Marquee block, so existing authored placeholders continue to work unchanged.
 
 ## Themes

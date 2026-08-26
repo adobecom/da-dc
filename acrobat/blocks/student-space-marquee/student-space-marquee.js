@@ -259,12 +259,26 @@ export default async function init(element) {
     initializePingService();
     window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: VERB, userAttempts } }));
   });
-  const children = element.querySelectorAll(':scope > div');
-  const foreground = children[children.length - 1];
+  const children = [...element.querySelectorAll(':scope > div')];
+  const LABEL_PREFIX = 'con-block-row-';
+  const authored = new Map();
+  const contentRows = [];
+  children.forEach((rowEl) => {
+    const label = rowEl.firstElementChild?.textContent?.trim() || '';
+    if (label.startsWith(LABEL_PREFIX)) {
+      authored.set(label.slice(LABEL_PREFIX.length), rowEl.children[1] || null);
+      rowEl.remove();
+    } else {
+      contentRows.push(rowEl);
+    }
+  });
+  const foreground = contentRows.find((r) => r.querySelector('h1, h2, h3, h4, h5, h6'))
+    || contentRows[contentRows.length - 1];
   foreground.classList.add('foreground', 'container');
-  if (children.length > 1 && children[0].textContent !== '') {
-    children[0].classList.add('background');
-    decorateBlockBg(element, children[0], { useHandleFocalpoint: true });
+  const background = contentRows.find((r) => r !== foreground && r.textContent.trim() !== '');
+  if (background) {
+    background.classList.add('background');
+    decorateBlockBg(element, background, { useHandleFocalpoint: true });
   }
   const headline = foreground.querySelector('h1, h2, h3, h4, h5, h6');
   const heading = headline?.textContent?.trim() || '';
@@ -277,28 +291,24 @@ export default async function init(element) {
     processMedia(media);
   }
 
-  // Read all block text from the authored DOM first (paragraphs in the same
-  // cell as the heading, in order). Only fall back to placeholders - and only
-  // then load the placeholder file - for values that are not authored.
-  // Authored order (each optional): desktop copy, mobile copy,
-  // desktop sub-copy, mobile sub-copy, legal, tooltip.
-  const authoredParas = text ? [...text.querySelectorAll(':scope > p')] : [];
-  const paraText = (i) => authoredParas[i]?.textContent?.trim() || '';
-  const paraHTML = (i) => authoredParas[i]?.innerHTML?.trim() || '';
+  const cellText = (key) => authored.get(key)?.textContent?.trim() || '';
+  const cellHTML = (key) => authored.get(key)?.innerHTML?.trim() || '';
   const isMobileOrTablet = window.innerWidth < 1200;
-  const authoredCopy = isMobileOrTablet ? (paraText(1) || paraText(0)) : paraText(0);
-  const authoredSubCopy = isMobileOrTablet ? (paraText(3) || paraText(2)) : paraText(2);
-  const authoredLegal = paraHTML(4);
-  const authoredTooltip = paraText(5);
-  if (!authoredCopy || !authoredSubCopy || !authoredLegal || !authoredTooltip) {
+  const authoredCopy = isMobileOrTablet
+    ? (cellText('mobile-copy') || cellText('desktop-copy'))
+    : cellText('desktop-copy');
+  const authoredSubCopy = isMobileOrTablet
+    ? (cellText('mobile-sub-copy') || cellText('desktop-sub-copy'))
+    : cellText('desktop-sub-copy');
+  const authoredLegal = cellHTML('legal');
+  const authoredTooltip = cellText('tooltip');
+  if (!authoredCopy || !authoredLegal || !authoredTooltip) {
     await loadPlaceholders(['study', 'verb-widget']);
   }
   const copy1Text = authoredCopy || (isMobileOrTablet
     ? (window.mph[`study-marquee-${VERB}-mobile-copy`] || window.mph[`study-marquee-${VERB}-copy`])
     : window.mph[`study-marquee-${VERB}-copy`]) || '';
-  const copy2Text = authoredSubCopy || (isMobileOrTablet
-    ? (window.mph[`study-marquee-${VERB}-mobile-sub-copy`] || window.mph[`study-marquee-${VERB}-sub-copy`])
-    : window.mph[`study-marquee-${VERB}-sub-copy`]) || '';
+  const copy2Text = authoredSubCopy || '';
 
   const container = createTag('div', { class: 'student-space-marquee-container' });
   const row = createTag('div', { class: 'student-space-marquee-row' });
