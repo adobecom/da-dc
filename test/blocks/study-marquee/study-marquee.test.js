@@ -172,9 +172,7 @@ describe('study-marquee block', () => {
     const redirectSpy = sinon.spy();
     window.addEventListener('DCUnity:RedirectReady', redirectSpy);
 
-    block.dispatchEvent(new CustomEvent('unity:track-analytics', {
-      detail: { event: 'uploaded', data: {}, sendToSplunk: true },
-    }));
+    block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'uploaded', data: {}, sendToSplunk: true } }));
 
     window.removeEventListener('DCUnity:RedirectReady', redirectSpy);
     expect(redirectSpy.called).to.be.true;
@@ -197,9 +195,7 @@ describe('study-marquee block', () => {
     window.addEventListener('DCUnity:RedirectReady', redirectSpy);
 
     try {
-      block.dispatchEvent(new CustomEvent('unity:track-analytics', {
-        detail: { event: 'uploaded', data: {}, sendToSplunk: true },
-      }));
+      block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'uploaded', data: {}, sendToSplunk: true } }));
 
       // Redirect is deferred until the 3 second fallback timeout elapses.
       expect(redirectSpy.called).to.be.false;
