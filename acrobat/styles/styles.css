@@ -388,9 +388,9 @@ main {
     .media [class*="heading-"] {
       font-family: "Adobe Clean ExtraBold", var(--body-font-family);
       font-weight: 800;
-      line-height: 1;
+      line-height: 1.1;
       letter-spacing: -0.04em;
-      font-size: 36px;
+      font-size: 32px;
     }
 
     .media [class*="body-"] {
@@ -399,7 +399,8 @@ main {
     }
 
     .media.medium-compact [class*="heading-"] {
-      line-height: 0.98 !important;
+      line-height: 1.1 !important;
+      font-size: 32px !important;
     }
 
     @media screen and (min-width: 600px) and (max-width: 1199px) {
@@ -424,8 +425,8 @@ main {
       }
 
       .media [class*="heading-"] {
-        line-height: 0.98;
-        font-size: 42px;
+        line-height: 1.1;
+        font-size: 32px;
       }
     }
 
@@ -456,8 +457,8 @@ main {
       }
 
       .media [class*="heading-"] {
-        line-height: 0.98;
-        font-size: 64px;
+        line-height: 1.1;
+        font-size: 42px;
       }
 
       .media [class*="body-"] {
@@ -465,8 +466,8 @@ main {
       }
 
       .media.medium-compact [class*="heading-"] {
-        line-height: 1.25 !important;
-        font-size: 54px !important;
+        line-height: 1.1 !important;
+        font-size: 42px !important;
       }
     }
   }
