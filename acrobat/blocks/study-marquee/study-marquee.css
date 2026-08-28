@@ -777,6 +777,20 @@
   }
 }
 
+@media screen and (max-width: 1199px) {
+  .study-marquee.avalon .study-marquee-heading {
+    font-family: var(--body-font-family);
+    font-size: var(--type-heading-xxl-size);
+    font-weight: 700;
+    line-height: var(--type-heading-xxl-lh);
+    letter-spacing: 0;
+  }
+
+  .study-marquee.avalon .study-marquee-copy-sub {
+    font-weight: 400;
+  }
+}
+
 @media screen and (min-width: 1200px) {
   .study-marquee.avalon {
     padding-block: var(--spacing-xl);
