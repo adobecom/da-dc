@@ -260,7 +260,7 @@ export default async function init(element) {
     window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: VERB, userAttempts } }));
   });
   const children = [...element.querySelectorAll(':scope > div')];
-  const LABEL_PREFIX = 'con-block-row-';
+  const LABEL_PREFIX = 'dc-block-row-';
   const authored = new Map();
   const contentRows = [];
   children.forEach((rowEl) => {
