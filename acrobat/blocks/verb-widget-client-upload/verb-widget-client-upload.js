@@ -300,7 +300,7 @@ export async function encryptAndStore(file) {
   return id;
 }
 
-async function clearPreviousUploads() {
+export async function clearPreviousUploads() {
   try {
     await new Promise((resolve, reject) => {
       const req = indexedDB.deleteDatabase(IDB_NAME);
