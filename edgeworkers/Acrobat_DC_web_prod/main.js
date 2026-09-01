@@ -36,13 +36,16 @@ export async function responseProvider(request) {
 
     // Make preliminary pass through the content to capture metadata
     const firstPassRewriter = new HtmlRewritingStream();
-    let mobileWidget, unityWorkflow;
+    let mobileWidget, unityWorkflow, clientUploadWidget;
     const prefix = isProd ? '' : 'stg-';
     firstPassRewriter.onElement('meta[name="mobile-widget"]', el => {
       mobileWidget = el.getAttribute('content');
     });
     firstPassRewriter.onElement('.unity.workflow-acrobat', el => {
       unityWorkflow = true;
+    });
+    firstPassRewriter.onElement('.verb-widget-client-upload', el => {
+      clientUploadWidget = true;
     });
     let studyMarquee;
     firstPassRewriter.onElement('.study-marquee', el => {
@@ -81,7 +84,7 @@ export async function responseProvider(request) {
       delete responseHeaders[prop];
     }
 
-    return [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee];
+    return [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget];
   };
 
   const fetchResource = async path => {
@@ -95,7 +98,7 @@ export async function responseProvider(request) {
   const scriptHashes = [];
   let prerenderTop = 0;
 
-  const inlineScripts = async (unityWorkflow, mobileWidget, scripts, dcConverter) => {
+  const inlineScripts = async (unityWorkflow, mobileWidget, clientUploadWidget, scripts, dcConverter) => {
     // Inline dc-converter-widget.js and scripts.js. Remove modular definition and import.
     // Change relative paths to absolute. Remove JS-driven CSP in favor of HTTP header.
     let inlineScript = scripts
@@ -106,7 +109,7 @@ export async function responseProvider(request) {
       .replace('await import(\'./tooltips.js\')', 'await import(\'/acrobat/scripts/tooltips.js\')')
       .replace('await import(\'./imageReplacer.js\')', 'await import(\'/acrobat/scripts/imageReplacer.js\')');
 
-    if (!(mobileWidget && request.device.isMobile) && !unityWorkflow) {
+    if (!(mobileWidget && request.device.isMobile) && !unityWorkflow && !clientUploadWidget) {
       inlineScript = dcConverter
         .replace('export default', 'const dcConverter = ')
         .replace('import(\'../../scripts/frictionless.js\')', 'import(\'/acrobat/scripts/frictionless.js\')')
@@ -156,11 +159,13 @@ export async function responseProvider(request) {
     });
   };
 
-  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, unityWorkflow, studyMarquee, verbMarquee, prerenderTop) => {
+  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop) => {
     rewriter.onElement('head', el => {
       el.append(`<style id="inline-milo-styles">${miloStyles}</style>`);
       el.append(`<style id="inline-dc-styles">${dcStyles}</style>`);
-      if (unityWorkflow) {
+      if (clientUploadWidget) {
+        el.append(`<style id="inline-verb-widget-client-upload-styles">${verbWidgetClientUploadStyles}</style>`);
+      } else if (unityWorkflow) {
         if (studyMarquee) {
           el.append(`<style id="inline-study-marquee-styles">${studyMarqueeStyles}</style>`);
         } else if (verbMarquee) {
@@ -175,14 +180,15 @@ export async function responseProvider(request) {
 
   try {
     const [
-      [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee],
+      [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget],
       scripts,
       dcConverter,
       dcStyles,
       miloStyles,
       verbWidgetStyles,
       studyMarqueeStyles,
-      verbMarqueeStyles
+      verbMarqueeStyles,
+      verbWidgetClientUploadStyles
     ] = await Promise.all([
       fetchFrictionlessPage(),
       fetchResource('/acrobat/scripts/scripts.js'),
@@ -191,11 +197,12 @@ export async function responseProvider(request) {
       fetchResource('/libs/styles/styles.css'),
       fetchResource('/acrobat/blocks/verb-widget/verb-widget.css'),
       fetchResource('/acrobat/blocks/study-marquee/study-marquee.css'),
-      fetchResource('/acrobat/blocks/verb-marquee/verb-marquee.css')
+      fetchResource('/acrobat/blocks/verb-marquee/verb-marquee.css'),
+      fetchResource('/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css')
     ]);
 
-    await inlineScripts(unityWorkflow, mobileWidget, scripts, dcConverter);
-    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, unityWorkflow, studyMarquee, verbMarquee, prerenderTop);
+    await inlineScripts(unityWorkflow, mobileWidget, clientUploadWidget, scripts, dcConverter);
+    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop);
 
     const csp = contentSecurityPolicy(isProd, scriptHashes);
     const acrobat = isProd ? 'https://acrobat.adobe.com' : 'https://stage.acrobat.adobe.com';
@@ -207,7 +214,12 @@ export async function responseProvider(request) {
         '<https://use.typekit.net>;rel="preconnect"',
         `</libs/deps/imslib.min.js>;rel="preload";as="script"`,
     ];
-    if (unityWorkflow) {
+    if (clientUploadWidget) {
+      headerLink = [...headerLink,
+        `</acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css>;rel="preload";as="style"`,
+      ];
+    } else if (unityWorkflow) {
       headerLink = [...headerLink,
         `</acrobat/blocks/unity/unity.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</acrobat/blocks/unity/unity.css>;rel="preload";as="style"`,
