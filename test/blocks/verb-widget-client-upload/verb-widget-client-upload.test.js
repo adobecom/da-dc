@@ -5,6 +5,7 @@ const {
   validateFiles,
   encryptAndStore,
   storeEncryptedLocalFile,
+  LOCALE_REDIRECT_MAP,
   openIDB,
   IDB_NAME,
   IDB_STORE,
@@ -116,6 +117,40 @@ describe('verb-widget-client-upload', () => {
         record.ciphertext,
       );
       expect(new Uint8Array(decrypted)).to.deep.equal(original);
+    });
+  });
+
+  describe('LOCALE_REDIRECT_MAP', () => {
+    it('maps a direct language locale correctly', () => {
+      expect(LOCALE_REDIRECT_MAP.fr).to.equal('fr');
+      expect(LOCALE_REDIRECT_MAP.de).to.equal('de');
+      expect(LOCALE_REDIRECT_MAP.jp).to.equal('jp');
+    });
+
+    it('maps LATAM Spanish locales to the shared es prefix', () => {
+      expect(LOCALE_REDIRECT_MAP.mx).to.equal('es');
+      expect(LOCALE_REDIRECT_MAP.la).to.equal('es');
+      expect(LOCALE_REDIRECT_MAP.ar).to.equal('es');
+      expect(LOCALE_REDIRECT_MAP.cl).to.equal('es');
+    });
+
+    it('maps regional variants of the same language to a shared prefix', () => {
+      expect(LOCALE_REDIRECT_MAP.at).to.equal('de');
+      expect(LOCALE_REDIRECT_MAP.ch_de).to.equal('de');
+      expect(LOCALE_REDIRECT_MAP.lu_de).to.equal('de');
+    });
+
+    it('maps compound-key locales correctly', () => {
+      expect(LOCALE_REDIRECT_MAP.id_id).to.equal('id_id');
+      expect(LOCALE_REDIRECT_MAP.in_hi).to.equal('in_hi');
+      expect(LOCALE_REDIRECT_MAP.th_th).to.equal('th_th');
+    });
+
+    it('returns undefined for English-only locales not in the redirect map', () => {
+      expect(LOCALE_REDIRECT_MAP.uk).to.be.undefined;
+      expect(LOCALE_REDIRECT_MAP.au).to.be.undefined;
+      expect(LOCALE_REDIRECT_MAP.in).to.be.undefined;
+      expect(LOCALE_REDIRECT_MAP['']).to.be.undefined;
     });
   });
 

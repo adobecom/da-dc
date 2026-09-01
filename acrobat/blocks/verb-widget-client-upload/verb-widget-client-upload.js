@@ -17,6 +17,51 @@ const ACCEPTED_FILES = ['.jpg', '.jpeg', '.png'];
 
 const LIMITS = { 'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ACCEPTED_FILES, multipleFiles: false } };
 
+export const LOCALE_REDIRECT_MAP = {
+  ar: 'es',
+  at: 'de',
+  be_fr: 'fr',
+  be_nl: 'nl',
+  br: 'pt',
+  ca_fr: 'fr',
+  ch_de: 'de',
+  ch_fr: 'fr',
+  ch_it: 'it',
+  cl: 'es',
+  co: 'es',
+  cr: 'es',
+  cz: 'cz',
+  de: 'de',
+  dk: 'dk',
+  ec: 'es',
+  es: 'es',
+  fi: 'fi',
+  fr: 'fr',
+  gt: 'es',
+  hk_zh: 'tw',
+  id_id: 'id_id',
+  in_hi: 'in_hi',
+  it: 'it',
+  jp: 'jp',
+  kr: 'kr',
+  la: 'es',
+  lu_de: 'de',
+  lu_fr: 'fr',
+  mx: 'es',
+  nl: 'nl',
+  no: 'no',
+  pe: 'es',
+  pl: 'pl',
+  pr: 'es',
+  pt: 'pt',
+  ro: 'ro',
+  ru: 'ru',
+  se: 'se',
+  th_th: 'th_th',
+  tr: 'tr',
+  tw: 'tw',
+};
+
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
 
 const fallBack = 'https://www.adobe.com/go/acrobat-overview';
@@ -263,20 +308,11 @@ export function validateFiles(files, verb) {
     return { valid: false, code: 'error_generic', message: mph['verb-widget-error-generic'] || 'Unable to process the request.' };
   }
 
-  if (!limits.multipleFiles && !limits.maxNumFiles && files.length > 1) {
+  if (files.length > 1) {
     return {
       valid: false,
       code: 'error_only_accept_one_file',
-      message: mph['verb-widget-error-only-accept-one-file'] || 'This tool only accepts one file at a time.',
-    };
-  }
-
-  const maxFiles = limits.maxNumFiles ?? (limits.multipleFiles ? Infinity : 1);
-  if (files.length > maxFiles) {
-    return {
-      valid: false,
-      code: 'error_max_num_files',
-      message: mph['verb-widget-error-max-num-files'] || 'Too many files selected.',
+      message: mph['verb-widget-error-only-accept-one-file'] || 'Only 1 file can be uploaded at a time.',
     };
   }
 
@@ -290,13 +326,12 @@ export function validateFiles(files, verb) {
     };
   }
 
-  const multi = files.length > 1;
   for (const file of files) {
     if (file.size === 0) {
       return {
         valid: false,
         code: 'error_empty_file',
-        message: mph['verb-widget-error-empty-file'] || (multi ? 'These files are empty.' : 'This file is empty.'),
+        message: mph['verb-widget-error-empty-file'] || 'This file is empty.',
       };
     }
 
@@ -304,7 +339,7 @@ export function validateFiles(files, verb) {
       return {
         valid: false,
         code: 'error_file_too_large',
-        message: mph['verb-widget-error-file-too-large'] || (multi ? 'These files are either too large or too complex to export.' : 'This file is either too large or too complex to export.'),
+        message: mph['verb-widget-error-file-too-large'] || 'This file is either too large or too complex to export.',
       };
     }
 
@@ -313,7 +348,7 @@ export function validateFiles(files, verb) {
       return {
         valid: false,
         code: 'error_unsupported_type',
-        message: mph['verb-widget-error-unsupported-type'] || (multi ? 'These files are in a format not supported for conversion to PDF.' : 'This file is in a format not supported for conversion to PDF.'),
+        message: mph['verb-widget-error-unsupported-type'] || 'This file is in a format not supported for conversion to PDF.',
       };
     }
 
@@ -322,7 +357,7 @@ export function validateFiles(files, verb) {
       return {
         valid: false,
         code: 'error_unsupported_type',
-        message: mph['verb-widget-error-unsupported-type'] || (multi ? 'These files are in a format not supported for conversion to PDF.' : 'This file is in a format not supported for conversion to PDF.'),
+        message: mph['verb-widget-error-unsupported-type'] || 'This file is in a format not supported for conversion to PDF.',
       };
     }
   }
@@ -549,7 +584,6 @@ export default async function init(element) {
     error_unsupported_type: 'error:UnsupportedFile',
     error_empty_file: 'error:EmptyFile',
     error_file_too_large: 'error:TooLargeFile',
-    error_max_num_files: 'error:max_num_files',
     error_duplicate_asset: 'error:duplicate_asset',
     error_generic: 'error',
   };
@@ -604,18 +638,19 @@ export default async function init(element) {
       const uploadedMetadata = { ...filesData, assetId: id, uploadTime };
       handleAnalyticsEvent('job:uploaded', uploadedMetadata, false);
 
-      const redirectBase = DC_ENV === 'prod'
-        ? 'https://www.adobe.com/acrobat-online/image-to-pdf.html'
-        : 'https://www.stage.adobe.com/acrobat-online/image-to-pdf.html';
+      const domain = DC_ENV === 'prod' ? 'https://www.adobe.com' : 'https://www.stage.adobe.com';
+      const redirectPrefix = LOCALE_REDIRECT_MAP[locale.prefix.slice(1)];
+      const redirectBase = `${domain}${redirectPrefix ? `/${redirectPrefix}` : ''}/acrobat-online/image-to-pdf.html`;
       const originalParams = DC_ENV === 'stage' ? `${window.location.search.slice(1)}&` : '';
-      const redirectUrl = `${redirectBase}?${originalParams}clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}`;
+      const localeParam = locale.ietf ? `&localeCode=${encodeURIComponent(locale.ietf)}` : '';
+      const redirectUrl = `${redirectBase}?${originalParams}clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${localeParam}`;
       handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
       window.location.href = redirectUrl;
     } catch (err) {
       isUploading = false;
       ctaButton.disabled = false;
       ctaButton.querySelector('.verb-cta-label').textContent = ctaLabel;
-      dispatchError('error_generic', err.message || 'Failed to store file. Please try again.', filesData);
+      dispatchError('error_generic', window.mph?.['verb-widget-error-generic'] || 'Unable to process the request.', filesData);
     }
   }
 
@@ -694,7 +729,9 @@ export default async function init(element) {
     const historyTraversal = e.persisted
       || (typeof window.performance !== 'undefined'
         && window.performance.getEntriesByType('navigation')[0].type === 'back_forward');
-    if (historyTraversal) window.location.reload();
+    if (historyTraversal) {
+      window.location.reload();
+    }
   });
 
   if (document.readyState === 'loading') {
