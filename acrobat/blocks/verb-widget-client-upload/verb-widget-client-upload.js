@@ -316,8 +316,6 @@ async function clearPreviousUploads() {
   }
 }
 
-clearPreviousUploads();
-
 export function validateFiles(files, verb) {
   const limits = LIMITS[verb];
   const mph = window.mph ?? {};
@@ -414,6 +412,8 @@ export default async function init(element) {
     window.location.href = EOLBrowserPage;
     return;
   }
+
+  await clearPreviousUploads();
 
   const { locale } = getConfig();
   const ppURL = window.mph?.['verb-widget-privacy-policy-url']
@@ -743,11 +743,14 @@ export default async function init(element) {
     }
   });
 
-  window.addEventListener('pageshow', (e) => {
+  window.addEventListener('pageshow', async (e) => {
     const historyTraversal = e.persisted
       || (typeof window.performance !== 'undefined'
         && window.performance.getEntriesByType('navigation')[0].type === 'back_forward');
-    if (historyTraversal) window.location.reload();
+    if (historyTraversal) {
+      await clearPreviousUploads();
+      window.location.reload();
+    }
   });
 
   if (document.readyState === 'loading') {
