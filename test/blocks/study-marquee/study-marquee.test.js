@@ -53,16 +53,11 @@ describe('study-marquee block', () => {
     expect(LIMITS['mindmap-maker'].genAI).to.be.true;
   });
 
-  it('exports LIMITS for gen-presentation-v2 and interactive-report as single-file study verbs', () => {
+  it('exports LIMITS for gen-presentation-v2 and interactive-report as single-file PDF-only verbs', () => {
     expect(LIMITS).to.have.property('gen-presentation-v2');
     expect(LIMITS).to.have.property('interactive-report');
     ['gen-presentation-v2', 'interactive-report'].forEach((verb) => {
-      expect(LIMITS[verb].acceptedFiles).to.be.an('array');
-      // Extends the base study file types with email and image formats.
-      expect(LIMITS[verb].acceptedFiles).to.include.members(LIMITS['flashcard-maker'].acceptedFiles);
-      ['.eml', '.msg', '.jpg', '.jpeg', '.png', '.tif', '.tiff'].forEach((ext) => {
-        expect(LIMITS[verb].acceptedFiles).to.include(ext);
-      });
+      expect(LIMITS[verb].acceptedFiles).to.deep.equal(['.pdf']);
       expect(LIMITS[verb].maxFileSize).to.equal(104857600);
       expect(LIMITS[verb].maxNumFiles).to.equal(1);
       expect(LIMITS[verb].multipleFiles).to.not.be.ok;
@@ -99,8 +94,7 @@ describe('study-marquee block', () => {
     expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
   });
 
-  it('renders extended accept attribute for gen-presentation-v2 and interactive-report', async () => {
-    const extendedTypes = ['.eml', '.msg', '.jpg', '.jpeg', '.png', '.tif', '.tiff'];
+  it('renders pdf-only accept attribute for gen-presentation-v2 and interactive-report', async () => {
     const cases = [
       ['gen-presentation-v2', './mocks/body-gen-presentation-v2.html'],
       ['interactive-report', './mocks/body-interactive-report.html'],
@@ -111,11 +105,7 @@ describe('study-marquee block', () => {
       const conf = getConfig();
       setConfig({ ...conf, locale: { prefix: '' } });
       await init(block);
-      const accept = document.querySelector('.study-marquee #file-upload').getAttribute('accept');
-      const acceptList = accept.split(',');
-      [...extendedTypes, '.pdf', '.docx'].forEach((ext) => {
-        expect(acceptList, `${verb} should accept ${ext}`).to.include(ext);
-      });
+      expect(document.querySelector('.study-marquee #file-upload').getAttribute('accept'), `${verb} should only accept .pdf`).to.equal('.pdf');
     }
   });
 

@@ -43,7 +43,7 @@ const SIGNED_IN_UPLOAD_VERBS = new Set(['gen-presentation-v2', 'interactive-repo
 
 export const LIMITS = {
   ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI),
-  ...group(['gen-presentation-v2', 'interactive-report'], STUDY_GENAI_SINGLE),
+  ...group(['gen-presentation-v2', 'interactive-report'], { ...STUDY_GENAI_SINGLE, acceptedFiles: ['.pdf'] }),
   stylize: { ...STUDY_GENAI_SINGLE, acceptedFiles: ['.pdf'] },
 };
 
