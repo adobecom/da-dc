@@ -293,20 +293,11 @@ export function validateFiles(files, verb) {
     return { valid: false, code: 'error_generic', message: mph['verb-widget-error-generic'] || 'Unable to process the request.' };
   }
 
-  if (!limits.multipleFiles && !limits.maxNumFiles && files.length > 1) {
+  if (files.length > 1) {
     return {
       valid: false,
       code: 'error_only_accept_one_file',
-      message: mph['verb-widget-error-only-accept-one-file'] || 'Unable to process the request.',
-    };
-  }
-
-  const maxFiles = limits.maxNumFiles ?? (limits.multipleFiles ? Infinity : 1);
-  if (files.length > maxFiles) {
-    return {
-      valid: false,
-      code: 'error_max_num_files',
-      message: mph['verb-widget-error-max-num-files'] || 'Unable to process the request.',
+      message: mph['verb-widget-error-only-accept-one-file'] || 'Only 1 file can be uploaded at a time.',
     };
   }
 
@@ -580,7 +571,6 @@ export default async function init(element) {
     error_unsupported_type: 'error:UnsupportedFile',
     error_empty_file: 'error:EmptyFile',
     error_file_too_large: 'error:TooLargeFile',
-    error_max_num_files: 'error:max_num_files',
     error_duplicate_asset: 'error:duplicate_asset',
     error_generic: 'error',
   };
