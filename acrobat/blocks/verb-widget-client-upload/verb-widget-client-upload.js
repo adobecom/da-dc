@@ -376,7 +376,7 @@ export default async function init(element) {
   const isTablet = isTabletDevice();
 
   const heading = children[0]?.textContent ?? '';
-  const subCopy = children[1]?.textContent ?? window.mph?.[`verb-widget-${VERB}-description`] ?? '';
+  const subCopy = window.mph?.[`verb-widget-${VERB}-description`] ?? '';
   const ctaLabel = window.mph?.['verb-widget-cta'] ?? 'Select a file';
 
   children.forEach((c) => c.remove());
