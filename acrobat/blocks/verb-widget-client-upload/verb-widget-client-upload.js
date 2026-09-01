@@ -300,19 +300,6 @@ export async function encryptAndStore(file) {
   return id;
 }
 
-export async function clearPreviousUploads() {
-  try {
-    await new Promise((resolve, reject) => {
-      const req = indexedDB.deleteDatabase(IDB_NAME);
-      req.onsuccess = resolve;
-      req.onerror = ({ target: { error } }) => reject(error);
-      req.onblocked = resolve;
-    });
-  } catch (error) {
-    window.lana?.log(`Error Code: Unknown, Status: 'Unknown', Message: Failed to clear IDB on page load: ${error.message}`, lanaOptions);
-  }
-}
-
 export function validateFiles(files, verb) {
   const limits = LIMITS[verb];
   const mph = window.mph ?? {};
@@ -409,8 +396,6 @@ export default async function init(element) {
     window.location.href = EOLBrowserPage;
     return;
   }
-
-  await clearPreviousUploads();
 
   const { locale } = getConfig();
   const ppURL = window.mph?.['verb-widget-privacy-policy-url']
@@ -740,12 +725,11 @@ export default async function init(element) {
     }
   });
 
-  window.addEventListener('pageshow', async (e) => {
+  window.addEventListener('pageshow', (e) => {
     const historyTraversal = e.persisted
       || (typeof window.performance !== 'undefined'
         && window.performance.getEntriesByType('navigation')[0].type === 'back_forward');
     if (historyTraversal) {
-      await clearPreviousUploads();
       window.location.reload();
     }
   });

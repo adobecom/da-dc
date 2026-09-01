@@ -5,7 +5,6 @@ const {
   validateFiles,
   encryptAndStore,
   storeEncryptedLocalFile,
-  clearPreviousUploads,
   LOCALE_REDIRECT_MAP,
   openIDB,
   IDB_NAME,
@@ -152,34 +151,6 @@ describe('verb-widget-client-upload', () => {
       expect(LOCALE_REDIRECT_MAP.au).to.be.undefined;
       expect(LOCALE_REDIRECT_MAP.in).to.be.undefined;
       expect(LOCALE_REDIRECT_MAP['']).to.be.undefined;
-    });
-  });
-
-  describe('clearPreviousUploads', () => {
-    it('deletes the database so previously stored records are gone', async () => {
-      const file = makeFile(new Uint8Array([1, 2, 3]), 'photo.jpg', 'image/jpeg');
-      const id = await encryptAndStore(file);
-
-      const before = await readRecord(id);
-      expect(before).to.exist;
-
-      await clearPreviousUploads();
-
-      const db = await openIDB();
-      const after = await new Promise((resolve, reject) => {
-        const tx = db.transaction(IDB_STORE, 'readonly');
-        const req = tx.objectStore(IDB_STORE).get(id);
-        req.onsuccess = () => { resolve(req.result); db.close(); };
-        req.onerror = ({ target: { error } }) => { reject(error); db.close(); };
-      });
-      expect(after).to.be.undefined;
-    });
-
-    it('is safe to call when the database does not exist', async () => {
-      await deleteDB();
-      let threw = false;
-      try { await clearPreviousUploads(); } catch { threw = true; }
-      expect(threw).to.be.false;
     });
   });
 
