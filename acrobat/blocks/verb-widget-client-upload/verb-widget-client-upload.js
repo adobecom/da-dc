@@ -446,6 +446,7 @@ export default async function init(element) {
 
   const heading = children[0]?.textContent ?? '';
   const subCopy = window.mph?.[`verb-widget-${VERB}-description`] ?? '';
+  const mobSubCopy = window.mph?.[`verb-widget-${VERB}-mobile-description`] ?? subCopy;
   const ctaLabel = window.mph?.['verb-widget-cta'] ?? 'Select a file';
 
   children.forEach((c) => c.remove());
@@ -465,6 +466,7 @@ export default async function init(element) {
 
   const widgetHeading = createTag('h1', { class: 'verb-heading' }, heading);
   const widgetCopy = createTag('p', { class: 'verb-copy' }, subCopy);
+  const widgetMobCopy = createTag('p', { class: 'verb-copy' }, mobSubCopy);
 
   const errorState = createTag('div', { class: 'error hide' });
   const errorIcon = createTag('div', { class: 'verb-errorIcon' });
@@ -540,7 +542,7 @@ export default async function init(element) {
   widgetLeft.append(
     widgetHeader,
     widgetHeading,
-    widgetCopy,
+    (isMobile || isTablet) ? widgetMobCopy : widgetCopy,
     errorState,
     ctaButton,
     fileInput,
