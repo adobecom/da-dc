@@ -267,7 +267,10 @@ async function frictionlessResponseProvider(request) {
     // Setup: Fetch a stream containing HTML
     const hasLocalePrefix = request.path.split('/').filter(Boolean).length > 1;
     let docPath;
-    if (hasLocalePrefix) {
+    if (request.path.includes('/dc-shared')) {
+      // Already a dc-shared resource path — fetch as-is, no insertion
+      docPath = `${origin}${request.path}`;
+    } else if (hasLocalePrefix) {
       docPath = `${origin}${request.path.replace(`/${first}/`, `/${first}/dc-shared/`)}`;
     } else {
       docPath = `${origin}/dc-shared${request.path}`;
