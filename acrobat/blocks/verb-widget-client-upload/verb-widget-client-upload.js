@@ -365,6 +365,32 @@ export function validateFiles(files, verb) {
   return { valid: true };
 }
 
+function prefetchNextPage(url) {
+  if (window.clientUploadPrefetchUrl) return;
+  window.clientUploadPrefetchUrl = url;
+  const link = document.createElement('link');
+  link.rel = 'prefetch';
+  link.href = url;
+  link.crossOrigin = 'anonymous';
+  link.as = 'document';
+  document.head.appendChild(link);
+}
+
+function prefetchTarget() {
+  if (window.clientUploadPrefetchLoaded || !window.clientUploadPrefetchUrl) return;
+  window.clientUploadPrefetchLoaded = true;
+  const iframe = document.createElement('iframe');
+  iframe.src = window.clientUploadPrefetchUrl;
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+}
+
+function buildEarlyPrefetchUrl(locale) {
+  const domain = DC_ENV === 'prod' ? 'https://www.adobe.com' : 'https://www.stage.adobe.com';
+  const redirectPrefix = LOCALE_REDIRECT_MAP[locale.prefix.slice(1)];
+  return `${domain}${redirectPrefix ? `/${redirectPrefix}` : ''}/acrobat-online/image-to-pdf.html?clientConvert=true`;
+}
+
 const svgCache = new Map();
 
 async function loadSvg(iconName) {
@@ -398,6 +424,14 @@ export default async function init(element) {
   }
 
   const { locale } = getConfig();
+
+  const triggerEarlyPrefetch = () => {
+    prefetchNextPage(buildEarlyPrefetchUrl(locale));
+    prefetchTarget();
+  };
+  document.addEventListener('click', triggerEarlyPrefetch, { once: true });
+  document.addEventListener('dragover', triggerEarlyPrefetch, { once: true });
+
   const ppURL = window.mph?.['verb-widget-privacy-policy-url']
     || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
   const touURL = window.mph?.['verb-widget-terms-of-use-url']
