@@ -1,5 +1,6 @@
 /* eslint-disable compat/compat */
 import { setLibs, getEnv, isOldBrowser } from '../../scripts/utils.js';
+import { localeMap } from '../unity/unity.js';
 
 const miloLibs = setLibs('/libs');
 
@@ -16,6 +17,20 @@ const MB25 = 26214400;
 const ACCEPTED_FILES = ['.jpg', '.jpeg', '.png'];
 
 const LIMITS = { 'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ACCEPTED_FILES, multipleFiles: false } };
+
+const LANG_TO_REDIRECT_PREFIX = {
+  'id-id': 'id_id', 'hi-in': 'in_hi', 'ja-jp': 'jp', 'ko-kr': 'kr',
+  'th-th': 'th_th', 'zh-tw': 'tw', 'cs-cz': 'cz', 'de-de': 'de',
+  'da-dk': 'dk', 'es-es': 'es', 'fi-fi': 'fi', 'fr-fr': 'fr',
+  'it-it': 'it', 'nl-nl': 'nl', 'nb-no': 'no', 'pl-pl': 'pl',
+  'pt-br': 'pt', 'ro-ro': 'ro', 'ru-ru': 'ru', 'sv-se': 'se', 'tr-tr': 'tr',
+};
+
+const LOCALE_REDIRECT_MAP = Object.fromEntries(
+  Object.entries(localeMap)
+    .filter(([, lang]) => LANG_TO_REDIRECT_PREFIX[lang])
+    .map(([prefix, lang]) => [prefix, LANG_TO_REDIRECT_PREFIX[lang]])
+);
 
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
 
@@ -255,6 +270,21 @@ export async function encryptAndStore(file) {
   return id;
 }
 
+async function clearPreviousUploads() {
+  try {
+    const db = await openIDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).clear();
+      tx.oncomplete = resolve;
+      tx.onerror = ({ target: { error } }) => reject(error);
+    });
+    db.close();
+  } catch (error) {
+    window.lana?.log(`Error Code: Unknown, Status: 'Unknown', Message: Failed to clear IDB on page load: ${error.message}`, lanaOptions);
+  }
+}
+
 export function validateFiles(files, verb) {
   const limits = LIMITS[verb];
   const mph = window.mph ?? {};
@@ -267,7 +297,7 @@ export function validateFiles(files, verb) {
     return {
       valid: false,
       code: 'error_only_accept_one_file',
-      message: mph['verb-widget-error-only-accept-one-file'] || 'This tool only accepts one file at a time.',
+      message: mph['verb-widget-error-only-accept-one-file'] || 'Unable to process the request.',
     };
   }
 
@@ -276,7 +306,7 @@ export function validateFiles(files, verb) {
     return {
       valid: false,
       code: 'error_max_num_files',
-      message: mph['verb-widget-error-max-num-files'] || 'Too many files selected.',
+      message: mph['verb-widget-error-max-num-files'] || 'Unable to process the request.',
     };
   }
 
@@ -290,13 +320,12 @@ export function validateFiles(files, verb) {
     };
   }
 
-  const multi = files.length > 1;
   for (const file of files) {
     if (file.size === 0) {
       return {
         valid: false,
         code: 'error_empty_file',
-        message: mph['verb-widget-error-empty-file'] || (multi ? 'These files are empty.' : 'This file is empty.'),
+        message: mph['verb-widget-error-empty-file'] || 'This file is empty.',
       };
     }
 
@@ -304,7 +333,7 @@ export function validateFiles(files, verb) {
       return {
         valid: false,
         code: 'error_file_too_large',
-        message: mph['verb-widget-error-file-too-large'] || (multi ? 'These files are either too large or too complex to export.' : 'This file is either too large or too complex to export.'),
+        message: mph['verb-widget-error-file-too-large'] || 'This file is either too large or too complex to export.',
       };
     }
 
@@ -313,7 +342,7 @@ export function validateFiles(files, verb) {
       return {
         valid: false,
         code: 'error_unsupported_type',
-        message: mph['verb-widget-error-unsupported-type'] || (multi ? 'These files are in a format not supported for conversion to PDF.' : 'This file is in a format not supported for conversion to PDF.'),
+        message: mph['verb-widget-error-unsupported-type'] || 'This file is in a format not supported for conversion to PDF.',
       };
     }
 
@@ -322,7 +351,7 @@ export function validateFiles(files, verb) {
       return {
         valid: false,
         code: 'error_unsupported_type',
-        message: mph['verb-widget-error-unsupported-type'] || (multi ? 'These files are in a format not supported for conversion to PDF.' : 'This file is in a format not supported for conversion to PDF.'),
+        message: mph['verb-widget-error-unsupported-type'] || 'This file is in a format not supported for conversion to PDF.',
       };
     }
   }
@@ -361,6 +390,8 @@ export default async function init(element) {
     window.location.href = EOLBrowserPage;
     return;
   }
+
+  await clearPreviousUploads();
 
   const { locale } = getConfig();
   const ppURL = window.mph?.['verb-widget-privacy-policy-url']
@@ -604,9 +635,9 @@ export default async function init(element) {
       const uploadedMetadata = { ...filesData, assetId: id, uploadTime };
       handleAnalyticsEvent('job:uploaded', uploadedMetadata, false);
 
-      const redirectBase = DC_ENV === 'prod'
-        ? 'https://www.adobe.com/acrobat-online/image-to-pdf.html'
-        : 'https://www.stage.adobe.com/acrobat-online/image-to-pdf.html';
+      const domain = DC_ENV === 'prod' ? 'https://www.adobe.com' : 'https://www.stage.adobe.com';
+      const redirectPrefix = LOCALE_REDIRECT_MAP[locale.prefix.slice(1)];
+      const redirectBase = `${domain}${redirectPrefix ? `/${redirectPrefix}` : ''}/acrobat-online/image-to-pdf.html`;
       const originalParams = DC_ENV === 'stage' ? `${window.location.search.slice(1)}&` : '';
       const redirectUrl = `${redirectBase}?${originalParams}clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}`;
       handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
@@ -615,7 +646,7 @@ export default async function init(element) {
       isUploading = false;
       ctaButton.disabled = false;
       ctaButton.querySelector('.verb-cta-label').textContent = ctaLabel;
-      dispatchError('error_generic', err.message || 'Failed to store file. Please try again.', filesData);
+      dispatchError('error_generic', window.mph?.['verb-widget-error-generic'] || 'Unable to process the request.', filesData);
     }
   }
 
