@@ -308,12 +308,15 @@ async function clearPreviousUploads() {
       tx.objectStore(IDB_STORE).clear();
       tx.oncomplete = resolve;
       tx.onerror = ({ target: { error } }) => reject(error);
+      tx.onabort = ({ target: { error } }) => reject(error || new Error('Transaction aborted'));
     });
     db.close();
   } catch (error) {
     window.lana?.log(`Error Code: Unknown, Status: 'Unknown', Message: Failed to clear IDB on page load: ${error.message}`, lanaOptions);
   }
 }
+
+clearPreviousUploads();
 
 export function validateFiles(files, verb) {
   const limits = LIMITS[verb];
@@ -411,8 +414,6 @@ export default async function init(element) {
     window.location.href = EOLBrowserPage;
     return;
   }
-
-  await clearPreviousUploads();
 
   const { locale } = getConfig();
   const ppURL = window.mph?.['verb-widget-privacy-policy-url']
