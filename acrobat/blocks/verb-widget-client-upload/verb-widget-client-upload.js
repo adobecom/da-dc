@@ -657,7 +657,7 @@ export default async function init(element) {
       const redirectPrefix = LOCALE_REDIRECT_MAP[locale.prefix.slice(1)];
       const redirectBase = `${domain}${redirectPrefix ? `/${redirectPrefix}` : ''}/acrobat-online/image-to-pdf.html`;
       const originalParams = DC_ENV === 'stage' ? `${window.location.search.slice(1)}&` : '';
-      const localeParam = locale.prefix ? `&localeCode=${encodeURIComponent(locale.ietf)}` : '';
+      const localeParam = locale.ietf ? `&localeCode=${encodeURIComponent(locale.ietf)}` : '';
       const redirectUrl = `${redirectBase}?${originalParams}clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${localeParam}`;
       handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
       window.location.href = redirectUrl;
