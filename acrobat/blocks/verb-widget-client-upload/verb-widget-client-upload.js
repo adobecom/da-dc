@@ -302,15 +302,12 @@ export async function encryptAndStore(file) {
 
 async function clearPreviousUploads() {
   try {
-    const db = await openIDB();
     await new Promise((resolve, reject) => {
-      const tx = db.transaction(IDB_STORE, 'readwrite');
-      tx.objectStore(IDB_STORE).clear();
-      tx.oncomplete = resolve;
-      tx.onerror = ({ target: { error } }) => reject(error);
-      tx.onabort = ({ target: { error } }) => reject(error || new Error('Transaction aborted'));
+      const req = indexedDB.deleteDatabase(IDB_NAME);
+      req.onsuccess = resolve;
+      req.onerror = ({ target: { error } }) => reject(error);
+      req.onblocked = resolve;
     });
-    db.close();
   } catch (error) {
     window.lana?.log(`Error Code: Unknown, Status: 'Unknown', Message: Failed to clear IDB on page load: ${error.message}`, lanaOptions);
   }
