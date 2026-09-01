@@ -343,6 +343,11 @@ html[dir="rtl"] .verb-cta .upload-icon {
   outline: none;
 }
 
+.verb-errorBtn:focus {
+  box-shadow: 0 0 0 2px var(--consonant-color-white);
+  border-radius: 2px;
+}
+
 .verb-errorIcon {
   align-self: self-start;
   width: 18px;
