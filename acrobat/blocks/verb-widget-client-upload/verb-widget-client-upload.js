@@ -1,6 +1,5 @@
 /* eslint-disable compat/compat */
 import { setLibs, getEnv, isOldBrowser } from '../../scripts/utils.js';
-import { localeMap } from '../unity/unity.js';
 
 const miloLibs = setLibs('/libs');
 
@@ -18,19 +17,50 @@ const ACCEPTED_FILES = ['.jpg', '.jpeg', '.png'];
 
 const LIMITS = { 'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ACCEPTED_FILES, multipleFiles: false } };
 
-const LANG_TO_REDIRECT_PREFIX = {
-  'id-id': 'id_id', 'hi-in': 'in_hi', 'ja-jp': 'jp', 'ko-kr': 'kr',
-  'th-th': 'th_th', 'zh-tw': 'tw', 'cs-cz': 'cz', 'de-de': 'de',
-  'da-dk': 'dk', 'es-es': 'es', 'fi-fi': 'fi', 'fr-fr': 'fr',
-  'it-it': 'it', 'nl-nl': 'nl', 'nb-no': 'no', 'pl-pl': 'pl',
-  'pt-br': 'pt', 'ro-ro': 'ro', 'ru-ru': 'ru', 'sv-se': 'se', 'tr-tr': 'tr',
+const LOCALE_REDIRECT_MAP = {
+  ar: 'es',
+  at: 'de',
+  be_fr: 'fr',
+  be_nl: 'nl',
+  br: 'pt',
+  ca_fr: 'fr',
+  ch_de: 'de',
+  ch_fr: 'fr',
+  ch_it: 'it',
+  cl: 'es',
+  co: 'es',
+  cr: 'es',
+  cz: 'cz',
+  de: 'de',
+  dk: 'dk',
+  ec: 'es',
+  es: 'es',
+  fi: 'fi',
+  fr: 'fr',
+  gt: 'es',
+  hk_zh: 'tw',
+  id_id: 'id_id',
+  in_hi: 'in_hi',
+  it: 'it',
+  jp: 'jp',
+  kr: 'kr',
+  la: 'es',
+  lu_de: 'de',
+  lu_fr: 'fr',
+  mx: 'es',
+  nl: 'nl',
+  no: 'no',
+  pe: 'es',
+  pl: 'pl',
+  pr: 'es',
+  pt: 'pt',
+  ro: 'ro',
+  ru: 'ru',
+  se: 'se',
+  th_th: 'th_th',
+  tr: 'tr',
+  tw: 'tw',
 };
-
-const LOCALE_REDIRECT_MAP = Object.fromEntries(
-  Object.entries(localeMap)
-    .filter(([, lang]) => LANG_TO_REDIRECT_PREFIX[lang])
-    .map(([prefix, lang]) => [prefix, LANG_TO_REDIRECT_PREFIX[lang]])
-);
 
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
 
