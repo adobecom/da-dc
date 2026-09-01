@@ -17,7 +17,7 @@ const ACCEPTED_FILES = ['.jpg', '.jpeg', '.png'];
 
 const LIMITS = { 'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ACCEPTED_FILES, multipleFiles: false } };
 
-const LOCALE_REDIRECT_MAP = {
+export const LOCALE_REDIRECT_MAP = {
   ar: 'es',
   at: 'de',
   be_fr: 'fr',
