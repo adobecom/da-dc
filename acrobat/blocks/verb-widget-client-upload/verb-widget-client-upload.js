@@ -606,6 +606,8 @@ export default async function init(element) {
   await checkSignedInUser();
   window.addEventListener('IMS:Ready', checkSignedInUser);
 
+  let outsideClickHandler = null;
+
   const showError = (message) => {
     errorText.textContent = message;
     errorState.classList.remove('hide');
@@ -613,12 +615,24 @@ export default async function init(element) {
     widget.classList.remove('dragging');
     announceToScreenReader(message);
     closeErrorBtn.focus();
+    setTimeout(() => {
+      if (outsideClickHandler) return;
+      outsideClickHandler = (e) => {
+        if (!errorState.contains(e.target)) hideError();
+      };
+      document.addEventListener('click', outsideClickHandler);
+    }, 0);
   };
 
   const hideError = () => {
     errorState.classList.add('hide');
     errorState.classList.remove('verb-error');
     errorText.textContent = '';
+    clearSrAlert();
+    if (outsideClickHandler) {
+      document.removeEventListener('click', outsideClickHandler);
+      outsideClickHandler = null;
+    }
   };
 
   let exitFlag = false;
@@ -769,6 +783,13 @@ export default async function init(element) {
   closeErrorBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     hideError();
+  });
+
+  closeErrorBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      hideError();
+    }
   });
 
   window.addEventListener('beforeunload', (e) => {
