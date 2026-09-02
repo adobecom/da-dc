@@ -1,8 +1,68 @@
 {
-  "total": 20,
+  "total": 35,
   "offset": 0,
-  "limit": 20,
+  "limit": 35,
   "data": [
+    {
+      "key": "study-marquee-gen-presentation-v2-copy",
+      "value": "Turn your documents into a polished presentation with AI."
+    },
+    {
+      "key": "study-marquee-gen-presentation-v2-mobile-copy",
+      "value": "Create a presentation from your files with AI."
+    },
+    {
+      "key": "study-marquee-gen-presentation-v2-sub-copy",
+      "value": "Upload your files to get started."
+    },
+    {
+      "key": "study-widget-gen-presentation-v2-dragndrop-text",
+      "value": "or drag and drop a file"
+    },
+    {
+      "key": "study-widget-gen-presentation-v2-file-limit",
+      "value": "PDF, Word, PPT, XLS, TXT, up to 100 MB"
+    },
+    {
+      "key": "study-marquee-interactive-report-copy",
+      "value": "Transform your data into interactive reports with AI."
+    },
+    {
+      "key": "study-marquee-interactive-report-mobile-copy",
+      "value": "Build interactive reports from your files with AI."
+    },
+    {
+      "key": "study-marquee-interactive-report-sub-copy",
+      "value": "Upload your files to get started."
+    },
+    {
+      "key": "study-widget-interactive-report-dragndrop-text",
+      "value": "or drag and drop a file"
+    },
+    {
+      "key": "study-widget-interactive-report-file-limit",
+      "value": "PDF, Word, PPT, XLS, TXT, up to 100 MB"
+    },
+    {
+      "key": "study-marquee-stylize-copy",
+      "value": "Restyle and refresh your PDF with AI."
+    },
+    {
+      "key": "study-marquee-stylize-mobile-copy",
+      "value": "Give your PDF a new look with AI."
+    },
+    {
+      "key": "study-marquee-stylize-sub-copy",
+      "value": "Upload your PDF to get started."
+    },
+    {
+      "key": "study-widget-stylize-dragndrop-text",
+      "value": "or drag and drop a file"
+    },
+    {
+      "key": "study-widget-stylize-file-limit",
+      "value": "PDF, up to 100 MB"
+    },
     {
       "key": "verb-widget-cta",
       "value": "Select a file"
@@ -46,6 +106,14 @@
     {
       "key": "study-marquee-legal-text",
       "value": "By using this service, you agree to the Adobe Terms of Use and Privacy Policy."
+    },
+    {
+      "key": "study-marquee-legal-extra",
+      "value": "By clicking Generate, you confirm you are at least 13 years old (or older if required by the laws in your country)."
+    },
+    {
+      "key": "study-marquee-avalon-legal",
+      "value": "Avalon legal: by using this service, you agree to the Adobe Terms of Use and Privacy Policy."
     },
     {
       "key": "verb-widget-terms-of-use",

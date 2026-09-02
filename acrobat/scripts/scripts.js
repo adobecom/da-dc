@@ -519,15 +519,15 @@ const MAS_GEO_MAP = {
 
 const MAS_EXTRA_LOCALES = { pr: 'es_PR' };
 
-function getMasLocale(miloLocale) {
+function getMasLocale(miloLocale, geoCountry) {
   const geo = (miloLocale?.prefix || 'US_en').replace('/', '');
   let [country = 'US', language = 'en'] = (MAS_GEO_MAP[geo] ?? geo).split('_', 2);
   country = country.toUpperCase();
   language = language.toLowerCase();
-  return { locale: MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`, country };
+  return { locale: MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`, country: geoCountry ?? country };
 }
 
-function preloadMasFragment(a, config) {
+async function preloadMasFragment(a, config) {
   let url;
   try {
     // eslint-disable-next-line compat/compat
@@ -541,7 +541,9 @@ function preloadMasFragment(a, config) {
   const fragment = params.get('fragment') || params.get('query');
   if (!fragment) return;
 
-  const { locale, country } = getMasLocale(config?.locale);
+  const { getCountry } = await import(`${config?.miloLibs}/utils/utils.js`);
+
+  const { locale, country } = getMasLocale(config?.locale, (await getCountry())?.toUpperCase());
   const apiKey = config?.commerce?.['wcs-api-key'] ?? DEFAULT_MAS_FRAGMENT_API_KEY;
   let endpoint = `${MAS_FRAGMENT_API}?id=${fragment}&api_key=${apiKey}&locale=${locale}`;
   if (country && !locale.endsWith(`_${country}`)) endpoint += `&country=${country}`;
