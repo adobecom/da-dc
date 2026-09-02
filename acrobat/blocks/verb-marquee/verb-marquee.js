@@ -684,7 +684,7 @@ export default async function init(element) {
 
   function handleUploadedEvent(data, attempts, cookieExp, canSendDataToSplunk) {
     exitFlag = true;
-    if (LIMITS[VERB]?.noRedirectTimeout ?? true) {
+    if (LIMITS[VERB]?.noRedirectTimeout) {
       window.dispatchEvent(redirectReady);
     } else {
       setTimeout(() => {
