@@ -140,7 +140,7 @@ describe('study-marquee block', () => {
     expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
   });
 
-  it('dispatches redirect immediately on uploaded when noRedirectTimeout is truthy', async () => {
+  it('delays redirect by 3 seconds and logs a warning on uploaded for all verbs', async () => {
     document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
@@ -149,27 +149,6 @@ describe('study-marquee block', () => {
     await delay(100);
 
     window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
-    const redirectSpy = sinon.spy();
-    window.addEventListener('DCUnity:RedirectReady', redirectSpy);
-
-    block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'uploaded', data: {}, sendToSplunk: true } }));
-
-    window.removeEventListener('DCUnity:RedirectReady', redirectSpy);
-    expect(redirectSpy.called).to.be.true;
-    expect(window.analytics.verbAnalytics.calledWith('job:uploaded')).to.be.true;
-  });
-
-  it('delays redirect and logs a warning on uploaded when noRedirectTimeout is false', async () => {
-    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
-    const conf = getConfig();
-    setConfig({ ...conf, locale: { prefix: '' } });
-    const block = document.body.querySelector('.study-marquee');
-    await init(block);
-    await delay(100);
-
-    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
-    const original = LIMITS['gen-presentation-v2'].noRedirectTimeout;
-    LIMITS['gen-presentation-v2'].noRedirectTimeout = false;
     const clock = sinon.useFakeTimers();
     const redirectSpy = sinon.spy();
     window.addEventListener('DCUnity:RedirectReady', redirectSpy);
@@ -177,16 +156,14 @@ describe('study-marquee block', () => {
     try {
       block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'uploaded', data: {}, sendToSplunk: true } }));
 
-      // Redirect is deferred until the 3 second fallback timeout elapses.
       expect(redirectSpy.called).to.be.false;
       clock.tick(3000);
       expect(redirectSpy.called).to.be.true;
       expect(window.lana.log.calledWith(sinon.match(/3 second timeout dispatched event/))).to.be.true;
+      expect(window.analytics.verbAnalytics.calledWith('job:uploaded')).to.be.true;
     } finally {
       clock.restore();
       window.removeEventListener('DCUnity:RedirectReady', redirectSpy);
-      if (original === undefined) delete LIMITS['gen-presentation-v2'].noRedirectTimeout;
-      else LIMITS['gen-presentation-v2'].noRedirectTimeout = original;
     }
   });
 
