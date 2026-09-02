@@ -608,6 +608,17 @@ export default async function init(element) {
 
   let outsideClickHandler = null;
 
+  const hideError = () => {
+    errorState.classList.add('hide');
+    errorState.classList.remove('verb-error');
+    errorText.textContent = '';
+    clearSrAlert();
+    if (outsideClickHandler) {
+      document.removeEventListener('click', outsideClickHandler);
+      outsideClickHandler = null;
+    }
+  };
+
   const showError = (message) => {
     errorText.textContent = message;
     errorState.classList.remove('hide');
@@ -622,17 +633,6 @@ export default async function init(element) {
       };
       document.addEventListener('click', outsideClickHandler);
     }, 0);
-  };
-
-  const hideError = () => {
-    errorState.classList.add('hide');
-    errorState.classList.remove('verb-error');
-    errorText.textContent = '';
-    clearSrAlert();
-    if (outsideClickHandler) {
-      document.removeEventListener('click', outsideClickHandler);
-      outsideClickHandler = null;
-    }
   };
 
   let exitFlag = false;
