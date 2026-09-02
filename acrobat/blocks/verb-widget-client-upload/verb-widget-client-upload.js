@@ -472,6 +472,25 @@ export default async function init(element) {
   const errorIcon = createTag('div', { class: 'verb-errorIcon' });
   const errorText = createTag('p', { class: 'verb-errorText' });
   const closeErrorBtn = createTag('div', { class: 'verb-errorBtn', role: 'button', tabindex: '0', 'aria-label': 'Close error' });
+  const srAlert = { announceTimer: null, cleanupTimer: null };
+  const clearSrAlert = () => {
+    clearTimeout(srAlert.announceTimer);
+    clearTimeout(srAlert.cleanupTimer);
+    document.querySelector('.verb-sr-alert')?.remove();
+  };
+  const announceToScreenReader = (msg) => {
+    clearSrAlert();
+    srAlert.announceTimer = setTimeout(() => {
+      const alertEl = createTag('div', {
+        class: 'verb-sr-alert',
+        role: 'alert',
+        style: 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0',
+      });
+      alertEl.textContent = msg;
+      document.body.appendChild(alertEl);
+      srAlert.cleanupTimer = setTimeout(() => alertEl.remove(), 10000);
+    }, 5000);
+  };
   const closeIconSvg = await createSvgElement('CLOSE_ICON');
   if (closeIconSvg) { closeIconSvg.classList.add('close-icon', 'error'); closeErrorBtn.prepend(closeIconSvg); }
 
@@ -592,6 +611,8 @@ export default async function init(element) {
     errorState.classList.remove('hide');
     errorState.classList.add('verb-error');
     widget.classList.remove('dragging');
+    announceToScreenReader(message);
+    closeErrorBtn.focus();
   };
 
   const hideError = () => {
@@ -770,11 +791,42 @@ export default async function init(element) {
     }
   });
 
+  const initializePingService = async () => {
+    try {
+      const { PingService, USER_TYPE } = await import('../../scripts/ping.js');
+      const isSignedIn = window.adobeIMS?.isSignedInUser() || false;
+      const userType = isSignedIn ? USER_TYPE.SIGNEDIN : USER_TYPE.ANON;
+      const userId = isSignedIn ? ((await window.adobeIMS?.getProfile())?.userId || '') : '';
+      const localePrefix = getConfig().locale?.prefix.replace('/', '');
+      const pingService = new PingService({
+        locale: localePrefix || 'en-us',
+        config: {
+          serverEnv: getEnv(),
+          appName: 'adobe_com',
+          appVersion: '1.0',
+          appReferrer: '',
+        },
+        userId,
+        isSignedIn,
+        userType,
+        subscriptionType: 'unspecified',
+      });
+      await pingService.sendPingEvent({ appPath: 'unity-dc-frictionless', schema: {} });
+    } catch (error) {
+      window.lana?.log(
+        `Error Code: Unknown, Status: 'Unknown', Message: Failed to send ping: ${error.message}`,
+        lanaOptions,
+      );
+    }
+  };
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
+      initializePingService();
       window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: VERB, userAttempts } }));
     });
   } else {
+    initializePingService();
     window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: VERB, userAttempts } }));
   }
 }
