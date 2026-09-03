@@ -128,7 +128,7 @@ test.describe('Unity Rearrange PDF test suite', () => {
       console.log(`[Post-upload URL]: ${currentUrl}`);
       const urlObj = new URL(currentUrl);
       expect(urlObj.searchParams.get('x_api_client_id')).toBe('unity');
-      expect(urlObj.searchParams.get('x_api_client_location')).toBe('reorder-pages');
+      expect(urlObj.searchParams.get('x_api_client_location')).toBe('rearrange-pdf');
       expect(urlObj.searchParams.get('user')).toBe('frictionless_new_user');
       expect(urlObj.searchParams.get('attempts')).toBe('1st');
       console.log({

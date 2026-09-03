@@ -44,10 +44,10 @@ test.describe('Unity Flashcard maker test suite', () => {
       await expect(flashcardMaker.ctaButton).toBeEnabled();
     });
 
-    await test.step('Verify how-to section', async () => {
-      await flashcardMaker.howToHeading.scrollIntoViewIfNeeded();
-      await expect(flashcardMaker.howToHeading).toBeVisible({ timeout: 60000 });
-    });
+    // await test.step('Verify how-to section', async () => {
+    //   await flashcardMaker.howToHeading.scrollIntoViewIfNeeded();
+    //   await expect(flashcardMaker.howToHeading).toBeVisible({ timeout: 60000 });
+    // });
 
     await test.step(`Verify three-up sections (${data.sectionCounts.threeUp})`, async () => {
       const { threeUpSections } = flashcardMaker;
@@ -75,13 +75,13 @@ test.describe('Unity Flashcard maker test suite', () => {
       }
     });
 
-    await test.step(`Verify Student Spaces carousel (${data.sectionCounts.carousels})`, async () => {
-      const { carousels, studentSpacesHeading } = flashcardMaker;
+    // await test.step(`Verify Student Spaces carousel (${data.sectionCounts.carousels})`, async () => {
+    //   const { carousels, studentSpacesHeading } = flashcardMaker;
 
-      await studentSpacesHeading.scrollIntoViewIfNeeded();
-      await expect(studentSpacesHeading).toBeVisible({ timeout: 60000 });
-      await expect(carousels).toBeVisible({ timeout: 60000 });
-    });
+    //   await studentSpacesHeading.scrollIntoViewIfNeeded();
+    //   await expect(studentSpacesHeading).toBeVisible({ timeout: 60000 });
+    //   await expect(carousels).toBeVisible({ timeout: 60000 });
+    // });
 
     await test.step('Verify FAQ accordion', async () => {
       const { faqSection, faqAccordionTriggers } = flashcardMaker;

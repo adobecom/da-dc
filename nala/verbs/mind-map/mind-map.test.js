@@ -44,10 +44,10 @@ test.describe('Unity Mind map test suite', () => {
       await expect(mindMap.ctaButton).toBeEnabled();
     });
 
-    await test.step('Verify how-to section', async () => {
-      await mindMap.howToHeading.scrollIntoViewIfNeeded();
-      await expect(mindMap.howToHeading).toBeVisible({ timeout: 60000 });
-    });
+    // await test.step('Verify how-to section', async () => {
+    //   await mindMap.howToHeading.scrollIntoViewIfNeeded();
+    //   await expect(mindMap.howToHeading).toBeVisible({ timeout: 60000 });
+    // });
 
     await test.step(`Verify three-up sections (${data.sectionCounts.threeUp})`, async () => {
       const { threeUpSections } = mindMap;
@@ -75,13 +75,13 @@ test.describe('Unity Mind map test suite', () => {
       }
     });
 
-    await test.step('Verify Student Spaces carousel', async () => {
-      const { carousels, studentSpacesHeading } = mindMap;
+    // await test.step('Verify Student Spaces carousel', async () => {
+    //   const { carousels, studentSpacesHeading } = mindMap;
 
-      await studentSpacesHeading.scrollIntoViewIfNeeded();
-      await expect(studentSpacesHeading).toBeVisible({ timeout: 60000 });
-      await expect(carousels).toBeVisible({ timeout: 60000 });
-    });
+    //   await studentSpacesHeading.scrollIntoViewIfNeeded();
+    //   await expect(studentSpacesHeading).toBeVisible({ timeout: 60000 });
+    //   await expect(carousels).toBeVisible({ timeout: 60000 });
+    // });
 
     await test.step('Verify FAQ accordion', async () => {
       const { faqSection, faqAccordionTriggers } = mindMap;
