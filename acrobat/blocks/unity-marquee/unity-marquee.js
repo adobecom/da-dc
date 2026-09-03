@@ -18,19 +18,7 @@ const ICONS = {
   INFO_ICON: '<svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g opacity="0.8"><path d="M9.00078 7.0748C9.59449 7.0748 10.0758 6.59351 10.0758 5.9998C10.0758 5.4061 9.59449 4.9248 9.00078 4.9248C8.40707 4.9248 7.92578 5.4061 7.92578 5.9998C7.92578 6.59351 8.40707 7.0748 9.00078 7.0748Z" fill="#222222"/><path fill-rule="evenodd" clip-rule="evenodd" d="M10.167 12H10V8.2C10 8.14696 9.97893 8.09609 9.94142 8.05858C9.90391 8.02107 9.85304 8 9.8 8H7.833C7.833 8 7.25 8.016 7.25 8.5C7.25 8.984 7.833 9 7.833 9H8V12H7.833C7.833 12 7.25 12.016 7.25 12.5C7.25 12.984 7.833 13 7.833 13H10.167C10.167 13 10.75 12.984 10.75 12.5C10.75 12.016 10.167 12 10.167 12Z" fill="#222222"/><path fill-rule="evenodd" clip-rule="evenodd" d="M9.00078 1.0498C7.42842 1.0498 5.89137 1.51606 4.584 2.38962C3.27663 3.26318 2.25766 4.5048 1.65594 5.95747C1.05423 7.41014 0.896789 9.00862 1.20354 10.5508C1.51029 12.0929 2.26746 13.5095 3.37929 14.6213C4.49111 15.7331 5.90767 16.4903 7.44982 16.797C8.99197 17.1038 10.5904 16.9464 12.0431 16.3446C13.4958 15.7429 14.7374 14.724 15.611 13.4166C16.4845 12.1092 16.9508 10.5722 16.9508 8.9998C16.9508 6.89133 16.1132 4.86922 14.6223 3.37831C13.1314 1.88739 11.1093 1.0498 9.00078 1.0498ZM9.00078 15.9558C7.62502 15.9558 6.28015 15.5478 5.13624 14.7835C3.99233 14.0192 3.10076 12.9328 2.57428 11.6618C2.0478 10.3907 1.91004 8.99209 2.17844 7.64276C2.44684 6.29342 3.10934 5.05398 4.08215 4.08117C5.05496 3.10836 6.2944 2.44586 7.64374 2.17746C8.99307 1.90906 10.3917 2.04682 11.6627 2.5733C12.9338 3.09978 14.0202 3.99135 14.7845 5.13526C15.5488 6.27917 15.9568 7.62404 15.9568 8.9998C15.9568 10.8447 15.2239 12.6139 13.9194 13.9184C12.6149 15.2229 10.8456 15.9558 9.00078 15.9558Z" fill="#222222"/></g></svg>',
 };
 
-const MB100 = 104857600;
-const STUDY_FILES = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.rtf', '.txt', '.text', '.vtt'];
-const STUDY_GENAI = {
-  maxFileSize: MB100,
-  acceptedFiles: STUDY_FILES,
-  maxNumFiles: 100,
-  multipleFiles: true,
-  uploadType: 'multifile-only',
-  genAI: true,
-};
-const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
-
-export const LIMITS = { ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI) };
+const GENAI_VERBS = new Set(['quiz-maker', 'flashcard-maker', 'mindmap-maker']);
 
 function createSvgElement(iconName) {
   const svgString = ICONS[iconName];
@@ -139,7 +127,7 @@ window.addEventListener('analyticsLoad', async ({ detail }) => {
     || sendAnalyticsToSplunk === stubSend
   ) {
     window.lana?.log(
-      'Analytics failed to initialize correctly: some methods remain no-ops on student-space-marquee block',
+      'Analytics failed to initialize correctly: some methods remain no-ops on unity-marquee block',
       lanaOptions,
     );
   }
@@ -310,11 +298,11 @@ export default async function init(element) {
     : window.mph[`study-marquee-${VERB}-copy`]) || '';
   const copy2Text = authoredSubCopy || '';
 
-  const container = createTag('div', { class: 'student-space-marquee-container' });
-  const row = createTag('div', { class: 'student-space-marquee-row' });
-  const leftCol = createTag('div', { class: 'student-space-marquee-col student-space-marquee-col-left' });
-  const rightCol = createTag('div', { class: 'student-space-marquee-col student-space-marquee-col-right' });
-  const header = createTag('div', { class: 'student-space-marquee-header' });
+  const container = createTag('div', { class: 'unity-marquee-container' });
+  const row = createTag('div', { class: 'unity-marquee-row' });
+  const leftCol = createTag('div', { class: 'unity-marquee-col unity-marquee-col-left' });
+  const rightCol = createTag('div', { class: 'unity-marquee-col unity-marquee-col-right' });
+  const header = createTag('div', { class: 'unity-marquee-header' });
   const iconWrapper = createTag('div', { class: 'acrobat-icon' });
   const widgetIconSvg = createSvgElement('WIDGET_ICON');
   if (widgetIconSvg) {
@@ -322,16 +310,14 @@ export default async function init(element) {
     widgetIconSvg.setAttribute('aria-hidden', 'true');
     iconWrapper.appendChild(widgetIconSvg);
   }
-  const title = createTag('div', { class: 'student-space-marquee-title' });
-  const adobeText = createTag('span', {}, 'Adobe');
-  const studySpaceText = createTag('span', {}, ' Acrobat');
-  title.append(adobeText, studySpaceText);
+  const authoredTitle = cellText('title') || 'Adobe Acrobat';
+  const title = createTag('div', { class: 'unity-marquee-title' }, authoredTitle);
   header.append(iconWrapper, title);
-  const headingEl = createTag('h1', { class: 'student-space-marquee-heading' }, heading);
-  const copy1 = createTag('p', { class: 'student-space-marquee-copy' }, copy1Text);
-  const copy2 = createTag('p', { class: 'student-space-marquee-copy student-space-marquee-copy-sub' }, copy2Text);
-  const footer = createTag('div', { class: 'student-space-marquee-footer' });
-  const legalText = createTag('p', { class: 'student-space-marquee-legal' });
+  const headingEl = createTag('h1', { class: 'unity-marquee-heading' }, heading);
+  const copy1 = createTag('p', { class: 'unity-marquee-copy' }, copy1Text);
+  const copy2 = createTag('p', { class: 'unity-marquee-copy unity-marquee-copy-sub' }, copy2Text);
+  const footer = createTag('div', { class: 'unity-marquee-footer' });
+  const legalText = createTag('p', { class: 'unity-marquee-legal' });
   if (authoredLegal) {
     // Authored legal keeps its own markup (e.g. links) as-is.
     legalText.innerHTML = authoredLegal;
@@ -342,11 +328,11 @@ export default async function init(element) {
     const genAIurl = window.mph['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`;
     const legalPlaceholder = window.mph['study-marquee-legal-text'] || '';
     if (legalPlaceholder) {
-      const createLegalLink = (label, url) => `<a class="student-space-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
+      const createLegalLink = (label, url) => `<a class="unity-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
       const legalLinks = [
         ['verb-widget-terms-of-use', touURL],
         ['verb-widget-privacy-policy', ppURL],
-        ...(LIMITS[VERB]?.genAI ? [['verb-widget-genai-guidelines', genAIurl]] : []),
+        ...(GENAI_VERBS.has(VERB) ? [['verb-widget-genai-guidelines', genAIurl]] : []),
       ];
       legalText.innerHTML = legalLinks.reduce(
         (html, [key, url]) => {
@@ -381,7 +367,7 @@ export default async function init(element) {
   ];
   leftCol.append(...leftColChildren);
   if (media) {
-    const mediaWrapper = createTag('div', { class: 'student-space-marquee-media' });
+    const mediaWrapper = createTag('div', { class: 'unity-marquee-media' });
     while (media.firstChild) {
       mediaWrapper.appendChild(media.firstChild);
     }

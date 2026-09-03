@@ -1,0 +1,15 @@
+{
+  "total": 8,
+  "offset": 0,
+  "limit": 8,
+  "data": [
+    { "key": "study-marquee-quiz-maker-copy", "value": "Create quizzes from any document." },
+    { "key": "study-marquee-legal-text", "value": "By using this service, you agree to the Adobe Terms of Use and Privacy Policy." },
+    { "key": "verb-widget-terms-of-use", "value": "Terms of Use" },
+    { "key": "verb-widget-privacy-policy", "value": "Privacy Policy" },
+    { "key": "verb-widget-tool-tip", "value": "Your files are secure with us." },
+    { "key": "verb-widget-privacy-policy-url", "value": "https://www.adobe.com/privacy/policy.html" },
+    { "key": "verb-widget-terms-of-use-url", "value": "https://www.adobe.com/legal/terms.html" },
+    { "key": "verb-widget-genai-guidelines", "value": "Gen AI Guidelines" }
+  ]
+}
