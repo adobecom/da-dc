@@ -79,7 +79,18 @@ async function waitForPageReady(page) {
   }, { timeout: 60000 });
 }
 
+const isStageOrProd = (host) => (
+  host === 'www.adobe.com'
+  || host === 'www.stage.adobe.com'
+  || host.startsWith('stage--')
+);
+
 async function checkPageLinks(page, expect) {
+  const host = new URL(page.url()).hostname;
+  if (!isStageOrProd(host)) {
+    console.log(`[link-checker] skipped on ${host} (stage/prod only)`);
+    return;
+  }
   await waitForPageReady(page);
   const pageOrigin = new URL(page.url()).origin;
   const currentPathname = new URL(page.url()).pathname;
