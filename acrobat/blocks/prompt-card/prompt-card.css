@@ -10,6 +10,10 @@
   display: none;
 }
 
+.prompt-card {
+  align-self: stretch;
+}
+
 .prompt-a11y-action {
   top: 0;
   left: -2px;
@@ -72,14 +76,14 @@
 
 .prompt-blade {
   align-items: flex-start;
-  align-self: stretch;
   background-color: #fff;
   border: 1px solid #e8e8e8;
   border-radius: 10px;
+  box-sizing: border-box;
   cursor: pointer;
-  display: flow;
-  flex: 1 0 0;
+  display: flex;
   flex-direction: column;
+  height: 100%;
   justify-content: space-between;
   padding: 16px 16px 24px;
   transition-delay: 1s;
@@ -134,12 +138,12 @@
   border-top-right-radius: 8px;
   color: #696969;
   display: -webkit-box;
-  flex: 1 0 0;
+  flex: 1 1 auto;
   font-family: "Adobe Clean", adobe-clean, "Trebuchet MS", sans-serif;
   font-size: 20px;
   font-style: normal;
   font-weight: 400;
-  height: 155px;
+  min-height: 155px;
   line-height: 150%;
   margin-top: 16px;
   overflow: hidden;
@@ -155,6 +159,7 @@
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+  margin-top: auto;
   padding-bottom: 16px;
   padding-top: 5px
 }
