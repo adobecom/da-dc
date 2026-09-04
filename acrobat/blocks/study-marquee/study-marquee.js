@@ -43,7 +43,8 @@ const SIGNED_IN_UPLOAD_VERBS = new Set(['gen-presentation-v2', 'interactive-repo
 
 export const LIMITS = {
   ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI),
-  ...group(['gen-presentation-v2', 'interactive-report', 'stylize'], { ...STUDY_GENAI_SINGLE, acceptedFiles: ['.pdf'] }),
+  ...group(['gen-presentation-v2', 'interactive-report'], STUDY_GENAI_SINGLE),
+  stylize: { ...STUDY_GENAI_SINGLE, acceptedFiles: ['.pdf'] },
 };
 
 function createSvgElement(iconName) {
