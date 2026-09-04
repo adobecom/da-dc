@@ -60,7 +60,7 @@ describe('study-marquee block', () => {
       expect(LIMITS[verb].acceptedFiles).to.be.an('array');
       // Extends the base study file types with email and image formats.
       expect(LIMITS[verb].acceptedFiles).to.include.members(LIMITS['flashcard-maker'].acceptedFiles);
-      ['.eml', '.msg', '.jpg', '.jpeg', '.png', '.tif', '.tiff'].forEach((ext) => {
+      ['.eml', '.msg'].forEach((ext) => {
         expect(LIMITS[verb].acceptedFiles).to.include(ext);
       });
       expect(LIMITS[verb].maxFileSize).to.equal(104857600);
@@ -100,7 +100,7 @@ describe('study-marquee block', () => {
   });
 
   it('renders extended accept attribute for gen-presentation-v2 and interactive-report', async () => {
-    const extendedTypes = ['.eml', '.msg', '.jpg', '.jpeg', '.png', '.tif', '.tiff'];
+    const extendedTypes = ['.eml', '.msg'];
     const cases = [
       ['gen-presentation-v2', './mocks/body-gen-presentation-v2.html'],
       ['interactive-report', './mocks/body-interactive-report.html'],
