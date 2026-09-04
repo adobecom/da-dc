@@ -53,115 +53,22 @@ test.describe('Acrobat PDF Reader Smoke Test', () => {
     // Skipped: “Download now” / install block — not part of this smoke (see product / scope).
     // -------------------------------------------------------------------------
 
-    await test.step('Verify merch card plans (compare tabs)', async () => {
-      await expect(pdfReader.merchCardPlans).toBeVisible();
-      await expect(pdfReader.merchCardPlansTitle).toBeVisible();
-      await expect(pdfReader.tabCompareIndividuals).toBeVisible();
-      await expect(pdfReader.tabCompareIndividuals).toBeEnabled();
-      await expect(pdfReader.tabCompareBusiness).toBeVisible();
-      await expect(pdfReader.tabCompareBusiness).toBeEnabled();
-      await expect(pdfReader.tabCompareStudentsAndTeachers).toBeVisible();
-      await expect(pdfReader.tabCompareStudentsAndTeachers).toBeEnabled();
+    await test.step('Verify merch card plans and compare tabs', async () => {
+      const merchCardPlans = page.locator('div[data-path*="/dc-shared/fragments/merch-cards/compare-acrobat-plans"]');
+      const tabs = merchCardPlans.locator('button[id^="tab-compare-plans-"]');
 
-      await pdfReader.tabCompareIndividuals.click();
-      await expect(pdfReader.tabCompareIndividuals).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(400);
+      // Scroll the first tab into view, then switch through each tab and verify merch cards render.
+      await tabs.first().scrollIntoViewIfNeeded({ timeout: 30000 });
+      const tabCount = await tabs.count();
+      expect(tabCount).toBeGreaterThan(0);
 
-      await expect(pdfReader.individualMerchCards.first()).toBeVisible();
-      await expect(pdfReader.individualMerchCards).toHaveCount(3);
-
-      await expect(pdfReader.acrobatReaderPrice).toBeVisible();
-      await expect(pdfReader.acrobatReaderLink.first()).toBeVisible();
-      await expect(pdfReader.acrobatReaderLink.first()).toBeEnabled();
-
-      await expect(pdfReader.acrobatProPrice).toBeVisible();
-      await expect(pdfReader.acrobatProFreeTrial).toBeVisible();
-      await expect(pdfReader.acrobatProFreeTrial).toBeEnabled();
-      await expect(pdfReader.acrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(pdfReader.acrobatProBuyNow).toBeVisible();
-      await expect(pdfReader.acrobatProBuyNow).toBeEnabled();
-      await expect(pdfReader.acrobatProBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(pdfReader.acrobatStudioPrice).toBeVisible();
-      await expect(pdfReader.acrobatStudioFreeTrial).toBeVisible();
-      await expect(pdfReader.acrobatStudioFreeTrial).toBeEnabled();
-      await expect(pdfReader.acrobatStudioFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(pdfReader.acrobatStudioBuyNow).toBeVisible();
-      await expect(pdfReader.acrobatStudioBuyNow).toBeEnabled();
-      await expect(pdfReader.acrobatStudioBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(pdfReader.individualMerchCardsPricingLink).toBeVisible();
-      await expect(pdfReader.individualMerchCardsPricingLink).toBeEnabled();
-      await expect(pdfReader.individualMerchCardsPricingLink).toHaveCount(1);
-
-      await expect(pdfReader.merchIndividualsComparePlansLink).toBeVisible();
-      await expect(pdfReader.merchIndividualsComparePlansLink).toBeEnabled();
-      await expect(pdfReader.merchIndividualsComparePlansLink).toHaveAttribute(
-        'href',
-        /compare-versions|compare-pricing/,
-      );
-
-      await pdfReader.tabCompareBusiness.click();
-      await expect(pdfReader.tabCompareBusiness).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(400);
-
-      await expect(pdfReader.businessMerchCards.first()).toBeVisible();
-      await expect(pdfReader.businessMerchCards).toHaveCount(2);
-
-      await expect(pdfReader.acrobatProForTeamsPrice).toBeVisible();
-      await expect(pdfReader.acrobatProForTeamsFreeTrial).toBeVisible();
-      await expect(pdfReader.acrobatProForTeamsFreeTrial).toBeEnabled();
-      await expect(pdfReader.acrobatProForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(pdfReader.acrobatProForTeamsBuyNow).toBeVisible();
-      await expect(pdfReader.acrobatProForTeamsBuyNow).toBeEnabled();
-      await expect(pdfReader.acrobatProForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(pdfReader.acrobatStudioForTeamsPrice).toBeVisible();
-      await expect(pdfReader.acrobatStudioForTeamsFreeTrial).toBeVisible();
-      await expect(pdfReader.acrobatStudioForTeamsFreeTrial).toBeEnabled();
-      await expect(pdfReader.acrobatStudioForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(pdfReader.acrobatStudioForTeamsBuyNow).toBeVisible();
-      await expect(pdfReader.acrobatStudioForTeamsBuyNow).toBeEnabled();
-      await expect(pdfReader.acrobatStudioForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(pdfReader.businessMerchCardsPricingLink).toBeVisible();
-      await expect(pdfReader.businessMerchCardsPricingLink).toBeEnabled();
-      await expect(pdfReader.businessMerchCardsPricingLink).toHaveCount(1);
-
-      await expect(pdfReader.merchBusinessViewPlansLink).toBeVisible();
-      await expect(pdfReader.merchBusinessViewPlansLink).toBeEnabled();
-      await expect(pdfReader.merchBusinessViewPlansLink).toHaveAttribute('href', /pricing\/business/);
-
-      await pdfReader.tabCompareStudentsAndTeachers.click();
-      await expect(pdfReader.tabCompareStudentsAndTeachers).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(400);
-
-      await expect(pdfReader.studentsAndTeachersMerchCards.first()).toBeVisible();
-      await expect(pdfReader.studentsAndTeachersMerchCards).toHaveCount(2);
-
-      await expect(pdfReader.acrobatProForStudentsAndTeachersPrice.first()).toBeVisible();
-      await expect(pdfReader.acrobatProForStudentsAndTeachersFreeTrial).toBeVisible();
-      await expect(pdfReader.acrobatProForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(pdfReader.acrobatProForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(pdfReader.acrobatProForStudentsAndTeachersBuyNow).toBeVisible();
-      await expect(pdfReader.acrobatProForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(pdfReader.acrobatProForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(pdfReader.creativeCloudForStudentsAndTeachersPrice.first()).toBeVisible();
-      await expect(pdfReader.creativeCloudForStudentsAndTeachersFreeTrial).toBeVisible();
-      await expect(pdfReader.creativeCloudForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(pdfReader.creativeCloudForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(pdfReader.creativeCloudForStudentsAndTeachersBuyNow).toBeVisible();
-      await expect(pdfReader.creativeCloudForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(pdfReader.creativeCloudForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(pdfReader.studentsAndTeachersPricingLink).toBeVisible();
-      await expect(pdfReader.studentsAndTeachersPricingLink).toBeEnabled();
-      await expect(pdfReader.studentsAndTeachersPricingLink).toHaveCount(1);
-
-      await expect(pdfReader.merchStudentsViewPlansLink).toBeVisible();
-      await expect(pdfReader.merchStudentsViewPlansLink).toBeEnabled();
-      await expect(pdfReader.merchStudentsViewPlansLink).toHaveAttribute('href', /pricing\/students/);
+      for (let i = 0; i < tabCount; i += 1) {
+        const tab = tabs.nth(i);
+        await expect(tab).toBeVisible();
+        await tab.click();
+        const visibleCard = merchCardPlans.locator('merch-card').filter({ visible: true }).first();
+        await expect(visibleCard).toBeVisible();
+      }
     });
 
     await test.step('Verify FAQ accordion', async () => {

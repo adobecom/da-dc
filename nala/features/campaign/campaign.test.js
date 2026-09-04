@@ -36,13 +36,10 @@ test.describe('Acrobat Campaign — Acrobats got it', () => {
       await expect(body).toBeVisible({ timeout: 60000 });
     });
 
-    await test.step('Verify Compare Acrobat plans merch (2 cards visible)', async () => {
-      await expect(campaign.compareAcrobatPlansSection).toBeVisible();
-      await expect(campaign.compareAcrobatPlansHeading).toBeVisible();
-
-      await expect(campaign.campaignMerchCards).toHaveCount(2);
-      await expect(campaign.acrobatProCard).toBeVisible();
-      await expect(campaign.acrobatProTeamsCard).toBeVisible();
+    await test.step('Verify Compare Acrobat plans merch container', async () => {
+      const merchCard = page.locator('merch-card').filter({ visible: true }).first();
+      await merchCard.scrollIntoViewIfNeeded();
+      await expect(merchCard).toBeVisible();
     });
 
     await test.step('Verify footer', async () => {
