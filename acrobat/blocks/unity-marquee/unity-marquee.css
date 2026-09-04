@@ -491,7 +491,7 @@
 
   .unity-marquee-row {
     display: grid;
-    grid-template-columns: 650px 525px;
+    grid-template-columns: 26fr 21fr;
     align-items: center;
     gap: 25px;
   }
