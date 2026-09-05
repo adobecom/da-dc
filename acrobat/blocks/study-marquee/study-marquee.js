@@ -360,6 +360,16 @@ export default async function init(element) {
     initializePingService();
     window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: VERB, userAttempts } }));
   });
+  const LABEL_PREFIX = 'dc-block-row-';
+  const authored = new Map();
+  element.querySelectorAll(':scope > div').forEach((rowEl) => {
+    const label = rowEl.firstElementChild?.textContent?.trim() || '';
+    if (label.startsWith(LABEL_PREFIX)) {
+      authored.set(label.slice(LABEL_PREFIX.length), rowEl.children[1] || null);
+      rowEl.remove();
+    }
+  });
+  const cellText = (key) => authored.get(key)?.textContent?.trim() || '';
   const children = element.querySelectorAll(':scope > div');
   const foreground = children[children.length - 1];
   foreground.classList.add('foreground', 'container');
@@ -390,9 +400,13 @@ export default async function init(element) {
     iconWrapper.appendChild(widgetIconSvg);
   }
   const title = createTag('div', { class: 'study-marquee-title' });
-  const adobeText = createTag('span', {}, 'Adobe');
-  const studySpaceText = createTag('span', {}, ' Acrobat');
-  title.append(adobeText, studySpaceText);
+  if (cellText('title')) {
+    title.textContent = cellText('title');
+  } else {
+    const adobeText = createTag('span', {}, 'Adobe');
+    const studySpaceText = createTag('span', {}, ' Acrobat');
+    title.append(adobeText, studySpaceText);
+  }
   header.append(iconWrapper, title);
   const headingEl = createTag('h1', { class: 'study-marquee-heading' }, heading);
   const isMobileOrTablet = window.innerWidth < 1200;
