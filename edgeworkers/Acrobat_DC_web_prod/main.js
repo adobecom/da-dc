@@ -219,6 +219,10 @@ export async function responseProvider(request) {
       headerLink = [...headerLink,
         `</acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css>;rel="preload";as="style"`,
+        `</acrobat/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
       ];
     } else if (unityWorkflow) {
       headerLink = [...headerLink,
