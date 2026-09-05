@@ -127,7 +127,7 @@ export async function responseProvider(request) {
     const isMobile = /android|iphone|ipod|blackberry|windows phone/i.test(ua);
     const isIPadOS = ua.includes('Mac') && ua.includes('Version/') && !/iphone|ipod/i.test(ua);
     const isTablet = /ipad|android(?!.*mobile)/i.test(ua);    
-    if (unityWorkflow && !(isTablet || isIPadOS)) {
+    if ((unityWorkflow || clientUploadWidget) && !(isTablet || isIPadOS)) {
       const group = 'frictionless' + (first === 'acrobat' ? '' : `_${first}`);
       const edgeKv = new EdgeKV({namespace: isProd? 'prod' : 'stage', group});
       let prerenderHtml = '<!-- init -->';
@@ -165,6 +165,7 @@ export async function responseProvider(request) {
       el.append(`<style id="inline-dc-styles">${dcStyles}</style>`);
       if (clientUploadWidget) {
         el.append(`<style id="inline-verb-widget-client-upload-styles">${verbWidgetClientUploadStyles}</style>`);
+        el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
       } else if (unityWorkflow) {
         if (studyMarquee) {
           el.append(`<style id="inline-study-marquee-styles">${studyMarqueeStyles}</style>`);
