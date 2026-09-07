@@ -423,6 +423,37 @@ export default async function init(element) {
     return;
   }
 
+  const prerenderElement = document.querySelector('#prerender_verb-widget');
+  if (prerenderElement && window.PerformanceObserver) {
+    Promise.race([
+      new Promise((resolve) => {
+        try {
+          const lcpObserver = new PerformanceObserver((entries) => {
+            if (entries.getEntries().length > 0) {
+              prerenderElement.remove();
+              lcpObserver.disconnect();
+              resolve();
+            }
+          });
+          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+        } catch (error) {
+          prerenderElement.remove();
+          resolve();
+        }
+      }),
+      new Promise((resolve) => {
+        setTimeout(() => {
+          prerenderElement.remove();
+          resolve();
+        }, 3000);
+      }),
+    ]);
+  } else if (prerenderElement) {
+    setTimeout(() => {
+      prerenderElement.remove();
+    }, 3000);
+  }
+
   const { locale } = getConfig();
 
   const triggerEarlyPrefetch = () => {
