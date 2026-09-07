@@ -424,35 +424,7 @@ export default async function init(element) {
   }
 
   const prerenderElement = document.querySelector('#prerender_verb-widget');
-  if (prerenderElement && window.PerformanceObserver) {
-    Promise.race([
-      new Promise((resolve) => {
-        try {
-          const lcpObserver = new PerformanceObserver((entries) => {
-            if (entries.getEntries().length > 0) {
-              prerenderElement.remove();
-              lcpObserver.disconnect();
-              resolve();
-            }
-          });
-          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-        } catch (error) {
-          prerenderElement.remove();
-          resolve();
-        }
-      }),
-      new Promise((resolve) => {
-        setTimeout(() => {
-          prerenderElement.remove();
-          resolve();
-        }, 3000);
-      }),
-    ]);
-  } else if (prerenderElement) {
-    setTimeout(() => {
-      prerenderElement.remove();
-    }, 3000);
-  }
+  const removePrerender = () => prerenderElement?.remove();
 
   const { locale } = getConfig();
 
@@ -583,6 +555,7 @@ export default async function init(element) {
   widgetContainer.append(widgetRow);
   widget.append(widgetContainer);
   element.append(widget, footer);
+  requestAnimationFrame(() => requestAnimationFrame(removePrerender));
   element.classList.add('ready');
   element.parentNode.style.display = 'block';
 
