@@ -119,6 +119,53 @@ describe('study-marquee block', () => {
     expect(document.querySelector('.study-marquee .info-icon svg')).to.exist;
   });
 
+  it('uses the authored title and removes authored rows', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div class="authored-title-row">
+        <div>dc-block-row-title</div>
+        <div>Authored title</div>
+      </div>
+      <div class="authored-copy-row">
+        <div>dc-block-row-copy</div>
+        <div>Authored copy</div>
+      </div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+
+    await init(block);
+
+    expect(block.querySelector('.study-marquee-title').textContent).to.equal('Authored title');
+    expect(block.querySelector('.authored-title-row')).to.not.exist;
+    expect(block.querySelector('.authored-copy-row')).to.not.exist;
+  });
+
+  it('falls back to Adobe Acrobat when no authored title exists', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+
+    await init(block);
+
+    expect(block.querySelector('.study-marquee-title').textContent).to.equal('Adobe Acrobat');
+  });
+
+  it('falls back to Adobe Acrobat when the authored title row is blank', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div class="authored-title-row">
+        <div>dc-block-row-title</div>
+        <div>   </div>
+      </div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+
+    await init(block);
+
+    expect(block.querySelector('.study-marquee-title').textContent).to.equal('Adobe Acrobat');
+    expect(block.querySelector('.authored-title-row')).to.not.exist;
+  });
+
   it('init flashcard-maker block', async () => {
     const block = document.body.querySelector('.study-marquee');
     block.classList.remove('quiz-maker');
