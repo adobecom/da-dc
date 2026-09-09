@@ -20,6 +20,26 @@ const ICONS = {
 
 const GENAI_VERBS = new Set(['quiz-maker', 'flashcard-maker', 'mindmap-maker']);
 
+function waitForLCP(timeout = 3000) {
+  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
+  return new Promise((resolve) => {
+    if (!window.PerformanceObserver) { setTimeout(resolve, timeout); return; }
+    const obs = new PerformanceObserver((list) => {
+      if (list.getEntries().length) { obs.disconnect(); resolve(); }
+    });
+    try { obs.observe({ type: 'largest-contentful-paint', buffered: true }); } catch { resolve(); }
+    setTimeout(resolve, timeout);
+  });
+}
+
+function runWhenDocumentIsReady(callback) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', callback);
+  } else {
+    callback();
+  }
+}
+
 function createSvgElement(iconName) {
   const svgString = ICONS[iconName];
   if (!svgString) {
@@ -41,9 +61,9 @@ function getEnv() {
 }
 
 function redDirLink(verb) {
-  const hostname = window?.location?.hostname;
+  const { hostname } = window.location;
   const env = getEnv();
-  const verbSlug = verb.split('-').join('');
+  const verbSlug = verb.replaceAll('-', '');
   return hostname !== 'www.adobe.com'
     ? `https://www.adobe.com/go/acrobat-${verbSlug}-${env}`
     : `https://www.adobe.com/go/acrobat-${verbSlug}`;
@@ -88,33 +108,12 @@ async function loadAnalyticsAfterLCP(analyticsData) {
 }
 
 window.addEventListener('analyticsLoad', async ({ detail }) => {
-  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
-  const delay = (ms) => new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
   const {
     verbAnalytics: stubVerb,
     reviewAnalytics: stubReview,
     sendAnalyticsToSplunk: stubSend,
   } = window.analytics;
-  if (window.PerformanceObserver) {
-    await Promise.race([
-      new Promise((res) => {
-        try {
-          const obs = new PerformanceObserver((list) => {
-            const entries = list.getEntries();
-            if (entries.length > 0) res();
-          });
-          obs.observe({ type: 'largest-contentful-paint', buffered: true });
-        } catch (error) {
-          res();
-        }
-      }),
-      delay(3000),
-    ]);
-  } else {
-    await delay(3000);
-  }
+  await waitForLCP();
   await loadAnalyticsAfterLCP(detail);
   const {
     verbAnalytics,
@@ -164,37 +163,7 @@ export default async function init(element) {
   }
 
   const prerenderElement = document.querySelector('#prerender_verb-widget');
-  if (prerenderElement && window.PerformanceObserver) {
-    Promise.race([
-      new Promise((resolve) => {
-        try {
-          const lcpObserver = new PerformanceObserver((entries) => {
-            if (entries.getEntries().length > 0) {
-              prerenderElement.remove();
-              lcpObserver.disconnect();
-              resolve();
-            }
-          });
-          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-        } catch (error) {
-          prerenderElement.remove();
-          resolve();
-        }
-      }),
-      // Fallback timeout - remove after 3 seconds if LCP not detected
-      new Promise((resolve) => {
-        setTimeout(() => {
-          prerenderElement.remove();
-          resolve();
-        }, 3000);
-      }),
-    ]);
-  } else if (prerenderElement) {
-    // Fallback for browsers without PerformanceObserver support
-    setTimeout(() => {
-      prerenderElement.remove();
-    }, 3000);
-  }
+  const removePrerender = () => prerenderElement?.remove();
 
   window.mph = window.mph || {};
   const VERB = element.classList[1];
@@ -204,13 +173,6 @@ export default async function init(element) {
   function getLocale() {
     const currLocale = getConfig().locale?.prefix.replace('/', '');
     return currLocale || 'en-us';
-  }
-  function runWhenDocumentIsReady(callback) {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', callback);
-    } else {
-      callback();
-    }
   }
   const initializePingService = async () => {
     try {
@@ -377,6 +339,8 @@ export default async function init(element) {
   container.appendChild(row);
   foreground.innerHTML = '';
   foreground.append(container);
+  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
+  requestAnimationFrame(() => requestAnimationFrame(removePrerender));
 
   async function checkSignedInUser() {
     if (!window.adobeIMS?.isSignedInUser?.()) return;
