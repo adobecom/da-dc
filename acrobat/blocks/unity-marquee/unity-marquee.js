@@ -390,7 +390,6 @@ export default async function init(element) {
   }
   await checkSignedInUser();
   window.addEventListener('IMS:Ready', checkSignedInUser);
-  element.parentNode.style.display = 'block';
   window.addEventListener('pageshow', (event) => {
     const historyTraversal = event.persisted
       || (typeof window.performance !== 'undefined'
