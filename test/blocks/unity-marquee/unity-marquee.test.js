@@ -218,4 +218,140 @@ describe('unity-marquee block', () => {
     Object.defineProperty(event, 'persisted', { value: false, writable: false });
     expect(() => window.dispatchEvent(event)).to.not.throw();
   });
+
+  it('returns early and sets EOL href when isOldBrowser returns true', async () => {
+    window.browser = { name: 'Internet Explorer' };
+    const origLoc = window.location;
+    const locStub = { href: '', hostname: 'localhost' };
+    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: locStub });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    expect(locStub.href).to.equal('https://acrobat.adobe.com/home/index-browser-eol.html');
+    expect(block.querySelector('.unity-marquee-container')).to.not.exist;
+    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: origLoc });
+    delete window.browser;
+  });
+
+  it('redirects signed-in user via getAccountType', async () => {
+    window.adobeIMS = { isSignedInUser: () => true, getAccountType: () => 'INDIVIDUAL' };
+    const origLoc = window.location;
+    const locStub = { href: '', hostname: 'localhost' };
+    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: locStub });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    expect(locStub.href).to.include('acrobat-quizmaker');
+    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: origLoc });
+  });
+
+  it('falls back to getProfile when getAccountType throws and redirects', async () => {
+    window.adobeIMS = {
+      isSignedInUser: () => true,
+      getAccountType: () => { throw new Error('not available'); },
+      getProfile: async () => ({ account_type: 'INDIVIDUAL', userId: 'user123' }),
+    };
+    const origLoc = window.location;
+    const locStub = { href: '', hostname: 'localhost' };
+    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: locStub });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    expect(locStub.href).to.include('acrobat-quizmaker');
+    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: origLoc });
+  });
+
+  it('IMS:Ready event triggers redirect for signed-in user', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    const origLoc = window.location;
+    const locStub = { href: '', hostname: 'localhost' };
+    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: locStub });
+    window.adobeIMS = { isSignedInUser: () => true, getAccountType: () => 'INDIVIDUAL' };
+    window.dispatchEvent(new Event('IMS:Ready'));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(locStub.href).to.include('acrobat-quizmaker');
+    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: origLoc });
+  });
+
+  it('pageshow with persisted=true calls window.location.reload', async () => {
+    const reloadSpy = sinon.spy();
+    const origLoc = window.location;
+    const locStub = { href: 'http://localhost/', hostname: 'localhost', reload: reloadSpy };
+    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: locStub });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    const event = new Event('pageshow');
+    Object.defineProperty(event, 'persisted', { value: true });
+    window.dispatchEvent(event);
+    expect(reloadSpy.calledOnce).to.be.true;
+    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: origLoc });
+  });
+
+  it('genai verb includes a third genai-guidelines legal link', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    window.mph['study-marquee-legal-text'] = 'You agree to the Terms of Use, Privacy Policy and Gen AI Guidelines.';
+    window.mph['verb-widget-genai-guidelines'] = 'Gen AI Guidelines';
+    window.mph['verb-widget-genai-terms-url'] = 'https://www.adobe.com/legal/licenses-terms/adobe-gen-ai-user-guidelines.html';
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    const links = block.querySelectorAll('.unity-marquee-legal a.unity-marquee-legal-url');
+    expect(links.length).to.equal(3);
+    const hrefs = Array.from(links).map((a) => a.getAttribute('href'));
+    expect(hrefs.some((h) => h.includes('gen-ai'))).to.be.true;
+  });
+
+  it('non-genai verb has only 2 legal links', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-compress-pdf.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    const links = block.querySelectorAll('.unity-marquee-legal a.unity-marquee-legal-url');
+    expect(links.length).to.equal(2);
+  });
+
+  it('prefers mobile-copy over desktop-copy on narrow viewport', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-mobile-copy.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 375 });
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    const copy = block.querySelector('.unity-marquee-copy:not(.unity-marquee-copy-sub)');
+    expect(copy.textContent.trim()).to.equal('Mobile copy text.');
+    Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 1280 });
+  });
+
+  it('video media is not decorated with image class', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-video.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    const mediaWrapper = block.querySelector('.unity-marquee-media');
+    expect(mediaWrapper).to.exist;
+    expect(mediaWrapper.querySelector('a[href*=".mp4"]')).to.exist;
+    expect(block.querySelector('.unity-marquee-media .image')).to.not.exist;
+  });
+
+  it('removes #prerender_verb-widget element after init', async () => {
+    const prerender = document.createElement('div');
+    prerender.id = 'prerender_verb-widget';
+    document.body.appendChild(prerender);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    await new Promise((r) => setTimeout(r, 100));
+    expect(document.getElementById('prerender_verb-widget')).to.not.exist;
+  });
 });
