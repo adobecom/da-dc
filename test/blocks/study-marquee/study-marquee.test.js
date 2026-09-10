@@ -918,4 +918,28 @@ describe('study-marquee block', () => {
     expect(legal.textContent).to.contain('Authored avalon legal override');
     expect(legal.textContent).to.not.contain('Avalon legal:');
   });
+
+  it('authored legal-text uses innerHTML as-is without placeholder link injection', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-legal-text</div><div>By using this, you agree to our <a href="https://example.com/terms">custom terms</a>.</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    const legal = block.querySelector('.study-marquee-legal');
+    const links = legal.querySelectorAll('a');
+    expect(links.length).to.equal(1);
+    expect(links[0].getAttribute('href')).to.equal('https://example.com/terms');
+    expect(links[0].textContent).to.equal('custom terms');
+  });
+
+  it('placeholder legal-text still applies link injection when not authored', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    const legal = block.querySelector('.study-marquee-legal');
+    const links = legal.querySelectorAll('a.study-marquee-legal-url');
+    expect(links.length).to.be.greaterThan(0);
+  });
 });
