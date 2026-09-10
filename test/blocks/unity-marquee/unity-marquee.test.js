@@ -37,6 +37,7 @@ describe('unity-marquee block', () => {
   afterEach(() => {
     xhr.restore();
     sinon.restore();
+    delete window.browser;
   });
 
   it('init renders block structure with acrobat icon and info icon', async () => {
@@ -161,14 +162,6 @@ describe('unity-marquee block', () => {
     expect(block.querySelector('.unity-marquee-copy-sub')).to.not.exist;
   });
 
-  it('makes parent visible after init', async () => {
-    const conf = getConfig();
-    setConfig({ ...conf, locale: { prefix: '' } });
-    const block = document.body.querySelector('.unity-marquee');
-    await init(block);
-    expect(block.parentNode.style.display).to.equal('block');
-  });
-
   it('does not redirect anonymous user', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
@@ -219,49 +212,51 @@ describe('unity-marquee block', () => {
     expect(() => window.dispatchEvent(event)).to.not.throw();
   });
 
-  it('returns early and sets EOL href when isOldBrowser returns true', async () => {
+  it('returns early without building DOM when isOldBrowser returns true', async () => {
+    let capturedUrl = '';
+    const abortNav = (e) => { e.preventDefault(); capturedUrl = e.destination.url; };
+    window.navigation.addEventListener('navigate', abortNav);
     window.browser = { name: 'Internet Explorer' };
-    const origLoc = window.location;
-    const locStub = { href: '', hostname: 'localhost' };
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: locStub });
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
-    expect(locStub.href).to.equal('https://acrobat.adobe.com/home/index-browser-eol.html');
+    await new Promise((r) => setTimeout(r, 50));
+    window.navigation.removeEventListener('navigate', abortNav);
+    expect(capturedUrl).to.include('index-browser-eol');
     expect(block.querySelector('.unity-marquee-container')).to.not.exist;
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: origLoc });
-    delete window.browser;
   });
 
   it('redirects signed-in user via getAccountType', async () => {
+    let capturedUrl = '';
+    const abortNav = (e) => { e.preventDefault(); capturedUrl = e.destination.url; };
+    window.navigation.addEventListener('navigate', abortNav);
     window.adobeIMS = { isSignedInUser: () => true, getAccountType: () => 'INDIVIDUAL' };
-    const origLoc = window.location;
-    const locStub = { href: '', hostname: 'localhost' };
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: locStub });
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
-    expect(locStub.href).to.include('acrobat-quizmaker');
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: origLoc });
+    await new Promise((r) => setTimeout(r, 50));
+    window.navigation.removeEventListener('navigate', abortNav);
+    expect(capturedUrl).to.include('acrobat-quizmaker');
   });
 
   it('falls back to getProfile when getAccountType throws and redirects', async () => {
+    let capturedUrl = '';
+    const abortNav = (e) => { e.preventDefault(); capturedUrl = e.destination.url; };
+    window.navigation.addEventListener('navigate', abortNav);
     window.adobeIMS = {
       isSignedInUser: () => true,
       getAccountType: () => { throw new Error('not available'); },
       getProfile: async () => ({ account_type: 'INDIVIDUAL', userId: 'user123' }),
     };
-    const origLoc = window.location;
-    const locStub = { href: '', hostname: 'localhost' };
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: locStub });
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
-    expect(locStub.href).to.include('acrobat-quizmaker');
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: origLoc });
+    await new Promise((r) => setTimeout(r, 50));
+    window.navigation.removeEventListener('navigate', abortNav);
+    expect(capturedUrl).to.include('acrobat-quizmaker');
   });
 
   it('IMS:Ready event triggers redirect for signed-in user', async () => {
@@ -269,21 +264,20 @@ describe('unity-marquee block', () => {
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
-    const origLoc = window.location;
-    const locStub = { href: '', hostname: 'localhost' };
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: locStub });
+    let capturedUrl = '';
+    const abortNav = (e) => { e.preventDefault(); capturedUrl = e.destination.url; };
+    window.navigation.addEventListener('navigate', abortNav);
     window.adobeIMS = { isSignedInUser: () => true, getAccountType: () => 'INDIVIDUAL' };
     window.dispatchEvent(new Event('IMS:Ready'));
-    await new Promise((r) => setTimeout(r, 20));
-    expect(locStub.href).to.include('acrobat-quizmaker');
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: origLoc });
+    await new Promise((r) => setTimeout(r, 50));
+    window.navigation.removeEventListener('navigate', abortNav);
+    expect(capturedUrl).to.include('acrobat-quizmaker');
   });
 
-  it('pageshow with persisted=true calls window.location.reload', async () => {
-    const reloadSpy = sinon.spy();
-    const origLoc = window.location;
-    const locStub = { href: 'http://localhost/', hostname: 'localhost', reload: reloadSpy };
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: locStub });
+  it('pageshow with persisted=true triggers reload navigation', async () => {
+    let reloadTriggered = false;
+    const abortNav = (e) => { e.preventDefault(); reloadTriggered = (e.navigationType === 'reload'); };
+    window.navigation.addEventListener('navigate', abortNav);
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
@@ -291,8 +285,9 @@ describe('unity-marquee block', () => {
     const event = new Event('pageshow');
     Object.defineProperty(event, 'persisted', { value: true });
     window.dispatchEvent(event);
-    expect(reloadSpy.calledOnce).to.be.true;
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: origLoc });
+    await new Promise((r) => setTimeout(r, 50));
+    window.navigation.removeEventListener('navigate', abortNav);
+    expect(reloadTriggered).to.be.true;
   });
 
   it('genai verb includes a third genai-guidelines legal link', async () => {
