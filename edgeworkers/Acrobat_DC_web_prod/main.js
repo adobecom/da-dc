@@ -285,9 +285,9 @@ async function frictionlessResponseProvider(request) {
     const hasLocalePrefix = request.path.split('/').filter(Boolean).length > 1;
     let docPath;
     if (hasLocalePrefix) {
-      docPath = `${origin}${request.path.replace(`/${first}/`, `/${first}/dc-shared/`)}`;
+      docPath = `${origin}${request.path.replace(`/${first}/`, `/${first}/`)}`;
     } else {
-      docPath = `${origin}/dc-shared${request.path}`;
+      docPath = `${origin}/{request.path}`;
     }
     
     const htmlResponse = await httpRequest(docPath, { headers });
