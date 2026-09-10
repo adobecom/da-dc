@@ -465,6 +465,11 @@
   outline: none;
 }
 
+.vm2-error-btn:focus {
+  box-shadow: 0 0 0 2px var(--consonant-color-white, #fff);
+  border-radius: 2px;
+}
+
 .vm2-error-icon {
   align-self: self-start;
   width: 18px;
