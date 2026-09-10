@@ -1,6 +1,6 @@
-# Student Space Marquee — Authoring Guide
+# Unity Marquee — Authoring Guide
 
-The **Student Space Marquee** is a display-only variation of the Study Marquee. It renders the Acrobat header (icon + "Adobe Acrobat"), a heading, supporting copy, a legal line, an info tooltip, and a media image — **without the file upload zone**. There is no drag-and-drop, file picker, or error handling; the block is purely presentational.
+The **Unity Marquee** is a display-only marquee block. It renders the Acrobat header (icon + title), a heading, supporting copy, a legal line, an info tooltip, and a media image — **without a file upload zone**. There is no drag-and-drop, file picker, or error handling; the block is purely presentational.
 
 All text shown in the block is read from the authored DOM first. Placeholders are used **only as a fallback** for values you do not author — and the placeholder file is loaded only when at least one value is missing.
 
@@ -9,10 +9,10 @@ All text shown in the block is read from the authored DOM first. Placeholders ar
 Author the block as a table. The **first cell of the first row names the block, with the verb as an option in parentheses**:
 
 ```
-student-space-marquee (<verb-name>)
+unity-marquee (<verb-name>)
 ```
 
-For example: `student-space-marquee (quiz-maker)`, `student-space-marquee (flashcard-maker)`, `student-space-marquee (mindmap-maker)`.
+For example: `unity-marquee (quiz-maker)`, `unity-marquee (flashcard-maker)`, `unity-marquee (mindmap-maker)`.
 
 The `<verb-name>` determines which placeholder copy is used as a fallback and which legal links are shown (gen-AI verbs get an extra guidelines link).
 
@@ -24,7 +24,7 @@ The block is authored in two parts: a small **layout section** (background + the
 | --- | --- | --- |
 | **Background** | One cell holding a background color (e.g. `#F0F0F0`) or a background image for the whole marquee. Omit this row if you do not want a background. | Optional |
 | **Heading + media** | Two cells: the **heading cell** (`H1`–`H6`) and the **media cell** (the foreground image). | Required |
-| **Labeled rows** | Any of the `con-block-row-*` rows below, each a two-cell row: the label in the first cell, the value in the second. Add only the rows you need, in any order. | Optional |
+| **Labeled rows** | Any of the `dc-block-row-*` rows below, each a two-cell row: the label in the first cell, the value in the second. Add only the rows you need, in any order. | Optional |
 
 If you include a background it must come **before** the heading/media row; the heading/media row is identified by the row that contains the heading.
 
@@ -34,12 +34,13 @@ Each text value is authored as its own row: the first cell is the fixed label, t
 
 | Row label | Content | If not authored |
 | --- | --- | --- |
-| `con-block-row-desktop-copy` | Supporting line shown on desktop (≥ 1200px) | Falls back to `study-marquee-<verb>-copy` |
-| `con-block-row-mobile-copy` | Supporting line shown on mobile/tablet (< 1200px) | Falls back to `study-marquee-<verb>-mobile-copy` (then desktop copy) |
-| `con-block-row-desktop-sub-copy` | Secondary line shown on desktop | **Omitted entirely — no placeholder fallback** |
-| `con-block-row-mobile-sub-copy` | Secondary line shown on mobile/tablet | **Omitted entirely — no placeholder fallback** |
-| `con-block-row-legal` | Legal / consent line. Author any links directly in the value cell — they are kept as-is. | Falls back to `study-marquee-legal-text` (links auto-inserted from `verb-widget-*` placeholders) |
-| `con-block-row-tooltip` | Text shown in the info-icon tooltip next to the legal line | Falls back to `verb-widget-tool-tip` |
+| `dc-block-row-title` | Text shown next to the Acrobat icon in the header | Defaults to `Adobe Acrobat` |
+| `dc-block-row-desktop-copy` | Supporting line shown on desktop (≥ 1200px) | Falls back to `study-marquee-<verb>-copy` |
+| `dc-block-row-mobile-copy` | Supporting line shown on mobile/tablet (< 1200px) | Falls back to `study-marquee-<verb>-mobile-copy` (then desktop copy) |
+| `dc-block-row-desktop-sub-copy` | Secondary line shown on desktop | **Omitted entirely — no placeholder fallback** |
+| `dc-block-row-mobile-sub-copy` | Secondary line shown on mobile/tablet | **Omitted entirely — no placeholder fallback** |
+| `dc-block-row-legal` | Legal / consent line. Author any links directly in the value cell — they are kept as-is. | Falls back to `study-marquee-legal-text` (links auto-inserted from `verb-widget-*` placeholders) |
+| `dc-block-row-tooltip` | Text shown in the info-icon tooltip next to the legal line | Falls back to `verb-widget-tool-tip` |
 
 Notes:
 
