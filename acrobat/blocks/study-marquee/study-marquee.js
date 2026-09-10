@@ -436,11 +436,11 @@ export default async function init(element) {
   }
   const ctaLabel = createTag('span', { class: 'study-marquee-cta-label' }, ctaButtonLabel);
   ctaButton.appendChild(ctaLabel);
-  const dragText = createTag('p', { class: 'study-marquee-drag' }, window.mph?.[`study-widget-${VERB}-dragndrop-text`] || '');
+  const dragText = createTag('p', { class: 'study-marquee-drag' }, cellText('dragndrop-text') || window.mph?.[`study-widget-${VERB}-dragndrop-text`] || '');
   const fileLimitText = createTag('p', {
     class: 'study-marquee-file-limit',
     id: 'file-upload-description',
-  }, window.mph?.[`study-widget-${VERB}-file-limit`] || '');
+  }, cellText('file-limit') || window.mph?.[`study-widget-${VERB}-file-limit`] || '');
   const fileInput = createTag('input', {
     type: 'file',
     accept: LIMITS[VERB]?.acceptedFiles,
@@ -502,11 +502,12 @@ export default async function init(element) {
   const touURL = window.mph?.['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
   const genAIurl = window.mph?.['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`;
   const baseLegalText = window.mph?.['study-marquee-legal-text'] || '';
-  const legalTextContent = isAvalon
-    ? (window.mph?.[`study-marquee-avalon-${VERB}-legal`]
-      || window.mph?.['study-marquee-avalon-legal']
-      || baseLegalText)
-    : baseLegalText;
+  const legalTextContent = cellText('legal-text')
+    || (isAvalon
+      ? (window.mph?.[`study-marquee-avalon-${VERB}-legal`]
+        || window.mph?.['study-marquee-avalon-legal']
+        || baseLegalText)
+      : baseLegalText);
   const legalText = createTag('p', { class: 'study-marquee-legal' }, legalTextContent);
   if (legalText.textContent) {
     const createLegalLink = (label, url) => `<a class="study-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
@@ -523,7 +524,7 @@ export default async function init(element) {
       legalText.textContent,
     );
   }
-  const tooltipContent = window.mph?.['verb-widget-tool-tip'] || '';
+  const tooltipContent = cellText('tool-tip') || window.mph?.['verb-widget-tool-tip'] || '';
   const infoIcon = createTag('button', {
     class: 'info-icon milo-tooltip top',
     type: 'button',

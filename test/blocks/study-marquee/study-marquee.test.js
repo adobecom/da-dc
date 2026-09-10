@@ -790,4 +790,132 @@ describe('study-marquee block', () => {
       writable: false,
     });
   });
+
+  it('authored copy is rendered instead of placeholder', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-copy</div><div>Authored copy text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-copy').textContent).to.equal('Authored copy text');
+  });
+
+  it('falls back to placeholder copy when not authored', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    const isMobileOrTablet = window.innerWidth < 1200;
+    const expectedCopy = isMobileOrTablet
+      ? (window.mph['study-marquee-gen-presentation-v2-mobile-copy'] || window.mph['study-marquee-gen-presentation-v2-copy'])
+      : window.mph['study-marquee-gen-presentation-v2-copy'];
+    expect(block.querySelector('.study-marquee-copy').textContent).to.equal(expectedCopy);
+  });
+
+  it('authored sub-copy is rendered instead of placeholder', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-sub-copy</div><div>Authored sub-copy text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-copy-sub').textContent).to.equal('Authored sub-copy text');
+  });
+
+  it('falls back to placeholder sub-copy when not authored', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-copy-sub').textContent)
+      .to.equal(window.mph['study-marquee-gen-presentation-v2-sub-copy']);
+  });
+
+  it('authored upload-cta overrides placeholder CTA', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-upload-cta</div><div>Authored CTA text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-cta-label').textContent).to.equal('Authored CTA text');
+  });
+
+  it('authored dragndrop-text overrides placeholder', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-dragndrop-text</div><div>Authored drag text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-drag').textContent).to.equal('Authored drag text');
+  });
+
+  it('falls back to placeholder dragndrop-text when not authored', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-drag').textContent)
+      .to.equal(window.mph['study-widget-gen-presentation-v2-dragndrop-text']);
+  });
+
+  it('authored file-limit overrides placeholder', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-file-limit</div><div>Authored file limit text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-file-limit').textContent).to.equal('Authored file limit text');
+  });
+
+  it('falls back to placeholder file-limit when not authored', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-file-limit').textContent)
+      .to.equal(window.mph['study-widget-gen-presentation-v2-file-limit']);
+  });
+
+  it('authored tool-tip overrides placeholder tooltip', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-tool-tip</div><div>Authored tooltip text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    const infoIcon = block.querySelector('.info-icon');
+    expect(infoIcon.getAttribute('data-tooltip')).to.equal('Authored tooltip text');
+    expect(infoIcon.getAttribute('aria-label')).to.equal('Authored tooltip text');
+  });
+
+  it('authored legal-text overrides placeholder fallback chain', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-legal-text</div><div>Authored legal text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-legal').textContent).to.contain('Authored legal text');
+  });
+
+  it('authored legal-text takes precedence over avalon placeholders', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.add('avalon');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-legal-text</div><div>Authored avalon legal override</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    const legal = block.querySelector('.study-marquee-legal');
+    expect(legal.textContent).to.contain('Authored avalon legal override');
+    expect(legal.textContent).to.not.contain('Avalon legal:');
+  });
 });
