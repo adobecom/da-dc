@@ -63,11 +63,12 @@ describe('verb-widget-client-upload init', () => {
       const block = makeBlock(['<h1>Image to PDF</h1>']);
       await setup(block);
 
-      const copies = [...block.querySelectorAll('.verb-copy')];
-      expect(copies.some((el) => el.textContent === 'Placeholder desktop copy')).to.be.true;
+      const copy = block.querySelector('.verb-copy');
+      expect(copy).to.exist;
+      expect(copy.textContent).to.equal('Placeholder desktop copy');
     });
 
-    it('uses authored DOM rows for desktop and mobile copy when 3 rows are present', async () => {
+    it('uses authored desktop copy from the 2nd DOM row in a non-mobile environment', async () => {
       const block = makeBlock([
         '<h1>Image to PDF</h1>',
         'Authored desktop copy',
@@ -75,12 +76,13 @@ describe('verb-widget-client-upload init', () => {
       ]);
       await setup(block);
 
-      const texts = [...block.querySelectorAll('.verb-copy')].map((el) => el.textContent);
-      expect(texts).to.include('Authored desktop copy');
-      expect(texts).to.include('Authored mobile copy');
+      // init renders only one copy element — desktop or mobile based on UA
+      const copy = block.querySelector('.verb-copy');
+      expect(copy).to.exist;
+      expect(copy.textContent).to.equal('Authored desktop copy');
     });
 
-    it('does not use placeholder text when authored copy is present', async () => {
+    it('does not use placeholder text when authored copy rows are present', async () => {
       const block = makeBlock([
         '<h1>Image to PDF</h1>',
         'Authored desktop copy',
@@ -88,9 +90,9 @@ describe('verb-widget-client-upload init', () => {
       ]);
       await setup(block);
 
-      const texts = [...block.querySelectorAll('.verb-copy')].map((el) => el.textContent);
-      expect(texts).to.not.include('Placeholder desktop copy');
-      expect(texts).to.not.include('Placeholder mobile copy');
+      const copy = block.querySelector('.verb-copy');
+      expect(copy.textContent).to.not.equal('Placeholder desktop copy');
+      expect(copy.textContent).to.not.equal('Placeholder mobile copy');
     });
   });
 
