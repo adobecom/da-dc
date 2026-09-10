@@ -221,7 +221,7 @@ describe('unity-marquee block', () => {
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise((r) => { setTimeout(r, 50); });
     window.navigation.removeEventListener('navigate', abortNav);
     expect(capturedUrl).to.include('index-browser-eol');
     expect(block.querySelector('.unity-marquee-container')).to.not.exist;
@@ -236,7 +236,7 @@ describe('unity-marquee block', () => {
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise((r) => { setTimeout(r, 50); });
     window.navigation.removeEventListener('navigate', abortNav);
     expect(capturedUrl).to.include('acrobat-quizmaker');
   });
@@ -254,7 +254,7 @@ describe('unity-marquee block', () => {
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise((r) => { setTimeout(r, 50); });
     window.navigation.removeEventListener('navigate', abortNav);
     expect(capturedUrl).to.include('acrobat-quizmaker');
   });
@@ -269,7 +269,7 @@ describe('unity-marquee block', () => {
     window.navigation.addEventListener('navigate', abortNav);
     window.adobeIMS = { isSignedInUser: () => true, getAccountType: () => 'INDIVIDUAL' };
     window.dispatchEvent(new Event('IMS:Ready'));
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise((r) => { setTimeout(r, 50); });
     window.navigation.removeEventListener('navigate', abortNav);
     expect(capturedUrl).to.include('acrobat-quizmaker');
   });
@@ -285,7 +285,7 @@ describe('unity-marquee block', () => {
     const event = new Event('pageshow');
     Object.defineProperty(event, 'persisted', { value: true });
     window.dispatchEvent(event);
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise((r) => { setTimeout(r, 50); });
     window.navigation.removeEventListener('navigate', abortNav);
     expect(reloadTriggered).to.be.true;
   });
@@ -346,7 +346,7 @@ describe('unity-marquee block', () => {
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => { setTimeout(r, 100); });
     expect(document.getElementById('prerender_verb-widget')).to.not.exist;
   });
 });
