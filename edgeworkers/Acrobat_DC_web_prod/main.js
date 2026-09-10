@@ -283,12 +283,7 @@ async function frictionlessResponseProvider(request) {
   const fetchFrictionlessPage = async () => {
     // Setup: Fetch a stream containing HTML
     const hasLocalePrefix = request.path.split('/').filter(Boolean).length > 1;
-    let docPath;
-    if (hasLocalePrefix) {
-      docPath = `${origin}${request.path.replace(`/${first}/`, `/${first}/`)}`;
-    } else {
-      docPath = `${origin}/{request.path}`;
-    }
+    let docPath = `${origin}/${request.path}`;
     
     const htmlResponse = await httpRequest(docPath, { headers });
     if (!htmlResponse.ok) {
