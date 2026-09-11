@@ -437,6 +437,7 @@
     font-size: 11px;
     text-align: center;
     flex: 0 1 auto;
+    max-width: 72%;
   }
 
   .unity-marquee-footer {
