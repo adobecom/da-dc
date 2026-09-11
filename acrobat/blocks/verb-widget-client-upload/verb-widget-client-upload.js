@@ -423,6 +423,9 @@ export default async function init(element) {
     return;
   }
 
+  const prerenderElement = document.querySelector('#prerender_verb-widget');
+  const removePrerender = () => prerenderElement?.remove();
+
   const { locale } = getConfig();
 
   const triggerEarlyPrefetch = () => {
@@ -571,6 +574,7 @@ export default async function init(element) {
   widgetContainer.append(widgetRow);
   widget.append(widgetContainer);
   element.append(widget, footer);
+  requestAnimationFrame(() => requestAnimationFrame(removePrerender));
   element.classList.add('ready');
   element.parentNode.style.display = 'block';
 
