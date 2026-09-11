@@ -117,10 +117,9 @@ test.describe('Unity AI resume builder test suite', () => {
         aiResumeBuilder.dropZone.click(),
       ]);
       await fileChooser.setFiles(pdfFilePath);
-
-      await page.waitForURL(/acrobat\.adobe/, {
-        timeout: 60000,
-      });
+      // Upload redirects to acrobat.adobe.com via an interstitial; poll the final URL
+      // instead of binding to a single navigation commit (which aborts mid-redirect).
+      await expect(page).toHaveURL(/acrobat\.adobe/, { timeout: 60000 });
 
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);

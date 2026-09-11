@@ -47,10 +47,9 @@ test.describe('Unity Compress PDF test suite', () => {
         compressPdf.dropZone.click(),
       ]);
       await fileChooser.setFiles(pdfFilePath);
-
-      await page.waitForURL(/acrobat\.adobe/, {
-        timeout: 60000,
-      });
+      // Upload redirects to acrobat.adobe.com via an interstitial; poll the final URL
+      // instead of binding to a single navigation commit (which aborts mid-redirect).
+      await expect(page).toHaveURL(/acrobat\.adobe/, { timeout: 60000 });
 
       // Verify the URL parameters
       const currentUrl = page.url();

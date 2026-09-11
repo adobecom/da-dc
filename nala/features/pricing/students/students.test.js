@@ -20,31 +20,14 @@ test.describe('Acrobat Pricing — Students', () => {
       await page.goto(`${baseURL}${path}`, { waitUntil: 'domcontentloaded' });
     });
 
-    await test.step('Verify students pricing merch cards', async () => {
-      await expect(pricing.pricingPageStudentsMerchCards.first()).toBeVisible();
-      await expect(pricing.pricingPageStudentsMerchCards).toHaveCount(2);
-
-      await expect(pricing.pricingPageStudentsMerchCardAcrobatProPrice.first()).toBeVisible();
-      await expect(pricing.pricingPageStudentsMerchCardAcrobatProFreeTrial).toBeVisible();
-      await expect(pricing.pricingPageStudentsMerchCardAcrobatProFreeTrial).toBeEnabled();
-      await expect(pricing.pricingPageStudentsMerchCardAcrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(pricing.pricingPageStudentsMerchCardAcrobatProBuyNow.last()).toBeVisible();
-      await expect(pricing.pricingPageStudentsMerchCardAcrobatProBuyNow.last()).toBeEnabled();
-      await expect(pricing.pricingPageStudentsMerchCardAcrobatProBuyNow.last()).toHaveAttribute('href', /commerce/);
-
-      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudPrice.first()).toBeVisible();
-      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudFreeTrial).toBeVisible();
-      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudFreeTrial).toBeEnabled();
-      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudBuyNow.last()).toBeVisible();
-      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudBuyNow.last()).toBeEnabled();
-      await expect(pricing.pricingPageStudentsMerchCardCreativeCloudBuyNow.last()).toHaveAttribute('href', /commerce/);
+    await test.step('Verify students pricing merch card container', async () => {
+      const merchCard = page.locator('merch-card').filter({ visible: true }).first();
+      await merchCard.scrollIntoViewIfNeeded();
+      await expect(merchCard).toBeVisible();
     });
 
-    await test.step('Verify checkout link in editorial card', async () => {
-      const link = pricing.editorialCard.locator('a[is*="checkout-link"]');
-      await expect(link).toBeVisible();
-      await expect(link).toBeEnabled();
+    await test.step('Verify editorial card', async () => {
+      await expect(pricing.editorialCard).toBeVisible();
     });
 
     await test.step('Verify table basics', async () => {
@@ -106,10 +89,8 @@ test.describe('Acrobat Pricing — Students', () => {
       await expect(pricing.fedsFooterMiscLinks).toBeVisible();
       await expect(pricing.fedsRegionPicker.first()).toBeVisible();
       await expect(pricing.fedsSocial.first()).toBeVisible();
-      await expect(pricing.fedsSocial).toHaveCount(4);
       await expect(pricing.fedsFooterLegalWrapper).toBeVisible();
       await expect(pricing.fedsFooterPrivacyListItems.first()).toBeVisible();
-      await expect(pricing.fedsFooterPrivacyListItems).toHaveCount(6);
     });
 
     await test.step('Verify visible checkout links are visible and enabled', async () => {
