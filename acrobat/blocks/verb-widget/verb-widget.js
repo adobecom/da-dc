@@ -76,7 +76,7 @@ const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.x
 const STUDENT_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt'];
 const SIGNED_IN_FILES = ['.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
 const COMMON_TO_PDF_FILES = ['.jpg', '.jpeg', '.png', '.heic', '.tif', '.tiff', '.bmp', '.gif', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text'];
-const CREATEPDF_FILES = [...COMMON_TO_PDF_FILES, '.pdf', '.psd', '.ai', '.indd'];
+const CREATEPDF_FILES = [...COMMON_TO_PDF_FILES, '.psd', '.ai', '.indd'];
 
 const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
 const MULTI_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, multipleFiles: true };
