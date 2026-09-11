@@ -413,6 +413,16 @@ async function createSvgElement(iconName) {
   return doc.documentElement.cloneNode(true);
 }
 
+function getAuthoredVerbIcon(element) {
+  const img = element.querySelector('img');
+  if (img) return img;
+  const svgLink = element.querySelector('a[href$=".svg"]');
+  if (svgLink) {
+    return createTag('img', { src: svgLink.getAttribute('href'), alt: '' });
+  }
+  return null;
+}
+
 export default async function init(element) {
   ({
     createTag, getConfig, loadBlock, getMetadata, loadIms, loadScript,
@@ -448,9 +458,14 @@ export default async function init(element) {
   const isTablet = isTabletDevice();
 
   const heading = children[0]?.textContent ?? '';
-  const subCopy = window.mph?.[`verb-widget-${VERB}-description`] ?? '';
-  const mobSubCopy = window.mph?.[`verb-widget-${VERB}-mobile-description`] ?? subCopy;
+  let subCopy = window.mph?.[`verb-widget-${VERB}-description`] ?? '';
+  let mobSubCopy = window.mph?.[`verb-widget-${VERB}-mobile-description`] ?? subCopy;
+  if (children.length > 2) {
+    subCopy = children[1].textContent;
+    mobSubCopy = children[2].textContent;
+  }
   const ctaLabel = window.mph?.['verb-widget-cta'] ?? 'Select a file';
+  const authoredIcon = getAuthoredVerbIcon(element);
 
   children.forEach((c) => c.remove());
 
@@ -512,7 +527,7 @@ export default async function init(element) {
   });
 
   const widgetImage = createTag('div', { class: 'verb-image' });
-  const verbImageSvg = await createSvgElement(VERB);
+  const verbImageSvg = authoredIcon || await createSvgElement(VERB);
   if (verbImageSvg) {
     verbImageSvg.classList.add('icon-verb-image');
     verbImageSvg.setAttribute('alt', window.mph?.[`verb-widget-${VERB}-alt`] || VERB);
