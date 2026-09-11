@@ -264,6 +264,7 @@ const CONFIG = {
   codeRoot: '/acrobat',
   contentRoot: '/dc-shared',
   imsClientId: 'acrobatmilo',
+  iconsExcludeBlocks: ['unity'],
   commerce: {
     checkoutClientId: 'doc_cloud',
     'wcs-api-key': 'wcms-commerce-ims-ro-user-milo-dc',
@@ -418,7 +419,7 @@ replaceDotMedia(document);
 
 // Default to loading the first image as eager.
 (async function loadLCPImage() {
-  const blocks = '.marquee,.hero-marquee,.study-marquee';
+  const blocks = '.marquee,.hero-marquee,.study-marquee,.unity-marquee';
   const marquee = document.querySelector(blocks); // first marquee only
   if (marquee) {
     if (window?.browser?.isMobile) {
