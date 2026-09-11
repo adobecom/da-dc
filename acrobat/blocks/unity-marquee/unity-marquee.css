@@ -27,6 +27,7 @@
   color: inherit;
   margin: 0;
   margin-top: -22px;
+  margin-bottom: -4px;
   word-break: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
@@ -421,6 +422,7 @@
     font-size: 64px;
     line-height: 0.98;
     letter-spacing: -4.5px;
+    margin-bottom: 3px;
   }
 
   .unity-marquee-copy {
@@ -433,6 +435,12 @@
 
   .unity-marquee-legal {
     font-size: 11px;
+    text-align: center;
+    flex: 0 1 auto;
+  }
+
+  .unity-marquee-footer {
+    justify-content: center;
   }
 }
 
