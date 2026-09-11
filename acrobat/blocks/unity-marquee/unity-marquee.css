@@ -435,13 +435,12 @@
 
   .unity-marquee-legal {
     font-size: 11px;
-    text-align: center;
-    flex: 0 1 auto;
-    max-width: 72%;
   }
 
   .unity-marquee-footer {
-    justify-content: center;
+    box-sizing: border-box;
+    padding-left: 56px;
+    padding-right: 56px;
   }
 }
 
