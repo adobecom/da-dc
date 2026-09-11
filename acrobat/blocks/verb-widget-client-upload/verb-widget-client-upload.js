@@ -13,9 +13,16 @@ let loadScript;
 const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 
 const MB25 = 26214400;
-const ACCEPTED_FILES = ['.jpg', '.jpeg', '.png'];
 
-const LIMITS = { 'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ACCEPTED_FILES, multipleFiles: false } };
+const LIMITS = {
+  'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.jpg', '.jpeg', '.png'], multipleFiles: false },
+  'bmp-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.bmp'], multipleFiles: false },
+  'gif-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.gif'], multipleFiles: false },
+  'tiff-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.tif', '.tiff'], multipleFiles: false },
+  'psd-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.psd'], multipleFiles: false },
+  'ai-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.ai'], multipleFiles: false },
+  'indd-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.indd'], multipleFiles: false },
+};
 
 export const LOCALE_REDIRECT_MAP = {
   ar: 'es',
@@ -115,6 +122,13 @@ const MIME_TYPES = {
   '.jpg': ['image/jpeg'],
   '.jpeg': ['image/jpeg'],
   '.png': ['image/png'],
+  '.bmp': ['image/bmp', 'image/x-bmp', 'image/x-ms-bmp'],
+  '.gif': ['image/gif'],
+  '.tif': ['image/tiff'],
+  '.tiff': ['image/tiff'],
+  '.psd': ['image/vnd.adobe.photoshop', 'application/photoshop', 'application/psd', 'application/x-photoshop'],
+  '.ai': ['application/postscript', 'application/illustrator', 'application/pdf'],
+  '.indd': ['application/x-indesign'],
 };
 
 const ICONS = {
