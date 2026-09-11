@@ -13,15 +13,16 @@ let loadScript;
 const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 
 const MB25 = 26214400;
+const IMG_BASE = ['.jpg', '.jpeg', '.png'];
 
 const LIMITS = {
-  'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.jpg', '.jpeg', '.png'], multipleFiles: false },
-  'bmp-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.bmp'], multipleFiles: false },
-  'gif-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.gif'], multipleFiles: false },
-  'tiff-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.tif', '.tiff'], multipleFiles: false },
-  'psd-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.psd'], multipleFiles: false },
-  'ai-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.ai'], multipleFiles: false },
-  'indd-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.indd'], multipleFiles: false },
+  'image-to-pdf': { maxFileSize: MB25, acceptedFiles: IMG_BASE, multipleFiles: false },
+  'bmp-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.bmp', ...IMG_BASE], multipleFiles: false },
+  'gif-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.gif', ...IMG_BASE], multipleFiles: false },
+  'tiff-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.tif', '.tiff', ...IMG_BASE], multipleFiles: false },
+  'psd-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.psd', ...IMG_BASE], multipleFiles: false },
+  'ai-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.ai', ...IMG_BASE], multipleFiles: false },
+  'indd-to-pdf': { maxFileSize: MB25, acceptedFiles: ['.indd', ...IMG_BASE], multipleFiles: false },
 };
 
 export const LOCALE_REDIRECT_MAP = {
