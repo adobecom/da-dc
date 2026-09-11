@@ -75,17 +75,21 @@ async function fetchCuratedSpaces() {
     throw new Error('No IMS guest token available — verify ims-cid: acrobatmiloguest is set in the metadata sheet for this URL');
   }
 
-  const baseHeaders = {
-    'x-api-key': PDFSPACES_API_KEY,
-    Authorization: `Bearer ${token}`,
-  };
+  // Discovery reads the client identifier from `x-api-key`; Curated
+  // Collections reads it from `x-api-client-id` instead — sending the wrong
+  // one to either produces a generic ErrInvalidAPIKey regardless of
+  // subscription status.
+  const authHeader = { Authorization: `Bearer ${token}` };
+  const discoveryHeaders = { ...authHeader, 'x-api-key': PDFSPACES_API_KEY };
+  const collectionsHeaders = { ...authHeader, 'x-api-client-id': PDFSPACES_API_KEY };
 
   // The IMS token's issuing environment (prod vs stage) must match the API's
   // environment — dc-api.adobe.io rejects stage-issued tokens outright.
-  const discoveryUrl = getConfig?.().env?.name === 'prod' ? DISCOVERY_URL_PROD : DISCOVERY_URL_STAGE;
+  const discoveryUrl = getConfig?.().env?.name === 'prod'
+    ? DISCOVERY_URL_PROD : DISCOVERY_URL_STAGE;
   const discoveryResp = await fetch(discoveryUrl, {
     headers: {
-      ...baseHeaders,
+      ...discoveryHeaders,
       Accept: 'application/vnd.adobe.dc+json;profile="https://dc-api-v2.adobe.io/schemas/discovery_v1.json"',
     },
   });
@@ -103,7 +107,7 @@ async function fetchCuratedSpaces() {
 
   const collectionsResp = await fetch(kwUrl, {
     headers: {
-      ...baseHeaders,
+      ...collectionsHeaders,
       Accept: 'application/vnd.adobe.dc+json;profile="https://dc-kwcollection.adobe.io/schemas/kwcollection_curated_listing_v1.json"',
     },
   });
