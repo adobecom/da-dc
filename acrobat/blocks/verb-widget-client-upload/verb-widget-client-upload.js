@@ -127,9 +127,16 @@ const MIME_TYPES = {
   '.gif': ['image/gif'],
   '.tif': ['image/tiff'],
   '.tiff': ['image/tiff'],
-  '.psd': ['image/vnd.adobe.photoshop', 'application/photoshop', 'application/psd', 'application/x-photoshop'],
-  '.ai': ['application/postscript', 'application/illustrator', 'application/pdf'],
+  '.psd': ['image/vnd.adobe.photoshop'],
+  '.ai': ['application/illustrator'],
   '.indd': ['application/x-indesign'],
+};
+
+// Mirrors Unity's getMimeType() — overrides unreliable browser-reported MIME for these types
+const MIME_FALLBACK = {
+  psd: 'image/vnd.adobe.photoshop',
+  ai: 'application/illustrator',
+  indd: 'application/x-indesign',
 };
 
 const ICONS = {
@@ -367,8 +374,9 @@ export function validateFiles(files, verb) {
       };
     }
 
+    const effectiveMime = MIME_FALLBACK[ext.slice(1)] || file.type;
     const allowedMimes = MIME_TYPES[ext];
-    if (file.type && allowedMimes && !allowedMimes.includes(file.type)) {
+    if (effectiveMime && allowedMimes && !allowedMimes.includes(effectiveMime)) {
       return {
         valid: false,
         code: 'error_unsupported_type',
@@ -461,6 +469,12 @@ export default async function init(element) {
   const userAttempts = getVerbKey(`${VERB}_attempts`);
   const isMobile = isMobileDevice();
   const isTablet = isTabletDevice();
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const IOS_UNKNOWN_EXTS = new Set(['.ai', '.psd', '.indd']);
+  const getAcceptValue = (acceptedFiles) => {
+    if (isIOS && acceptedFiles?.some((ext) => IOS_UNKNOWN_EXTS.has(ext))) return '*/*';
+    return acceptedFiles?.join(',');
+  };
 
   const heading = children[0]?.textContent ?? '';
   const subCopy = window.mph?.[`verb-widget-${VERB}-description`] ?? '';
@@ -519,7 +533,7 @@ export default async function init(element) {
 
   const fileInput = createTag('input', {
     type: 'file',
-    accept: limits.acceptedFiles?.join(','),
+    accept: getAcceptValue(limits.acceptedFiles),
     id: 'file-upload',
     class: 'hide',
     'aria-hidden': 'true',
