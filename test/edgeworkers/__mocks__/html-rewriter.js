@@ -3,11 +3,12 @@ export const mockOnElement = jest.fn().mockImplementation((elem, fn) => {
   let el =  {
     getAttribute: jest.fn().mockImplementation(() => '1.0'),
     append: jest.fn(),
+    prepend: jest.fn(),
     replaceWith: jest.fn(),
   };
-  if (elem !== '.unity.workflow-acrobat') {
+  if (elem !== '.unity.workflow-acrobat' && elem !== '.verb-widget-client-upload') {
     fn(el);
-  }  
+  }
   return {
     selector: String,
     handler: Element()
