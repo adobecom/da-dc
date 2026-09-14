@@ -1,0 +1,51 @@
+{
+  "total": 10,
+  "offset": 0,
+  "limit": 10,
+  "data": [
+    {
+      "key": "verb-redesign-test-cta",
+      "value": "Select a file"
+    },
+    {
+      "key": "verb-redesign-test-word-to-pdf-subtitle",
+      "value": "Convert Word files to PDF."
+    },
+    {
+      "key": "verb-redesign-test-word-to-pdf-dragndrop-text",
+      "value": "or drag and drop a file"
+    },
+    {
+      "key": "verb-redesign-test-word-to-pdf-file-limit",
+      "value": "Max file size 100MB."
+    },
+    {
+      "key": "verb-redesign-test-highlight-1",
+      "value": "Fast and easy"
+    },
+    {
+      "key": "verb-redesign-test-highlight-2",
+      "value": "Secure"
+    },
+    {
+      "key": "verb-redesign-test-highlight-3",
+      "value": "Files deleted automatically"
+    },
+    {
+      "key": "verb-redesign-test-legal",
+      "value": "By using this service you agree to the Terms of Use and Privacy Policy."
+    },
+    {
+      "key": "verb-widget-terms-of-use",
+      "value": "Terms of Use"
+    },
+    {
+      "key": "verb-widget-privacy-policy",
+      "value": "Privacy Policy"
+    },
+    {
+      "key": "verb-widget-tool-tip",
+      "value": "Your files are secure."
+    }
+  ]
+}
