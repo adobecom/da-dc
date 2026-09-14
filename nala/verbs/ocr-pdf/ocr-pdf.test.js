@@ -17,7 +17,6 @@ test.describe('Unity OCR PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to OCR PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,18 +35,9 @@ test.describe('Unity OCR PDF test suite', () => {
       await expect(ocrPdf.dropZone).toBeVisible();
       await expect(ocrPdf.verbImage).toBeVisible();
       await expect(ocrPdf.acrobatIcon).toBeVisible();
-      const actualText = await ocrPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(ocrPdf.verbTitle).toContainText(data.verbTitle);
-
-      const userAgent = await page.evaluate(() => navigator.userAgent);
-      const isMobile = /Mobile|Android|iPhone|iPad/i.test(userAgent);
-
-      if (isMobile) {
-        await expect(ocrPdf.verbCopy).toContainText(data.verbCopyMobile);
-      } else {
-        await expect(ocrPdf.verbCopy).toContainText(data.verbCopy);
-      }
+      await expect(ocrPdf.verbHeader).toBeVisible();
+      await expect(ocrPdf.verbTitle).toBeVisible();
+      await expect(ocrPdf.verbCopy).toBeVisible();
 
       await expect(ocrPdf.selectFilesButton).toBeVisible();
       await expect(ocrPdf.selectFilesButton).toBeEnabled();

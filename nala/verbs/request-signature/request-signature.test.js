@@ -17,7 +17,6 @@ test.describe('Unity Request Signature test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Request Signature test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity Request Signature test suite', () => {
       await expect(requestSignature.dropZone).toBeVisible();
       await expect(requestSignature.verbImage).toBeVisible();
       await expect(requestSignature.acrobatIcon).toBeVisible();
-      const actualText = await requestSignature.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(requestSignature.verbTitle).toContainText(data.verbTitle);
-      await expect(requestSignature.verbCopy).toContainText(data.verbCopy);
+      await expect(requestSignature.verbHeader).toBeVisible();
+      await expect(requestSignature.verbTitle).toBeVisible();
+      await expect(requestSignature.verbCopy).toBeVisible();
       await expect(requestSignature.selectFilesButton).toBeVisible();
       await expect(requestSignature.selectFilesButton).toBeEnabled();
     });

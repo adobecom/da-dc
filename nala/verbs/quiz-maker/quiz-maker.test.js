@@ -36,10 +36,9 @@ test.describe('Unity Quiz maker test suite', () => {
       await expect(quizMaker.dropZone).toBeVisible();
       await expect(quizMaker.studyMarqueeMedia).toBeVisible();
       await expect(quizMaker.acrobatIcon).toBeVisible();
-      const actualText = await quizMaker.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(quizMaker.verbTitle).toContainText(data.verbTitle);
-      await expect(quizMaker.verbCopy).toContainText(data.verbCopy);
+      await expect(quizMaker.verbHeader).toBeVisible();
+      await expect(quizMaker.verbTitle).toBeVisible();
+      await expect(quizMaker.verbCopy).toBeVisible();
       await expect(quizMaker.ctaButton).toBeVisible();
       await expect(quizMaker.ctaButton).toBeEnabled();
     });

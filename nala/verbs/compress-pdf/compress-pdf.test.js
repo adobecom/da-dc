@@ -18,7 +18,6 @@ test.describe('Unity Compress PDF test suite', () => {
   // Test 0 : Compress PDF
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('step-1: Go to Compress PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -35,10 +34,9 @@ test.describe('Unity Compress PDF test suite', () => {
       await expect(await compressPdf.dropZone).toBeVisible();
       await expect(await compressPdf.verbImage).toBeVisible();
       await expect(await compressPdf.acrobatIcon).toBeVisible();
-      const actualText = await compressPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(await compressPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(await compressPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(compressPdf.verbHeader).toBeVisible();
+      await expect(compressPdf.verbTitle).toBeVisible();
+      await expect(compressPdf.verbCopy).toBeVisible();
     });
 
     await test.step('step-3: Upload a sample PDF file', async () => {

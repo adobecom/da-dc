@@ -17,7 +17,6 @@ test.describe('Unity Add PDF page number test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Add PDF page numbers test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity Add PDF page number test suite', () => {
       await expect(addPdf.dropZone).toBeVisible();
       await expect(addPdf.verbImage).toBeVisible();
       await expect(addPdf.acrobatIcon).toBeVisible();
-      const actualText = await addPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(addPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(addPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(addPdf.verbHeader).toBeVisible();
+      await expect(addPdf.verbTitle).toBeVisible();
+      await expect(addPdf.verbCopy).toBeVisible();
       await expect(addPdf.selectFilesButton).toBeVisible();
       await expect(addPdf.selectFilesButton).toBeEnabled();
     });

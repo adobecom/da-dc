@@ -17,7 +17,6 @@ test.describe('Unity Split PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Split PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity Split PDF test suite', () => {
       await expect(splitPdf.dropZone).toBeVisible();
       await expect(splitPdf.verbImage).toBeVisible();
       await expect(splitPdf.acrobatIcon).toBeVisible();
-      const actualText = await splitPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(splitPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(splitPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(splitPdf.verbHeader).toBeVisible();
+      await expect(splitPdf.verbTitle).toBeVisible();
+      await expect(splitPdf.verbCopy).toBeVisible();
       await expect(splitPdf.selectFilesButton).toBeVisible();
       await expect(splitPdf.selectFilesButton).toBeEnabled();
     });

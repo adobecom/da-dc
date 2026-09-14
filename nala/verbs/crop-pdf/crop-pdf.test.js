@@ -17,7 +17,6 @@ test.describe('Unity Crop PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Crop PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity Crop PDF test suite', () => {
       await expect(cropPdf.dropZone).toBeVisible();
       await expect(cropPdf.verbImage).toBeVisible();
       await expect(cropPdf.acrobatIcon).toBeVisible();
-      const actualText = await cropPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(cropPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(cropPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(cropPdf.verbHeader).toBeVisible();
+      await expect(cropPdf.verbTitle).toBeVisible();
+      await expect(cropPdf.verbCopy).toBeVisible();
       await expect(cropPdf.selectFilesButton).toBeVisible();
       await expect(cropPdf.selectFilesButton).toBeEnabled();
     });

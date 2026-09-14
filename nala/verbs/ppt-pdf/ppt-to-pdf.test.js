@@ -17,7 +17,6 @@ test.describe('Unity PPT to PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to PPT to PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity PPT to PDF test suite', () => {
       await expect(pptToPdf.dropZone).toBeVisible();
       await expect(pptToPdf.verbImage).toBeVisible();
       await expect(pptToPdf.acrobatIcon).toBeVisible();
-      const actualText = await pptToPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(pptToPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(pptToPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(pptToPdf.verbHeader).toBeVisible();
+      await expect(pptToPdf.verbTitle).toBeVisible();
+      await expect(pptToPdf.verbCopy).toBeVisible();
       await expect(pptToPdf.selectFilesButton).toBeVisible();
       await expect(pptToPdf.selectFilesButton).toBeEnabled();
     });

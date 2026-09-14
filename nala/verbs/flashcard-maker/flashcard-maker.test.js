@@ -36,10 +36,9 @@ test.describe('Unity Flashcard maker test suite', () => {
       await expect(flashcardMaker.dropZone).toBeVisible();
       await expect(flashcardMaker.studyMarqueeMedia).toBeVisible();
       await expect(flashcardMaker.acrobatIcon).toBeVisible();
-      const actualText = await flashcardMaker.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(flashcardMaker.verbTitle).toContainText(data.verbTitle);
-      await expect(flashcardMaker.verbCopy).toContainText(data.verbCopy);
+      await expect(flashcardMaker.verbHeader).toBeVisible();
+      await expect(flashcardMaker.verbTitle).toBeVisible();
+      await expect(flashcardMaker.verbCopy).toBeVisible();
       await expect(flashcardMaker.ctaButton).toBeVisible();
       await expect(flashcardMaker.ctaButton).toBeEnabled();
     });

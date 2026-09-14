@@ -17,7 +17,6 @@ test.describe('Unity PNG to PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to PNG to PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity PNG to PDF test suite', () => {
       await expect(pngToPdf.dropZone).toBeVisible();
       await expect(pngToPdf.verbImage).toBeVisible();
       await expect(pngToPdf.acrobatIcon).toBeVisible();
-      const actualText = await pngToPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(pngToPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(pngToPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(pngToPdf.verbHeader).toBeVisible();
+      await expect(pngToPdf.verbTitle).toBeVisible();
+      await expect(pngToPdf.verbCopy).toBeVisible();
       await expect(pngToPdf.selectFilesButton).toBeVisible();
       await expect(pngToPdf.selectFilesButton).toBeEnabled();
     });

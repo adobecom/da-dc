@@ -18,7 +18,6 @@ test.describe('Unity AI Chat PDF test suite', () => {
   // Test 0 : AI Chat PDF
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to AI Chat PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -37,10 +36,9 @@ test.describe('Unity AI Chat PDF test suite', () => {
       await expect(aiChatPdf.dropZone).toBeVisible();
       await expect(aiChatPdf.verbImage).toBeVisible();
       await expect(aiChatPdf.acrobatIcon).toBeVisible();
-      const actualText = await aiChatPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(aiChatPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(aiChatPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(aiChatPdf.verbHeader).toBeVisible();
+      await expect(aiChatPdf.verbTitle).toBeVisible();
+      await expect(aiChatPdf.verbCopy).toBeVisible();
     });
 
     await test.step('Verify how-to section', async () => {

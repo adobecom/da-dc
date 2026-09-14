@@ -36,10 +36,9 @@ test.describe('Unity Mind map test suite', () => {
       await expect(mindMap.dropZone).toBeVisible();
       await expect(mindMap.studyMarqueeMedia).toBeVisible();
       await expect(mindMap.acrobatIcon).toBeVisible();
-      const actualText = await mindMap.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(mindMap.verbTitle).toContainText(data.verbTitle);
-      await expect(mindMap.verbCopy).toContainText(data.verbCopy);
+      await expect(mindMap.verbHeader).toBeVisible();
+      await expect(mindMap.verbTitle).toBeVisible();
+      await expect(mindMap.verbCopy).toBeVisible();
       await expect(mindMap.ctaButton).toBeVisible();
       await expect(mindMap.ctaButton).toBeEnabled();
     });

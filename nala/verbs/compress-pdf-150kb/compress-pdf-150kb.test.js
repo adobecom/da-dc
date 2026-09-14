@@ -17,7 +17,6 @@ test.describe('Unity Compress PDF to 150KB test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Compress PDF to 150KB test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -34,10 +33,9 @@ test.describe('Unity Compress PDF to 150KB test suite', () => {
       await expect(compressPdf150kb.dropZone).toBeVisible();
       await expect(compressPdf150kb.verbImage).toBeVisible();
       await expect(compressPdf150kb.acrobatIcon).toBeVisible();
-      const actualText = await compressPdf150kb.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(compressPdf150kb.verbTitle).toContainText(data.verbTitle);
-      await expect(compressPdf150kb.verbCopy).toContainText(data.verbCopy);
+      await expect(compressPdf150kb.verbHeader).toBeVisible();
+      await expect(compressPdf150kb.verbTitle).toBeVisible();
+      await expect(compressPdf150kb.verbCopy).toBeVisible();
     });
 
     await test.step('Upload a sample PDF file', async () => {

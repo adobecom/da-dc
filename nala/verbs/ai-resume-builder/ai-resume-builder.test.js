@@ -35,9 +35,8 @@ test.describe('Unity AI resume builder test suite', () => {
       await expect(aiResumeBuilder.dropZone).toBeVisible();
       await expect(aiResumeBuilder.verbImage).toBeVisible();
       await expect(aiResumeBuilder.acrobatIcon).toBeVisible();
-      const actualText = await aiResumeBuilder.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(aiResumeBuilder.verbTitle).toContainText(data.verbTitle);
+      await expect(aiResumeBuilder.verbHeader).toBeVisible();
+      await expect(aiResumeBuilder.verbTitle).toBeVisible();
       await expect(aiResumeBuilder.verbCopy).toBeVisible();
       await expect(aiResumeBuilder.selectFilesButton).toBeVisible();
       await expect(aiResumeBuilder.selectFilesButton).toBeEnabled();

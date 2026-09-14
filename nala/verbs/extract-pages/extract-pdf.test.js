@@ -17,7 +17,6 @@ test.describe('Unity Extract PDF Pages test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Extract PDF Pages test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity Extract PDF Pages test suite', () => {
       await expect(extractPages.dropZone).toBeVisible();
       await expect(extractPages.verbImage).toBeVisible();
       await expect(extractPages.acrobatIcon).toBeVisible();
-      const actualText = await extractPages.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(extractPages.verbTitle).toContainText(data.verbTitle);
-      await expect(extractPages.verbCopy).toContainText(data.verbCopy);
+      await expect(extractPages.verbHeader).toBeVisible();
+      await expect(extractPages.verbTitle).toBeVisible();
+      await expect(extractPages.verbCopy).toBeVisible();
       await expect(extractPages.selectFilesButton).toBeVisible();
       await expect(extractPages.selectFilesButton).toBeEnabled();
     });

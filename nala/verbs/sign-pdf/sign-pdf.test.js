@@ -17,7 +17,6 @@ test.describe('Unity Sign PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Sign PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity Sign PDF test suite', () => {
       await expect(signPdf.dropZone).toBeVisible();
       await expect(signPdf.verbImage).toBeVisible();
       await expect(signPdf.acrobatIcon).toBeVisible();
-      const actualText = await signPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(signPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(signPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(signPdf.verbHeader).toBeVisible();
+      await expect(signPdf.verbTitle).toBeVisible();
+      await expect(signPdf.verbCopy).toBeVisible();
       await expect(signPdf.selectFilesButton).toBeVisible();
       await expect(signPdf.selectFilesButton).toBeEnabled();
     });

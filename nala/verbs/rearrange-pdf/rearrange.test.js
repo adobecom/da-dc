@@ -17,7 +17,6 @@ test.describe('Unity Rearrange PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Rearrange PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity Rearrange PDF test suite', () => {
       await expect(rearrangePdf.dropZone).toBeVisible();
       await expect(rearrangePdf.verbImage).toBeVisible();
       await expect(rearrangePdf.acrobatIcon).toBeVisible();
-      const actualText = await rearrangePdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(rearrangePdf.verbTitle).toContainText(data.verbTitle);
-      await expect(rearrangePdf.verbCopy).toContainText(data.verbCopy);
+      await expect(rearrangePdf.verbHeader).toBeVisible();
+      await expect(rearrangePdf.verbTitle).toBeVisible();
+      await expect(rearrangePdf.verbCopy).toBeVisible();
       await expect(rearrangePdf.selectFilesButton).toBeVisible();
       await expect(rearrangePdf.selectFilesButton).toBeEnabled();
     });

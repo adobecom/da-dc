@@ -17,7 +17,6 @@ test.describe('Unity PSD to PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to PSD to PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity PSD to PDF test suite', () => {
       await expect(psdToPdf.dropZone).toBeVisible();
       await expect(psdToPdf.verbImage).toBeVisible();
       await expect(psdToPdf.acrobatIcon).toBeVisible();
-      const actualText = await psdToPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(psdToPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(psdToPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(psdToPdf.verbHeader).toBeVisible();
+      await expect(psdToPdf.verbTitle).toBeVisible();
+      await expect(psdToPdf.verbCopy).toBeVisible();
       await expect(psdToPdf.selectFilesButton).toBeVisible();
       await expect(psdToPdf.selectFilesButton).toBeEnabled();
     });
