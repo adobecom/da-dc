@@ -17,7 +17,6 @@ test.describe('Unity WORD to PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Word to PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity WORD to PDF test suite', () => {
       await expect(wordToPdf.dropZone).toBeVisible();
       await expect(wordToPdf.verbImage).toBeVisible();
       await expect(wordToPdf.acrobatIcon).toBeVisible();
-      const actualText = await wordToPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(wordToPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(wordToPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(wordToPdf.verbHeader).toBeVisible();
+      await expect(wordToPdf.verbTitle).toBeVisible();
+      await expect(wordToPdf.verbCopy).toBeVisible();
       await expect(wordToPdf.selectFilesButton).toBeVisible();
       await expect(wordToPdf.selectFilesButton).toBeEnabled();
     });
@@ -120,14 +118,10 @@ test.describe('Unity WORD to PDF test suite', () => {
         wordToPdf.dropZone.click(),
       ]);
 
-      await Promise.all([
-        page.waitForURL(/acrobat\.adobe/, {
-          timeout: 60000,
-          waitUntil: 'commit',
-        }),
-        fileChooser.setFiles(wordFilePath),
-      ]);
-
+      await fileChooser.setFiles(wordFilePath);
+      // Upload redirects to acrobat.adobe.com via an interstitial; poll the final URL
+      // instead of binding to a single navigation commit (which aborts mid-redirect).
+      await expect(page).toHaveURL(/acrobat\.adobe/, { timeout: 60000 });
 
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);

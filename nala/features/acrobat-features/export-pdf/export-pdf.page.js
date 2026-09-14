@@ -20,16 +20,5 @@ export default class ExportPdfPage extends BasePage {
     this.editorialCards = page.locator('div.editorial-card');
 
     this.fourUpSection = page.locator('div.four-up');
-
-    const mc = this.merchCards;
-    this.merchIndividualsComparePlansLink = mc.individualMerchCardsContainer.locator(
-      'a.con-button[href*="compare-versions"]',
-    );
-    this.merchBusinessViewPlansLink = mc.businessMerchCardsContainer.locator(
-      'a.con-button[href*="/acrobat/pricing/business"]',
-    );
-    this.merchStudentsViewPlansLink = mc.studentsAndTeachersContainer.locator(
-      'a.con-button[href*="/acrobat/pricing/students"]',
-    );
   }
 }
