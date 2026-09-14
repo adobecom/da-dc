@@ -501,7 +501,7 @@ export default async function init(element) {
   const ppURL = window.mph?.['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
   const touURL = window.mph?.['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
   const genAIurl = window.mph?.['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`;
-  const authoredLegalEl = authored.get('legal-text');
+  const authoredLegalEl = cellText('legal-text') ? authored.get('legal-text') : null;
   const legalText = createTag('p', { class: 'study-marquee-legal' });
   if (authoredLegalEl) {
     legalText.innerHTML = authoredLegalEl.innerHTML;
