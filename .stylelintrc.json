@@ -4,6 +4,7 @@
     "selector-id-pattern": "^[a-zA-Z][a-zA-Z0-9_-]+$",
     "selector-class-pattern": "^[a-zA-Z][a-zA-Z0-9_-]+$",
     "keyframes-name-pattern": "^[a-zA-Z][a-zA-Z0-9_-]+$",
-    "property-no-vendor-prefix": [true, {"ignoreProperties": ["transition", "mask-position", "mask"]}]
+    "property-no-vendor-prefix": [true, {"ignoreProperties": ["transition", "mask-position", "mask"]}],
+    "value-no-vendor-prefix": [true, {"ignoreValues": ["box"]}]
   }
 }
