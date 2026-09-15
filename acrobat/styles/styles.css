@@ -76,6 +76,15 @@ div [class *= PdfnowLifecycle__dropzone2___] {
   }
 }
 
+
+@media (max-width: 600px) {
+  .hero-marquee .action-area > p:has(.con-button) {
+    display: flex;
+    flex-flow: column wrap;
+    gap: var(--spacing-s);
+  }
+}
+
 .col[data-align="center"] {
   justify-content: center;
   display: flex;
