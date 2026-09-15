@@ -287,36 +287,10 @@ export default async function init(element) {
     return;
   }
 
+  // Snapshot injected by the EdgeWorker for an early-painting LCP. Remove it only
+  // after the real widget has painted (double rAF below the reveal) to avoid a
+  // blank flash; keeping it until then is a safe fallback if init throws.
   const prerenderElement = document.querySelector('#prerender_verb-widget');
-  if (prerenderElement && window.PerformanceObserver) {
-    Promise.race([
-      new Promise((resolve) => {
-        try {
-          const lcpObserver = new PerformanceObserver((entries) => {
-            if (entries.getEntries().length > 0) {
-              prerenderElement.remove();
-              lcpObserver.disconnect();
-              resolve();
-            }
-          });
-          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-        } catch (error) {
-          prerenderElement.remove();
-          resolve();
-        }
-      }),
-      new Promise((resolve) => {
-        setTimeout(() => {
-          prerenderElement.remove();
-          resolve();
-        }, 3000);
-      }),
-    ]);
-  } else if (prerenderElement) {
-    setTimeout(() => {
-      prerenderElement.remove();
-    }, 3000);
-  }
 
   window.mph = window.mph || {};
   await loadPlaceholders(['verb-redesign-test', 'verb-marquee', 'verb-widget']);
@@ -871,6 +845,13 @@ export default async function init(element) {
   }
 
   element.parentNode.style.display = 'block';
+
+  // Double rAF: first callback fires before the next paint (widget now revealed),
+  // the second after it — so the prerender snapshot is removed only once the real
+  // widget is actually on screen, preventing the swap flicker.
+  // eslint-disable-next-line compat/compat
+  requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
+
   window.addEventListener('pageshow', (event) => {
     const historyTraversal = event.persisted
       || (typeof window.performance !== 'undefined'
