@@ -43,6 +43,8 @@ node md2json.js ./word-to-pdf.md --verb word-to-pdf --locale en-US --out word-to
 | `--locale <code>` | `en-US` | Locale id (the DA source URL carries no locale). |
 | `--out <file>` | stdout | Where to write the JSON. |
 | `--minify` | off | Compact output instead of 2-space pretty. |
+| `--no-validate` | validation on | Skip the authoring-grammar enum checks. |
+| `--strict` | off | Exit non-zero (code 2) if any grammar warning is emitted — the JSON is still written first. For CI. |
 
 Programmatic use:
 
@@ -183,10 +185,32 @@ key is a **MINOR** bump — see *Extending* below.
   `three-up`.
 - **`background`** — a named colour or hex: `white`, `#fbfbfb`.
 
-These reflect the values authored across current verb pages; treat them as the
-known enum surface rather than a hard constraint (unknown values pass through).
-The canonical list lives in [`src/extractors.js`](./src/extractors.js)
-(`SECTION_METADATA`) so code and docs stay in sync.
+These reflect the values authored across current verb pages. The canonical list
+lives in [`src/extractors.js`](./src/extractors.js) (`SECTION_METADATA`) so code
+and docs stay in sync.
+
+### Grammar validation (enum enforcement)
+
+The converter validates every authored block against the grammar's enum surface
+and emits a **warning** for anything outside it:
+
+- an **unknown block type** (name not in `grammar.json`),
+- a **variant** not in that block's enum,
+- a **Section Metadata** `style` token or `background` value not in its enum
+  (or an unknown metadata key).
+
+Comparison is case-insensitive and tolerant of authoring Markdown (`**bold**`,
+escaped `\#`), so it flags real drift/typos — not cosmetic differences. These
+are warnings, **not** errors: the block is still emitted into raw `blocks[]`
+(nothing is dropped). Warnings surface on the CLI (stderr) and in the UI's
+warnings panel.
+
+- On by default; disable with `--no-validate` (CLI) or `convert(raw, { …, validate: false })`.
+- `--strict` turns any warning into a non-zero exit (code 2) for CI gating.
+- Implementation: [`src/validate.js`](./src/validate.js). When a new variant/token
+  becomes legitimate, add it to `BLOCK_GRAMMAR` / `SECTION_METADATA` in
+  [`src/extractors.js`](./src/extractors.js) (and `grammar.json` follows via the
+  sync test).
 
 ## Extending (add a new component)
 

@@ -10,6 +10,8 @@
  *   --locale <code>   Locale id. Default: en-US.
  *   --out <file>      Write JSON here. Default: stdout.
  *   --minify          Compact JSON. Default: pretty-printed (2-space).
+ *   --no-validate     Skip authoring-grammar enum checks (on by default).
+ *   --strict          Exit non-zero if any grammar warning is emitted (CI).
  *
  * Requires `npm install` inside tools/md2json first (remark/rehype deps).
  */
@@ -25,6 +27,8 @@ async function main() {
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--minify') opts.minify = true;
+    else if (arg === '--no-validate') opts.noValidate = true;
+    else if (arg === '--strict') opts.strict = true;
     else if (arg === '--verb') opts.verb = argv[(i += 1)];
     else if (arg === '--locale') opts.locale = argv[(i += 1)];
     else if (arg === '--out') opts.out = argv[(i += 1)];
@@ -45,7 +49,7 @@ async function main() {
 
   // Imported after arg parsing so `--help` works without installed deps.
   const { convert } = await import('./src/convert.js');
-  const { data, warnings } = convert(raw, { verb, locale });
+  const { data, warnings } = convert(raw, { verb, locale, validate: !opts.noValidate });
 
   for (const w of warnings) process.stderr.write(`warning: ${w}\n`);
 
@@ -55,6 +59,12 @@ async function main() {
     process.stderr.write(`wrote ${opts.out} (${verb}/${locale})\n`);
   } else {
     process.stdout.write(`${json}\n`);
+  }
+
+  // Gate last so the JSON is still emitted for CI logs before we fail.
+  if (opts.strict && warnings.length) {
+    process.stderr.write(`error: --strict: ${warnings.length} grammar warning(s)\n`);
+    process.exit(2);
   }
 }
 

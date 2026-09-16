@@ -127,7 +127,10 @@
     };
 
     async function fetchInto(url) {
-      const res = await fetch(url);
+      // Bypass the browser HTTP cache — published `.md` is served with
+      // `max-age=7200`, so a plain fetch can return a stale copy for up to two
+      // hours after the author fixes the doc.
+      const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       els.raw.value = await res.text();
     }

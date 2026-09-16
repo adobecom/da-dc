@@ -6,6 +6,7 @@
 
 import { parseBlockMarkdown } from './gridTable.js';
 import { EXTRACTORS, extractVerb } from './extractors.js';
+import { validateBlocks } from './validate.js';
 
 /**
  * Bump the MAJOR when the shape changes in a way that would break an existing
@@ -25,7 +26,7 @@ export const SCHEMA_VERSION = '1.1.0';
  *   `data` is the document to publish; `warnings` are non-fatal authoring
  *   mismatches for the caller to surface (not part of the published JSON).
  */
-export function convert(raw, { verb, locale }) {
+export function convert(raw, { verb, locale, validate = true }) {
   const { sections, linkReferences } = parseBlockMarkdown(raw);
   const blocks = sections.flatMap((s) => s.blocks);
   const warnings = [];
@@ -34,6 +35,11 @@ export function convert(raw, { verb, locale }) {
   if (declaredVerb && declaredVerb !== verb) {
     warnings.push(`Rnr block declares verb "${declaredVerb}" but conversion was requested for "${verb}".`);
   }
+
+  // Enforce the authoring grammar's enum surface (block types, variants,
+  // Section Metadata style/background). Warnings only — blocks are still
+  // emitted into the raw catch-all below. Disable with `validate: false`.
+  if (validate) warnings.push(...validateBlocks(blocks));
 
   // Insertion order defines key order in the emitted JSON.
   const data = { schemaVersion: SCHEMA_VERSION, verb, locale };
