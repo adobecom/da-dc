@@ -51,6 +51,21 @@ import { convert, SCHEMA_VERSION } from './src/convert.js';
 const { data, warnings } = convert(rawMarkdown, { verb: 'word-to-pdf', locale: 'en-US' });
 ```
 
+## UI / DA tool
+
+A browser UI lives at [`tools/ms-apps/md2json.html`](../ms-apps/md2json.html). It
+reuses this package's `src/` converter (via a CDN import map for the remark
+deps), so its output is identical to the CLI — no build step.
+
+- **Standalone:** run `aem up` and open
+  `http://localhost:3000/tools/ms-apps/md2json.html`. Fetch a URL or paste raw
+  Markdown, Convert, then Copy/Download.
+- **As a DA tool:** register the hosted URL in DA
+  (`https://main--da-dc--adobecom.aem.live/tools/ms-apps/md2json.html`). When
+  opened from a document, it reads the current doc's context via `DA_SDK`,
+  builds that page's `.md` URL, and auto-converts. Hosting on the same site
+  keeps that fetch same-origin (no CORS).
+
 ## Output schema (v1.0.0)
 
 Machine-readable JSON Schema: [`verb-content.schema.json`](./verb-content.schema.json).

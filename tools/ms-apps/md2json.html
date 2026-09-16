@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>md2json — DA Markdown → verb-content JSON</title>
+  <!-- Reuse the tool's own remark/rehype stack in the browser so the UI's
+       output is byte-identical to the CLI (same versions as
+       tools/md2json/package.json). -->
+  <script type="importmap">
+  {
+    "imports": {
+      "unified": "https://esm.sh/unified@11.0.5",
+      "remark-parse": "https://esm.sh/remark-parse@11.0.0",
+      "remark-gfm": "https://esm.sh/remark-gfm@4.0.1",
+      "remark-rehype": "https://esm.sh/remark-rehype@11.1.2",
+      "rehype-stringify": "https://esm.sh/rehype-stringify@10.0.1"
+    }
+  }
+  </script>
+  <style>
+    :root { --border: #e1e1e1; --muted: #6e6e6e; --accent: #1473e6; --bg: #fafafa; --warn: #b45309; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Adobe Clean', adobe-clean, ui-sans-serif, system-ui, sans-serif;
+      color: #2c2c2c; margin: 0; background: var(--bg); line-height: 1.45;
+    }
+    header { padding: 16px 24px; border-bottom: 1px solid var(--border); background: #fff; }
+    header h1 { font-size: 18px; margin: 0 0 4px; }
+    header p { margin: 0; color: var(--muted); font-size: 13px; }
+    header a { color: var(--accent); }
+    .da-badge { display: none; margin: 8px 0 0; font-size: 12px; color: #268e6c; }
+    .da-badge code { color: #2c2c2c; }
+    main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--border); }
+    .panel { background: #fff; padding: 20px 24px; min-height: calc(100vh - 150px); }
+    .panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 12px; }
+    label { display: block; font-size: 12px; color: var(--muted); margin: 12px 0 4px; }
+    input[type=text], textarea {
+      width: 100%; font: inherit; padding: 8px 10px; border: 1px solid var(--border);
+      border-radius: 6px; background: #fff;
+    }
+    textarea { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; min-height: 200px; resize: vertical; }
+    .row { display: flex; gap: 12px; }
+    .row > div { flex: 1; }
+    .controls { display: flex; align-items: center; gap: 12px; margin: 16px 0 8px; flex-wrap: wrap; }
+    button {
+      font: inherit; font-weight: 600; padding: 9px 16px; border-radius: 20px; border: 1px solid var(--accent);
+      background: var(--accent); color: #fff; cursor: pointer;
+    }
+    button.secondary { background: #fff; color: var(--accent); }
+    button:disabled { opacity: .5; cursor: default; }
+    .checkbox { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #2c2c2c; }
+    .checkbox input { margin: 0; }
+    pre {
+      margin: 0; background: #1e1e1e; color: #e6e6e6; padding: 16px; border-radius: 8px;
+      overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
+      max-height: calc(100vh - 240px);
+    }
+    .status { font-size: 13px; margin: 10px 0; min-height: 18px; }
+    .status.error { color: #d7373f; }
+    .status.ok { color: #268e6c; }
+    .warnings { list-style: none; padding: 0; margin: 8px 0 0; }
+    .warnings li { color: var(--warn); font-size: 12.5px; padding: 6px 10px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 6px; margin-top: 6px; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    @media (max-width: 860px) { main { grid-template-columns: 1fr; } .panel { min-height: 0; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>md2json</h1>
+    <p>DA/AEM verb-page grid-table Markdown → versioned, combined <strong>verb-content JSON</strong>. Runs entirely in your browser using the same converter as the CLI. See <a href="../md2json/README.md">README</a> &amp; <a href="../md2json/verb-content.schema.json">schema</a>.</p>
+    <p id="daBadge" class="da-badge">Connected to DA — current document: <code id="daPath"></code></p>
+  </header>
+  <main>
+    <section class="panel">
+      <h2>Source</h2>
+      <label for="url">DA Markdown URL</label>
+      <div class="row">
+        <div style="flex: 3"><input id="url" type="text" placeholder="https://main--da-dc--adobecom.aem.live/…/word-to-pdf.md" /></div>
+        <div style="flex: 0 0 auto; display: flex; align-items: flex-end"><button id="fetchBtn" class="secondary" type="button">Fetch</button></div>
+      </div>
+      <p class="hint">In DA the open document is loaded automatically. Otherwise fetch a URL, or if the host blocks cross-origin requests, paste the raw <code>.md</code> below.</p>
+
+      <label for="raw">…or paste raw Markdown</label>
+      <textarea id="raw" placeholder="+----------------+&#10;| How To (…)     |&#10;+----------------+&#10;…" spellcheck="false"></textarea>
+
+      <div class="row">
+        <div><label for="verb">verb</label><input id="verb" type="text" placeholder="word-to-pdf" /></div>
+        <div><label for="locale">locale</label><input id="locale" type="text" value="en-US" /></div>
+      </div>
+
+      <div class="controls">
+        <button id="convertBtn" type="button">Convert</button>
+        <span class="checkbox"><input id="pretty" type="checkbox" checked /><label for="pretty" style="margin:0">Pretty-print</label></span>
+      </div>
+      <div id="status" class="status"></div>
+      <ul id="warnings" class="warnings"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>verb-content.json</h2>
+      <div class="controls">
+        <button id="copyBtn" class="secondary" type="button" disabled>Copy</button>
+        <button id="downloadBtn" class="secondary" type="button" disabled>Download</button>
+      </div>
+      <pre id="output">// Open a document in DA, or fetch a URL / paste Markdown, then Convert.</pre>
+    </section>
+  </main>
+
+  <script type="module">
+    import { convert } from '../md2json/src/convert.js';
+
+    const $ = (id) => document.getElementById(id);
+    const els = {
+      url: $('url'), raw: $('raw'), verb: $('verb'), locale: $('locale'),
+      pretty: $('pretty'), status: $('status'), warnings: $('warnings'), output: $('output'),
+      fetchBtn: $('fetchBtn'), convertBtn: $('convertBtn'), copyBtn: $('copyBtn'), downloadBtn: $('downloadBtn'),
+      daBadge: $('daBadge'), daPath: $('daPath'),
+    };
+    let lastJson = '';
+
+    const setStatus = (msg, kind = '') => { els.status.textContent = msg; els.status.className = `status ${kind}`; };
+
+    const verbFromUrl = (u) => {
+      try { return decodeURIComponent(new URL(u).pathname.split('/').pop() || '').replace(/\.md$/i, ''); }
+      catch { return ''; }
+    };
+
+    async function fetchInto(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      els.raw.value = await res.text();
+    }
+
+    function runConvert() {
+      const raw = els.raw.value;
+      if (!raw.trim()) return setStatus('No Markdown to convert — fetch a URL or paste it.', 'error');
+      const verb = els.verb.value.trim() || verbFromUrl(els.url.value) || 'verb';
+      const locale = els.locale.value.trim() || 'en-US';
+      try {
+        const { data, warnings } = convert(raw, { verb, locale });
+        lastJson = JSON.stringify(data, null, els.pretty.checked ? 2 : 0);
+        els.output.textContent = lastJson;
+        els.warnings.innerHTML = '';
+        for (const w of warnings) {
+          const li = document.createElement('li');
+          li.textContent = w;
+          els.warnings.appendChild(li);
+        }
+        els.copyBtn.disabled = false;
+        els.downloadBtn.disabled = false;
+        const keys = Object.keys(data).filter((k) => !['schemaVersion', 'verb', 'locale'].includes(k));
+        setStatus(`Converted ${verb}/${locale} — components: ${keys.length ? keys.join(', ') : 'none'}.`, 'ok');
+      } catch (err) {
+        setStatus(`Convert error: ${err.message}`, 'error');
+      }
+    }
+
+    els.url.addEventListener('change', () => {
+      if (!els.verb.value) els.verb.value = verbFromUrl(els.url.value);
+    });
+
+    els.fetchBtn.addEventListener('click', async () => {
+      const url = els.url.value.trim();
+      if (!url) return setStatus('Enter a URL first.', 'error');
+      setStatus('Fetching…');
+      try {
+        await fetchInto(url);
+        if (!els.verb.value) els.verb.value = verbFromUrl(url);
+        setStatus('Fetched. Click Convert.', 'ok');
+      } catch (err) {
+        setStatus(`Fetch failed (${err.message}). Paste the raw Markdown instead.`, 'error');
+      }
+    });
+
+    els.convertBtn.addEventListener('click', runConvert);
+
+    els.copyBtn.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(lastJson);
+      setStatus('Copied to clipboard.', 'ok');
+    });
+
+    els.downloadBtn.addEventListener('click', () => {
+      const verb = els.verb.value.trim() || 'verb';
+      const locale = els.locale.value.trim() || 'en-US';
+      const blob = new Blob([`${lastJson}\n`], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${verb}.${locale}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    // --- DA integration -----------------------------------------------------
+    // When opened as a DA tool, DA_SDK resolves with the current document's
+    // context. We build the aem.live `.md` URL for that doc and auto-load it.
+    // Hosting this page on the same site (…--da-dc--adobecom.aem.live) makes
+    // that fetch same-origin, so no CORS. Standalone use skips this silently.
+    (async () => {
+      try {
+        const { default: DA_SDK } = await import('https://da.live/nx/utils/sdk.js');
+        const { context } = await DA_SDK;
+        if (!context?.path) return;
+        const { org = 'adobecom', repo = 'da-dc', ref = 'main', path } = context;
+        const cleanPath = path.replace(/\.html$/i, '');
+        const mdUrl = `https://${ref}--${repo}--${org}.aem.live${cleanPath}.md`;
+        els.url.value = mdUrl;
+        els.verb.value = verbFromUrl(mdUrl);
+        els.daPath.textContent = cleanPath;
+        els.daBadge.style.display = 'block';
+        setStatus('Loading current DA document…');
+        await fetchInto(mdUrl);
+        runConvert();
+      } catch {
+        // Not running inside DA (or SDK unavailable) — manual mode only.
+      }
+    })();
+  </script>
+</body>
+</html>
