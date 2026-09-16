@@ -1,16 +1,16 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://main--da-dc--adobecom.aem.live/schemas/verb-content-1.0.0.json",
+  "$id": "https://main--da-dc--adobecom.aem.live/schemas/verb-content-1.1.0.json",
   "title": "Verb content (combined, per verb/locale)",
-  "description": "One document per verb per locale. Optional component keys are OMITTED entirely when the page has no such component (never null or empty), so the shape maps directly onto the consumer's .optional() fields.",
+  "description": "One document per verb per locale. Semantic component keys (howTo, faq) are OMITTED entirely when the page has no such component (never null or empty), so they map directly onto the consumer's .optional() fields. `blocks` and `linkReferences` are always present and carry the full, raw document so nothing is dropped.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "verb", "locale"],
+  "required": ["schemaVersion", "verb", "locale", "blocks", "linkReferences"],
   "properties": {
     "schemaVersion": {
       "type": "string",
       "description": "SemVer of THIS schema. MAJOR = breaking shape change, MINOR = additive key, PATCH = non-structural fix. Loaders should branch on the MAJOR.",
-      "const": "1.0.0"
+      "const": "1.1.0"
     },
     "verb": {
       "type": "string",
@@ -72,6 +72,30 @@
           }
         }
       }
+    },
+    "blocks": {
+      "type": "array",
+      "description": "Every parsed block in document order, verbatim — a raw catch-all so nothing is dropped, including blocks with no semantic key (Text, Icon Block, Media, Columns, Section Metadata, Rnr, …). Cell content is RAW Markdown, not rendered HTML.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["section", "name", "variants", "rows"],
+        "properties": {
+          "section": { "type": "integer", "minimum": 0, "description": "0-based index of the `---`-delimited section this block belongs to." },
+          "name": { "type": "string", "description": "Block name, e.g. \"How To\", \"Icon Block\", \"Section Metadata\"." },
+          "variants": { "type": "array", "items": { "type": "string" }, "description": "Modifiers from the header's (…), e.g. [\"vertical\",\"small\"]." },
+          "rows": {
+            "type": "array",
+            "description": "Data rows (header row excluded). Each row is an array of raw-Markdown cells, one per column.",
+            "items": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "linkReferences": {
+      "type": "object",
+      "description": "Reference-style link/image definitions (`[label]: url`) collected from the whole file, so raw block rows using `![alt][label]` remain resolvable. Empty object when the file has none.",
+      "additionalProperties": { "type": "string" }
     }
   }
 }

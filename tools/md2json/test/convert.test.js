@@ -39,6 +39,25 @@ test('omits absent keys entirely (absence convention)', () => {
   assert.ok(!('faq' in data), 'faq key must be omitted, not null/empty');
 });
 
+test('raw catch-all keeps every block, not just howTo/faq', () => {
+  const { data } = convert(sample, { verb: 'word-to-pdf', locale: 'en-US' });
+  assert.ok(Array.isArray(data.blocks));
+  const names = new Set(data.blocks.map((b) => b.name));
+  for (const expected of ['Text', 'How To', 'Icon Block', 'Media', 'Columns', 'Accordion', 'Rnr', 'Section Metadata']) {
+    assert.ok(names.has(expected), `blocks should include "${expected}"`);
+  }
+  // Blocks carry raw Markdown rows + a section index, and variants are parsed.
+  const iconBlock = data.blocks.find((b) => b.name === 'Icon Block');
+  assert.deepEqual(iconBlock.variants, ['vertical', 'small', 'xs spacing']);
+  assert.equal(typeof iconBlock.section, 'number');
+  assert.ok(iconBlock.rows[0][0].length > 0);
+});
+
+test('linkReferences map is exposed so ![alt][label] rows resolve', () => {
+  const { data } = convert(sample, { verb: 'word-to-pdf', locale: 'en-US' });
+  assert.match(data.linkReferences.image0, /\.png/);
+});
+
 test('warns when Rnr verb disagrees with requested verb', () => {
   const { warnings } = convert(sample, { verb: 'compress-pdf', locale: 'en-US' });
   assert.ok(warnings.some((w) => /word-to-pdf/.test(w)));

@@ -66,13 +66,18 @@ deps), so its output is identical to the CLI — no build step.
   builds that page's `.md` URL, and auto-converts. Hosting on the same site
   keeps that fetch same-origin (no CORS).
 
-## Output schema (v1.0.0)
+## Output schema (v1.1.0)
 
 Machine-readable JSON Schema: [`verb-content.schema.json`](./verb-content.schema.json).
 
+The document has two layers: **semantic convenience keys** (`howTo`, `faq`) that
+are pre-rendered and omitted when absent, and a **raw catch-all** (`blocks`,
+`linkReferences`) that carries the full document verbatim so nothing is ever
+dropped — including blocks with no semantic mapping yet.
+
 ```jsonc
 {
-  "schemaVersion": "1.0.0",   // always present
+  "schemaVersion": "1.1.0",   // always present
   "verb": "word-to-pdf",      // always present
   "locale": "en-US",          // always present
 
@@ -91,9 +96,27 @@ Machine-readable JSON Schema: [`verb-content.schema.json`](./verb-content.schema
     "items": [                // always ≥ 1 when present
       { "q": "…?", "a": "<p>…</p>" }  // q: inline HTML, a: block-level HTML
     ]
+  },
+
+  "blocks": [                 // ALWAYS present — every block, document order
+    {
+      "section": 0,           // 0-based index of the `---`-delimited section
+      "name": "Icon Block",
+      "variants": ["vertical", "small", "xs spacing"],
+      "rows": [["…raw Markdown cell…"]]  // header row excluded; RAW, not HTML
+    }
+    // … Text, How To, Media, Columns, Accordion, Rnr, Section Metadata, …
+  ],
+
+  "linkReferences": {         // ALWAYS present ({} when none)
+    "image0": "https://…/media_….png#width=912&height=642"
   }
 }
 ```
+
+`blocks` cell content is **raw Markdown** (not rendered) — it's the fidelity
+layer. The semantic keys are where rendered HTML lives. Reference-style images
+in raw rows (`![alt][image0]`) resolve via `linkReferences`.
 
 ### `schemaVersion` policy
 
@@ -112,6 +135,10 @@ If a page lacks a component, its key is **absent** — not `null`, not `{}`, not
 `"faq" in data` be a reliable "does this page have an FAQ" test. The same rule
 applies one level down: `howTo.video` is omitted when there's no video, and
 `video.fragmentUrl` / `video.posterUrl` are omitted when the source lacks them.
+
+This rule covers the **semantic** keys only. The raw layer (`blocks`,
+`linkReferences`) is *always* present — `blocks` is `[]` and `linkReferences` is
+`{}` for an empty document rather than being omitted.
 
 ## Authoring grammar (source side)
 
@@ -133,8 +160,10 @@ bare `---`.
 | `Media` | `large` | *(not consumed yet)* | Image + copy + CTAs. |
 | `Columns` | `verb subfooter`, `container` | *(not consumed yet)* | Related-tools grid. |
 
-Blocks under "not consumed yet" are parsed structurally but have no semantic key
-in v1. Adding one is a **MINOR** bump (new optional key) — see *Extending* below.
+Blocks under "not consumed yet" have no *dedicated semantic key*, but they are
+still fully present in the raw `blocks[]` catch-all (name, variants, raw rows,
+section index) — nothing is dropped. Promoting one to its own rendered semantic
+key is a **MINOR** bump — see *Extending* below.
 
 ### `Section Metadata` enums
 
