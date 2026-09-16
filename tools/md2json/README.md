@@ -1,0 +1,165 @@
+# md2json — DA verb-page Markdown → verb-content JSON
+
+Converts a DA/AEM verb-page `.md` (the Pandoc-style "grid table" Markdown that
+`main--da-dc--adobecom.aem.live/.../*.md` serves) into a **single, versioned,
+semantic JSON document per verb per locale** — the shape downstream loaders
+(agentic-seo's `verbContent` collection) consume directly, with **no grid-table
+or block parsing on the consumer side**.
+
+- **Combined, not split by block type** — one file per verb/locale carries every
+  supported component (`howTo`, `faq`, …).
+- **Versioned** — every document carries `schemaVersion` (SemVer). Branch on the
+  MAJOR; never silently misparse a newer shape.
+- **Omit-when-absent** — a component the page doesn't have is left out entirely
+  (never `null`, never `[]`), so it maps 1:1 onto the consumer's `.optional()`
+  fields.
+- **HTML-ready values** — rich text is pre-rendered to HTML with the same
+  remark/rehype stack the consumer uses today, so strings drop straight into
+  `set:html`.
+
+## Install & run
+
+The tool is a self-contained package (its remark/rehype deps stay out of the
+`da-dc` root tree). Install once:
+
+```bash
+cd tools/md2json
+npm install
+```
+
+Then convert a local file or a live URL:
+
+```bash
+# From the published DA Markdown, to stdout:
+node md2json.js https://main--da-dc--adobecom.aem.live/drafts/ruchika/fragments/word-to-pdf.md
+
+# From a local file, writing the artifact:
+node md2json.js ./word-to-pdf.md --verb word-to-pdf --locale en-US --out word-to-pdf.en-US.json
+```
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `--verb <name>` | input filename without `.md` | Verb id; cross-checked against the page's `Rnr` block (mismatch → stderr warning). |
+| `--locale <code>` | `en-US` | Locale id (the DA source URL carries no locale). |
+| `--out <file>` | stdout | Where to write the JSON. |
+| `--minify` | off | Compact output instead of 2-space pretty. |
+
+Programmatic use:
+
+```js
+import { convert, SCHEMA_VERSION } from './src/convert.js';
+const { data, warnings } = convert(rawMarkdown, { verb: 'word-to-pdf', locale: 'en-US' });
+```
+
+## Output schema (v1.0.0)
+
+Machine-readable JSON Schema: [`verb-content.schema.json`](./verb-content.schema.json).
+
+```jsonc
+{
+  "schemaVersion": "1.0.0",   // always present
+  "verb": "word-to-pdf",      // always present
+  "locale": "en-US",          // always present
+
+  "howTo": {                  // OMITTED if the page has no "How To" block
+    "heading": "How to convert Word to PDF",   // inline HTML
+    "intro":  ["Follow these easy steps …"],    // inline HTML, in order
+    "steps":  ["Click the <strong>Select a file</strong> …", "…"], // inline HTML, ordered
+    "video": {                // OMITTED if the block carries no video line
+      "title": "Play video: How to convert Word to PDF",
+      "fragmentUrl": "https://…#video",         // lightbox/embed target
+      "posterUrl":  "https://…/media_….png#…"   // resolved poster image
+    }
+  },
+
+  "faq": {                    // OMITTED if the page has no plain Accordion block
+    "items": [                // always ≥ 1 when present
+      { "q": "…?", "a": "<p>…</p>" }  // q: inline HTML, a: block-level HTML
+    ]
+  }
+}
+```
+
+### `schemaVersion` policy
+
+`schemaVersion` is the SemVer of **this schema**, independent of the tool version:
+
+- **MAJOR** — breaking shape change (key renamed/removed, value type changed).
+  Loaders should switch on the MAJOR and refuse/branch on unknown majors.
+- **MINOR** — additive: a new optional key. Old loaders keep working (they
+  ignore it).
+- **PATCH** — non-structural fix (e.g. rendering correction).
+
+### Absence convention
+
+If a page lacks a component, its key is **absent** — not `null`, not `{}`, not
+`[]`. This is what lets a consumer write `faq: FaqSchema.optional()` and have
+`"faq" in data` be a reliable "does this page have an FAQ" test. The same rule
+applies one level down: `howTo.video` is omitted when there's no video, and
+`video.fragmentUrl` / `video.posterUrl` are omitted when the source lacks them.
+
+## Authoring grammar (source side)
+
+The converter reads a fixed grammar of DA blocks. A block is a grid table whose
+header row is `Block Name (variant, variant, …)`. Sections are separated by a
+bare `---`.
+
+### Block types
+
+| Block name | Variants seen in the wild | Maps to output key | Notes |
+| --- | --- | --- | --- |
+| `How To` | `large image`, `seo`, `container` | `howTo` | Row 0 = heading + intro + optional video line; row 1 = `-` bulleted steps. |
+| `Accordion` | *(none)* | `faq` | Alternating question / answer rows. **Only the un-varianted block** is the FAQ. |
+| `Accordion` | `verb subfooter mobile` | *(ignored)* | Related-tools mobile nav — deliberately not pulled in. |
+| `Rnr` | *(none)* | `verb` (cross-check only) | `Verb` row declares the verb id. |
+| `Section Metadata` | *(none)* | *(styling only)* | Per-section `style` / `background`; see enums below. |
+| `Text` | `l body`, `xs body`, `large`, `center`, `contained`, `xl spacing top`, `s spacing top`, `xs spacing bottom` | *(not consumed yet)* | Marketing copy sections. |
+| `Icon Block` | `vertical`, `small`, `xs spacing` | *(not consumed yet)* | SEO icon + heading + body. |
+| `Media` | `large` | *(not consumed yet)* | Image + copy + CTAs. |
+| `Columns` | `verb subfooter`, `container` | *(not consumed yet)* | Related-tools grid. |
+
+Blocks under "not consumed yet" are parsed structurally but have no semantic key
+in v1. Adding one is a **MINOR** bump (new optional key) — see *Extending* below.
+
+### `Section Metadata` enums
+
+`Section Metadata` is a key/value block. Recognised keys and value surface:
+
+- **`style`** — a comma/space-separated list of these tokens:
+  `l spacing`, `s spacing`, `xl spacing`, `xxl-spacing`, `divider`, `center`,
+  `three-up`.
+- **`background`** — a named colour or hex: `white`, `#fbfbfb`.
+
+These reflect the values authored across current verb pages; treat them as the
+known enum surface rather than a hard constraint (unknown values pass through).
+The canonical list lives in [`src/extractors.js`](./src/extractors.js)
+(`SECTION_METADATA`) so code and docs stay in sync.
+
+## Extending (add a new component)
+
+1. Add an extractor to `EXTRACTORS` in [`src/extractors.js`](./src/extractors.js)
+   returning `undefined` when the block is absent.
+2. Add the optional key to [`verb-content.schema.json`](./verb-content.schema.json)
+   and the table above.
+3. Bump `SCHEMA_VERSION` in [`src/convert.js`](./src/convert.js): **MINOR** for a
+   new optional key, **MAJOR** if you change/remove an existing one.
+4. Add a fixture-backed test in [`test/convert.test.js`](./test/convert.test.js).
+
+## Layout
+
+```
+tools/md2json/
+  md2json.js               CLI entry (file or URL → JSON)
+  verb-content.schema.json JSON Schema of the output (draft-07)
+  src/
+    gridTable.js           DA grid-table parser (dependency-free)
+    markdown.js            cell Markdown → HTML (remark/rehype)
+    extractors.js          block → semantic key, plus block/enum constants
+    convert.js             orchestration, schemaVersion, omit-when-absent
+  test/
+    convert.test.js        node:test suite
+    fixtures/word-to-pdf.md
+```
+
+The parser and renderer are faithful ports of the agentic-seo reference
+implementation; keep them in sync when the DA export format changes.

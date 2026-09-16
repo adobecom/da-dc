@@ -1,0 +1,24 @@
+{
+  "name": "@adobecom/dc-md2json",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Convert DA/AEM verb-page grid-table Markdown into versioned verb-content JSON for downstream consumers (agentic-seo).",
+  "type": "module",
+  "bin": {
+    "md2json": "./md2json.js"
+  },
+  "scripts": {
+    "start": "node ./md2json.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "unified": "^11.0.5"
+  }
+}

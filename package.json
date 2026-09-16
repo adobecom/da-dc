@@ -22,6 +22,7 @@
     "lint:js": "eslint .",
     "lint:css": "stylelint 'acrobat/blocks/**/*.css' 'acrobat/styles/*.css'",
     "update-csp": "node ./tools/cspUpdate/cspUpdate.js",
+    "md2json": "node ./tools/md2json/md2json.js",
     "ewtest": "jest --testPathPattern=edgeworkers",
     "ewprod2stg": "node ./edgeworkers/scripts/prod2stg.js",
     "ewbuild": "node ./edgeworkers/scripts/build.js",

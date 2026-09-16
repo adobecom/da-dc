@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://main--da-dc--adobecom.aem.live/schemas/verb-content-1.0.0.json",
+  "title": "Verb content (combined, per verb/locale)",
+  "description": "One document per verb per locale. Optional component keys are OMITTED entirely when the page has no such component (never null or empty), so the shape maps directly onto the consumer's .optional() fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "verb", "locale"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "SemVer of THIS schema. MAJOR = breaking shape change, MINOR = additive key, PATCH = non-structural fix. Loaders should branch on the MAJOR.",
+      "const": "1.0.0"
+    },
+    "verb": {
+      "type": "string",
+      "description": "Verb id, e.g. \"word-to-pdf\". Cross-checked against the page's Rnr block.",
+      "examples": ["word-to-pdf", "compress-pdf"]
+    },
+    "locale": {
+      "type": "string",
+      "description": "Locale id, e.g. \"en-US\".",
+      "examples": ["en-US"]
+    },
+    "howTo": {
+      "type": "object",
+      "description": "Sourced from the DA \"How To\" block. Omitted when the page has no How To block.",
+      "additionalProperties": false,
+      "required": ["heading", "intro", "steps"],
+      "properties": {
+        "heading": { "type": "string", "description": "Inline HTML." },
+        "intro": {
+          "type": "array",
+          "description": "Intro paragraphs as inline HTML, in order.",
+          "items": { "type": "string" }
+        },
+        "steps": {
+          "type": "array",
+          "description": "Ordered steps as inline HTML.",
+          "items": { "type": "string" }
+        },
+        "video": {
+          "type": "object",
+          "description": "Omitted when the How To block carries no video line.",
+          "additionalProperties": false,
+          "required": ["title"],
+          "properties": {
+            "title": { "type": "string" },
+            "fragmentUrl": { "type": "string", "description": "Lightbox/embed target." },
+            "posterUrl": { "type": "string", "description": "Poster image, resolved from the reference-style image definition." }
+          }
+        }
+      }
+    },
+    "faq": {
+      "type": "object",
+      "description": "Sourced from the plain DA \"Accordion\" block (no variant). Omitted when the page has no such block or it is empty.",
+      "additionalProperties": false,
+      "required": ["items"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["q", "a"],
+            "properties": {
+              "q": { "type": "string", "description": "Question, inline HTML." },
+              "a": { "type": "string", "description": "Answer, block-level HTML (may contain <p>, <ul>, <a>)." }
+            }
+          }
+        }
+      }
+    }
+  }
+}

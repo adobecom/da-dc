@@ -1,3 +1,4 @@
 test/e2e
 test/edgeworkers
 edgeworkers
+tools/md2json
