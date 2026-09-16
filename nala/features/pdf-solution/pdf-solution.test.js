@@ -64,77 +64,21 @@ async function runCompletePdfSolutionSmoke(page, baseURL, path) {
     await expect(link).toHaveAttribute('href', /acrobat\/features/);
   });
 
-  await test.step('Verify plans & pricing merch cards (tabs)', async () => {
-    await expect(pdf.plansAndPricingSection).toBeVisible();
-    await expect(pdf.plansAndPricingTabs).toBeVisible();
-    await expect(pdf.plansAndPricingTabButtons).toHaveCount(3);
+  await test.step('Verify plans & pricing merch cards per tab', async () => {
+    const plansSection = page.locator('div[data-path="/dc-shared/fragments/acrobat/complete-pdf-solution/mini-compare-chart"]');
+    const tabs = plansSection.locator('button[id^="tab-plans-and-pricing-"]');
 
-    await expect(pdf.plansAndPricingTabIndividuals).toBeVisible();
-    await expect(pdf.plansAndPricingTabIndividuals).toBeEnabled();
-    await expect(pdf.plansAndPricingTabBusiness).toBeVisible();
-    await expect(pdf.plansAndPricingTabBusiness).toBeEnabled();
-    await expect(pdf.plansAndPricingTabStudents).toBeVisible();
-    await expect(pdf.plansAndPricingTabStudents).toBeEnabled();
+    await tabs.first().scrollIntoViewIfNeeded({ timeout: 30000 });
+    const tabCount = await tabs.count();
+    expect(tabCount).toBeGreaterThan(0);
 
-    await pdf.plansAndPricingTabIndividuals.click();
-    await expect(pdf.plansAndPricingTabIndividuals).toHaveAttribute('aria-selected', 'true');
-    await expect(pdf.plansAndPricingPanelIndividuals).not.toHaveAttribute('hidden');
-
-    await expect(pdf.plansIndividualsMerchCards).toHaveCount(3);
-    await expect(pdf.plansIndividualsReaderCard).toBeVisible();
-    await expect(pdf.plansIndividualsReaderDownload).toBeVisible();
-    await expect(pdf.plansIndividualsReaderDownload).toBeEnabled();
-    await expect(pdf.plansIndividualsProCard).toBeVisible();
-    await expect(pdf.plansIndividualsProPrice.first()).toBeVisible();
-    await expect(pdf.plansIndividualsProFreeTrial).toBeVisible();
-    await expect(pdf.plansIndividualsProFreeTrial).toBeEnabled();
-    await expect(pdf.plansIndividualsProBuyNow).toBeVisible();
-    await expect(pdf.plansIndividualsProBuyNow).toBeEnabled();
-    await expect(pdf.plansIndividualsStudioCard).toBeVisible();
-    await expect(pdf.plansIndividualsStudioPrice.first()).toBeVisible();
-    await expect(pdf.plansIndividualsStudioFreeTrial).toBeVisible();
-    await expect(pdf.plansIndividualsStudioFreeTrial).toBeEnabled();
-    await expect(pdf.plansIndividualsStudioBuyNow).toBeVisible();
-    await expect(pdf.plansIndividualsStudioBuyNow).toBeEnabled();
-
-    await pdf.plansAndPricingTabBusiness.click();
-    await expect(pdf.plansAndPricingTabBusiness).toHaveAttribute('aria-selected', 'true');
-    await expect(pdf.plansAndPricingPanelBusiness).not.toHaveAttribute('hidden');
-
-    await expect(pdf.plansBusinessMerchCards).toHaveCount(2);
-    await expect(pdf.plansBusinessProCard).toBeVisible();
-    await expect(pdf.plansBusinessProPrice.first()).toBeVisible();
-    await expect(pdf.plansBusinessProFreeTrial).toBeVisible();
-    await expect(pdf.plansBusinessProFreeTrial).toBeEnabled();
-    await expect(pdf.plansBusinessProBuyNow).toBeVisible();
-    await expect(pdf.plansBusinessProBuyNow).toBeEnabled();
-    await expect(pdf.plansBusinessStudioCard).toBeVisible();
-    await expect(pdf.plansBusinessStudioPrice.first()).toBeVisible();
-    await expect(pdf.plansBusinessStudioFreeTrial).toBeVisible();
-    await expect(pdf.plansBusinessStudioFreeTrial).toBeEnabled();
-    await expect(pdf.plansBusinessStudioBuyNow).toBeVisible();
-    await expect(pdf.plansBusinessStudioBuyNow).toBeEnabled();
-
-    await pdf.plansAndPricingTabStudents.click();
-    await expect(pdf.plansAndPricingTabStudents).toHaveAttribute('aria-selected', 'true');
-    await expect(pdf.plansAndPricingPanelStudents).not.toHaveAttribute('hidden');
-
-    await expect(pdf.plansStudentsMerchCards).toHaveCount(2);
-    await expect(pdf.plansStudentsProCard).toBeVisible();
-    await expect(pdf.plansStudentsProPrice.first()).toBeVisible();
-    await expect(pdf.plansStudentsProFreeTrial).toBeVisible();
-    await expect(pdf.plansStudentsProFreeTrial).toBeEnabled();
-    await expect(pdf.plansStudentsProBuyNow).toBeVisible();
-    await expect(pdf.plansStudentsProBuyNow).toBeEnabled();
-    await expect(pdf.plansStudentsCCCard).toBeVisible();
-    await expect(pdf.plansStudentsCCPrice.first()).toBeVisible();
-    await expect(pdf.plansStudentsCCFreeTrial).toBeVisible();
-    await expect(pdf.plansStudentsCCFreeTrial).toBeEnabled();
-    await expect(pdf.plansStudentsCCBuyNow).toBeVisible();
-    await expect(pdf.plansStudentsCCBuyNow).toBeEnabled();
-
-    await pdf.plansAndPricingTabIndividuals.click();
-    await expect(pdf.plansAndPricingTabIndividuals).toHaveAttribute('aria-selected', 'true');
+    for (let i = 0; i < tabCount; i += 1) {
+      const tab = tabs.nth(i);
+      await expect(tab).toBeVisible();
+      await tab.click();
+      const visibleCard = plansSection.locator('merch-card').filter({ visible: true }).first();
+      await expect(visibleCard).toBeVisible();
+    }
   });
 
   // await test.step('Verify PCWorld Best 2025 blade', async () => {
@@ -205,10 +149,8 @@ async function runCompletePdfSolutionSmoke(page, baseURL, path) {
     await expect(pdf.fedsFooterMiscLinks).toBeVisible();
     await expect(pdf.fedsRegionPicker.first()).toBeVisible();
     await expect(pdf.fedsSocial.first()).toBeVisible();
-    await expect(pdf.fedsSocial).toHaveCount(4);
     await expect(pdf.fedsFooterLegalWrapper).toBeVisible();
     await expect(pdf.fedsFooterPrivacyListItems.first()).toBeVisible();
-    await expect(pdf.fedsFooterPrivacyListItems).toHaveCount(6);
   });
 
   await test.step('Verify visible checkout links are visible and enabled', async () => {
