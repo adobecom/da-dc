@@ -146,6 +146,15 @@ The converter reads a fixed grammar of DA blocks. A block is a grid table whose
 header row is `Block Name (variant, variant, …)`. Sections are separated by a
 bare `---`.
 
+> **Machine-readable version:** [`grammar.json`](./grammar.json) is the canonical,
+> fetchable form of everything in this section — the fixed block-type set, each
+> block's variant enum, its `mapsTo` output key, and the `Section Metadata`
+> `style`/`background` enums. It's kept in lock-step with the code constants in
+> [`src/extractors.js`](./src/extractors.js) (`BLOCK_GRAMMAR`, `SECTION_METADATA`)
+> by a sync test, so the table below and `grammar.json` can never drift. Note:
+> variant lists are the **known enum surface**, not enforced — an unknown variant
+> passes through into raw `blocks[]` rather than being rejected.
+
 ### Block types
 
 | Block name | Variants seen in the wild | Maps to output key | Notes |

@@ -12,19 +12,72 @@
 import { renderInline, renderBlock } from './markdown.js';
 
 /**
+ * The DA/AEM authoring grammar for verb pages: the fixed set of block types,
+ * their known variant options (enum surface), and which output key each maps
+ * to. This is the canonical source for the machine-readable `grammar.json`
+ * (kept in sync by a test) and the README block table.
+ *
+ * `variants` is the KNOWN enum surface, not an enforced constraint — the
+ * converter passes unknown variants through into the raw `blocks[]` catch-all
+ * rather than rejecting them. `mapsTo` is the semantic output key (or `null`
+ * for blocks that are styling/markers/not-yet-modelled).
+ */
+export const BLOCK_GRAMMAR = [
+  {
+    name: 'How To',
+    variants: ['large image', 'seo', 'container'],
+    mapsTo: 'howTo',
+    notes: 'Row 0 = heading + intro + optional video line; row 1 = "-" bulleted steps.',
+  },
+  {
+    name: 'Accordion',
+    variants: ['verb subfooter mobile'],
+    mapsTo: 'faq',
+    notes: 'Only the UN-varianted Accordion becomes `faq` (alternating Q/A rows). The "verb subfooter mobile" variant is the related-tools mobile nav and is ignored.',
+  },
+  {
+    name: 'Rnr',
+    variants: [],
+    mapsTo: null,
+    notes: 'The `Verb` row declares the verb id; used to cross-check the filename, not emitted as a component.',
+  },
+  {
+    name: 'Section Metadata',
+    variants: [],
+    mapsTo: null,
+    notes: 'Per-section styling; see `sectionMetadata` enums for `style` / `background` values.',
+  },
+  {
+    name: 'Text',
+    variants: ['l body', 'xs body', 'large', 'center', 'contained', 'xl spacing top', 's spacing top', 'xs spacing bottom'],
+    mapsTo: null,
+    notes: 'Marketing copy / section headings. Present in raw `blocks[]` only.',
+  },
+  {
+    name: 'Icon Block',
+    variants: ['vertical', 'small', 'xs spacing'],
+    mapsTo: null,
+    notes: 'SEO feature card: icon + heading + body. Present in raw `blocks[]` only.',
+  },
+  {
+    name: 'Media',
+    variants: ['large'],
+    mapsTo: null,
+    notes: 'Image + copy + CTA links. Present in raw `blocks[]` only.',
+  },
+  {
+    name: 'Columns',
+    variants: ['verb subfooter', 'container'],
+    mapsTo: null,
+    notes: 'Related-tools footer grid. Present in raw `blocks[]` only.',
+  },
+];
+
+/**
  * Block names recognised by the DA/AEM authoring grammar for verb pages. Names
  * not listed here are still parsed structurally but carry no semantic key.
  */
-export const KNOWN_BLOCK_TYPES = [
-  'Text',
-  'How To',
-  'Icon Block',
-  'Media',
-  'Columns',
-  'Accordion',
-  'Rnr',
-  'Section Metadata',
-];
+export const KNOWN_BLOCK_TYPES = BLOCK_GRAMMAR.map((b) => b.name);
 
 /**
  * Section Metadata is a key/value block. These are the values seen in authored

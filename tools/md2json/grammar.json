@@ -1,0 +1,59 @@
+{
+  "$comment": "Machine-readable authoring grammar for DA/AEM verb pages, consumed alongside verb-content.schema.json. `variants` is the KNOWN enum surface, not enforced — unknown variants pass through into the raw blocks[] catch-all. Kept in sync with src/extractors.js (BLOCK_GRAMMAR, SECTION_METADATA) by a test.",
+  "grammarVersion": "1.1.0",
+  "blockTypes": [
+    {
+      "name": "How To",
+      "variants": ["large image", "seo", "container"],
+      "mapsTo": "howTo",
+      "notes": "Row 0 = heading + intro + optional video line; row 1 = \"-\" bulleted steps."
+    },
+    {
+      "name": "Accordion",
+      "variants": ["verb subfooter mobile"],
+      "mapsTo": "faq",
+      "notes": "Only the UN-varianted Accordion becomes `faq` (alternating Q/A rows). The \"verb subfooter mobile\" variant is the related-tools mobile nav and is ignored."
+    },
+    {
+      "name": "Rnr",
+      "variants": [],
+      "mapsTo": null,
+      "notes": "The `Verb` row declares the verb id; used to cross-check the filename, not emitted as a component."
+    },
+    {
+      "name": "Section Metadata",
+      "variants": [],
+      "mapsTo": null,
+      "notes": "Per-section styling; see `sectionMetadata` enums for `style` / `background` values."
+    },
+    {
+      "name": "Text",
+      "variants": ["l body", "xs body", "large", "center", "contained", "xl spacing top", "s spacing top", "xs spacing bottom"],
+      "mapsTo": null,
+      "notes": "Marketing copy / section headings. Present in raw `blocks[]` only."
+    },
+    {
+      "name": "Icon Block",
+      "variants": ["vertical", "small", "xs spacing"],
+      "mapsTo": null,
+      "notes": "SEO feature card: icon + heading + body. Present in raw `blocks[]` only."
+    },
+    {
+      "name": "Media",
+      "variants": ["large"],
+      "mapsTo": null,
+      "notes": "Image + copy + CTA links. Present in raw `blocks[]` only."
+    },
+    {
+      "name": "Columns",
+      "variants": ["verb subfooter", "container"],
+      "mapsTo": null,
+      "notes": "Related-tools footer grid. Present in raw `blocks[]` only."
+    }
+  ],
+  "sectionMetadata": {
+    "keys": ["style", "background"],
+    "styleTokens": ["l spacing", "s spacing", "xl spacing", "xxl-spacing", "divider", "center", "three-up"],
+    "backgrounds": ["white", "#fbfbfb"]
+  }
+}
