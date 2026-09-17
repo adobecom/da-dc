@@ -893,10 +893,24 @@ export default async function init(element) {
     });
   }
 
+  function preloadUnitySplash() {
+    return new Promise((resolve) => {
+      const deadline = Date.now() + 3000;
+      const tick = () => {
+        if (document.querySelector('.splash-loader') || Date.now() > deadline) {
+          resolve();
+          return;
+        }
+        document.dispatchEvent(new Event('mousemove'));
+        setTimeout(tick, 60);
+      };
+      tick();
+    });
+  }
+
   function ensureUnity() {
     if (!unityInitPromise) {
       unityInitPromise = (async () => {
-        element.classList.add('verb-widget');
         wireUnityEvents();
         const unityBlock = createTag('div', { class: `unity workflow-acrobat${referrer ? ` referrer-${referrer}` : ''}`, style: 'display:none' });
         const span = createTag('span', { class: `icon icon-${VERB}` });
@@ -904,7 +918,7 @@ export default async function init(element) {
         element.after(unityBlock);
         const { default: initUnity } = await warmUnity();
         await initUnity(unityBlock);
-        document.dispatchEvent(new Event('mousemove'));
+        await preloadUnitySplash();
         unityReady = true;
       })();
     }
