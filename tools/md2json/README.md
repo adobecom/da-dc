@@ -159,35 +159,47 @@ bare `---`.
 
 ### Block types
 
-| Block name | Variants seen in the wild | Maps to output key | Notes |
+| Block name | Known variants (enum) | Maps to output key | Notes |
 | --- | --- | --- | --- |
-| `How To` | `large image`, `seo`, `container` | `howTo` | Row 0 = heading + intro + optional video line; row 1 = `-` bulleted steps. |
-| `Accordion` | *(none)* | `faq` | Alternating question / answer rows. **Only the un-varianted block** is the FAQ. |
-| `Accordion` | `verb subfooter mobile` | *(ignored)* | Related-tools mobile nav — deliberately not pulled in. |
+| `How To` | `large image`, `large media`, `seo`, `container`, `xlarge` | `howTo` | Row 0 = heading + intro + optional video line; row 1 = `-` bulleted steps. |
+| `Accordion` | *(none)* → `faq`; `verb subfooter mobile`, `seo` → ignored | `faq` | Alternating question / answer rows. **Only the un-varianted block** is the FAQ; varianted Accordions (mobile nav, seo) are ignored by the extractor. |
 | `Rnr` | *(none)* | `verb` (cross-check only) | `Verb` row declares the verb id. |
 | `Section Metadata` | *(none)* | *(styling only)* | Per-section `style` / `background`; see enums below. |
-| `Text` | `l body`, `xs body`, `large`, `center`, `contained`, `xl spacing top`, `s spacing top`, `xs spacing bottom` | *(not consumed yet)* | Marketing copy sections. |
-| `Icon Block` | `vertical`, `small`, `xs spacing` | *(not consumed yet)* | SEO icon + heading + body. |
+| `Text` | `l body`, `xs body`, `medium`, `large`, `center`, `contained`, `l spacing top`, `l spacing bottom`, `s spacing`, `s spacing top`, `xl spacing`, `xl spacing top`, `xs spacing bottom` | *(not consumed yet)* | Marketing copy sections. |
+| `Icon Block` | `vertical`, `small`, `center`, `xs spacing` | *(not consumed yet)* | SEO icon + heading + body. |
 | `Media` | `large` | *(not consumed yet)* | Image + copy + CTAs. |
 | `Columns` | `verb subfooter`, `container` | *(not consumed yet)* | Related-tools grid. |
+| `Breadcrumbs` | *(none)* | *(not consumed yet)* | Breadcrumb navigation. |
+| `Editorial Card` | `no border`, `xs body`, `xs heading` | *(not consumed yet)* | Editorial / promo card. |
+| `Metadata` | *(none)* | *(not consumed yet)* | Page-level metadata. |
+| `Unity` | `workflow acrobat` | *(not consumed yet)* | Loads the Unity SDK / verb bridge. |
+| `Verb Widget` | `combine pdf`, `compress pdf`, `crop pages`, `jpg to pdf`, `pdf to image`, `pdf to word`, `rotate pages`, `split pdf` | *(not consumed yet)* | Lightweight verb widget; variant selects the verb. |
 
 Blocks under "not consumed yet" have no *dedicated semantic key*, but they are
 still fully present in the raw `blocks[]` catch-all (name, variants, raw rows,
 section index) — nothing is dropped. Promoting one to its own rendered semantic
 key is a **MINOR** bump — see *Extending* below.
 
+> **Matching is lenient.** Variant/token comparison is **case-insensitive** and
+> treats **hyphens and spaces as equivalent**, so `l spacing` ≡ `l-spacing` and
+> `three-up` ≡ `Three up` ≡ `three up`. This absorbs authoring inconsistency; you
+> only get a warning for a genuinely new or misspelled value.
+
 ### `Section Metadata` enums
 
-`Section Metadata` is a key/value block. Recognised keys and value surface:
+`Section Metadata` is a key/value block. Recognised keys and value surface
+(canonical forms — matching is case/hyphen/space-insensitive):
 
-- **`style`** — a comma/space-separated list of these tokens:
-  `l spacing`, `s spacing`, `xl spacing`, `xxl-spacing`, `divider`, `center`,
-  `three-up`.
-- **`background`** — a named colour or hex: `white`, `#fbfbfb`.
+- **`style`** — a comma-separated list of these tokens:
+  `l spacing`, `l spacing top`, `s spacing`, `xl spacing`, `xs spacing`,
+  `xxl spacing`, `xxl spacing bottom`, `divider`, `center`, `three up`,
+  `four up`, `grid width 10`.
+- **`background`** — a named colour or hex: `white`, `#fbfbfb`, `#f8f8f8`, `#fff`.
 
-These reflect the values authored across current verb pages. The canonical list
-lives in [`src/extractors.js`](./src/extractors.js) (`SECTION_METADATA`) so code
-and docs stay in sync.
+These reflect the values authored across the surveyed verb pages
+(`drafts/ruchika/fragments` + `/acrobat/online`). The canonical list lives in
+[`src/extractors.js`](./src/extractors.js) (`SECTION_METADATA`) so code and docs
+stay in sync.
 
 ### Grammar validation (enum enforcement)
 

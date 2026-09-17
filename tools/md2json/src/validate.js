@@ -13,13 +13,19 @@
 
 import { BLOCK_GRAMMAR, SECTION_METADATA } from './extractors.js';
 
-const BY_NAME = new Map(BLOCK_GRAMMAR.map((b) => [b.name, b]));
-const STYLE_TOKENS = new Set(SECTION_METADATA.styleTokens.map((t) => t.toLowerCase()));
-const BACKGROUNDS = new Set(SECTION_METADATA.backgrounds.map((t) => t.toLowerCase()));
-const META_KEYS = new Set(SECTION_METADATA.keys.map((k) => k.toLowerCase()));
-
 /** Strip authoring Markdown noise so enum comparisons see the bare value. */
 const clean = (s) => (s ?? '').replace(/\*\*/g, '').replace(/\\/g, '').trim();
+
+/**
+ * Normalise for enum comparison: case-insensitive AND hyphen/space-insensitive,
+ * so authors may write `l spacing` or `l-spacing`, `three-up` or `Three up`.
+ */
+const norm = (s) => clean(s).toLowerCase().replace(/[-\s]+/g, ' ').trim();
+
+const BY_NAME = new Map(BLOCK_GRAMMAR.map((b) => [b.name, b]));
+const STYLE_TOKENS = new Set(SECTION_METADATA.styleTokens.map(norm));
+const BACKGROUNDS = new Set(SECTION_METADATA.backgrounds.map(norm));
+const META_KEYS = new Set(SECTION_METADATA.keys.map((k) => k.toLowerCase()));
 
 function validateSectionMetadata(block) {
   const warnings = [];
@@ -35,11 +41,11 @@ function validateSectionMetadata(block) {
     if (key === 'style') {
       // `style` is a comma-separated list of (possibly multi-word) tokens.
       for (const token of value.split(/[,\n]/).map((t) => t.trim()).filter(Boolean)) {
-        if (!STYLE_TOKENS.has(token.toLowerCase())) {
+        if (!STYLE_TOKENS.has(norm(token))) {
           warnings.push(`Section Metadata style token "${token}" is not in the grammar (known: ${SECTION_METADATA.styleTokens.join(', ')}).`);
         }
       }
-    } else if (key === 'background' && !BACKGROUNDS.has(value.toLowerCase())) {
+    } else if (key === 'background' && !BACKGROUNDS.has(norm(value))) {
       warnings.push(`Section Metadata background "${value}" is not in the grammar (known: ${SECTION_METADATA.backgrounds.join(', ')}).`);
     }
   }
@@ -58,9 +64,9 @@ export function validateBlocks(blocks) {
       warnings.push(`Unknown block type "${block.name}" — not in the authoring grammar (grammar.json).`);
       continue;
     }
-    const known = new Set(grammar.variants.map((v) => v.toLowerCase()));
+    const known = new Set(grammar.variants.map(norm));
     for (const variant of block.variants) {
-      if (!known.has(variant.toLowerCase())) {
+      if (!known.has(norm(variant))) {
         warnings.push(`Unknown variant "${variant}" on "${block.name}" block (known: ${grammar.variants.join(', ') || 'none'}).`);
       }
     }

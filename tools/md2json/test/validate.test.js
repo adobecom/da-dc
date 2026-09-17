@@ -18,6 +18,26 @@ test('in-grammar blocks produce no warnings (case/Markdown tolerant)', () => {
   assert.deepEqual(validateBlocks(blocks), []);
 });
 
+test('matching is hyphen/space and case insensitive', () => {
+  const blocks = [
+    // canonical grammar has "l spacing", "three up", "xxl spacing"
+    { name: 'Section Metadata', variants: [], rows: [['style', 'l-spacing, Three-Up, Xxl-Spacing']] },
+    // grammar has "no border" / "xs heading" for Editorial Card
+    { name: 'Editorial Card', variants: ['No-Border', 'XS Heading'], rows: [] },
+  ];
+  assert.deepEqual(validateBlocks(blocks), []);
+});
+
+test('recognises the newly surveyed block types (Verb Widget, Unity, etc.)', () => {
+  const blocks = [
+    { name: 'Verb Widget', variants: ['jpg to pdf'], rows: [] },
+    { name: 'Unity', variants: ['workflow acrobat'], rows: [] },
+    { name: 'Breadcrumbs', variants: [], rows: [] },
+    { name: 'Metadata', variants: [], rows: [] },
+  ];
+  assert.deepEqual(validateBlocks(blocks), []);
+});
+
 test('flags unknown block, unknown variant, and bad Section Metadata values', () => {
   const blocks = [
     { name: 'Bogus', variants: [], rows: [] },

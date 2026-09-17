@@ -21,19 +21,25 @@ import { renderInline, renderBlock } from './markdown.js';
  * converter passes unknown variants through into the raw `blocks[]` catch-all
  * rather than rejecting them. `mapsTo` is the semantic output key (or `null`
  * for blocks that are styling/markers/not-yet-modelled).
+ *
+ * Values are stored in a canonical readable form. Validation compares
+ * case-insensitively AND treats hyphens/spaces as equivalent (see validate.js),
+ * so authoring both `l spacing` and `l-spacing`, or `three-up` and `Three up`,
+ * matches the same entry. Derived from a survey of the drafts/ruchika fragments
+ * and the /acrobat/online verb pages.
  */
 export const BLOCK_GRAMMAR = [
   {
     name: 'How To',
-    variants: ['large image', 'seo', 'container'],
+    variants: ['large image', 'large media', 'seo', 'container', 'xlarge'],
     mapsTo: 'howTo',
     notes: 'Row 0 = heading + intro + optional video line; row 1 = "-" bulleted steps.',
   },
   {
     name: 'Accordion',
-    variants: ['verb subfooter mobile'],
+    variants: ['verb subfooter mobile', 'seo'],
     mapsTo: 'faq',
-    notes: 'Only the UN-varianted Accordion becomes `faq` (alternating Q/A rows). The "verb subfooter mobile" variant is the related-tools mobile nav and is ignored.',
+    notes: 'Only the UN-varianted Accordion becomes `faq` (alternating Q/A rows). Variants like "verb subfooter mobile" (related-tools mobile nav) and "seo" are ignored by the faq extractor.',
   },
   {
     name: 'Rnr',
@@ -49,13 +55,13 @@ export const BLOCK_GRAMMAR = [
   },
   {
     name: 'Text',
-    variants: ['l body', 'xs body', 'large', 'center', 'contained', 'xl spacing top', 's spacing top', 'xs spacing bottom'],
+    variants: ['l body', 'xs body', 'medium', 'large', 'center', 'contained', 'l spacing top', 'l spacing bottom', 's spacing', 's spacing top', 'xl spacing', 'xl spacing top', 'xs spacing bottom'],
     mapsTo: null,
     notes: 'Marketing copy / section headings. Present in raw `blocks[]` only.',
   },
   {
     name: 'Icon Block',
-    variants: ['vertical', 'small', 'xs spacing'],
+    variants: ['vertical', 'small', 'center', 'xs spacing'],
     mapsTo: null,
     notes: 'SEO feature card: icon + heading + body. Present in raw `blocks[]` only.',
   },
@@ -71,6 +77,36 @@ export const BLOCK_GRAMMAR = [
     mapsTo: null,
     notes: 'Related-tools footer grid. Present in raw `blocks[]` only.',
   },
+  {
+    name: 'Breadcrumbs',
+    variants: [],
+    mapsTo: null,
+    notes: 'Breadcrumb navigation. Present in raw `blocks[]` only.',
+  },
+  {
+    name: 'Editorial Card',
+    variants: ['no border', 'xs body', 'xs heading'],
+    mapsTo: null,
+    notes: 'Editorial/promo card. Present in raw `blocks[]` only.',
+  },
+  {
+    name: 'Metadata',
+    variants: [],
+    mapsTo: null,
+    notes: 'Page-level metadata (title, description, etc.). Present in raw `blocks[]` only.',
+  },
+  {
+    name: 'Unity',
+    variants: ['workflow acrobat'],
+    mapsTo: null,
+    notes: 'Loads the Unity SDK and wires the verb → DC Hosted bridge. Present in raw `blocks[]` only.',
+  },
+  {
+    name: 'Verb Widget',
+    variants: ['combine pdf', 'compress pdf', 'crop pages', 'jpg to pdf', 'pdf to image', 'pdf to word', 'rotate pages', 'split pdf'],
+    mapsTo: null,
+    notes: 'Newer lightweight verb widget; the variant selects the verb/workflow. Present in raw `blocks[]` only.',
+  },
 ];
 
 /**
@@ -80,23 +116,29 @@ export const BLOCK_GRAMMAR = [
 export const KNOWN_BLOCK_TYPES = BLOCK_GRAMMAR.map((b) => b.name);
 
 /**
- * Section Metadata is a key/value block. These are the values seen in authored
- * verb pages; treat them as the current enum surface, not a hard constraint.
+ * Section Metadata is a key/value block. These are the values authored across
+ * the surveyed verb pages, in canonical form (validation is case- and
+ * hyphen/space-insensitive, so `Xxl-spacing` matches `xxl spacing`).
  */
 export const SECTION_METADATA = {
   keys: ['style', 'background'],
-  // `style` is a space/comma-separated list of tokens; these are the tokens.
+  // `style` is a comma-separated list of (possibly multi-word) tokens.
   styleTokens: [
     'l spacing',
+    'l spacing top',
     's spacing',
     'xl spacing',
-    'xxl-spacing',
+    'xs spacing',
+    'xxl spacing',
+    'xxl spacing bottom',
     'divider',
     'center',
-    'three-up',
+    'three up',
+    'four up',
+    'grid width 10',
   ],
   // `background` is a named colour or a hex value.
-  backgrounds: ['white', '#fbfbfb'],
+  backgrounds: ['white', '#fbfbfb', '#f8f8f8', '#fff'],
 };
 
 // `![<fragment-url> \| <caption> \| <icon-hint>][<poster-ref-label>]` — the alt
