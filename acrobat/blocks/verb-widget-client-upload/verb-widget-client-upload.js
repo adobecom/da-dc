@@ -478,7 +478,6 @@ export default async function init(element) {
   const triggerEarlyPrefetch = () => {
     prefetchNextPage(buildEarlyPrefetchUrl(locale));
     prefetchTarget();
-    warmUnity();
   };
   document.addEventListener('click', triggerEarlyPrefetch, { once: true });
   document.addEventListener('dragover', triggerEarlyPrefetch, { once: true });
@@ -1073,6 +1072,10 @@ export default async function init(element) {
       );
     }
   };
+
+  const initUnityOnInteraction = () => ensureUnity();
+  document.addEventListener('click', initUnityOnInteraction, { once: true });
+  document.addEventListener('dragover', initUnityOnInteraction, { once: true });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {

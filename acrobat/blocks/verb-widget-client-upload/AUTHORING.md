@@ -9,7 +9,7 @@ The **verb-widget-client-upload** block is a standalone upload widget for image-
 
 > **Currently supported verb:** `image-to-pdf` only. Do not use this block for other verbs.
 
-> **No Unity block required:** Pages using this block do **not** need to author a `unity` block. The block injects one on demand the first time a non-jpg/png file is selected. Unity code is not loaded on page load — it is warmed on the first user interaction (click/drag) and fully initialized only when a non-jpg/png file is chosen, so the common jpg/png path keeps its fast, fully-client-side behavior.
+> **No Unity block required:** Pages using this block do **not** need to author a `unity` block. The block injects and initializes one itself. Unity code is not loaded on page load — it is initialized on the first user interaction (click/drag), which is also when the file picker opens, so Unity and its transition screen are ready by the time a file is selected. The jpg/png path stays fully client-side regardless (Unity never handles those files).
 
 ---
 
