@@ -422,6 +422,17 @@ function prefetchTarget() {
   document.body.appendChild(iframe);
 }
 
+function prefetchUnityRedirect(url) {
+  if (!url || window.unityRedirectPrefetched) return;
+  window.unityRedirectPrefetched = true;
+  const link = document.createElement('link');
+  link.rel = 'prefetch';
+  link.href = url;
+  link.crossOrigin = 'anonymous';
+  link.as = 'document';
+  document.head.appendChild(link);
+}
+
 function buildEarlyPrefetchUrl(locale) {
   const domain = DC_ENV === 'prod' ? 'https://www.adobe.com' : 'https://www.stage.adobe.com';
   const redirectPrefix = LOCALE_REDIRECT_MAP[locale.prefix.slice(1)];
@@ -695,6 +706,7 @@ export default async function init(element) {
   let exitFlag = false;
   let isUploading = false;
   let tabClosureSent = false;
+  let noOfFiles = null;
 
   function setCookie(name, value) {
     const expires = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
@@ -826,7 +838,7 @@ export default async function init(element) {
     element.addEventListener('unity:track-analytics', (e) => {
       const { event, data } = e.detail || {};
       if (!event) return;
-      const metadata = { ...data, userAttempts };
+      const metadata = { ...data, userAttempts, noOfFiles };
       switch (event) {
         case 'change':
           hideError();
@@ -845,18 +857,23 @@ export default async function init(element) {
           exitFlag = false;
           setCookie('UTS_Uploading', Date.now());
           handleAnalyticsEvent('job:uploading', metadata, false);
+          if (limits.multipleFiles) handleAnalyticsEvent('job:multi-file-uploading', metadata, false);
           registerTabCloseEvent(metadata, 'uploading');
           break;
-        case 'uploaded':
+        case 'uploaded': {
           exitFlag = true;
           isUploading = false;
           setCookie('UTS_Uploaded', Date.now());
-          handleAnalyticsEvent('job:uploaded', { ...metadata, uploadTime: getUploadTime() }, false);
+          const uploadedMeta = { ...metadata, uploadTime: getUploadTime() };
+          handleAnalyticsEvent('job:uploaded', uploadedMeta, false);
+          if (limits.multipleFiles) handleAnalyticsEvent('job:multi-file-uploaded', uploadedMeta, false);
           setUser();
           incrementVerbKey(`${VERB}_attempts`);
           window.dispatchEvent(new CustomEvent('DCUnity:RedirectReady'));
           break;
+        }
         case 'redirectUrl':
+          if (data?.redirectUrl) prefetchUnityRedirect(data.redirectUrl);
           handleAnalyticsEvent('job:redirect-success', metadata, false);
           break;
         case 'cancel':
@@ -961,6 +978,7 @@ export default async function init(element) {
     if (!e.isTrusted) return;
     const { files } = e.target;
     if (!files?.length) return;
+    noOfFiles = files.length;
     if (files.length > 1 || !isClientFile(files[0], limits)) {
       routeToUnity(Array.from(files), 'change');
       return;
@@ -997,6 +1015,7 @@ export default async function init(element) {
     if (!e.isTrusted) return;
     const { files } = e.dataTransfer;
     if (!files?.length) return;
+    noOfFiles = files.length;
     if (files.length > 1 || !isClientFile(files[0], limits)) {
       routeToUnity(Array.from(files), 'drop');
       return;
