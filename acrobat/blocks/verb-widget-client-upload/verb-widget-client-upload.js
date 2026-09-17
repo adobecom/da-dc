@@ -1073,9 +1073,28 @@ export default async function init(element) {
     }
   };
 
-  const initUnityOnInteraction = () => ensureUnity();
-  document.addEventListener('click', initUnityOnInteraction, { once: true });
-  document.addEventListener('dragover', initUnityOnInteraction, { once: true });
+  const kickstartUnity = () => ensureUnity();
+  const kickstartUnityWhenIdle = () => {
+    if (window.requestIdleCallback) window.requestIdleCallback(kickstartUnity, { timeout: 2000 });
+    else kickstartUnity();
+  };
+  document.addEventListener('click', kickstartUnity, { once: true });
+  document.addEventListener('dragover', kickstartUnity, { once: true });
+  if (window.PerformanceObserver) {
+    try {
+      const lcpObserver = new PerformanceObserver((entries) => {
+        if (entries.getEntries().length > 0) {
+          lcpObserver.disconnect();
+          kickstartUnityWhenIdle();
+        }
+      });
+      lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+    } catch {
+      setTimeout(kickstartUnityWhenIdle, 2500);
+    }
+  } else {
+    setTimeout(kickstartUnityWhenIdle, 2500);
+  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
