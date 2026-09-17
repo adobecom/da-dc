@@ -82,8 +82,13 @@ describe('verb-widget-client-upload', () => {
       expect(validateFiles([tooBig], VERB)).to.include({ valid: false, code: 'error_file_too_large' });
     });
 
-    it('rejects an unsupported extension', () => {
+    it('accepts pdf (supported by verb-widget, routed to Unity)', () => {
       const file = makeFile(new Uint8Array([1]), 'doc.pdf', 'application/pdf');
+      expect(validateFiles([file], VERB).valid).to.be.true;
+    });
+
+    it('rejects an unsupported extension', () => {
+      const file = makeFile(new Uint8Array([1]), 'archive.zip', 'application/zip');
       expect(validateFiles([file], VERB)).to.include({ valid: false, code: 'error_unsupported_type' });
     });
 

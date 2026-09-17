@@ -3,7 +3,7 @@
 The **verb-widget-client-upload** block is a standalone upload widget for image-to-PDF conversion. It accepts the **same file types and sizes as the standard `verb-widget` block** for `image-to-pdf`, but routes them down two different paths:
 
 - **jpg / jpeg / png (≤ 25 MB) → client-side.** The file is AES-GCM encrypted in the browser, stored in IndexedDB, and the user is redirected to the Acrobat Online tool with a reference to the stored file. No file bytes leave the browser during the upload step.
-- **Every other supported type → Unity.** For any non-jpg/png type (`.heic`, `.tif`, `.tiff`, `.bmp`, `.gif`, `.doc`, `.docx`, `.ppt`, `.pptx`, `.xls`, `.xlsx`, `.rtf`, `.txt`, `.text`, up to 100 MB), the block loads the Unity SDK on demand and uploads through it, exactly like the standard `verb-widget` block. Unity performs the authoritative validation, upload, and redirect.
+- **Every other supported type → Unity.** For any non-jpg/png type (`.pdf`, `.heic`, `.tif`, `.tiff`, `.bmp`, `.gif`, `.doc`, `.docx`, `.xml`, `.ppt`, `.pptx`, `.xls`, `.xlsx`, `.rtf`, `.txt`, `.text`, `.eml`, `.form`, up to 100 MB), the block loads the Unity SDK on demand and uploads through it, exactly like the standard `verb-widget` block. Unity performs the authoritative validation, upload, and redirect. (This set mirrors Unity's `image-to-pdf` `limits.json` — `allowed-filetypes-no-adobe-design` + `heic`.)
 
 > **Single file:** the block is single-file only. The file picker offers all supported types; only jpg/png take the client-side path.
 

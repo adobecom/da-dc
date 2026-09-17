@@ -16,11 +16,11 @@ const MB25 = 26214400;
 const MB100 = 104857600;
 
 const CLIENT_FILES = ['.jpg', '.jpeg', '.png'];
-const COMMON_TO_PDF_FILES = ['.jpg', '.jpeg', '.png', '.heic', '.tif', '.tiff', '.bmp', '.gif', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text'];
+const SUPPORTED_FILES = ['.pdf', '.jpg', '.jpeg', '.png', '.heic', '.tif', '.tiff', '.bmp', '.gif', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.eml', '.form'];
 
 const LIMITS = {
   'image-to-pdf': {
-    acceptedFiles: COMMON_TO_PDF_FILES,
+    acceptedFiles: SUPPORTED_FILES,
     clientAcceptedFiles: CLIENT_FILES,
     clientMaxFileSize: MB25,
     maxFileSize: MB100,
@@ -137,6 +137,14 @@ function isClientFile(file, limits) {
   if (!limits.clientAcceptedFiles?.includes(ext)) return false;
   const allowedMimes = CLIENT_MIME_TYPES[ext];
   return !file.type || !allowedMimes || allowedMimes.includes(file.type);
+}
+
+const IOS_UNKNOWN_EXTS = new Set(['.ai', '.psd', '.indd', '.form']);
+function getAcceptValue(limits) {
+  const accepted = limits.acceptedFiles;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (isIOS && accepted?.some((ext) => IOS_UNKNOWN_EXTS.has(ext))) return '*/*';
+  return accepted?.join(',');
 }
 
 const ICONS = {
@@ -549,7 +557,7 @@ export default async function init(element) {
 
   const fileInput = createTag('input', {
     type: 'file',
-    accept: limits.acceptedFiles?.join(','),
+    accept: getAcceptValue(limits),
     id: 'file-upload',
     class: 'hide',
     'aria-hidden': 'true',
@@ -861,12 +869,13 @@ export default async function init(element) {
       unityInitPromise = (async () => {
         element.classList.add('verb-widget');
         wireUnityEvents();
-        const unityBlock = createTag('div', { class: 'unity workflow-acrobat' });
+        const unityBlock = createTag('div', { class: 'unity workflow-acrobat', style: 'display:none' });
         const span = createTag('span', { class: `icon icon-${VERB}` });
         unityBlock.append(createTag('div', {}, createTag('div', {}, span)));
         element.after(unityBlock);
         const { default: initUnity } = await warmUnity();
         await initUnity(unityBlock);
+        document.dispatchEvent(new Event('mousemove'));
         unityReady = true;
       })();
     }
@@ -876,7 +885,12 @@ export default async function init(element) {
   async function routeToUnity(file, origin) {
     if (unityReady) return;
     hideError();
-    await ensureUnity();
+    try {
+      await ensureUnity();
+    } catch (err) {
+      dispatchError('error_generic', window.mph?.['verb-widget-error-generic'] || 'Unable to process the request.', { userAttempts });
+      return;
+    }
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(file);
     if (origin === 'drop') {
