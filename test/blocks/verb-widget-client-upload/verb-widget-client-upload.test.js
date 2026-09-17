@@ -66,7 +66,7 @@ describe('verb-widget-client-upload', () => {
       expect(validateFiles([], VERB)).to.include({ valid: false, code: 'error_generic' });
     });
 
-    it('rejects more than one file (single-file tool)', () => {
+    it('rejects more than one file on the client path', () => {
       const a = makeFile(new Uint8Array([1]), 'a.jpg', 'image/jpeg');
       const b = makeFile(new Uint8Array([1]), 'b.jpg', 'image/jpeg');
       expect(validateFiles([a, b], VERB)).to.include({ valid: false, code: 'error_only_accept_one_file' });

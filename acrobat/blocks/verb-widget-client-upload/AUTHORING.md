@@ -2,10 +2,10 @@
 
 The **verb-widget-client-upload** block is a standalone upload widget for image-to-PDF conversion. It accepts the **same file types and sizes as the standard `verb-widget` block** for `image-to-pdf`, but routes them down two different paths:
 
-- **jpg / jpeg / png (≤ 25 MB) → client-side.** The file is AES-GCM encrypted in the browser, stored in IndexedDB, and the user is redirected to the Acrobat Online tool with a reference to the stored file. No file bytes leave the browser during the upload step.
-- **Every other supported type → Unity.** For any non-jpg/png type (`.pdf`, `.heic`, `.tif`, `.tiff`, `.bmp`, `.gif`, `.doc`, `.docx`, `.xml`, `.ppt`, `.pptx`, `.xls`, `.xlsx`, `.rtf`, `.txt`, `.text`, `.eml`, `.form`, up to 100 MB), the block loads the Unity SDK on demand and uploads through it, exactly like the standard `verb-widget` block. Unity performs the authoritative validation, upload, and redirect. (This set mirrors Unity's `image-to-pdf` `limits.json` — `allowed-filetypes-no-adobe-design` + `heic`.)
+- **A single jpg / jpeg / png (≤ 25 MB) → client-side.** The file is AES-GCM encrypted in the browser, stored in IndexedDB, and the user is redirected to the Acrobat Online tool with a reference to the stored file. No file bytes leave the browser during the upload step.
+- **Everything else → Unity.** A single non-jpg/png supported type (`.pdf`, `.heic`, `.tif`, `.tiff`, `.bmp`, `.gif`, `.doc`, `.docx`, `.xml`, `.ppt`, `.pptx`, `.xls`, `.xlsx`, `.rtf`, `.txt`, `.text`, `.eml`, `.form`, up to 100 MB) **or any multi-file selection (regardless of type, including multiple jpg/png)** loads the Unity SDK on demand and uploads through it, exactly like the standard `verb-widget` block. Unity performs the authoritative validation, upload, and redirect. (The type set mirrors Unity's `image-to-pdf` `limits.json` — `allowed-filetypes-no-adobe-design` + `heic`.)
 
-> **Single file:** the block is single-file only. The file picker offers all supported types; only jpg/png take the client-side path.
+> **Multi-file:** the picker allows selecting multiple files (matching `verb-widget`). Any multi-file selection is always processed by Unity; only a single jpg/png takes the client-side path.
 
 > **Currently supported verb:** `image-to-pdf` only. Do not use this block for other verbs.
 
@@ -20,6 +20,16 @@ Author the block as a table. The **first cell names the block with the verb in p
 ```
 verb-widget-client-upload (image-to-pdf)
 ```
+
+### Optional: `referrer-<value>` (x_api_client_location override)
+
+To override the `x_api_client_location` query param sent on redirect, add a `referrer-<value>` option **after** the verb:
+
+```
+verb-widget-client-upload (image-to-pdf, referrer-photo-to-pdf)
+```
+
+When authored, `x_api_client_location` uses `<value>` (e.g. `photo-to-pdf`) on **both** the client-side (jpg/png) redirect and the Unity (server-side) redirect. When omitted, it falls back to the verb name (`image-to-pdf`). This mirrors the standard `unity` block's `referrer-*` behavior — the block forwards the class to the Unity block it injects so the Unity SDK reads it. Keep the verb as the **first** option so it is still detected correctly.
 
 | Row | Content | Required? |
 | --- | --- | --- |
@@ -57,12 +67,12 @@ These keys provide the user-facing error strings shown in the inline error toast
 
 | Placeholder key | When it appears | Required? |
 | --- | --- | --- |
-| `verb-widget-error-generic` | Catch-all error when encryption or IndexedDB storage fails. | Required |
-| `verb-widget-error-only-accept-one-file` | User tries to drop or select more than one file at a time. | Required |
+| `verb-widget-error-generic` | Catch-all error when encryption or IndexedDB storage fails, or when the Unity SDK fails to load. | Required |
+| `verb-widget-error-only-accept-one-file` | Client-path fallback for the single-file validator. Multi-file selections are routed to Unity, which enforces its own file-count limits. | Required |
 | `verb-widget-error-unsupported-type` | File extension/MIME type is outside the supported `image-to-pdf` set (also raised by Unity for the server-side path). | Required |
 | `verb-widget-error-empty-file` | Selected file has a size of 0 bytes. | Required |
 | `verb-widget-error-file-too-large` | A jpg/png exceeds 25 MB, or another supported type exceeds 100 MB. | Required |
-| `verb-widget-error-duplicate-asset` | User selects a file with the same name as one already queued (reserved for future multi-file support). | Required |
+| `verb-widget-error-duplicate-asset` | Duplicate detection on the Unity (multi-file) path. | Required |
 
 
 ### Sample placeholder values
@@ -82,6 +92,7 @@ These keys provide the user-facing error strings shown in the inline error toast
 ## Summary checklist
 
 - First cell reads `verb-widget-client-upload (image-to-pdf)` — verb in parentheses.
+- Optional: add `referrer-<value>` after the verb (e.g. `(image-to-pdf, referrer-photo-to-pdf)`) to override `x_api_client_location`; omit to fall back to the verb name.
 - Row 1 contains the heading (required).
 - Row 2 contains `{{verb-widget-legal}}` (documentation convention — optional but recommended for author visibility).
 - Description text is **never authored in the block** — use the `verb-widget-image-to-pdf-description` placeholder.

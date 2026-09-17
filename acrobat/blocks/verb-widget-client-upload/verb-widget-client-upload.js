@@ -24,7 +24,7 @@ const LIMITS = {
     clientAcceptedFiles: CLIENT_FILES,
     clientMaxFileSize: MB25,
     maxFileSize: MB100,
-    multipleFiles: false,
+    multipleFiles: true,
   },
 };
 
@@ -490,6 +490,7 @@ export default async function init(element) {
 
   const children = [...element.querySelectorAll(':scope > div')];
   const VERB = element.classList[1];
+  const referrer = [...element.classList].find((cn) => cn.startsWith('referrer-'))?.replace('referrer-', '') || '';
   const limits = LIMITS[VERB] ?? LIMITS['image-to-pdf'];
   const userAttempts = getVerbKey(`${VERB}_attempts`);
   const isMobile = isMobileDevice();
@@ -694,10 +695,34 @@ export default async function init(element) {
 
   let exitFlag = false;
   let isUploading = false;
+  let tabClosureSent = false;
 
   function setCookie(name, value) {
     const expires = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
     document.cookie = `${name}=${value};domain=.adobe.com;path=/;expires=${expires}`;
+  }
+
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  function handleExit(event, userObj, workflowStep) {
+    if (exitFlag || tabClosureSent || (isUploading && workflowStep === 'preuploading')) return;
+    tabClosureSent = true;
+    const uploadingStartTime = parseInt(getCookie('UTS_Uploading'), 10);
+    const duration = uploadingStartTime ? ((Date.now() - uploadingStartTime) / 1000).toFixed(1) : 'N/A';
+    window.analytics.verbAnalytics('job:browser-tab-closure', VERB, userObj, false);
+    window.analytics.sendAnalyticsToSplunk('job:browser-tab-closure', VERB, { ...userObj, workflowStep, uploadTime: duration }, getSplunkEndpoint(), true);
+    if (!isUploading) return;
+    event.preventDefault();
+    event.returnValue = true;
+  }
+
+  function registerTabCloseEvent(eventData, workflowStep) {
+    window.addEventListener('beforeunload', (windowEvent) => {
+      handleExit(windowEvent, eventData, workflowStep);
+    });
   }
 
   function getUploadTime() {
@@ -760,6 +785,7 @@ export default async function init(element) {
     exitFlag = false;
     setCookie('UTS_Uploading', Date.now());
     handleAnalyticsEvent('job:uploading', filesData, false);
+    registerTabCloseEvent(filesData, 'uploading');
 
     ctaButton.disabled = true;
     ctaButton.querySelector('.verb-cta-label').textContent = window.mph?.['verb-widget-processing'] || 'Processing…';
@@ -783,7 +809,7 @@ export default async function init(element) {
       const redirectBase = `${domain}${redirectPrefix ? `/${redirectPrefix}` : ''}/acrobat-online/image-to-pdf.html`;
       const originalParams = DC_ENV === 'stage' ? `${window.location.search.slice(1)}&` : '';
       const localeParam = locale.ietf ? `&localeCode=${encodeURIComponent(locale.ietf)}` : '';
-      const redirectUrl = `${redirectBase}?${originalParams}clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${localeParam}`;
+      const redirectUrl = `${redirectBase}?${originalParams}clientConvert=true&x_api_client_location=${referrer || VERB}&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${localeParam}`;
       handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
       window.location.href = redirectUrl;
     } catch (err) {
@@ -807,17 +833,20 @@ export default async function init(element) {
           hideError();
           exitFlag = false;
           handleAnalyticsEvent('choose-file:open', metadata, true);
+          registerTabCloseEvent(metadata, 'preuploading');
           break;
         case 'drop':
           hideError();
           exitFlag = false;
           ['files-dropped', 'entry:clicked', 'discover:clicked'].forEach((ev) => handleAnalyticsEvent(ev, metadata, true));
+          registerTabCloseEvent(metadata, 'preuploading');
           break;
         case 'uploading':
           isUploading = true;
           exitFlag = false;
           setCookie('UTS_Uploading', Date.now());
           handleAnalyticsEvent('job:uploading', metadata, false);
+          registerTabCloseEvent(metadata, 'uploading');
           break;
         case 'uploaded':
           exitFlag = true;
@@ -869,7 +898,7 @@ export default async function init(element) {
       unityInitPromise = (async () => {
         element.classList.add('verb-widget');
         wireUnityEvents();
-        const unityBlock = createTag('div', { class: 'unity workflow-acrobat', style: 'display:none' });
+        const unityBlock = createTag('div', { class: `unity workflow-acrobat${referrer ? ` referrer-${referrer}` : ''}`, style: 'display:none' });
         const span = createTag('span', { class: `icon icon-${VERB}` });
         unityBlock.append(createTag('div', {}, createTag('div', {}, span)));
         element.after(unityBlock);
@@ -882,7 +911,7 @@ export default async function init(element) {
     return unityInitPromise;
   }
 
-  async function routeToUnity(file, origin) {
+  async function routeToUnity(files, origin) {
     if (unityReady) return;
     hideError();
     try {
@@ -892,7 +921,7 @@ export default async function init(element) {
       return;
     }
     const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(file);
+    files.forEach((f) => dataTransfer.items.add(f));
     if (origin === 'drop') {
       widget.dispatchEvent(new DragEvent('drop', { dataTransfer, bubbles: true, cancelable: true }));
     } else {
@@ -919,6 +948,10 @@ export default async function init(element) {
     if (!e.isTrusted) return;
     const { files } = e.target;
     if (!files?.length) return;
+    if (files.length > 1 || !isClientFile(files[0], limits)) {
+      routeToUnity(Array.from(files), 'change');
+      return;
+    }
     const validation = validateFiles(files, VERB);
     if (!validation.valid) {
       exitFlag = false;
@@ -926,14 +959,10 @@ export default async function init(element) {
       dispatchError(validation.code, validation.message, { userAttempts });
       return;
     }
-    const [file] = files;
-    if (!isClientFile(file, limits)) {
-      routeToUnity(file, 'change');
-      return;
-    }
     e.stopImmediatePropagation();
     exitFlag = false;
     handleAnalyticsEvent('choose-file:open', { userAttempts }, true);
+    registerTabCloseEvent({ userAttempts }, 'preuploading');
     startUpload(Array.from(files));
   });
 
@@ -955,15 +984,14 @@ export default async function init(element) {
     if (!e.isTrusted) return;
     const { files } = e.dataTransfer;
     if (!files?.length) return;
+    if (files.length > 1 || !isClientFile(files[0], limits)) {
+      routeToUnity(Array.from(files), 'drop');
+      return;
+    }
     const validation = validateFiles(files, VERB);
     if (!validation.valid) {
       exitFlag = false;
       dispatchError(validation.code, validation.message, { userAttempts });
-      return;
-    }
-    const [file] = files;
-    if (!isClientFile(file, limits)) {
-      routeToUnity(file, 'drop');
       return;
     }
     e.stopImmediatePropagation();
@@ -971,6 +999,7 @@ export default async function init(element) {
     ['files-dropped', 'entry:clicked', 'discover:clicked'].forEach((evt) => {
       handleAnalyticsEvent(evt, { userAttempts }, true);
     });
+    registerTabCloseEvent({ userAttempts }, 'preuploading');
     startUpload(Array.from(files));
   });
 
@@ -986,14 +1015,10 @@ export default async function init(element) {
     }
   });
 
-  window.addEventListener('beforeunload', (e) => {
+  window.addEventListener('beforeunload', () => {
     const cookieExp = new Date(Date.now() + 90 * 1000).toUTCString();
     if (exitFlag) {
       document.cookie = `UTS_Redirect=${Date.now()};domain=.adobe.com;path=/;expires=${cookieExp}`;
-    }
-    if (isUploading) {
-      e.preventDefault();
-      e.returnValue = true;
     }
   });
 
