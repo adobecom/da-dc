@@ -91,6 +91,28 @@ describe('verb-widget-client-upload', () => {
       const file = makeFile(new Uint8Array([1]), 'photo.jpg', 'application/pdf');
       expect(validateFiles([file], VERB)).to.include({ valid: false, code: 'error_unsupported_type' });
     });
+
+    it('accepts a non-jpg/png type supported by verb-widget (Unity path)', () => {
+      const file = makeFile(new Uint8Array([1, 2, 3]), 'scan.tiff', 'image/tiff');
+      expect(validateFiles([file], VERB).valid).to.be.true;
+    });
+
+    it('accepts a non-jpg/png type up to the 100 MB verb-widget limit', () => {
+      const tiff = { name: 'scan.tiff', type: 'image/tiff', size: 26214400 + 1 };
+      expect(validateFiles([tiff], VERB).valid).to.be.true;
+      const doc = { name: 'letter.docx', type: '', size: 104857600 };
+      expect(validateFiles([doc], VERB).valid).to.be.true;
+    });
+
+    it('rejects a non-jpg/png type over the 100 MB limit', () => {
+      const tiff = { name: 'scan.tiff', type: 'image/tiff', size: 104857600 + 1 };
+      expect(validateFiles([tiff], VERB)).to.include({ valid: false, code: 'error_file_too_large' });
+    });
+
+    it('still rejects a type outside the verb-widget image-to-pdf set', () => {
+      const file = makeFile(new Uint8Array([1]), 'app.exe', 'application/octet-stream');
+      expect(validateFiles([file], VERB)).to.include({ valid: false, code: 'error_unsupported_type' });
+    });
   });
 
   describe('storeEncryptedLocalFile', () => {

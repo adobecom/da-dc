@@ -1,10 +1,15 @@
 # Verb Widget (Client Upload) — Authoring Guide
 
-The **verb-widget-client-upload** block is a standalone upload widget for image-to-PDF conversion. Unlike the standard `verb-widget` block it does **not** use the Unity SDK — file processing happens entirely client-side. When a user selects or drops an image, the file is AES-GCM encrypted in the browser, stored in IndexedDB, and the user is redirected to the Acrobat Online tool with a reference to the stored file. No file bytes ever leave the browser during the upload step.
+The **verb-widget-client-upload** block is a standalone upload widget for image-to-PDF conversion. It accepts the **same file types and sizes as the standard `verb-widget` block** for `image-to-pdf`, but routes them down two different paths:
 
-> **Currently supported verb:** `image-to-pdf` only. The block's accepted-file and size limits are hardcoded to single-file image uploads (`.jpg`, `.jpeg`, `.png`, up to 25 MB). Do not use this block for other verbs.
+- **jpg / jpeg / png (≤ 25 MB) → client-side.** The file is AES-GCM encrypted in the browser, stored in IndexedDB, and the user is redirected to the Acrobat Online tool with a reference to the stored file. No file bytes leave the browser during the upload step.
+- **Every other supported type → Unity.** For any non-jpg/png type (`.heic`, `.tif`, `.tiff`, `.bmp`, `.gif`, `.doc`, `.docx`, `.ppt`, `.pptx`, `.xls`, `.xlsx`, `.rtf`, `.txt`, `.text`, up to 100 MB), the block loads the Unity SDK on demand and uploads through it, exactly like the standard `verb-widget` block. Unity performs the authoritative validation, upload, and redirect.
 
-> **No Unity block required:** Pages using this block do not need the `unity` block. Omit it from the page.
+> **Single file:** the block is single-file only. The file picker offers all supported types; only jpg/png take the client-side path.
+
+> **Currently supported verb:** `image-to-pdf` only. Do not use this block for other verbs.
+
+> **No Unity block required:** Pages using this block do **not** need to author a `unity` block. The block injects one on demand the first time a non-jpg/png file is selected. Unity code is not loaded on page load — it is warmed on the first user interaction (click/drag) and fully initialized only when a non-jpg/png file is chosen, so the common jpg/png path keeps its fast, fully-client-side behavior.
 
 ---
 
@@ -48,15 +53,15 @@ These keys are **unique to this block** and do not exist in the standard `verb-w
 
 ### Error message keys
 
-These keys provide the user-facing error strings shown in the inline error toast. The block validates files before processing, so all of these can be triggered without a network call.
+These keys provide the user-facing error strings shown in the inline error toast. The block pre-validates files client-side (so these can be triggered without a network call); on the Unity path, Unity may also surface validation/upload errors, which render in the same inline error toast.
 
 | Placeholder key | When it appears | Required? |
 | --- | --- | --- |
 | `verb-widget-error-generic` | Catch-all error when encryption or IndexedDB storage fails. | Required |
 | `verb-widget-error-only-accept-one-file` | User tries to drop or select more than one file at a time. | Required |
-| `verb-widget-error-unsupported-type` | File extension or MIME type is not `.jpg`, `.jpeg`, or `.png`. | Required |
+| `verb-widget-error-unsupported-type` | File extension/MIME type is outside the supported `image-to-pdf` set (also raised by Unity for the server-side path). | Required |
 | `verb-widget-error-empty-file` | Selected file has a size of 0 bytes. | Required |
-| `verb-widget-error-file-too-large` | File exceeds 25 MB. | Required |
+| `verb-widget-error-file-too-large` | A jpg/png exceeds 25 MB, or another supported type exceeds 100 MB. | Required |
 | `verb-widget-error-duplicate-asset` | User selects a file with the same name as one already queued (reserved for future multi-file support). | Required |
 
 
