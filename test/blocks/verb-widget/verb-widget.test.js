@@ -2,7 +2,7 @@
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
-import { delay } from '../../helpers/waitfor.js';
+import { delay, waitForElement } from '../../helpers/waitfor.js';
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
 
 const { default: init } = await import(
@@ -45,7 +45,7 @@ describe('verb-widget block', () => {
     const block = document.body.querySelector('.verb-widget');
     await init(block);
     expect(document.querySelector('.verb-widget .acrobat-icon svg')).to.exist;
-    expect(document.querySelector('.verb-widget .verb-image svg')).to.exist;
+    expect(await waitForElement('.verb-widget .verb-image svg')).to.exist;
     expect(document.querySelector('.verb-widget .security-icon svg')).to.exist;
     expect(document.querySelector('.verb-widget .info-icon svg')).to.exist;
   });
@@ -64,7 +64,7 @@ describe('verb-widget block', () => {
     expect(block.classList.contains('signed-in')).to.be.true;
 
     expect(document.querySelector('.verb-widget .acrobat-icon svg')).to.exist;
-    expect(document.querySelector('.verb-widget .verb-image svg')).to.exist;
+    expect(await waitForElement('.verb-widget .verb-image svg')).to.exist;
   });
 
   it('show error toast', async () => {
