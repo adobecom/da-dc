@@ -2,11 +2,12 @@
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
+import { waitFor } from '../../helpers/waitfor.js';
+import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
 
 const { default: init } = await import(
   '../../../acrobat/blocks/verb-widget/verb-widget.js'
 );
-import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
 
 describe('verb-widget block', () => {
   let xhr;
@@ -25,9 +26,7 @@ describe('verb-widget block', () => {
     });
     xhr = sinon.useFakeXMLHttpRequest();
 
-    window.lana = {
-      log: sinon.stub(),
-    }
+    window.lana = { log: sinon.stub() };
     const placeholdersText = await readFile({ path: './mocks/placeholders.json' });
     placeholders = JSON.parse(placeholdersText);
 
@@ -51,6 +50,9 @@ describe('verb-widget block', () => {
     setConfig({ ...conf, locale: { prefix: '' }, codeRoot: '/acrobat' });
     const block = document.body.querySelector('.verb-widget');
     await init(block);
+    // The hero SVG now loads off the critical path (fire-and-forget), so the
+    // failure is logged after init() resolves; wait for it before asserting.
+    await waitFor(() => window.lana.log.calledOnce);
     expect(window.lana.log.calledOnce).to.be.true;
   });
 });
