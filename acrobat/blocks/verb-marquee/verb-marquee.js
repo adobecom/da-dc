@@ -1000,9 +1000,6 @@ export default async function init(element) {
 
   element.parentNode.style.display = 'block';
 
-  // The EdgeWorker injects a prerender snapshot (#prerender_verb-widget) on unity
-  // pages for an early-painting LCP. Remove it only after the real widget has
-  // painted — double rAF fires after the next paint — so there is no blank flash.
   const prerenderElement = document.querySelector('#prerender_verb-widget');
   // eslint-disable-next-line compat/compat
   requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
