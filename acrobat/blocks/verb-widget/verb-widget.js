@@ -187,6 +187,7 @@ function redDirLink(verb) {
 }
 
 function redDir(verb) {
+  if (['split-pdf', 'pdf-to-word'].includes(verb)) return;
   window.location.href = redDirLink(verb);
 }
 
