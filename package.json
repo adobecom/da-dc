@@ -43,7 +43,7 @@
     "@amwp/platform-ui-automation": "^0.0.8",
     "@amwp/platform-ui-lib-adobe": "^0.0.10",
     "@axe-core/playwright": "4.10.0",
-    "@babel/core": "7.23.2",
+    "@babel/core": "7.29.7",
     "@babel/eslint-parser": "7.22.15",
     "@babel/register": "7.22.15",
     "@esm-bundle/chai": "4.3.4-fix.0",
@@ -85,7 +85,7 @@
     "async": "^3.2.5",
     "bowser": "^2.11.0",
     "jest-fetch-mock": "^3.0.3",
-    "ws": "^8.18.0",
+    "ws": "^8.21.3",
     "yargs": "^17.7.2"
   },
   "optionalDependencies": {
