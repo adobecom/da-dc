@@ -2,7 +2,16 @@ import { ReadableStream } from './streams';
 
 export const mock_HttpResponse_text = jest.fn().mockReturnValue(
   new Promise(function(resolve) {
-    resolve('scripts response text')
+    resolve(`const locales = {
+  de: { ietf: 'de-DE', tk: 'vin7zsi.css' },
+  fr: { ietf: 'fr-FR', tk: 'vrk5vyv.css' },
+  id_id: { ietf: 'id-ID', tk: 'czc0mun.css' },
+  jp: { ietf: 'ja-JP', tk: 'dvg6awq' },
+};
+
+const CONFIG = {
+  codeRoot: '/dc-shared',
+};`)
   })
 );
 export const mock_HttpResponse_json = jest.fn();

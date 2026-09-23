@@ -280,16 +280,27 @@ async function frictionlessResponseProvider(request) {
   const contentRoot = '/dc-shared';
   const rewriter = new HtmlRewritingStream();
 
-  const fetchFrictionlessPage = async () => {
+  const fetchResource = async path => {
+    const url = path.startsWith('http') ? path : origin + path;
+    const response = await httpRequest(url, { headers });
+    if (response.ok) {
+      return response.text();
+    }
+    const statusText = response.statusText || 'Unknown';
+    throw new Error(
+      `fetchResource failed | path: "${path}" | url: "${url}" | status: ${response.status} (${statusText})`
+    );
+  };
+
+  const fetchFrictionlessPage = async (isLocalePrefix) => {
     // Setup: Fetch a stream containing HTML
-    const hasLocalePrefix = request.path.split('/').filter(Boolean).length > 1;
     let docPath;
-    if (hasLocalePrefix) {
+    if (isLocalePrefix) {
       docPath = `${origin}${request.path.replace(`/${first}/`, `/${first}/dc-shared/`)}`;
     } else {
       docPath = `${origin}/dc-shared${request.path}`;
     }
-    
+
     const htmlResponse = await httpRequest(docPath, { headers });
     if (!htmlResponse.ok) {
       const err = new Error(`Failed to fetch doc: ${docPath}`);
@@ -340,20 +351,9 @@ async function frictionlessResponseProvider(request) {
     return [responseStream, responseHeaders, mobileWidget, unityWorkflow];
   };
 
-  const fetchResource = async path => {
-    const url = path.startsWith('http') ? path : origin + path;
-    const response = await httpRequest(url, { headers });
-    if (response.ok) {
-      return response.text();
-    }
-    const statusText = response.statusText || 'Unknown';
-    throw new Error(
-      `fetchResource failed | path: "${path}" | url: "${url}" | status: ${response.status} (${statusText})`
-    );
-  };
-
   const scriptHashes = [];
   let prerenderTop = 0;
+  let isLocalePrefix = false;
 
   const inlineScripts = async (unityWorkflow, mobileWidget, scripts, dcConverter) => {
     // Inline dc-converter-widget.js and scripts.js. Remove modular definition and import.
@@ -385,7 +385,7 @@ async function frictionlessResponseProvider(request) {
     const isIPadOS = ua.includes('Mac') && ua.includes('Version/') && !/iphone|ipod/i.test(ua);
     const isTablet = /ipad|android(?!.*mobile)/i.test(ua);    
     if (unityWorkflow && !(isTablet || isIPadOS)) {
-      const group = 'frictionless_acrobat' + `${request.path.split('/').filter(Boolean).length <= 1 ? '' : `_${first}`}`;
+      const group = 'frictionless_acrobat' + (isLocalePrefix ? `_${first}` : '');
       const edgeKv = new EdgeKV({namespace: isProd? 'prod' : 'stage', group});
       let prerenderHtml = '<!-- init -->';
       try {
@@ -440,16 +440,27 @@ async function frictionlessResponseProvider(request) {
 
   try {
     const miloBaseUrl = '/dc-shared';
+
+    // Fetch scripts.js first so we can determine whether the first path segment
+    // is a known locale prefix (e.g. "de", "jp") vs. a non-locale section (e.g. "tools").
+    const scripts = await fetchResource(`${codeRoot}/scripts/scripts.js`);
+    const localesSection = scripts.slice(
+      scripts.indexOf('const locales = {'),
+      scripts.indexOf('const CONFIG')
+    );
+    const LOCALES = new Set(
+      [...localesSection.matchAll(/^\s{2}([a-z][a-z_]*[a-z]):/gm)].map(m => m[1])
+    );
+    isLocalePrefix = LOCALES.has(first);
+
     const [
       [responseStream, responseHeaders, mobileWidget, unityWorkflow],
-      scripts,
       dcConverter,
       dcStyles,
       miloStyles,
       verbWidgetStyles
     ] = await Promise.all([
-      fetchFrictionlessPage(),
-      fetchResource(`${codeRoot}/scripts/scripts.js`),
+      fetchFrictionlessPage(isLocalePrefix),
       fetchResource(`${codeRoot}/blocks/dc-converter-widget/dc-converter-widget.js`),
       fetchResource(`${codeRoot}/styles/styles.css`),
       fetchResource(`${miloBaseUrl}/libs/styles/styles.css`),
@@ -478,7 +489,7 @@ async function frictionlessResponseProvider(request) {
         `<${codeRoot}/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `<${request.path.split('/').filter(Boolean).length <= 1 ? '' : `/${first}`}${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`
+        `<${isLocalePrefix ? `/${first}` : ''}${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`
       ];
     }
     headerLink = headerLink.join();
