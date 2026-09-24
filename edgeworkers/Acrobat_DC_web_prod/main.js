@@ -284,8 +284,8 @@ async function frictionlessResponseProvider(request) {
   // A first segment in this set is a locale (e.g. /fr/heic-to-pdf → /fr/dc-shared/...);
   // anything else is a non-locale section served directly under /dc-shared (e.g. /tools/).
   const ACROBAT_LOCALES = new Set([
-    'es', 'de', 'fr', 'nl', 'pt', 'it', 'tw', 'cz', 'dk', 'fi', 'id_id',
-    'in_hi', 'jp', 'kr', 'no', 'pl', 'ro', 'ru', 'se', 'th_th', 'tr',
+    'cz', 'de', 'dk', 'es', 'fi', 'fr', 'id_id', 'in_hi', 'it', 'jp', 'kr',
+    'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'se', 'th_th', 'tr', 'tw',
   ]);
   const isLocalePrefix = request.path.split('/').filter(Boolean).length > 1
     && ACROBAT_LOCALES.has(first);
