@@ -186,16 +186,23 @@
 
 .verb-image {
   width: var(--verb-widget-image-width);
+}
 
+.verb-image.generated {
   /* Reserve space so the async-filled hero SVG can't shift layout (CLS). */
   aspect-ratio: 1 / 1;
 }
 
-.verb-image svg,
-.verb-image img {
+.verb-image svg {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.verb-image img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .security-icon {
@@ -823,4 +830,3 @@ html[dir="rtl"] .verb-cta .upload-icon {
     max-width: 180px;
   }
 }
-

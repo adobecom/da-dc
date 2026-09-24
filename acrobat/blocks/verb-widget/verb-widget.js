@@ -610,6 +610,7 @@ export default async function init(element) {
     ...(LIMITS[VERB]?.multipleFiles && { multiple: '' }),
   });
   const widgetImage = createTag('div', { class: 'verb-image' });
+  if (!authoredIcon) widgetImage.classList.add('generated');
   const fillVerbImage = (verbImageSvg) => {
     if (!verbImageSvg) return;
     verbImageSvg.classList.add('icon-verb-image');
