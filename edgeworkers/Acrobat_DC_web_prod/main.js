@@ -280,6 +280,16 @@ async function frictionlessResponseProvider(request) {
   const contentRoot = '/dc-shared';
   const rewriter = new HtmlRewritingStream();
 
+  // acrobat.adobe.com serves this fixed set of locale prefixes (English is prefix-less).
+  // A first segment in this set is a locale (e.g. /fr/heic-to-pdf → /fr/dc-shared/...);
+  // anything else is a non-locale section served directly under /dc-shared (e.g. /tools/).
+  const ACROBAT_LOCALES = new Set([
+    'es', 'de', 'fr', 'nl', 'pt', 'it', 'tw', 'cz', 'dk', 'fi', 'id_id',
+    'in_hi', 'jp', 'kr', 'no', 'pl', 'ro', 'ru', 'se', 'th_th', 'tr',
+  ]);
+  const isLocalePrefix = request.path.split('/').filter(Boolean).length > 1
+    && ACROBAT_LOCALES.has(first);
+
   const fetchResource = async path => {
     const url = path.startsWith('http') ? path : origin + path;
     const response = await httpRequest(url, { headers });
@@ -292,7 +302,7 @@ async function frictionlessResponseProvider(request) {
     );
   };
 
-  const fetchFrictionlessPage = async (isLocalePrefix) => {
+  const fetchFrictionlessPage = async () => {
     // Setup: Fetch a stream containing HTML
     let docPath;
     if (isLocalePrefix) {
@@ -353,7 +363,6 @@ async function frictionlessResponseProvider(request) {
 
   const scriptHashes = [];
   let prerenderTop = 0;
-  let isLocalePrefix = false;
 
   const inlineScripts = async (unityWorkflow, mobileWidget, scripts, dcConverter) => {
     // Inline dc-converter-widget.js and scripts.js. Remove modular definition and import.
@@ -440,27 +449,16 @@ async function frictionlessResponseProvider(request) {
 
   try {
     const miloBaseUrl = '/dc-shared';
-
-    // Fetch scripts.js first so we can determine whether the first path segment
-    // is a known locale prefix (e.g. "de", "jp") vs. a non-locale section (e.g. "tools").
-    const scripts = await fetchResource(`${codeRoot}/scripts/scripts.js`);
-    const localesSection = scripts.slice(
-      scripts.indexOf('const locales = {'),
-      scripts.indexOf('const CONFIG')
-    );
-    const LOCALES = new Set(
-      [...localesSection.matchAll(/^\s{2}([a-z][a-z_]*[a-z]):/gm)].map(m => m[1])
-    );
-    isLocalePrefix = LOCALES.has(first);
-
     const [
       [responseStream, responseHeaders, mobileWidget, unityWorkflow],
+      scripts,
       dcConverter,
       dcStyles,
       miloStyles,
       verbWidgetStyles
     ] = await Promise.all([
-      fetchFrictionlessPage(isLocalePrefix),
+      fetchFrictionlessPage(),
+      fetchResource(`${codeRoot}/scripts/scripts.js`),
       fetchResource(`${codeRoot}/blocks/dc-converter-widget/dc-converter-widget.js`),
       fetchResource(`${codeRoot}/styles/styles.css`),
       fetchResource(`${miloBaseUrl}/libs/styles/styles.css`),
