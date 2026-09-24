@@ -67,6 +67,33 @@ describe('verb-widget block', () => {
     expect(document.querySelector('.verb-widget .verb-image svg')).to.exist;
   });
 
+  describe('signed-in redirect', () => {
+    const runSignedIn = async (verb, accountType) => {
+      let dest = null;
+      const onNav = (e) => { dest = e.destination.url; e.preventDefault(); };
+      window.navigation.addEventListener('navigate', onNav);
+      window.adobeIMS = { isSignedInUser: () => true, getAccountType: () => accountType };
+      setConfig({ ...getConfig(), locale: { prefix: '' } });
+      const block = document.body.querySelector('.verb-widget');
+      block.className = `verb-widget ${verb}`;
+      await init(block);
+      await delay(200);
+      window.navigation.removeEventListener('navigate', onNav);
+      return dest;
+    };
+
+    // Akamai redirects signed-in users for these verbs (MWPW-189255)
+    ['fillsign', 'compress-pdf', 'add-comment', 'crop-pages', 'split-pdf', 'number-pages'].forEach((verb) => {
+      it(`does not redirect signed-in users on ${verb}`, async () => {
+        expect(await runSignedIn(verb, 'type2')).to.be.null;
+      });
+    });
+
+    it('still redirects signed-in users on other verbs', async () => {
+      expect(await runSignedIn('combine-pdf', 'type1')).to.include('/go/acrobat-combine');
+    });
+  });
+
   it('show error toast', async () => {
     window.lana = { log: sinon.spy() };
 

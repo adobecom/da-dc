@@ -90,7 +90,7 @@ const GENAI_MULTI = { ...MULTI_ALL, maxNumFiles: 100, uploadType: 'multifile-onl
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
 export const LIMITS = {
-  fillsign: { ...SINGLE_PDF, mobileApp: true, typeOneLanding: true },
+  fillsign: { ...SINGLE_PDF, mobileApp: true, neverRedirect: true },
   'ocr-pdf': { ...MULTI_PDF, maxNumFiles: 100 },
   'chat-pdf-student': {
     maxFileSize: MB100,
@@ -102,16 +102,16 @@ export const LIMITS = {
     genAI: true,
   },
   'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, subCopy: true, genAI: true },
-  'split-pdf': { ...SINGLE_PDF, signedInAcceptedFiles: SIGNED_IN_FILES, typeOneLanding: true },
-  'add-comment': { ...SINGLE_PDF, typeOneLanding: true },
-  'compress-pdf': { maxFileSize: 2147483648, acceptedFiles: ALL_FILES, multipleFiles: true, typeOneLanding: true },
+  'split-pdf': { ...SINGLE_PDF, signedInAcceptedFiles: SIGNED_IN_FILES, neverRedirect: true },
+  'add-comment': { ...SINGLE_PDF, neverRedirect: true },
+  'compress-pdf': { maxFileSize: 2147483648, acceptedFiles: ALL_FILES, multipleFiles: true, neverRedirect: true },
   sendforsignature: {
     maxFileSize: 5242880,
     acceptedFiles: PDF_ONLY,
     maxNumFiles: 1,
     mobileApp: true,
   },
-  ...group(['number-pages', 'crop-pages'], { ...SINGLE_PDF, level: 0, typeOneLanding: true }),
+  ...group(['number-pages', 'crop-pages'], { ...SINGLE_PDF, level: 0, neverRedirect: true }),
   ...group(['protect-pdf', 'delete-pages', 'insert-pdf', 'extract-pages', 'reorder-pages'], SINGLE_PDF),
   ...group(['chat-pdf', 'pdf-ai'], GENAI_MULTI),
   ...group(['combine-pdf', 'rotate-pages'], { ...MULTI_PDF, maxNumFiles: 100, uploadType: 'multifile-only' }),
@@ -754,20 +754,12 @@ export default async function init(element) {
     element.classList.remove('upsell');
     element.classList.add('signed-in');
 
-    let accountType;
-    try {
-      accountType = window.adobeIMS.getAccountType();
-    } catch {
-      accountType = (await window.adobeIMS.getProfile()).account_type;
-    }
-
     if (LIMITS[VERB].signedInAcceptedFiles) {
       button.accept = [...LIMITS[VERB].acceptedFiles, ...LIMITS[VERB].signedInAcceptedFiles];
     }
 
-    if (accountType && LIMITS[VERB].neverRedirect) return;
-    if (accountType !== 'type1') redDir(VERB);
-    if (accountType === 'type1' && !LIMITS[VERB].typeOneLanding) redDir(VERB);
+    if (LIMITS[VERB].neverRedirect) return;
+    redDir(VERB);
   }
 
   function handleAnalyticsEvent(
