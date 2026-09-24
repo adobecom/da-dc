@@ -290,18 +290,6 @@ async function frictionlessResponseProvider(request) {
   const isLocalePrefix = request.path.split('/').filter(Boolean).length > 1
     && ACROBAT_LOCALES.has(first);
 
-  const fetchResource = async path => {
-    const url = path.startsWith('http') ? path : origin + path;
-    const response = await httpRequest(url, { headers });
-    if (response.ok) {
-      return response.text();
-    }
-    const statusText = response.statusText || 'Unknown';
-    throw new Error(
-      `fetchResource failed | path: "${path}" | url: "${url}" | status: ${response.status} (${statusText})`
-    );
-  };
-
   const fetchFrictionlessPage = async () => {
     // Setup: Fetch a stream containing HTML
     let docPath;
@@ -359,6 +347,18 @@ async function frictionlessResponseProvider(request) {
     }
 
     return [responseStream, responseHeaders, mobileWidget, unityWorkflow];
+  };
+
+  const fetchResource = async path => {
+    const url = path.startsWith('http') ? path : origin + path;
+    const response = await httpRequest(url, { headers });
+    if (response.ok) {
+      return response.text();
+    }
+    const statusText = response.statusText || 'Unknown';
+    throw new Error(
+      `fetchResource failed | path: "${path}" | url: "${url}" | status: ${response.status} (${statusText})`
+    );
   };
 
   const scriptHashes = [];
