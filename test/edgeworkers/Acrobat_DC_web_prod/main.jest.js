@@ -86,6 +86,30 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     });
   });
 
+  it("responseProvider verb-widget hero SVG preload", async () => {
+    // Simulate a standard unity verb-widget page: fire only the
+    // `.unity.workflow-acrobat` marker so the Link header takes the default
+    // verb-widget branch (no study-marquee / verb-marquee / client-upload).
+    const originalOnElement = mockOnElement.getMockImplementation();
+    mockOnElement.mockImplementation((elem, fn) => {
+      if (elem === '.unity.workflow-acrobat') {
+        fn({ getAttribute: jest.fn() });
+      }
+      return {};
+    });
+
+    try {
+      const requestMock = new Request({ path: '/acrobat/online/word-to-pdf' });
+      const response = await replaceResponseProvider(requestMock);
+      expect(response.status).toEqual(200);
+      expect(response.headers.Link).toContain(
+        '</acrobat/blocks/verb-widget/icons/word-to-pdf.svg>;rel="preload";as="fetch";fetchpriority="high";crossorigin="anonymous"'
+      );
+    } finally {
+      mockOnElement.mockImplementation(originalOnElement);
+    }
+  });
+
   it("responseProvider ROW", async () => {
     let requestMock = new Request({path: '/jp/acrobat/online/pdf-to-ppt'});
 
