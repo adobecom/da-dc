@@ -165,6 +165,93 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     requestMock = new Request({path: '/acrobat/online/pdf-to-ppt', device: 'Tablet'});
 
     onClientRequest(requestMock);
-    expect(requestMock.setVariable).toBeCalledWith('PMUSER_DEVICETYPE', 'Desktop');    
-  });  
+    expect(requestMock.setVariable).toBeCalledWith('PMUSER_DEVICETYPE', 'Desktop');
+  });
+});
+
+describe("frictionlessResponseProvider for acrobat.adobe.com", () => {
+  let fetches;
+
+  beforeAll(() => {
+    httpRequest.mockImplementation((path) => {
+      fetches.push(path);
+      let response;
+      if (path.includes('scripts.js')) response = new HttpResponseScripts();
+      else if (path.includes('widget.js')) response = new HttpResponseWidget();
+      else if (path.includes('/libs/styles/styles.css')) response = new HttpResponseMiloStyles();
+      else if (path.includes('.css')) response = new HttpResponseStyles();
+      else response = new HttpResponsePdf();
+      return Promise.resolve(response);
+    });
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    fetches = [];
+  });
+
+  // Existing URLs — must continue to work
+  it("acrobat.adobe.com/heic-to-pdf → /dc-shared/heic-to-pdf (root, no locale)", async () => {
+    const requestMock = new Request({path: '/heic-to-pdf', host: 'acrobat.adobe.com'});
+    const response = await replaceResponseProvider(requestMock);
+    expect(response.status).toEqual(200);
+    expect(fetches).toContain('https://acrobat.adobe.com/dc-shared/heic-to-pdf');
+  });
+
+  it("acrobat.adobe.com/fr/heic-to-pdf → /fr/dc-shared/heic-to-pdf (locale prefix)", async () => {
+    const requestMock = new Request({path: '/fr/heic-to-pdf', host: 'acrobat.adobe.com'});
+    const response = await replaceResponseProvider(requestMock);
+    expect(response.status).toEqual(200);
+    expect(fetches).toContain('https://acrobat.adobe.com/fr/dc-shared/heic-to-pdf');
+  });
+
+  it("acrobat.adobe.com/id_id/heic-to-pdf → /id_id/dc-shared/heic-to-pdf (underscore locale)", async () => {
+    const requestMock = new Request({path: '/id_id/heic-to-pdf', host: 'acrobat.adobe.com'});
+    const response = await replaceResponseProvider(requestMock);
+    expect(response.status).toEqual(200);
+    expect(fetches).toContain('https://acrobat.adobe.com/id_id/dc-shared/heic-to-pdf');
+  });
+
+  // New /tools/* URLs
+  it("acrobat.adobe.com/tools/pdf-to-word → /dc-shared/tools/pdf-to-word (tools section)", async () => {
+    const requestMock = new Request({path: '/tools/pdf-to-word', host: 'acrobat.adobe.com'});
+    const response = await replaceResponseProvider(requestMock);
+    expect(response.status).toEqual(200);
+    expect(fetches).toContain('https://acrobat.adobe.com/dc-shared/tools/pdf-to-word');
+  });
+
+  it("acrobat.adobe.com/tools/split-pdf → /dc-shared/tools/split-pdf (tools section)", async () => {
+    const requestMock = new Request({path: '/tools/split-pdf', host: 'acrobat.adobe.com'});
+    const response = await replaceResponseProvider(requestMock);
+    expect(response.status).toEqual(200);
+    expect(fetches).toContain('https://acrobat.adobe.com/dc-shared/tools/split-pdf');
+  });
+
+  it("acrobat.adobe.com/fr/pdf-to-word → /fr/dc-shared/pdf-to-word (locale + new content)", async () => {
+    const requestMock = new Request({path: '/fr/pdf-to-word', host: 'acrobat.adobe.com'});
+    const response = await replaceResponseProvider(requestMock);
+    expect(response.status).toEqual(200);
+    expect(fetches).toContain('https://acrobat.adobe.com/fr/dc-shared/pdf-to-word');
+  });
+
+  it("acrobat.adobe.com/id_id/pdf-to-word → /id_id/dc-shared/pdf-to-word (underscore locale + new content)", async () => {
+    const requestMock = new Request({path: '/id_id/pdf-to-word', host: 'acrobat.adobe.com'});
+    const response = await replaceResponseProvider(requestMock);
+    expect(response.status).toEqual(200);
+    expect(fetches).toContain('https://acrobat.adobe.com/id_id/dc-shared/pdf-to-word');
+  });
+
+  it("acrobat.adobe.com/fr/tools/pdf-to-word → /fr/dc-shared/tools/pdf-to-word (locale + tools section)", async () => {
+    const requestMock = new Request({path: '/fr/tools/pdf-to-word', host: 'acrobat.adobe.com'});
+    const response = await replaceResponseProvider(requestMock);
+    expect(response.status).toEqual(200);
+    expect(fetches).toContain('https://acrobat.adobe.com/fr/dc-shared/tools/pdf-to-word');
+  });
+
+  it("acrobat.adobe.com/africa/heic-to-pdf → /dc-shared/africa/heic-to-pdf (unsupported locale treated as section)", async () => {
+    const requestMock = new Request({path: '/africa/heic-to-pdf', host: 'acrobat.adobe.com'});
+    const response = await replaceResponseProvider(requestMock);
+    expect(response.status).toEqual(200);
+    expect(fetches).toContain('https://acrobat.adobe.com/dc-shared/africa/heic-to-pdf');
+  });
 });
