@@ -243,7 +243,7 @@ export default async function init(element) {
 
   const cellText = (key) => authored.get(key)?.textContent?.trim() || '';
   const cellHTML = (key) => authored.get(key)?.innerHTML?.trim() || '';
-  const isMobileOrTablet = window.innerWidth < 1200;
+  const isMobileOrTablet = !window.matchMedia('(min-width: 1200px)').matches;
   const authoredCopy = isMobileOrTablet
     ? (cellText('mobile-copy') || cellText('desktop-copy'))
     : cellText('desktop-copy');

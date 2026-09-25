@@ -9,6 +9,22 @@ const { default: init } = await import(
   '../../../acrobat/blocks/verb-marquee/verb-marquee.js'
 );
 
+const DESKTOP_QUERY = '(min-width: 1200px)';
+const stubDesktopQuery = (matches) => sinon.stub(window, 'matchMedia').callsFake((query) => (
+  query === DESKTOP_QUERY
+    ? { matches, media: query }
+    : window.matchMedia.wrappedMethod.call(window, query)));
+
+const setCopyPlaceholders = () => {
+  Object.assign(window.mph, {
+    'verb-marquee-word-to-pdf-copy': 'Desktop copy.',
+    'verb-marquee-word-to-pdf-mobile-copy': 'Mobile copy.',
+    'verb-marquee-word-to-pdf-sub-copy': 'Desktop sub-copy.',
+    'verb-marquee-word-to-pdf-mobile-sub-copy': 'Mobile sub-copy.',
+    'verb-marquee-word-to-pdf-sub-copy-2': 'Desktop sub-copy 2.',
+  });
+};
+
 describe('verb-marquee block', () => {
   let xhr;
   let placeholders;
@@ -47,6 +63,32 @@ describe('verb-marquee block', () => {
     expect(document.querySelector('.verb-marquee .acrobat-icon svg')).to.exist;
     expect(document.querySelector('.verb-marquee .verb-marquee-cta')).to.exist;
     expect(document.querySelector('.verb-marquee .verb-marquee-dropzone')).to.exist;
+  });
+
+  it('uses mobile copy placeholders below the 1200px breakpoint, falling back to desktop keys', async () => {
+    stubDesktopQuery(false);
+    setCopyPlaceholders();
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-marquee');
+    await init(block);
+    expect(window.matchMedia.calledWith(DESKTOP_QUERY)).to.be.true;
+    expect(block.querySelector('.verb-marquee-copy').textContent).to.equal('Mobile copy.');
+    const subCopies = [...block.querySelectorAll('.verb-marquee-copy-sub-label')].map((el) => el.textContent);
+    expect(subCopies).to.deep.equal(['Mobile sub-copy.', 'Desktop sub-copy 2.']);
+  });
+
+  it('uses desktop copy placeholders at and above the 1200px breakpoint', async () => {
+    stubDesktopQuery(true);
+    setCopyPlaceholders();
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-marquee');
+    await init(block);
+    expect(window.matchMedia.calledWith(DESKTOP_QUERY)).to.be.true;
+    expect(block.querySelector('.verb-marquee-copy').textContent).to.equal('Desktop copy.');
+    const subCopies = [...block.querySelectorAll('.verb-marquee-copy-sub-label')].map((el) => el.textContent);
+    expect(subCopies).to.deep.equal(['Desktop sub-copy.', 'Desktop sub-copy 2.']);
   });
 
   it('show error toast', async () => {
