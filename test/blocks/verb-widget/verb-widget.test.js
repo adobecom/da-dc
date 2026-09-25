@@ -62,6 +62,7 @@ describe('verb-widget block', () => {
 
     expect(block.classList.contains('upsell')).to.be.false;
     expect(block.classList.contains('signed-in')).to.be.true;
+    expect(block.classList.contains('ready')).to.be.true;
 
     expect(document.querySelector('.verb-widget .acrobat-icon svg')).to.exist;
     expect(document.querySelector('.verb-widget .verb-image svg')).to.exist;
@@ -395,6 +396,68 @@ describe('verb-widget block', () => {
     Object.defineProperty(normalEvent, 'persisted', {
       value: false,
       writable: false,
+    });
+  });
+
+  describe('FOUC guard', () => {
+    const waitForVerbWidgetStyles = async (block) => {
+      for (let i = 0; i < 100 && getComputedStyle(block).backgroundImage === 'none'; i += 1) {
+        await delay(20);
+      }
+      expect(getComputedStyle(block).backgroundImage).to.not.equal('none');
+    };
+    const alpha = (color) => {
+      const channels = color.match(/[\d.]+/g);
+      return channels.length > 3 ? Number(channels[3]) : 1;
+    };
+    const hasOwnText = (el) => [...el.childNodes]
+      .some((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+
+    beforeEach(() => {
+      const conf = getConfig();
+      setConfig({ ...conf, locale: { prefix: '' } });
+    });
+
+    it('keeps authored text transparent until init adds ready, then inherits the page color', async () => {
+      const block = document.body.querySelector('.verb-widget');
+      block.parentElement.style.color = 'rgb(1, 2, 3)';
+      await waitForVerbWidgetStyles(block);
+      expect(block.classList.contains('ready')).to.be.false;
+      expect(getComputedStyle(block).color).to.equal('rgba(0, 0, 0, 0)');
+
+      await init(block);
+
+      expect(block.classList.contains('ready')).to.be.true;
+      expect(getComputedStyle(block).color).to.equal('rgb(1, 2, 3)');
+    });
+
+    it('renders every visible text element with a visible color', async () => {
+      const block = document.body.querySelector('.verb-widget');
+      await init(block);
+      await waitForVerbWidgetStyles(block);
+
+      const textElements = [...block.querySelectorAll('*')]
+        .filter((el) => el.getClientRects().length && hasOwnText(el));
+      expect(textElements.length).to.be.at.least(5);
+      const invisible = textElements.filter((el) => alpha(getComputedStyle(el).color) === 0);
+      expect(invisible.map((el) => el.className)).to.deep.equal([]);
+    });
+
+    it('adds ready on the mobile layout', async () => {
+      const { browser } = window;
+      const { userAgent } = window.navigator;
+      const iPhoneUA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1';
+      Object.defineProperty(window.navigator, 'userAgent', { value: iPhoneUA, configurable: true });
+      window.browser = { ua: iPhoneUA };
+      try {
+        const block = document.body.querySelector('.verb-widget');
+        await init(block);
+        expect(block.querySelector('.verb-wrapper.mobile')).to.exist;
+        expect(block.classList.contains('ready')).to.be.true;
+      } finally {
+        Object.defineProperty(window.navigator, 'userAgent', { value: userAgent, configurable: true });
+        window.browser = browser;
+      }
     });
   });
 });
