@@ -201,7 +201,12 @@ function setJsonLdProductInfo() {
 
   const name = getMetadata('product-name');
   const description = getMetadata('product-description');
-  if (!name) return;
+  // Google rejects AggregateRating when ratingCount is not positive.
+  if (!name || !(rnrData.votes > 0)) return;
+
+  const canonical = document.head.querySelector('link[rel="canonical"]')?.href;
+  const pageUrl = new URL(canonical || window.location.href);
+  const entityUrl = `${pageUrl.origin}${pageUrl.pathname}`;
 
   const linkedData = {
     name,
@@ -209,9 +214,12 @@ function setJsonLdProductInfo() {
     '@type': 'Product',
     '@context': 'http://schema.org',
     aggregateRating: {
+      '@id': `${entityUrl}#aggregaterating`,
       '@type': 'AggregateRating',
       ratingValue: rnrData.average.toString(),
       ratingCount: rnrData.votes.toString(),
+      bestRating: '5',
+      worstRating: '1',
     },
   };
 
