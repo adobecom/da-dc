@@ -374,13 +374,7 @@ async function loadSvg(iconName) {
   }
 }
 
-async function createSvgElement(iconName) {
-  // Check cache first
-  if (svgCache.has(iconName)) {
-    return svgCache.get(iconName).cloneNode(true);
-  }
-
-  const svgString = ICONS[iconName] || await loadSvg(iconName);
+function buildSvgElement(iconName, svgString) {
   if (!svgString) {
     window.lana?.log(
       `Error Code: Unknown, Status: 'Unknown', Message: Icon not found: ${iconName}`,
@@ -399,6 +393,22 @@ async function createSvgElement(iconName) {
 
   // Return a clone
   return svgElement.cloneNode(true);
+}
+
+function createInlineSvgElement(iconName) {
+  if (svgCache.has(iconName)) {
+    return svgCache.get(iconName).cloneNode(true);
+  }
+  return buildSvgElement(iconName, ICONS[iconName]);
+}
+
+async function createSvgElement(iconName) {
+  if (svgCache.has(iconName)) {
+    return svgCache.get(iconName).cloneNode(true);
+  }
+
+  const svgString = ICONS[iconName] || await loadSvg(iconName);
+  return buildSvgElement(iconName, svgString);
 }
 
 function getAuthoredVerbIcon(element) {
@@ -578,7 +588,7 @@ export default async function init(element) {
   const widgetRight = createTag('div', { class: 'verb-col right' });
   const widgetHeader = createTag('div', { class: 'verb-header' });
   const widgetIcon = createTag('div', { class: 'acrobat-icon' });
-  const widgetIconSvg = await createSvgElement('WIDGET_ICON');
+  const widgetIconSvg = createInlineSvgElement('WIDGET_ICON');
   const verbCTA = getCTA(VERB);
   if (widgetIconSvg) {
     widgetIconSvg.classList.add('icon-verb');
@@ -590,7 +600,7 @@ export default async function init(element) {
   const widgetButton = createTag('button', { for: 'file-upload', class: 'verb-cta', tabindex: 0, 'aria-label': verbCTA });
   const widgetButtonLabel = createTag('span', { class: 'verb-cta-label' }, verbCTA);
   widgetButton.append(widgetButtonLabel);
-  const uploadIconSvg = await createSvgElement('UPLOAD_ICON');
+  const uploadIconSvg = createInlineSvgElement('UPLOAD_ICON');
   if (uploadIconSvg) {
     uploadIconSvg.classList.add('upload-icon');
     widgetButton.prepend(uploadIconSvg);
@@ -637,8 +647,8 @@ export default async function init(element) {
     'aria-label': window.mph['verb-widget-tool-tip'] || 'Files security information',
     'data-tooltip': `${window.mph['verb-widget-tool-tip']}`,
   });
-  const securityIconSvg = await createSvgElement('SECURITY_ICON');
-  const infoIconSvg = await createSvgElement('INFO_ICON');
+  const securityIconSvg = createInlineSvgElement('SECURITY_ICON');
+  const infoIconSvg = createInlineSvgElement('INFO_ICON');
   if (securityIconSvg) {
     iconSecurity.appendChild(securityIconSvg);
     infoIcon.appendChild(infoIconSvg);
@@ -668,7 +678,7 @@ export default async function init(element) {
       srAlert.cleanupTimer = setTimeout(() => alertEl.remove(), 10000);
     }, 5000);
   };
-  const closeIconSvg = await createSvgElement('CLOSE_ICON');
+  const closeIconSvg = createInlineSvgElement('CLOSE_ICON');
   if (closeIconSvg) {
     closeIconSvg.classList.add('close-icon', 'error');
     errorCloseBtn.prepend(closeIconSvg);

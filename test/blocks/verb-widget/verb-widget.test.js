@@ -52,6 +52,40 @@ describe('verb-widget block', () => {
     expect(document.querySelector('.verb-widget .info-icon svg')).to.exist;
   });
 
+  it('renders every inline icon in place', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+
+    expect(block.querySelector('.acrobat-icon > svg.icon-verb')).to.exist;
+    const uploadIcon = block.querySelector('button.verb-cta').firstElementChild;
+    expect(uploadIcon.matches('svg.upload-icon')).to.be.true;
+    expect(block.querySelector('.security-icon > svg')).to.exist;
+    expect(block.querySelector('.info-icon > svg')).to.exist;
+    const closeIcon = block.querySelector('.verb-errorBtn').firstElementChild;
+    expect(closeIcon.matches('svg.close-icon.error')).to.be.true;
+  });
+
+  it('swaps the authored rows for the widget in one microtask turn', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    const batches = [];
+    const observer = new MutationObserver((records) => batches.push(records));
+    observer.observe(block, { childList: true });
+
+    await init(block);
+    observer.disconnect();
+
+    expect(batches).to.not.be.empty;
+    const [firstBatch] = batches;
+    const removed = firstBatch.flatMap((record) => [...record.removedNodes]);
+    const added = firstBatch.flatMap((record) => [...record.addedNodes]);
+    expect(removed).to.not.be.empty;
+    expect(added.some((node) => node.classList?.contains('verb-wrapper'))).to.be.true;
+  });
+
   it('does not apply generated icon sizing to an authored image', async () => {
     const block = document.body.querySelector('.verb-widget');
     const authoredIcon = document.createElement('img');
