@@ -187,6 +187,7 @@ function redDirLink(verb) {
 }
 
 function redDir(verb) {
+  if (['split-pdf', 'pdf-to-word'].includes(verb)) return;
   window.location.href = redDirLink(verb);
 }
 
@@ -500,37 +501,6 @@ export default async function init(element) {
   }
 
   const prerenderElement = document.querySelector('#prerender_verb-widget');
-  if (prerenderElement && window.PerformanceObserver) {
-    Promise.race([
-      new Promise((resolve) => {
-        try {
-          const lcpObserver = new PerformanceObserver((entries) => {
-            if (entries.getEntries().length > 0) {
-              prerenderElement.remove();
-              lcpObserver.disconnect();
-              resolve();
-            }
-          });
-          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-        } catch (error) {
-          prerenderElement.remove();
-          resolve();
-        }
-      }),
-      // Fallback timeout - remove after 3 seconds if LCP not detected
-      new Promise((resolve) => {
-        setTimeout(() => {
-          prerenderElement.remove();
-          resolve();
-        }, 3000);
-      }),
-    ]);
-  } else if (prerenderElement) {
-    // Fallback for browsers without PerformanceObserver support
-    setTimeout(() => {
-      prerenderElement.remove();
-    }, 3000);
-  }
 
   const isMobile = isMobileDevice();
   const isTablet = isTabletDevice();
@@ -858,6 +828,8 @@ export default async function init(element) {
   }
 
   element.parentNode.style.display = 'block';
+
+  requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
 
   widget.addEventListener('click', (e) => {
     if (e.srcElement.classList.value.includes('error')) { return; }
