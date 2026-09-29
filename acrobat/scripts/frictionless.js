@@ -3,8 +3,6 @@ import reviewAlloy from './alloy/review.js';
 import reviewFeedbackAlloy from './alloy/reviewFeedback.js';
 import browserExtAlloy from './alloy/browserExt.js';
 
-// Calls onFound once `selector` matches inside `root`: checks now, then re-checks only when
-// root's subtree changes, so nothing runs on a timer while the element is missing.
 function whenElementExists(root, selector, onFound) {
   const element = root.querySelector(selector);
   if (element) {
@@ -30,7 +28,6 @@ export default function init(verb) {
    */
   if (miloReviewBlock || rnrBlock) {
     reviewAlloy();
-    // Milo block handling
     if (miloReviewBlock) {
       whenElementExists(miloReviewBlock, '.hlx-Review', (miloReviewForm) => {
         miloReviewForm.addEventListener('submit', (e) => {
@@ -49,7 +46,6 @@ export default function init(verb) {
         }
       });
     }
-    // Rnr block handling
     if (rnrBlock) {
       whenElementExists(rnrBlock, '.rnr-form', (rnrForm) => {
         rnrForm.addEventListener('submit', (e) => {

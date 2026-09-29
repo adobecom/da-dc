@@ -704,8 +704,6 @@ async function loadPage() {
   const { default: lanaLogging } = await import('./dcLana.js');
   lanaLogging();
 
-  // DC Hosted Ready: dc-converter-widget injects the DC Hosted launcher, which sets
-  // window.dc_hosted synchronously while it executes, so its load event is the readiness signal.
   const dispatchDcHostedReady = () => window.dispatchEvent(new CustomEvent('DC_Hosted:Ready'));
   if (window.dc_hosted) {
     dispatchDcHostedReady();

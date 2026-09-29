@@ -8,7 +8,6 @@
 
 const LANA_OPTIONS = { sampleRate: 1, tags: 'DC_Milo,Frictionless', severity: 'error' };
 
-// loadPage() only awaits resolved promises here, so one macrotask lets it run to the end.
 const flush = () => new Promise((resolve) => { setTimeout(resolve, 0); });
 
 describe('scripts.js DC Hosted readiness', () => {
@@ -73,7 +72,6 @@ describe('scripts.js DC Hosted readiness', () => {
     await loadScripts();
     expect(onReady).not.toHaveBeenCalled();
 
-    // The launcher assigns window.dc_hosted while it executes, i.e. before its load event.
     window.dc_hosted = {};
     launcher.dispatchEvent(new Event('load'));
     expect(onReady).toHaveBeenCalledTimes(1);

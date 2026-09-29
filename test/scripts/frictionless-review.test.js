@@ -34,7 +34,6 @@ const MILO_REVIEW_FORM = `
     </form>
   </div>`;
 
-// MutationObserver callbacks are delivered as microtasks.
 const nextMicrotask = () => Promise.resolve();
 
 const lastInteraction = () => {
@@ -59,7 +58,6 @@ describe('frictionless review form readiness', () => {
   it('wires the rnr form once it renders after init, without timers', async () => {
     document.body.innerHTML = '<div class="rnr"></div>';
     init('pdf-to-ppt');
-    // productRating impression from reviewAlloy()
     expect(window._satellite.track.callCount).to.equal(1);
     expect(clock.countTimers()).to.equal(0);
 
@@ -103,12 +101,10 @@ describe('frictionless review form readiness', () => {
     expect(observe.firstCall.args[1]).to.deep.equal({ childList: true, subtree: true });
 
     const blockQuery = sinon.spy(rnrBlock, 'querySelector');
-    // Mutations outside the block never wake the observer.
     document.querySelector('.elsewhere').innerHTML = RNR_FORM;
     await nextMicrotask();
     expect(blockQuery.called).to.be.false;
 
-    // A mutation inside the block costs one re-check and keeps waiting.
     rnrBlock.append(document.createElement('div'));
     await nextMicrotask();
     expect(blockQuery.calledOnce).to.be.true;
