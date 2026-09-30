@@ -151,7 +151,6 @@
   min-height: var(--verb-widget-min-height);
 }
 
-/* Only the upsell -> signed-in swap needs this: it replaces the taller upsell panel (CLS) */
 .verb-widget.signed-in:has(> .verb-upsell-active) {
   min-height: 560px;
 }
@@ -220,7 +219,6 @@
   margin-top: var(--consonant-spacing-s);
 }
 
-/* Keep the box so .signed-in added after render (IMS:Ready) doesn't shift layout (CLS) */
 .verb-widget.signed-in .verb-footer {
   visibility: hidden;
 }
