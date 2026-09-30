@@ -527,11 +527,20 @@ export default async function init(element) {
   });
 
   const widgetImage = createTag('div', { class: 'verb-image' });
-  const verbImageSvg = authoredIcon || await createSvgElement(VERB);
-  if (verbImageSvg) {
+  const fillVerbImage = (verbImageSvg) => {
+    if (!verbImageSvg) return;
     verbImageSvg.classList.add('icon-verb-image');
     verbImageSvg.setAttribute('alt', window.mph?.[`verb-widget-${VERB}-alt`] || VERB);
-    widgetImage.appendChild(verbImageSvg);
+    widgetImage.replaceChildren(verbImageSvg);
+  };
+  if (authoredIcon) {
+    fillVerbImage(authoredIcon);
+  } else {
+    widgetImage.classList.add('generated');
+    // Show the prerender snapshot's hero until the fetched one arrives, so the swap can't blink.
+    fillVerbImage(prerenderElement?.querySelector('.verb-image svg')?.cloneNode(true));
+    // Don't hold the widget's first paint on the hero fetch; fill it when it arrives.
+    createSvgElement(VERB).then(fillVerbImage);
   }
 
   const footer = createTag('div', { class: 'verb-footer' });
