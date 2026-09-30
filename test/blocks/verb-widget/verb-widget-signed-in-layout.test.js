@@ -8,7 +8,6 @@ const { default: init } = await import(
   '../../../acrobat/blocks/verb-widget/verb-widget.js'
 );
 
-// One viewport per --verb-widget-min-height breakpoint: <835px, 835-1199px, >=1200px
 const VIEWPORTS = [
   { width: 390, height: 844 },
   { width: 1024, height: 768 },
