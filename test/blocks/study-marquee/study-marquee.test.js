@@ -853,7 +853,7 @@ describe('study-marquee block', () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     await init(block);
-    const isMobileOrTablet = window.innerWidth < 1200;
+    const isMobileOrTablet = !window.matchMedia(DESKTOP_QUERY).matches;
     const expectedCopy = isMobileOrTablet
       ? (window.mph['study-marquee-gen-presentation-v2-mobile-copy'] || window.mph['study-marquee-gen-presentation-v2-copy'])
       : window.mph['study-marquee-gen-presentation-v2-copy'];
@@ -868,7 +868,7 @@ describe('study-marquee block', () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     await init(block);
-    const isMobileOrTablet = window.innerWidth < 1200;
+    const isMobileOrTablet = !window.matchMedia(DESKTOP_QUERY).matches;
     const expectedCopy = isMobileOrTablet
       ? (window.mph['study-marquee-gen-presentation-v2-mobile-copy'] || window.mph['study-marquee-gen-presentation-v2-copy'])
       : window.mph['study-marquee-gen-presentation-v2-copy'];
@@ -876,21 +876,16 @@ describe('study-marquee block', () => {
   });
 
   it('falls back to placeholder copy on desktop when the authored copy row is blank', async () => {
-    const originalWidth = window.innerWidth;
-    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1280 });
-    try {
-      document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
-      const block = document.body.querySelector('.study-marquee');
-      block.insertAdjacentHTML('afterbegin', `
-        <div><div>dc-block-row-copy</div><div>   </div></div>`);
-      const conf = getConfig();
-      setConfig({ ...conf, locale: { prefix: '' } });
-      await init(block);
-      expect(block.querySelector('.study-marquee-copy').textContent)
-        .to.equal(window.mph['study-marquee-gen-presentation-v2-copy']);
-    } finally {
-      Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalWidth });
-    }
+    stubDesktopQuery(true);
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-copy</div><div>   </div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-copy').textContent)
+      .to.equal(window.mph['study-marquee-gen-presentation-v2-copy']);
   });
 
   it('authored sub-copy is rendered instead of placeholder', async () => {
@@ -926,21 +921,16 @@ describe('study-marquee block', () => {
   });
 
   it('falls back to placeholder sub-copy on desktop when the authored sub-copy row is blank', async () => {
-    const originalWidth = window.innerWidth;
-    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1280 });
-    try {
-      document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
-      const block = document.body.querySelector('.study-marquee');
-      block.insertAdjacentHTML('afterbegin', `
-        <div><div>dc-block-row-sub-copy</div><div>   </div></div>`);
-      const conf = getConfig();
-      setConfig({ ...conf, locale: { prefix: '' } });
-      await init(block);
-      expect(block.querySelector('.study-marquee-copy-sub').textContent)
-        .to.equal(window.mph['study-marquee-gen-presentation-v2-sub-copy']);
-    } finally {
-      Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalWidth });
-    }
+    stubDesktopQuery(true);
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-sub-copy</div><div>   </div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-copy-sub').textContent)
+      .to.equal(window.mph['study-marquee-gen-presentation-v2-sub-copy']);
   });
 
   it('authored upload-cta overrides placeholder CTA', async () => {
