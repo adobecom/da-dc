@@ -999,6 +999,11 @@ export default async function init(element) {
   }
 
   element.parentNode.style.display = 'block';
+
+  const prerenderElement = document.querySelector('#prerender_verb-widget');
+  // eslint-disable-next-line compat/compat
+  requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
+
   window.addEventListener('pageshow', (event) => {
     const historyTraversal = event.persisted
       || (typeof window.performance !== 'undefined'

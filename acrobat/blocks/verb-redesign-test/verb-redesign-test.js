@@ -288,35 +288,6 @@ export default async function init(element) {
   }
 
   const prerenderElement = document.querySelector('#prerender_verb-widget');
-  if (prerenderElement && window.PerformanceObserver) {
-    Promise.race([
-      new Promise((resolve) => {
-        try {
-          const lcpObserver = new PerformanceObserver((entries) => {
-            if (entries.getEntries().length > 0) {
-              prerenderElement.remove();
-              lcpObserver.disconnect();
-              resolve();
-            }
-          });
-          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-        } catch (error) {
-          prerenderElement.remove();
-          resolve();
-        }
-      }),
-      new Promise((resolve) => {
-        setTimeout(() => {
-          prerenderElement.remove();
-          resolve();
-        }, 3000);
-      }),
-    ]);
-  } else if (prerenderElement) {
-    setTimeout(() => {
-      prerenderElement.remove();
-    }, 3000);
-  }
 
   window.mph = window.mph || {};
   await loadPlaceholders(['verb-redesign-test', 'verb-marquee', 'verb-widget']);
@@ -871,6 +842,10 @@ export default async function init(element) {
   }
 
   element.parentNode.style.display = 'block';
+
+  // eslint-disable-next-line compat/compat
+  requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
+
   window.addEventListener('pageshow', (event) => {
     const historyTraversal = event.persisted
       || (typeof window.performance !== 'undefined'
