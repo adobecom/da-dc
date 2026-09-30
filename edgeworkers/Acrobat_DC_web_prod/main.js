@@ -223,6 +223,7 @@ export async function responseProvider(request) {
         `</libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
+        `</acrobat/blocks/verb-widget/icons/${last}.svg>;rel="preload";as="fetch";fetchpriority="high";crossorigin="anonymous"`,
       ];
     } else if (unityWorkflow) {
       headerLink = [...headerLink,

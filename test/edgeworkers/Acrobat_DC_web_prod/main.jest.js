@@ -130,6 +130,35 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     });
   });
 
+  it("responseProvider client-upload hero SVG preload", async () => {
+    // Fire only the `.verb-widget-client-upload` marker so the Link header takes
+    // the client-upload branch.
+    const originalOnElement = mockOnElement.getMockImplementation();
+    mockOnElement.mockImplementation((elem, fn) => {
+      if (elem === '.verb-widget-client-upload') {
+        fn({ getAttribute: jest.fn() });
+      }
+      return {};
+    });
+
+    try {
+      const heroPreload = '</acrobat/blocks/verb-widget/icons/image-to-pdf.svg>;rel="preload";as="fetch";fetchpriority="high";crossorigin="anonymous"';
+
+      let response = await replaceResponseProvider(new Request({ path: '/acrobat/online/image-to-pdf' }));
+      expect(response.status).toEqual(200);
+      expect(response.headers.Link).toContain('</acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.js>');
+      expect(response.headers.Link).toContain(heroPreload);
+
+      // Localized pages load the same icon path; it has no locale prefix.
+      response = await replaceResponseProvider(new Request({ path: '/jp/acrobat/online/image-to-pdf' }));
+      expect(response.status).toEqual(200);
+      expect(response.headers.Link).toContain('</jp/dc-shared/placeholders.json>');
+      expect(response.headers.Link).toContain(heroPreload);
+    } finally {
+      mockOnElement.mockImplementation(originalOnElement);
+    }
+  });
+
   it("404 exception", async () => {
     let requestMock = new Request({path: '/404/online/pdf-to-ppt'});
 
