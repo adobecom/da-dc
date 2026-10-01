@@ -163,7 +163,7 @@ export async function responseProvider(request) {
     });
   };
 
-  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop) => {
+  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, unityMarqueeStyles = []) => {
     rewriter.onElement('head', el => {
       el.append(`<style id="inline-milo-styles">${miloStyles}</style>`);
       el.append(`<style id="inline-dc-styles">${dcStyles}</style>`);
@@ -175,6 +175,10 @@ export async function responseProvider(request) {
           el.append(`<style id="inline-study-marquee-styles">${studyMarqueeStyles}</style>`);
         } else if (verbMarquee) {
           el.append(`<style id="inline-verb-marquee-styles">${verbMarqueeStyles}</style>`);
+        } else if (unityMarqueeStyles.length) {
+          unityMarqueeStyles.forEach(([id, css]) => {
+            el.append(`<style id="${id}">${css}</style>`);
+          });
         } else {
           el.append(`<style id="inline-verb-widget-styles">${verbWidgetStyles}</style>`);
         }
@@ -206,8 +210,18 @@ export async function responseProvider(request) {
       fetchResource('/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css')
     ]);
 
+    const loadUnityMarquee = unityMarquee && unityWorkflow
+      && !clientUploadWidget && !studyMarquee && !verbMarquee
+      && ['www.adobe.com', 'www.stage.adobe.com'].includes(request.host);
+    const unityMarqueeStyles = loadUnityMarquee ? await Promise.all([
+      ['inline-unity-shared-styles', '/unitylibs/core/widgets/shared/shared.css'],
+      ['inline-unity-dropdown-styles', '/unitylibs/core/widgets/shared/dropdown.css'],
+      ['inline-unity-prompt-upload-styles', '/unitylibs/core/widgets/prompt-upload/prompt-upload.css'],
+      ['inline-unity-marquee-styles', '/acrobat/blocks/unity-marquee/unity-marquee.css'],
+    ].map(async ([id, path]) => [id, await fetchResource(path)])) : [];
+
     await inlineScripts(unityWorkflow, mobileWidget, clientUploadWidget, scripts, dcConverter);
-    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop);
+    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, unityMarqueeStyles);
 
     const csp = contentSecurityPolicy(isProd, scriptHashes);
     const acrobat = isProd ? 'https://acrobat.adobe.com' : 'https://stage.acrobat.adobe.com';
@@ -247,26 +261,27 @@ export async function responseProvider(request) {
           `</acrobat/blocks/verb-marquee/verb-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/verb-marquee/verb-marquee.css>;rel="preload";as="style"`,
         ];
+      } else if (loadUnityMarquee) {
+        headerLink = [...headerLink,
+          `</acrobat/blocks/unity-marquee/unity-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</acrobat/blocks/unity-marquee/unity-marquee.css>;rel="preload";as="style"`,
+          `</unitylibs/core/widgets/prompt-upload/prompt-upload.css>;rel="preload";as="style"`,
+          `</unitylibs/core/widgets/shared/shared.css>;rel="preload";as="style"`,
+          `</unitylibs/core/widgets/shared/dropdown.css>;rel="preload";as="style"`,
+          `</unitylibs/core/widgets/prompt-upload/prompt-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/workflow/workflow-prompt-upload/action-binder.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/workflow/workflow-prompt-upload/target-config.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/dropzone.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/dropdown.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/widget-base.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/prompt-input.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        ];
       } else {
         headerLink = [...headerLink,
           `</acrobat/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
         ];
       }
-    }
-    // Add Unity resource hints without changing existing block loading or common styles.
-    if (isProd && unityMarquee) {
-      headerLink = [...headerLink,
-        `</unitylibs/core/widgets/prompt-upload/prompt-upload.css>;rel="preload";as="style"`,
-        `</unitylibs/core/widgets/shared/shared.css>;rel="preload";as="style"`,
-        `</unitylibs/core/widgets/prompt-upload/prompt-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</unitylibs/core/workflow/workflow-prompt-upload/action-binder.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</unitylibs/core/workflow/workflow-prompt-upload/target-config.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
-        `</unitylibs/core/widgets/shared/dropzone.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</unitylibs/core/widgets/shared/dropdown.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</unitylibs/core/widgets/shared/widget-base.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `</unitylibs/core/widgets/shared/prompt-input.js>;rel="preload";as="script";crossorigin="anonymous"`,
-      ];
     }
     headerLink = headerLink.join();
 

@@ -13,12 +13,21 @@ import { HttpResponseMiloStyles } from "response-milo-styles";
 import { HttpResponseVerbWidgetStyles } from "response-verb-widget-styles";
 import { HttpResponse404 } from "response-404";
 import { mockOnElement } from "html-rewriter";
+import { EdgeKV } from "../../../edgeworkers/Acrobat_DC_web_prod/edgekv.js";
 
 
 describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
   let fetches;
   let resource404 = false
   let unityMarquee = false;
+  let authoredBlocks;
+  let unityCss404;
+  const unityCssPaths = [
+    '/unitylibs/core/widgets/shared/shared.css',
+    '/unitylibs/core/widgets/shared/dropdown.css',
+    '/unitylibs/core/widgets/prompt-upload/prompt-upload.css',
+    '/acrobat/blocks/unity-marquee/unity-marquee.css',
+  ];
   const originalOnElement = mockOnElement.getMockImplementation();
 
   beforeAll(() => {
@@ -50,6 +59,9 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         response = new HttpResponseVerbWidgetStyles();
       } else if (path.includes('/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css')) {
         response = new HttpResponseVerbWidgetStyles();
+      } else if (unityCssPaths.some((cssPath) => path.endsWith(cssPath))) {
+        response = unityCss404 && path.endsWith(unityCss404)
+          ? new HttpResponse404() : new HttpResponseStyles();
       } else {
         response = new HttpResponse404();
       }
@@ -64,9 +76,16 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     fetches = [];
     resource404 = false;
     unityMarquee = false;
+    authoredBlocks = new Set();
+    unityCss404 = undefined;
+    jest.spyOn(EdgeKV.prototype, 'getJson').mockResolvedValue({html: '', top: 0});
     mockOnElement.mockImplementation((selector, handler) => {
       if (selector === '.unity-marquee') {
         if (unityMarquee) handler({});
+        return;
+      }
+      if (['.unity.workflow-acrobat', '.verb-widget-client-upload', '.study-marquee', '.verb-marquee'].includes(selector)) {
+        if (authoredBlocks.has(selector)) handler({});
         return;
       }
       return originalOnElement(selector, handler);
@@ -75,15 +94,21 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
 
   afterEach(() => {
     mockOnElement.mockImplementation(originalOnElement);
+    jest.restoreAllMocks();
   });
 
-  it("preloads Unity marquee resources on www.adobe.com without changing existing flows", async () => {
-    const request = new Request({path: '/acrobat/online/pdf-to-ppt'});
+  it.each(['www.adobe.com', 'www.stage.adobe.com'])("preloads Unity marquee resources on %s without changing existing flows", async (host) => {
+    authoredBlocks.add('.unity.workflow-acrobat');
+    const request = new Request({path: '/acrobat/online/pdf-to-ppt', host});
     const baseline = await replaceResponseProvider(request);
     const baselineFetches = [...fetches];
     const baselineSelectors = mockOnElement.mock.calls.map(([selector]) => selector);
     const baselineHeaders = {...baseline.headers};
     expect(baseline.headers.Link).not.toContain('/unitylibs/');
+    expect(baselineFetches.some((path) => unityCssPaths.some((cssPath) => path.endsWith(cssPath)))).toBe(false);
+    const baselineAppend = jest.fn();
+    mockOnElement.mock.calls.find(([selector]) => selector === 'head')[1]({append: baselineAppend});
+    expect(baselineAppend.mock.calls).toHaveLength(4);
 
     fetches = [];
     mockOnElement.mockClear();
@@ -94,6 +119,7 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
       '</acrobat/blocks/unity-marquee/unity-marquee.css>;rel="preload";as="style"',
       '</unitylibs/core/widgets/prompt-upload/prompt-upload.css>;rel="preload";as="style"',
       '</unitylibs/core/widgets/shared/shared.css>;rel="preload";as="style"',
+      '</unitylibs/core/widgets/shared/dropdown.css>;rel="preload";as="style"',
       '</unitylibs/core/widgets/prompt-upload/prompt-upload.js>;rel="preload";as="script";crossorigin="anonymous"',
       '</unitylibs/core/workflow/workflow-prompt-upload/action-binder.js>;rel="preload";as="script";crossorigin="anonymous"',
       '</unitylibs/core/workflow/workflow-prompt-upload/target-config.json>;rel="preload";as="fetch";crossorigin="anonymous"',
@@ -104,24 +130,77 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     ];
 
     expect(response.status).toBe(200);
-    expect(response.headers.Link).toBe([baselineHeaders.Link, ...unityLinks].join(','));
+    const commonLinks = baselineHeaders.Link.split(',').filter((link) => !link.includes('/acrobat/blocks/verb-widget/'));
+    expect(response.headers.Link).toBe([...commonLinks, ...unityLinks].join(','));
+    expect(response.headers.Link).not.toContain('/acrobat/blocks/verb-widget/');
     expect({...response.headers, Link: baselineHeaders.Link}).toEqual(baselineHeaders);
-    expect(fetches).toEqual(baselineFetches);
+    expect(fetches).toEqual([...baselineFetches, ...unityCssPaths.map((path) => `https://${host}${path}`)]);
     expect(mockOnElement.mock.calls.map(([selector]) => selector)).toEqual(baselineSelectors);
     const headHandler = mockOnElement.mock.calls.find(([selector]) => selector === 'head')[1];
     const append = jest.fn();
     headHandler({append});
     expect(append.mock.calls[0][0]).toContain('<style id="inline-milo-styles">');
     expect(append.mock.calls[1][0]).toContain('<style id="inline-dc-styles">');
+    expect(append.mock.calls.slice(2, 6)).toEqual([
+      ['<style id="inline-unity-shared-styles">styles response text</style>'],
+      ['<style id="inline-unity-dropdown-styles">styles response text</style>'],
+      ['<style id="inline-unity-prompt-upload-styles">styles response text</style>'],
+      ['<style id="inline-unity-marquee-styles">styles response text</style>'],
+    ]);
+    expect(append.mock.calls[6]).toEqual(baselineAppend.mock.calls[3]);
+    expect(append.mock.calls.some(([css]) => css.includes('inline-verb-widget-styles'))).toBe(false);
   });
 
-  it.each(['www.stage.adobe.com', 'sign.ing', 'edit.ing'])(
+  it.each(['sign.ing', 'edit.ing'])(
     "does not add Unity marquee preloads on %s",
     async (host) => {
       unityMarquee = true;
+      authoredBlocks.add('.unity.workflow-acrobat');
       const response = await replaceResponseProvider(new Request({path: '/acrobat/online/pdf-to-ppt', host}));
       expect(response.status).toBe(200);
       expect(response.headers.Link).not.toContain('/unitylibs/');
+      expect(fetches.some((path) => unityCssPaths.some((cssPath) => path.endsWith(cssPath)))).toBe(false);
+    },
+  );
+
+  it.each(unityCssPaths)("handles a failed Unity CSS fetch using existing resource error behavior: %s", async (path) => {
+    unityMarquee = true;
+    authoredBlocks.add('.unity.workflow-acrobat');
+    unityCss404 = path;
+    const response = await replaceResponseProvider(new Request({path: '/acrobat/online/pdf-to-ppt'}));
+    expect(response.status).toBe(500);
+    expect(response.body).toContain(`Failed to fetch resource: ${path} status: 404`);
+  });
+
+  it('does not add Unity marquee resources without a Unity workflow', async () => {
+    unityMarquee = true;
+    const response = await replaceResponseProvider(new Request({path: '/acrobat/online/pdf-to-ppt'}));
+    expect(response.status).toBe(200);
+    expect(response.headers.Link).not.toContain('/unitylibs/');
+    expect(response.headers.Link).not.toContain('/acrobat/blocks/unity-marquee/');
+    expect(fetches.some((path) => unityCssPaths.some((cssPath) => path.endsWith(cssPath)))).toBe(false);
+  });
+
+  it.each(['.verb-widget-client-upload', '.study-marquee', '.verb-marquee'])(
+    'preserves existing block precedence for %s',
+    async (selector) => {
+      authoredBlocks.add('.unity.workflow-acrobat');
+      authoredBlocks.add(selector);
+      const request = new Request({path: '/acrobat/online/pdf-to-ppt'});
+      const baseline = await replaceResponseProvider(request);
+      const baselineFetches = [...fetches];
+      const baselineAppend = jest.fn();
+      mockOnElement.mock.calls.find(([selected]) => selected === 'head')[1]({append: baselineAppend});
+      fetches = [];
+      mockOnElement.mockClear();
+      unityMarquee = true;
+      const response = await replaceResponseProvider(request);
+      const append = jest.fn();
+      mockOnElement.mock.calls.find(([selected]) => selected === 'head')[1]({append});
+      expect(response.status).toBe(200);
+      expect(response.headers).toEqual(baseline.headers);
+      expect(fetches).toEqual(baselineFetches);
+      expect(append.mock.calls).toEqual(baselineAppend.mock.calls);
     },
   );
 

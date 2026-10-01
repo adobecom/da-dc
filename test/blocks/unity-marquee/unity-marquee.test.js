@@ -376,6 +376,9 @@ describe('unity-marquee block', () => {
         expect(prerender.isConnected).to.be.true;
         expect(frames).to.have.lengthOf(1);
         hiddenElement.style.removeProperty(property);
+        await new Promise((resolve) => {
+          window.requestAnimationFrame.wrappedMethod.call(window, resolve);
+        });
         frames.shift()();
         expect(prerender.isConnected).to.be.false;
         expect(frames).to.be.empty;
