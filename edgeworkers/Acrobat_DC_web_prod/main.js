@@ -169,22 +169,16 @@ export async function responseProvider(request) {
 
   const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, inlineUnityMarquee, unitySharedStyles, unityDropdownStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles) => {
     rewriter.onElement('head', el => {
-      el.append(`<!-- EW-HEAD-TRACE: clientUpload=${!!clientUploadWidget}; unityStyles=${inlineUnityMarquee ? 5 : 0} -->`);
       el.append(`<style id="inline-milo-styles">${miloStyles}</style>`);
       el.append(`<style id="inline-dc-styles">${dcStyles}</style>`);
       if (clientUploadWidget) {
         el.append(`<style id="inline-verb-widget-client-upload-styles">${verbWidgetClientUploadStyles}</style>`);
         el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
       } else if (inlineUnityMarquee) {
-        el.append(`<!-- EW-CSS-TRACE: inline-unity-shared-styles; chars=${unitySharedStyles.length} -->`);
         el.append(`<style id="inline-unity-shared-styles">${unitySharedStyles}</style>`);
-        el.append(`<!-- EW-CSS-TRACE: inline-unity-dropdown-styles; chars=${unityDropdownStyles.length} -->`);
         el.append(`<style id="inline-unity-dropdown-styles">${unityDropdownStyles}</style>`);
-        el.append(`<!-- EW-CSS-TRACE: inline-unity-prompt-upload-styles; chars=${unityPromptUploadStyles.length} -->`);
         el.append(`<style id="inline-unity-prompt-upload-styles">${unityPromptUploadStyles}</style>`);
-        el.append(`<!-- EW-CSS-TRACE: inline-unity-marquee-styles; chars=${unityMarqueeBlockStyles.length} -->`);
         el.append(`<style id="inline-unity-marquee-styles">${unityMarqueeBlockStyles}</style>`);
-        el.append(`<!-- EW-CSS-TRACE: inline-unity-styles; chars=${unityBlockStyles.length} -->`);
         el.append(`<style id="inline-unity-styles">${unityBlockStyles}</style>`);
         el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
       } else if (unityWorkflow) {
