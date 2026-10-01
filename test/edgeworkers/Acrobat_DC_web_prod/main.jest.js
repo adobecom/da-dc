@@ -18,6 +18,8 @@ import { mockOnElement } from "html-rewriter";
 describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
   let fetches;
   let resource404 = false
+  let unityMarquee = false;
+  const originalOnElement = mockOnElement.getMockImplementation();
 
   beforeAll(() => {
     httpRequest.mockImplementation((path) => {
@@ -61,7 +63,67 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     jest.clearAllMocks();
     fetches = [];
     resource404 = false;
+    unityMarquee = false;
+    mockOnElement.mockImplementation((selector, handler) => {
+      if (selector === '.unity-marquee') {
+        if (unityMarquee) handler({});
+        return;
+      }
+      return originalOnElement(selector, handler);
+    });
   });
+
+  afterEach(() => {
+    mockOnElement.mockImplementation(originalOnElement);
+  });
+
+  it("preloads Unity marquee resources on www.adobe.com without changing existing flows", async () => {
+    const request = new Request({path: '/acrobat/online/pdf-to-ppt'});
+    const baseline = await replaceResponseProvider(request);
+    const baselineFetches = [...fetches];
+    const baselineSelectors = mockOnElement.mock.calls.map(([selector]) => selector);
+    const baselineHeaders = {...baseline.headers};
+    expect(baseline.headers.Link).not.toContain('/unitylibs/');
+
+    fetches = [];
+    mockOnElement.mockClear();
+    unityMarquee = true;
+    const response = await replaceResponseProvider(request);
+    const unityLinks = [
+      '</acrobat/blocks/unity-marquee/unity-marquee.js>;rel="preload";as="script";crossorigin="anonymous"',
+      '</acrobat/blocks/unity-marquee/unity-marquee.css>;rel="preload";as="style"',
+      '</unitylibs/core/widgets/prompt-upload/prompt-upload.css>;rel="preload";as="style"',
+      '</unitylibs/core/widgets/shared/shared.css>;rel="preload";as="style"',
+      '</unitylibs/core/widgets/prompt-upload/prompt-upload.js>;rel="preload";as="script";crossorigin="anonymous"',
+      '</unitylibs/core/workflow/workflow-prompt-upload/action-binder.js>;rel="preload";as="script";crossorigin="anonymous"',
+      '</unitylibs/core/workflow/workflow-prompt-upload/target-config.json>;rel="preload";as="fetch";crossorigin="anonymous"',
+      '</unitylibs/core/widgets/shared/dropzone.js>;rel="preload";as="script";crossorigin="anonymous"',
+      '</unitylibs/core/widgets/shared/dropdown.js>;rel="preload";as="script";crossorigin="anonymous"',
+      '</unitylibs/core/widgets/shared/widget-base.js>;rel="preload";as="script";crossorigin="anonymous"',
+      '</unitylibs/core/widgets/shared/prompt-input.js>;rel="preload";as="script";crossorigin="anonymous"',
+    ];
+
+    expect(response.status).toBe(200);
+    expect(response.headers.Link).toBe([baselineHeaders.Link, ...unityLinks].join(','));
+    expect({...response.headers, Link: baselineHeaders.Link}).toEqual(baselineHeaders);
+    expect(fetches).toEqual(baselineFetches);
+    expect(mockOnElement.mock.calls.map(([selector]) => selector)).toEqual(baselineSelectors);
+    const headHandler = mockOnElement.mock.calls.find(([selector]) => selector === 'head')[1];
+    const append = jest.fn();
+    headHandler({append});
+    expect(append.mock.calls[0][0]).toContain('<style id="inline-milo-styles">');
+    expect(append.mock.calls[1][0]).toContain('<style id="inline-dc-styles">');
+  });
+
+  it.each(['www.stage.adobe.com', 'sign.ing', 'edit.ing'])(
+    "does not add Unity marquee preloads on %s",
+    async (host) => {
+      unityMarquee = true;
+      const response = await replaceResponseProvider(new Request({path: '/acrobat/online/pdf-to-ppt', host}));
+      expect(response.status).toBe(200);
+      expect(response.headers.Link).not.toContain('/unitylibs/');
+    },
+  );
 
   it("responseProvider", async () => {
     let requestMock = new Request({path: '/acrobat/online/pdf-to-ppt'});

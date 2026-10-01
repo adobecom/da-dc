@@ -55,6 +55,10 @@ export async function responseProvider(request) {
     firstPassRewriter.onElement('.verb-marquee', el => {
       verbMarquee = true;
     });
+    let unityMarquee;
+    firstPassRewriter.onElement('.unity-marquee', el => {
+      unityMarquee = true;
+    });
     const nullWriter = new WritableStream({
       write() {},
       close() {},
@@ -84,7 +88,7 @@ export async function responseProvider(request) {
       delete responseHeaders[prop];
     }
 
-    return [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget];
+    return [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, unityMarquee];
   };
 
   const fetchResource = async path => {
@@ -181,7 +185,7 @@ export async function responseProvider(request) {
 
   try {
     const [
-      [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget],
+      [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, unityMarquee],
       scripts,
       dcConverter,
       dcStyles,
@@ -249,6 +253,20 @@ export async function responseProvider(request) {
           `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
         ];
       }
+    }
+    // Add Unity resource hints without changing existing block loading or common styles.
+    if (isProd && unityMarquee) {
+      headerLink = [...headerLink,
+        `</unitylibs/core/widgets/prompt-upload/prompt-upload.css>;rel="preload";as="style"`,
+        `</unitylibs/core/widgets/shared/shared.css>;rel="preload";as="style"`,
+        `</unitylibs/core/widgets/prompt-upload/prompt-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</unitylibs/core/workflow/workflow-prompt-upload/action-binder.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</unitylibs/core/workflow/workflow-prompt-upload/target-config.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
+        `</unitylibs/core/widgets/shared/dropzone.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</unitylibs/core/widgets/shared/dropdown.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</unitylibs/core/widgets/shared/widget-base.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</unitylibs/core/widgets/shared/prompt-input.js>;rel="preload";as="script";crossorigin="anonymous"`,
+      ];
     }
     headerLink = headerLink.join();
 

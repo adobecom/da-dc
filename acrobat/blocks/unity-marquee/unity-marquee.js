@@ -152,6 +152,20 @@ function processMedia(mediaDiv) {
   return mediaDiv;
 }
 
+function isBlockVisible(element) {
+  const { width, height } = element.getBoundingClientRect();
+  if (!width || !height) return false;
+  let current = element;
+  while (current) {
+    const { display, visibility, opacity } = window.getComputedStyle(current);
+    if (display === 'none' || visibility === 'hidden' || visibility === 'collapse' || opacity === '0') {
+      return false;
+    }
+    current = current.parentElement;
+  }
+  return true;
+}
+
 export default async function init(element) {
   ({ createTag, getConfig } = (await import(`${miloLibs}/utils/utils.js`)));
   ({ decorateBlockBg } = (await import(`${miloLibs}/utils/decorate.js`)));
@@ -163,7 +177,16 @@ export default async function init(element) {
   }
 
   const prerenderElement = document.querySelector('#prerender_verb-widget');
-  const removePrerender = () => prerenderElement?.remove();
+  const removePrerender = () => {
+    if (!prerenderElement?.isConnected || !element.isConnected) return;
+    if (isBlockVisible(element)) {
+      prerenderElement.remove();
+    } else {
+      // Milo may still be hiding the section while its blocks finish loading.
+      /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
+      requestAnimationFrame(removePrerender);
+    }
+  };
 
   window.mph = window.mph || {};
   const VERB = element.classList[1];
