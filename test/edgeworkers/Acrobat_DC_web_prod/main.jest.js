@@ -156,6 +156,20 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     expect(append.mock.calls.some(([css]) => css.includes('inline-verb-widget-styles'))).toBe(false);
   });
 
+  it.each(['.unity.workflow-acrobat', '.study-marquee', '.verb-marquee', '.verb-widget-client-upload'])(
+    'preserves inline styles for %s when Unity CSS is unavailable', async (selector) => {
+      authoredBlocks.add('.unity.workflow-acrobat');
+      authoredBlocks.add(selector);
+      unityCss404 = unityCssPaths[0];
+      const response = await replaceResponseProvider(new Request({path: '/acrobat/online/pdf-to-ppt'}));
+      expect(response.status).toBe(200);
+      expect(fetches.some((path) => unityCssPaths.some((cssPath) => path.endsWith(cssPath)))).toBe(false);
+      const append = jest.fn();
+      mockOnElement.mock.calls.find(([selected]) => selected === 'head')[1]({append});
+      expect(append.mock.calls).toHaveLength(4);
+    },
+  );
+
   it.each(unityCssPaths.flatMap((path) => [[path, false], [path, true]]))(
     "handles a failed Unity CSS fetch: %s with unityMarquee=%s", async (path, authored) => {
     unityMarquee = authored;

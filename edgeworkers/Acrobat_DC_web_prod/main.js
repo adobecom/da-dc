@@ -204,12 +204,7 @@ export async function responseProvider(request) {
       verbWidgetStyles,
       studyMarqueeStyles,
       verbMarqueeStyles,
-      verbWidgetClientUploadStyles,
-      unitySharedStyles,
-      unityDropdownStyles,
-      unityPromptUploadStyles,
-      unityMarqueeBlockStyles,
-      unityBlockStyles
+      verbWidgetClientUploadStyles
     ] = await Promise.all([
       fetchFrictionlessPage(),
       fetchResource('/acrobat/scripts/scripts.js'),
@@ -219,15 +214,18 @@ export async function responseProvider(request) {
       fetchResource('/acrobat/blocks/verb-widget/verb-widget.css'),
       fetchResource('/acrobat/blocks/study-marquee/study-marquee.css'),
       fetchResource('/acrobat/blocks/verb-marquee/verb-marquee.css'),
-      fetchResource('/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css'),
-      fetchResource('/unitylibs/core/widgets/shared/shared.css'),
-      fetchResource('/unitylibs/core/widgets/shared/dropdown.css'),
-      fetchResource('/unitylibs/core/widgets/prompt-upload/prompt-upload.css'),
-      fetchResource('/acrobat/blocks/unity-marquee/unity-marquee.css'),
-      fetchResource('/acrobat/blocks/unity/unity.css')
+      fetchResource('/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css')
     ]);
 
     const inlineUnityMarquee = unityMarquee && promptUploadWorkflow;
+    const [unitySharedStyles, unityDropdownStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles] = inlineUnityMarquee && !clientUploadWidget
+      ? await Promise.all([
+        fetchResource('/unitylibs/core/widgets/shared/shared.css'),
+        fetchResource('/unitylibs/core/widgets/shared/dropdown.css'),
+        fetchResource('/unitylibs/core/widgets/prompt-upload/prompt-upload.css'),
+        fetchResource('/acrobat/blocks/unity-marquee/unity-marquee.css'),
+        fetchResource('/acrobat/blocks/unity/unity.css')
+      ]) : [];
 
     await inlineScripts(unityWorkflow || promptUploadWorkflow, mobileWidget, clientUploadWidget, scripts, dcConverter);
     inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, inlineUnityMarquee, unitySharedStyles, unityDropdownStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles);
