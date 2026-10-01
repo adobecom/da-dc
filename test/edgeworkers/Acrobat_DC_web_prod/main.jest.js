@@ -109,7 +109,10 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     expect(baselineFetches.slice(-5)).toEqual(unityCssPaths.map((path) => `https://${host}${path}`));
     const baselineAppend = jest.fn();
     mockOnElement.mock.calls.find(([selector]) => selector === 'head')[1]({append: baselineAppend});
-    expect(baselineAppend.mock.calls).toHaveLength(4);
+    expect(baselineAppend.mock.calls[0]).toEqual([
+      '<!-- EW-HEAD-TRACE: clientUpload=false; unityStyles=0 -->',
+    ]);
+    expect(baselineAppend.mock.calls).toHaveLength(5);
 
     fetches = [];
     mockOnElement.mockClear();
@@ -142,16 +145,29 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     const headHandler = mockOnElement.mock.calls.find(([selector]) => selector === 'head')[1];
     const append = jest.fn();
     headHandler({append});
-    expect(append.mock.calls[0][0]).toContain('<style id="inline-milo-styles">');
-    expect(append.mock.calls[1][0]).toContain('<style id="inline-dc-styles">');
-    expect(append.mock.calls.slice(2, 7)).toEqual([
+    const styleCalls = append.mock.calls.filter(([html]) => !html.startsWith('<!-- EW-'));
+    const traceCalls = append.mock.calls.filter(([html]) => html.startsWith('<!-- EW-'));
+    expect(traceCalls).toEqual([
+      ['<!-- EW-HEAD-TRACE: clientUpload=false; unityStyles=5 -->'],
+      ...[
+        'inline-unity-shared-styles',
+        'inline-unity-dropdown-styles',
+        'inline-unity-prompt-upload-styles',
+        'inline-unity-marquee-styles',
+        'inline-unity-styles',
+      ].map((id) => [`<!-- EW-CSS-TRACE: ${id}; chars=${'styles response text'.length} -->`]),
+    ]);
+    expect(append.mock.calls).toHaveLength(14);
+    expect(styleCalls[0][0]).toContain('<style id="inline-milo-styles">');
+    expect(styleCalls[1][0]).toContain('<style id="inline-dc-styles">');
+    expect(styleCalls.slice(2, 7)).toEqual([
       ['<style id="inline-unity-shared-styles">styles response text</style>'],
       ['<style id="inline-unity-dropdown-styles">styles response text</style>'],
       ['<style id="inline-unity-prompt-upload-styles">styles response text</style>'],
       ['<style id="inline-unity-marquee-styles">styles response text</style>'],
       ['<style id="inline-unity-styles">styles response text</style>'],
     ]);
-    expect(append.mock.calls[7]).toEqual(baselineAppend.mock.calls[3]);
+    expect(styleCalls[7]).toEqual(baselineAppend.mock.calls[4]);
     expect(append.mock.calls.some(([css]) => css.includes('inline-verb-widget-styles'))).toBe(false);
   });
 
@@ -175,7 +191,10 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     expect(fetches.slice(-5)).toEqual(unityCssPaths.map((path) => `https://www.adobe.com${path}`));
     const append = jest.fn();
     mockOnElement.mock.calls.find(([selector]) => selector === 'head')[1]({append});
-    expect(append.mock.calls).toHaveLength(workflow ? 4 : 2);
+    expect(append.mock.calls[0]).toEqual([
+      '<!-- EW-HEAD-TRACE: clientUpload=false; unityStyles=0 -->',
+    ]);
+    expect(append.mock.calls).toHaveLength(workflow ? 5 : 3);
     expect(append.mock.calls.some(([css]) => css.includes('inline-unity-'))).toBe(false);
   });
 

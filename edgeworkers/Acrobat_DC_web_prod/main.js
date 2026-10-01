@@ -169,6 +169,7 @@ export async function responseProvider(request) {
 
   const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, unityMarqueeStyles = []) => {
     rewriter.onElement('head', el => {
+      el.append(`<!-- EW-HEAD-TRACE: clientUpload=${!!clientUploadWidget}; unityStyles=${unityMarqueeStyles.length} -->`);
       el.append(`<style id="inline-milo-styles">${miloStyles}</style>`);
       el.append(`<style id="inline-dc-styles">${dcStyles}</style>`);
       if (clientUploadWidget) {
@@ -176,6 +177,7 @@ export async function responseProvider(request) {
         el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
       } else if (unityMarqueeStyles.length) {
         unityMarqueeStyles.forEach(([id, css]) => {
+          el.append(`<!-- EW-CSS-TRACE: ${id}; chars=${css.length} -->`);
           el.append(`<style id="${id}">${css}</style>`);
         });
         el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
