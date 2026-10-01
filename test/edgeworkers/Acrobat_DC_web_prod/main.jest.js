@@ -97,7 +97,7 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     jest.restoreAllMocks();
   });
 
-  it.each(['www.adobe.com', 'www.stage.adobe.com'])("preloads Unity marquee resources on %s without changing existing flows", async (host) => {
+  it.each(['www.adobe.com', 'www.stage.adobe.com', 'sign.ing', 'edit.ing'])("selects Unity marquee styles and preloads on %s", async (host) => {
     authoredBlocks.add('.unity.workflow-acrobat');
     const request = new Request({path: '/acrobat/online/pdf-to-ppt', host});
     const baseline = await replaceResponseProvider(request);
@@ -105,7 +105,7 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     const baselineSelectors = mockOnElement.mock.calls.map(([selector]) => selector);
     const baselineHeaders = {...baseline.headers};
     expect(baseline.headers.Link).not.toContain('/unitylibs/');
-    expect(baselineFetches.some((path) => unityCssPaths.some((cssPath) => path.endsWith(cssPath)))).toBe(false);
+    expect(baselineFetches.slice(-4)).toEqual(unityCssPaths.map((path) => `https://${host}${path}`));
     const baselineAppend = jest.fn();
     mockOnElement.mock.calls.find(([selector]) => selector === 'head')[1]({append: baselineAppend});
     expect(baselineAppend.mock.calls).toHaveLength(4);
@@ -134,7 +134,7 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     expect(response.headers.Link).toBe([...commonLinks, ...unityLinks].join(','));
     expect(response.headers.Link).not.toContain('/acrobat/blocks/verb-widget/');
     expect({...response.headers, Link: baselineHeaders.Link}).toEqual(baselineHeaders);
-    expect(fetches).toEqual([...baselineFetches, ...unityCssPaths.map((path) => `https://${host}${path}`)]);
+    expect(fetches).toEqual(baselineFetches);
     expect(mockOnElement.mock.calls.map(([selector]) => selector)).toEqual(baselineSelectors);
     const headHandler = mockOnElement.mock.calls.find(([selector]) => selector === 'head')[1];
     const append = jest.fn();
@@ -151,20 +151,9 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     expect(append.mock.calls.some(([css]) => css.includes('inline-verb-widget-styles'))).toBe(false);
   });
 
-  it.each(['sign.ing', 'edit.ing'])(
-    "does not add Unity marquee preloads on %s",
-    async (host) => {
-      unityMarquee = true;
-      authoredBlocks.add('.unity.workflow-acrobat');
-      const response = await replaceResponseProvider(new Request({path: '/acrobat/online/pdf-to-ppt', host}));
-      expect(response.status).toBe(200);
-      expect(response.headers.Link).not.toContain('/unitylibs/');
-      expect(fetches.some((path) => unityCssPaths.some((cssPath) => path.endsWith(cssPath)))).toBe(false);
-    },
-  );
-
-  it.each(unityCssPaths)("handles a failed Unity CSS fetch using existing resource error behavior: %s", async (path) => {
-    unityMarquee = true;
+  it.each(unityCssPaths.flatMap((path) => [[path, false], [path, true]]))(
+    "handles a failed Unity CSS fetch: %s with unityMarquee=%s", async (path, authored) => {
+    unityMarquee = authored;
     authoredBlocks.add('.unity.workflow-acrobat');
     unityCss404 = path;
     const response = await replaceResponseProvider(new Request({path: '/acrobat/online/pdf-to-ppt'}));
@@ -172,13 +161,16 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     expect(response.body).toContain(`Failed to fetch resource: ${path} status: 404`);
   });
 
-  it('does not add Unity marquee resources without a Unity workflow', async () => {
+  it('does not inject Unity marquee styles or preloads without a Unity workflow', async () => {
     unityMarquee = true;
     const response = await replaceResponseProvider(new Request({path: '/acrobat/online/pdf-to-ppt'}));
     expect(response.status).toBe(200);
     expect(response.headers.Link).not.toContain('/unitylibs/');
     expect(response.headers.Link).not.toContain('/acrobat/blocks/unity-marquee/');
-    expect(fetches.some((path) => unityCssPaths.some((cssPath) => path.endsWith(cssPath)))).toBe(false);
+    expect(fetches.slice(-4)).toEqual(unityCssPaths.map((path) => `https://www.adobe.com${path}`));
+    const append = jest.fn();
+    mockOnElement.mock.calls.find(([selector]) => selector === 'head')[1]({append});
+    expect(append.mock.calls).toHaveLength(2);
   });
 
   it.each(['.verb-widget-client-upload', '.study-marquee', '.verb-marquee'])(
@@ -222,7 +214,8 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
         'https://www.adobe.com/acrobat/blocks/study-marquee/study-marquee.css',
         'https://www.adobe.com/acrobat/blocks/verb-marquee/verb-marquee.css',
-        'https://www.adobe.com/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css'
+        'https://www.adobe.com/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css',
+        ...unityCssPaths.map((path) => `https://www.adobe.com${path}`),
       ]);
     });
   });
@@ -243,7 +236,8 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         'https://www.adobe.com/acrobat/blocks/verb-widget/verb-widget.css',
         'https://www.adobe.com/acrobat/blocks/study-marquee/study-marquee.css',
         'https://www.adobe.com/acrobat/blocks/verb-marquee/verb-marquee.css',
-        'https://www.adobe.com/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css'
+        'https://www.adobe.com/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css',
+        ...unityCssPaths.map((path) => `https://www.adobe.com${path}`),
       ]);
     });
   });
@@ -267,6 +261,7 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         'https://www.adobe.com/acrobat/blocks/study-marquee/study-marquee.css',
         'https://www.adobe.com/acrobat/blocks/verb-marquee/verb-marquee.css',
         'https://www.adobe.com/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css',
+        ...unityCssPaths.map((path) => `https://www.adobe.com${path}`),
       ]);
     });
   });

@@ -351,6 +351,7 @@ describe('unity-marquee block', () => {
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
+    sinon.stub(block, 'getBoundingClientRect').returns({ width: 100, height: 100 });
     return { block, prerender, frames };
   }
 
@@ -376,13 +377,24 @@ describe('unity-marquee block', () => {
         expect(prerender.isConnected).to.be.true;
         expect(frames).to.have.lengthOf(1);
         hiddenElement.style.removeProperty(property);
-        await new Promise((resolve) => {
-          window.requestAnimationFrame.wrappedMethod.call(window, resolve);
-        });
         frames.shift()();
         expect(prerender.isConnected).to.be.false;
         expect(frames).to.be.empty;
       });
+    });
+  });
+
+  ['width', 'height'].forEach((dimension) => {
+    it(`retains prerender until the block has nonzero ${dimension}`, async () => {
+      const { block, prerender, frames } = await initWithPrerender();
+      block.getBoundingClientRect.returns({ width: 100, height: 100, [dimension]: 0 });
+      frames.shift()();
+      frames.shift()();
+      expect(prerender.isConnected).to.be.true;
+      block.getBoundingClientRect.returns({ width: 100, height: 100 });
+      frames.shift()();
+      expect(prerender.isConnected).to.be.false;
+      expect(frames).to.be.empty;
     });
   });
 

@@ -197,7 +197,11 @@ export async function responseProvider(request) {
       verbWidgetStyles,
       studyMarqueeStyles,
       verbMarqueeStyles,
-      verbWidgetClientUploadStyles
+      verbWidgetClientUploadStyles,
+      unitySharedStyles,
+      unityDropdownStyles,
+      unityPromptUploadStyles,
+      unityMarqueeBlockStyles
     ] = await Promise.all([
       fetchFrictionlessPage(),
       fetchResource('/acrobat/scripts/scripts.js'),
@@ -207,18 +211,19 @@ export async function responseProvider(request) {
       fetchResource('/acrobat/blocks/verb-widget/verb-widget.css'),
       fetchResource('/acrobat/blocks/study-marquee/study-marquee.css'),
       fetchResource('/acrobat/blocks/verb-marquee/verb-marquee.css'),
-      fetchResource('/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css')
+      fetchResource('/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css'),
+      fetchResource('/unitylibs/core/widgets/shared/shared.css'),
+      fetchResource('/unitylibs/core/widgets/shared/dropdown.css'),
+      fetchResource('/unitylibs/core/widgets/prompt-upload/prompt-upload.css'),
+      fetchResource('/acrobat/blocks/unity-marquee/unity-marquee.css')
     ]);
 
-    const loadUnityMarquee = unityMarquee && unityWorkflow
-      && !clientUploadWidget && !studyMarquee && !verbMarquee
-      && ['www.adobe.com', 'www.stage.adobe.com'].includes(request.host);
-    const unityMarqueeStyles = loadUnityMarquee ? await Promise.all([
-      ['inline-unity-shared-styles', '/unitylibs/core/widgets/shared/shared.css'],
-      ['inline-unity-dropdown-styles', '/unitylibs/core/widgets/shared/dropdown.css'],
-      ['inline-unity-prompt-upload-styles', '/unitylibs/core/widgets/prompt-upload/prompt-upload.css'],
-      ['inline-unity-marquee-styles', '/acrobat/blocks/unity-marquee/unity-marquee.css'],
-    ].map(async ([id, path]) => [id, await fetchResource(path)])) : [];
+    const unityMarqueeStyles = unityMarquee ? [
+      ['inline-unity-shared-styles', unitySharedStyles],
+      ['inline-unity-dropdown-styles', unityDropdownStyles],
+      ['inline-unity-prompt-upload-styles', unityPromptUploadStyles],
+      ['inline-unity-marquee-styles', unityMarqueeBlockStyles],
+    ] : [];
 
     await inlineScripts(unityWorkflow, mobileWidget, clientUploadWidget, scripts, dcConverter);
     inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, unityMarqueeStyles);
@@ -261,7 +266,7 @@ export async function responseProvider(request) {
           `</acrobat/blocks/verb-marquee/verb-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/verb-marquee/verb-marquee.css>;rel="preload";as="style"`,
         ];
-      } else if (loadUnityMarquee) {
+      } else if (unityMarquee) {
         headerLink = [...headerLink,
           `</acrobat/blocks/unity-marquee/unity-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/unity-marquee/unity-marquee.css>;rel="preload";as="style"`,
