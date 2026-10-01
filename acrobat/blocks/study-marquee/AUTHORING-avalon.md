@@ -4,7 +4,7 @@ The **Study Marquee** block is the split hero used on the AI study/creation verb
 
 > **Desktop-only variation:** The avalon **variation** is **desktop-specific — its styles apply only at ≥1200px** (see the block CSS). Designs were provided for desktop only, so this guide documents the desktop layout. It is not a separate block; below 1200px the study-marquee block falls back to its base responsive layout.
 
-> **Key concept:** Almost all the on-screen text is **not authored in the block**. The heading and the cover image are authored in the block; everything else (supporting copy, sub copy, upload button label, drag-and-drop text, file-size line, legal text, tooltip) is pulled from **placeholder keys** keyed by the verb. This guide lists every key you need to author in the placeholders sheet.
+> **Key concept:** The heading and cover image are always authored directly in the block. The title defaults to "Adobe Acrobat"; copy, sub copy, upload button label, drag-and-drop text, file-size line, legal text, and tooltip default to a **placeholder key** keyed by the verb. All of these (title included) can optionally be **authored directly in the block instead** via a `dc-block-row-<key>` row (see [Optional in-block authoring overrides](#optional-in-block-authoring-overrides) below) — useful when launching a one-off verb variant without touching the placeholders sheet. If a `dc-block-row-<key>` row is present but left blank, the block falls back to the placeholder/default value, same as if the row weren't authored at all.
 
 ## Block structure
 
@@ -87,6 +87,29 @@ Matching the reference block `study-marquee (avalon, stylize, light)`:
 | `study-widget-stylize-dragndrop-text` | or drag and drop a file |
 | `study-widget-stylize-file-limit` | PDF, up to 100 MB |
 | `study-marquee-avalon-legal` | By using this service, you agree to the Adobe Terms of Use, Generative AI User Guidelines, and acknowledge the Privacy Policy. |
+
+## Optional in-block authoring overrides
+
+Instead of (or in addition to) the placeholder keys above, you can author any of the following directly in the block as an extra row: first cell is the literal key name below (prefixed `dc-block-row-`), second cell is the value.
+
+```
+dc-block-row-copy | Restyle and refresh your PDF with AI.
+```
+
+| Row key | Overrides | Notes |
+| --- | --- | --- |
+| `dc-block-row-title` | The small "Adobe Acrobat" title above the heading. | Falls back to "Adobe Acrobat" if blank/absent. |
+| `dc-block-row-copy` | `study-marquee-<verb>-copy` | |
+| `dc-block-row-mobile-copy` | `study-marquee-<verb>-mobile-copy` | Only used at <1200px; falls back to `dc-block-row-copy`/its placeholder if absent. |
+| `dc-block-row-sub-copy` | `study-marquee-<verb>-sub-copy` | |
+| `dc-block-row-mobile-sub-copy` | `study-marquee-<verb>-mobile-sub-copy` | Same mobile fallback behavior as `mobile-copy`. |
+| `dc-block-row-upload-cta` | `study-marquee-<verb>-upload-cta` | |
+| `dc-block-row-dragndrop-text` | `study-widget-<verb>-dragndrop-text` | |
+| `dc-block-row-file-limit` | `study-widget-<verb>-file-limit` | |
+| `dc-block-row-tool-tip` | `verb-widget-tool-tip` | |
+| `dc-block-row-legal-text` | The full legal paragraph (all placeholder-based legal keys, including avalon overrides). | **Uses your authored HTML as-is** — the automatic Terms of Use / Privacy Policy / Gen AI Guidelines hyperlinking is skipped, so include your own links if needed. |
+
+These rows are stripped out of the DOM before rendering, so they won't show up as extra content. Any row left blank is treated the same as an absent row (falls back to the placeholder chain) — this applies to every key above.
 
 ## Summary checklist
 
