@@ -167,7 +167,7 @@ export async function responseProvider(request) {
     });
   };
 
-  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, inlineUnityMarquee, unitySharedStyles, unityDropdownStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles) => {
+  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, inlineUnityMarquee, unitySharedStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles) => {
     rewriter.onElement('head', el => {
       el.append(`<style id="inline-milo-styles">${miloStyles}</style>`);
       el.append(`<style id="inline-dc-styles">${dcStyles}</style>`);
@@ -176,7 +176,6 @@ export async function responseProvider(request) {
         el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
       } else if (inlineUnityMarquee) {
         el.append(`<style id="inline-unity-shared-styles">${unitySharedStyles}</style>`);
-        el.append(`<style id="inline-unity-dropdown-styles">${unityDropdownStyles}</style>`);
         el.append(`<style id="inline-unity-prompt-upload-styles">${unityPromptUploadStyles}</style>`);
         el.append(`<style id="inline-unity-marquee-styles">${unityMarqueeBlockStyles}</style>`);
         el.append(`<style id="inline-unity-styles">${unityBlockStyles}</style>`);
@@ -217,18 +216,17 @@ export async function responseProvider(request) {
       fetchResource('/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css')
     ]);
 
-    const inlineUnityMarquee = unityMarquee && promptUploadWorkflow;
-    const [unitySharedStyles, unityDropdownStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles] = inlineUnityMarquee && !clientUploadWidget
+    const inlineUnityMarquee = promptUploadWorkflow && unityMarquee;
+    const [unitySharedStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles] = inlineUnityMarquee && !clientUploadWidget
       ? await Promise.all([
         fetchResource('/unitylibs/core/widgets/shared/shared.css'),
-        fetchResource('/unitylibs/core/widgets/shared/dropdown.css'),
         fetchResource('/unitylibs/core/widgets/prompt-upload/prompt-upload.css'),
         fetchResource('/acrobat/blocks/unity-marquee/unity-marquee.css'),
         fetchResource('/acrobat/blocks/unity/unity.css')
       ]) : [];
 
     await inlineScripts(unityWorkflow || promptUploadWorkflow, mobileWidget, clientUploadWidget, scripts, dcConverter);
-    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, inlineUnityMarquee, unitySharedStyles, unityDropdownStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles);
+    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, inlineUnityMarquee, unitySharedStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles);
 
     const csp = contentSecurityPolicy(isProd, scriptHashes);
     const acrobat = isProd ? 'https://acrobat.adobe.com' : 'https://stage.acrobat.adobe.com';
@@ -274,7 +272,6 @@ export async function responseProvider(request) {
           `</acrobat/blocks/unity-marquee/unity-marquee.css>;rel="preload";as="style"`,
           `</unitylibs/core/widgets/prompt-upload/prompt-upload.css>;rel="preload";as="style"`,
           `</unitylibs/core/widgets/shared/shared.css>;rel="preload";as="style"`,
-          `</unitylibs/core/widgets/shared/dropdown.css>;rel="preload";as="style"`,
           `</unitylibs/core/widgets/prompt-upload/prompt-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</unitylibs/core/workflow/workflow-prompt-upload/action-binder.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</unitylibs/core/workflow/workflow-prompt-upload/target-config.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
