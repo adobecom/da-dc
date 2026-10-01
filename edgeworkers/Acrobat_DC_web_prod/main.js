@@ -41,12 +41,12 @@ export async function responseProvider(request) {
     firstPassRewriter.onElement('meta[name="mobile-widget"]', el => {
       mobileWidget = el.getAttribute('content');
     });
-    firstPassRewriter.onElement('.unity.workflow-acrobat', el => {
-      unityWorkflow = true;
-    });
     let promptUploadWorkflow;
-    firstPassRewriter.onElement('.unity.workflow-prompt-upload', el => {
-      promptUploadWorkflow = true;
+    // Compound class selectors miss unity blocks that carry extra option classes, so match the class list.
+    firstPassRewriter.onElement('.unity', el => {
+      const classes = (el.getAttribute('class') || '').split(/\s+/);
+      if (classes.includes('workflow-acrobat')) unityWorkflow = true;
+      if (classes.includes('workflow-prompt-upload')) promptUploadWorkflow = true;
     });
     firstPassRewriter.onElement('.verb-widget-client-upload', el => {
       clientUploadWidget = true;

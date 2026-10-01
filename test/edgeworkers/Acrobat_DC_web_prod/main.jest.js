@@ -81,10 +81,20 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     jest.spyOn(EdgeKV.prototype, 'getJson').mockResolvedValue({html: '', top: 0});
     mockOnElement.mockImplementation((selector, handler) => {
       if (selector === '.unity-marquee') {
-        if (unityMarquee) handler({});
+        if (unityMarquee) handler({getAttribute: () => 'unity-marquee flashcard-maker light'});
         return;
       }
-      if (['.unity.workflow-acrobat', '.unity.workflow-prompt-upload', '.verb-widget-client-upload', '.study-marquee', '.verb-marquee'].includes(selector)) {
+      if (selector === '.unity') {
+        if (authoredBlocks.has('.unity.workflow-acrobat')) {
+          handler({getAttribute: () => 'unity workflow-acrobat'});
+        }
+        if (authoredBlocks.has('.unity.workflow-prompt-upload')) {
+          // Mirrors production markup, which carries extra option classes.
+          handler({getAttribute: () => 'unity workflow-prompt-upload product-acrobat feature-flashcard-maker widget-prompt-upload'});
+        }
+        return;
+      }
+      if (['.verb-widget-client-upload', '.study-marquee', '.verb-marquee'].includes(selector)) {
         if (authoredBlocks.has(selector)) handler({});
         return;
       }
