@@ -21,7 +21,6 @@ const ICONS = {
 const GENAI_VERBS = new Set(['quiz-maker', 'flashcard-maker', 'mindmap-maker']);
 
 function waitForLCP(timeout = 3000) {
-  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
   return new Promise((resolve) => {
     if (!window.PerformanceObserver) { setTimeout(resolve, timeout); return; }
     const obs = new PerformanceObserver((list) => {

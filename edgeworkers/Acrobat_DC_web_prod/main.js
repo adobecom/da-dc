@@ -44,6 +44,10 @@ export async function responseProvider(request) {
     firstPassRewriter.onElement('.unity.workflow-acrobat', el => {
       unityWorkflow = true;
     });
+    let promptUploadWorkflow;
+    firstPassRewriter.onElement('.unity.workflow-prompt-upload', el => {
+      promptUploadWorkflow = true;
+    });
     firstPassRewriter.onElement('.verb-widget-client-upload', el => {
       clientUploadWidget = true;
     });
@@ -88,7 +92,7 @@ export async function responseProvider(request) {
       delete responseHeaders[prop];
     }
 
-    return [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, unityMarquee];
+    return [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, unityMarquee, promptUploadWorkflow];
   };
 
   const fetchResource = async path => {
@@ -170,15 +174,16 @@ export async function responseProvider(request) {
       if (clientUploadWidget) {
         el.append(`<style id="inline-verb-widget-client-upload-styles">${verbWidgetClientUploadStyles}</style>`);
         el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
+      } else if (unityMarqueeStyles.length) {
+        unityMarqueeStyles.forEach(([id, css]) => {
+          el.append(`<style id="${id}">${css}</style>`);
+        });
+        el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
       } else if (unityWorkflow) {
         if (studyMarquee) {
           el.append(`<style id="inline-study-marquee-styles">${studyMarqueeStyles}</style>`);
         } else if (verbMarquee) {
           el.append(`<style id="inline-verb-marquee-styles">${verbMarqueeStyles}</style>`);
-        } else if (unityMarqueeStyles.length) {
-          unityMarqueeStyles.forEach(([id, css]) => {
-            el.append(`<style id="${id}">${css}</style>`);
-          });
         } else {
           el.append(`<style id="inline-verb-widget-styles">${verbWidgetStyles}</style>`);
         }
@@ -189,7 +194,7 @@ export async function responseProvider(request) {
 
   try {
     const [
-      [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, unityMarquee],
+      [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, unityMarquee, promptUploadWorkflow],
       scripts,
       dcConverter,
       dcStyles,
@@ -201,7 +206,8 @@ export async function responseProvider(request) {
       unitySharedStyles,
       unityDropdownStyles,
       unityPromptUploadStyles,
-      unityMarqueeBlockStyles
+      unityMarqueeBlockStyles,
+      unityBlockStyles
     ] = await Promise.all([
       fetchFrictionlessPage(),
       fetchResource('/acrobat/scripts/scripts.js'),
@@ -215,17 +221,19 @@ export async function responseProvider(request) {
       fetchResource('/unitylibs/core/widgets/shared/shared.css'),
       fetchResource('/unitylibs/core/widgets/shared/dropdown.css'),
       fetchResource('/unitylibs/core/widgets/prompt-upload/prompt-upload.css'),
-      fetchResource('/acrobat/blocks/unity-marquee/unity-marquee.css')
+      fetchResource('/acrobat/blocks/unity-marquee/unity-marquee.css'),
+      fetchResource('/acrobat/blocks/unity/unity.css')
     ]);
 
-    const unityMarqueeStyles = unityMarquee ? [
+    const unityMarqueeStyles = unityMarquee && promptUploadWorkflow ? [
       ['inline-unity-shared-styles', unitySharedStyles],
       ['inline-unity-dropdown-styles', unityDropdownStyles],
       ['inline-unity-prompt-upload-styles', unityPromptUploadStyles],
       ['inline-unity-marquee-styles', unityMarqueeBlockStyles],
+      ['inline-unity-styles', unityBlockStyles],
     ] : [];
 
-    await inlineScripts(unityWorkflow, mobileWidget, clientUploadWidget, scripts, dcConverter);
+    await inlineScripts(unityWorkflow || promptUploadWorkflow, mobileWidget, clientUploadWidget, scripts, dcConverter);
     inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, unityMarqueeStyles);
 
     const csp = contentSecurityPolicy(isProd, scriptHashes);
@@ -247,7 +255,7 @@ export async function responseProvider(request) {
         `</libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
       ];
-    } else if (unityWorkflow) {
+    } else if (unityWorkflow || promptUploadWorkflow) {
       headerLink = [...headerLink,
         `</acrobat/blocks/unity/unity.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</acrobat/blocks/unity/unity.css>;rel="preload";as="style"`,
@@ -256,17 +264,17 @@ export async function responseProvider(request) {
         `</libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
       ];
-      if (studyMarquee) {
+      if (unityWorkflow && studyMarquee) {
         headerLink = [...headerLink,
           `</acrobat/blocks/study-marquee/study-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/study-marquee/study-marquee.css>;rel="preload";as="style"`,
         ];
-      } else if (verbMarquee) {
+      } else if (unityWorkflow && verbMarquee) {
         headerLink = [...headerLink,
           `</acrobat/blocks/verb-marquee/verb-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/verb-marquee/verb-marquee.css>;rel="preload";as="style"`,
         ];
-      } else if (unityMarquee) {
+      } else if (promptUploadWorkflow && unityMarquee) {
         headerLink = [...headerLink,
           `</acrobat/blocks/unity-marquee/unity-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/unity-marquee/unity-marquee.css>;rel="preload";as="style"`,
@@ -281,7 +289,7 @@ export async function responseProvider(request) {
           `</unitylibs/core/widgets/shared/widget-base.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</unitylibs/core/widgets/shared/prompt-input.js>;rel="preload";as="script";crossorigin="anonymous"`,
         ];
-      } else {
+      } else if (unityWorkflow) {
         headerLink = [...headerLink,
           `</acrobat/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
