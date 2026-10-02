@@ -91,6 +91,11 @@ describe('verb-widget early prefetch', () => {
 
     beforeEach(() => {
       window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+      // The uploading event's beforeunload handler blocks WTR from closing the page
+      const addListener = window.addEventListener.bind(window);
+      sinon.stub(window, 'addEventListener').callsFake((type, ...args) => {
+        if (type !== 'beforeunload') addListener(type, ...args);
+      });
     });
 
     it('does not load an iframe with a null src when uploading starts before redirectUrl', async () => {
