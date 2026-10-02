@@ -41,11 +41,12 @@ export async function responseProvider(request) {
     firstPassRewriter.onElement('meta[name="mobile-widget"]', el => {
       mobileWidget = el.getAttribute('content');
     });
+    firstPassRewriter.onElement('.unity.workflow-acrobat', el => {
+      unityWorkflow = true;
+    });
     let promptUploadWorkflow;
-    // Compound class selectors miss unity blocks that carry extra option classes, so match the class list.
     firstPassRewriter.onElement('.unity', el => {
       const classes = (el.getAttribute('class') || '').split(/\s+/);
-      if (classes.includes('workflow-acrobat')) unityWorkflow = true;
       if (classes.includes('workflow-prompt-upload')) promptUploadWorkflow = true;
     });
     firstPassRewriter.onElement('.verb-widget-client-upload', el => {
@@ -238,6 +239,19 @@ export async function responseProvider(request) {
         '<https://use.typekit.net>;rel="preconnect"',
         `</libs/deps/imslib.min.js>;rel="preload";as="script"`,
     ];
+    const unityMarqueeLinks = [
+      `</acrobat/blocks/unity-marquee/unity-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
+      `</acrobat/blocks/unity-marquee/unity-marquee.css>;rel="preload";as="style"`,
+      `</unitylibs/core/widgets/prompt-upload/prompt-upload.css>;rel="preload";as="style"`,
+      `</unitylibs/core/widgets/shared/shared.css>;rel="preload";as="style"`,
+      `</unitylibs/core/widgets/prompt-upload/prompt-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
+      `</unitylibs/core/workflow/workflow-prompt-upload/action-binder.js>;rel="preload";as="script";crossorigin="anonymous"`,
+      `</unitylibs/core/workflow/workflow-prompt-upload/target-config.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
+      `</unitylibs/core/widgets/shared/dropzone.js>;rel="preload";as="script";crossorigin="anonymous"`,
+      `</unitylibs/core/widgets/shared/dropdown.js>;rel="preload";as="script";crossorigin="anonymous"`,
+      `</unitylibs/core/widgets/shared/widget-base.js>;rel="preload";as="script";crossorigin="anonymous"`,
+      `</unitylibs/core/widgets/shared/prompt-input.js>;rel="preload";as="script";crossorigin="anonymous"`,
+    ];
     if (clientUploadWidget) {
       headerLink = [...headerLink,
         `</acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
@@ -247,7 +261,7 @@ export async function responseProvider(request) {
         `</libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
       ];
-    } else if (unityWorkflow || promptUploadWorkflow) {
+    } else if (unityWorkflow) {
       headerLink = [...headerLink,
         `</acrobat/blocks/unity/unity.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</acrobat/blocks/unity/unity.css>;rel="preload";as="style"`,
@@ -267,25 +281,21 @@ export async function responseProvider(request) {
           `</acrobat/blocks/verb-marquee/verb-marquee.css>;rel="preload";as="style"`,
         ];
       } else if (promptUploadWorkflow && unityMarquee) {
-        headerLink = [...headerLink,
-          `</acrobat/blocks/unity-marquee/unity-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
-          `</acrobat/blocks/unity-marquee/unity-marquee.css>;rel="preload";as="style"`,
-          `</unitylibs/core/widgets/prompt-upload/prompt-upload.css>;rel="preload";as="style"`,
-          `</unitylibs/core/widgets/shared/shared.css>;rel="preload";as="style"`,
-          `</unitylibs/core/widgets/prompt-upload/prompt-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
-          `</unitylibs/core/workflow/workflow-prompt-upload/action-binder.js>;rel="preload";as="script";crossorigin="anonymous"`,
-          `</unitylibs/core/workflow/workflow-prompt-upload/target-config.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
-          `</unitylibs/core/widgets/shared/dropzone.js>;rel="preload";as="script";crossorigin="anonymous"`,
-          `</unitylibs/core/widgets/shared/dropdown.js>;rel="preload";as="script";crossorigin="anonymous"`,
-          `</unitylibs/core/widgets/shared/widget-base.js>;rel="preload";as="script";crossorigin="anonymous"`,
-          `</unitylibs/core/widgets/shared/prompt-input.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        ];
+        headerLink = [...headerLink, ...unityMarqueeLinks];
       } else if (unityWorkflow) {
         headerLink = [...headerLink,
           `</acrobat/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
         ];
       }
+    } else if (promptUploadWorkflow) {
+      headerLink = [...headerLink,
+        `</acrobat/blocks/unity/unity.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</acrobat/blocks/unity/unity.css>;rel="preload";as="style"`,
+        `</acrobat/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+      ];
+      if (unityMarquee) headerLink = [...headerLink, ...unityMarqueeLinks];
     }
     headerLink = headerLink.join();
 

@@ -398,6 +398,19 @@ describe('unity-marquee block', () => {
     });
   });
 
+  it('stops polling and logs if the block never becomes visible', async () => {
+    const { block, prerender, frames } = await initWithPrerender();
+    block.style.display = 'none';
+    let polls = 0;
+    while (frames.length) {
+      frames.shift()();
+      polls += 1;
+    }
+    expect(prerender.isConnected).to.be.true;
+    expect(polls).to.be.lessThan(1000);
+    expect(window.lana.log.calledWithMatch(/prerender retained/)).to.be.true;
+  });
+
   it('stops cleanup retries if the block is detached', async () => {
     const { block, prerender, frames } = await initWithPrerender();
     block.remove();

@@ -84,10 +84,13 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
         if (unityMarquee) handler({getAttribute: () => 'unity-marquee flashcard-maker light'});
         return;
       }
-      if (selector === '.unity') {
+      if (selector === '.unity.workflow-acrobat') {
         if (authoredBlocks.has('.unity.workflow-acrobat')) {
           handler({getAttribute: () => 'unity workflow-acrobat'});
         }
+        return;
+      }
+      if (selector === '.unity') {
         if (authoredBlocks.has('.unity.workflow-prompt-upload')) {
           // Mirrors production markup, which carries extra option classes.
           handler({getAttribute: () => 'unity workflow-prompt-upload product-acrobat feature-flashcard-maker widget-prompt-upload'});
@@ -141,9 +144,10 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     ];
 
     expect(response.status).toBe(200);
-    const commonLinks = baselineHeaders.Link.split(',').filter((link) => !link.includes('/acrobat/blocks/verb-widget/'));
+    const commonLinks = baselineHeaders.Link.split(',').filter((link) => !link.includes('/acrobat/blocks/verb-widget/') && !link.includes('placeholders'));
     expect(response.headers.Link).toBe([...commonLinks, ...unityLinks].join(','));
     expect(response.headers.Link).not.toContain('/acrobat/blocks/verb-widget/');
+    expect(response.headers.Link).not.toContain('placeholders');
     expect({...response.headers, Link: baselineHeaders.Link}).toEqual(baselineHeaders);
     expect(fetches).toEqual([...baselineFetches, ...unityCssPaths.map((path) => `https://${host}${path}`)]);
     expect(mockOnElement.mock.calls.map(([selector]) => selector)).toEqual(baselineSelectors);
