@@ -520,12 +520,15 @@ const MAS_GEO_MAP = {
 
 const MAS_EXTRA_LOCALES = { pr: 'es_PR' };
 
+const MARKET_LOCALE_OVERRIDES = { en: { AU: 'en_GB', IN: 'en_GB', GB: 'en_GB' } };
+
 function getMasLocale(miloLocale, geoCountry) {
   const geo = (miloLocale?.prefix || 'US_en').replace('/', '');
   let [country = 'US', language = 'en'] = (MAS_GEO_MAP[geo] ?? geo).split('_', 2);
   country = country.toUpperCase();
   language = language.toLowerCase();
-  return { locale: MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`, country: geoCountry ?? country };
+  const marketOverride = MARKET_LOCALE_OVERRIDES[language]?.[geoCountry]; 
+  return { locale: marketOverride ?? MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`, country: geoCountry ?? country };
 }
 
 async function preloadMasFragment(a, config) {
