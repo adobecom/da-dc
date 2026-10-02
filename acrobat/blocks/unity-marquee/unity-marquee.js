@@ -20,10 +20,10 @@ const ICONS = {
 
 const GENAI_VERBS = new Set(['quiz-maker', 'flashcard-maker', 'mindmap-maker']);
 
-// Frames, not elapsed time, so backgrounded tabs (where rAF pauses) aren't cut short.
 const MAX_PRERENDER_FRAMES = 600;
 
 function waitForLCP(timeout = 3000) {
+  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
   return new Promise((resolve) => {
     if (!window.PerformanceObserver) { setTimeout(resolve, timeout); return; }
     const obs = new PerformanceObserver((list) => {
@@ -186,11 +186,9 @@ export default async function init(element) {
       prerenderElement.remove();
     } else if (prerenderFrames < MAX_PRERENDER_FRAMES) {
       prerenderFrames += 1;
-      // Milo may still be hiding the section while its blocks finish loading.
       /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
       requestAnimationFrame(removePrerender);
     } else {
-      // Keep the prerender rather than swapping in a block that never became visible.
       window.lana?.log(
         `Error Code: Unknown, Status: 'Unknown', Message: unity-marquee never became visible; prerender retained on ${element.classList[1]}`,
         lanaOptions,

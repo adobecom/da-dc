@@ -218,7 +218,7 @@ export async function responseProvider(request) {
     ]);
 
     const inlineUnityMarquee = promptUploadWorkflow && unityMarquee;
-    const [unitySharedStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles] = inlineUnityMarquee && !clientUploadWidget
+    const [unitySharedStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles] = inlineUnityMarquee
       ? await Promise.all([
         fetchResource('/unitylibs/core/widgets/shared/shared.css'),
         fetchResource('/unitylibs/core/widgets/prompt-upload/prompt-upload.css'),
@@ -239,19 +239,6 @@ export async function responseProvider(request) {
         '<https://use.typekit.net>;rel="preconnect"',
         `</libs/deps/imslib.min.js>;rel="preload";as="script"`,
     ];
-    const unityMarqueeLinks = [
-      `</acrobat/blocks/unity-marquee/unity-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
-      `</acrobat/blocks/unity-marquee/unity-marquee.css>;rel="preload";as="style"`,
-      `</unitylibs/core/widgets/prompt-upload/prompt-upload.css>;rel="preload";as="style"`,
-      `</unitylibs/core/widgets/shared/shared.css>;rel="preload";as="style"`,
-      `</unitylibs/core/widgets/prompt-upload/prompt-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
-      `</unitylibs/core/workflow/workflow-prompt-upload/action-binder.js>;rel="preload";as="script";crossorigin="anonymous"`,
-      `</unitylibs/core/workflow/workflow-prompt-upload/target-config.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
-      `</unitylibs/core/widgets/shared/dropzone.js>;rel="preload";as="script";crossorigin="anonymous"`,
-      `</unitylibs/core/widgets/shared/dropdown.js>;rel="preload";as="script";crossorigin="anonymous"`,
-      `</unitylibs/core/widgets/shared/widget-base.js>;rel="preload";as="script";crossorigin="anonymous"`,
-      `</unitylibs/core/widgets/shared/prompt-input.js>;rel="preload";as="script";crossorigin="anonymous"`,
-    ];
     if (clientUploadWidget) {
       headerLink = [...headerLink,
         `</acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
@@ -270,19 +257,17 @@ export async function responseProvider(request) {
         `</libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
       ];
-      if (unityWorkflow && studyMarquee) {
+      if (studyMarquee) {
         headerLink = [...headerLink,
           `</acrobat/blocks/study-marquee/study-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/study-marquee/study-marquee.css>;rel="preload";as="style"`,
         ];
-      } else if (unityWorkflow && verbMarquee) {
+      } else if (verbMarquee) {
         headerLink = [...headerLink,
           `</acrobat/blocks/verb-marquee/verb-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/verb-marquee/verb-marquee.css>;rel="preload";as="style"`,
         ];
-      } else if (promptUploadWorkflow && unityMarquee) {
-        headerLink = [...headerLink, ...unityMarqueeLinks];
-      } else if (unityWorkflow) {
+      } else {
         headerLink = [...headerLink,
           `</acrobat/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
@@ -295,7 +280,21 @@ export async function responseProvider(request) {
         `</acrobat/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
       ];
-      if (unityMarquee) headerLink = [...headerLink, ...unityMarqueeLinks];
+      if (unityMarquee) {
+        headerLink = [...headerLink,
+          `</acrobat/blocks/unity-marquee/unity-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</acrobat/blocks/unity-marquee/unity-marquee.css>;rel="preload";as="style"`,
+          `</unitylibs/core/widgets/prompt-upload/prompt-upload.css>;rel="preload";as="style"`,
+          `</unitylibs/core/widgets/shared/shared.css>;rel="preload";as="style"`,
+          `</unitylibs/core/widgets/prompt-upload/prompt-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/workflow/workflow-prompt-upload/action-binder.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/workflow/workflow-prompt-upload/target-config.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/dropzone.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/dropdown.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/widget-base.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/prompt-input.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        ];
+      }
     }
     headerLink = headerLink.join();
 
