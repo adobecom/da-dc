@@ -717,6 +717,7 @@ export default async function init(element) {
     }
   }
   element.append(widget, footer);
+  element.classList.add('ready');
 
   async function checkSignedInUser() {
     if (!window.adobeIMS?.isSignedInUser?.()) return;
