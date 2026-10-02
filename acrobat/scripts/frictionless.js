@@ -3,6 +3,21 @@ import reviewAlloy from './alloy/review.js';
 import reviewFeedbackAlloy from './alloy/reviewFeedback.js';
 import browserExtAlloy from './alloy/browserExt.js';
 
+function whenElementExists(root, selector, onFound) {
+  const element = root.querySelector(selector);
+  if (element) {
+    onFound(element);
+    return;
+  }
+  const observer = new MutationObserver(() => {
+    const found = root.querySelector(selector);
+    if (!found) return;
+    observer.disconnect();
+    onFound(found);
+  });
+  observer.observe(root, { childList: true, subtree: true });
+}
+
 export default function init(verb) {
   // Review Alloy
   const miloReviewBlock = document.querySelector('.review');
@@ -13,11 +28,8 @@ export default function init(verb) {
    */
   if (miloReviewBlock || rnrBlock) {
     reviewAlloy();
-    const reviewWait = setInterval(() => {
-      // Milo block handling
-      const [miloReviewForm] = document.querySelectorAll('.hlx-Review');
-      if (miloReviewForm) {
-        clearInterval(reviewWait);
+    if (miloReviewBlock) {
+      whenElementExists(miloReviewBlock, '.hlx-Review', (miloReviewForm) => {
         miloReviewForm.addEventListener('submit', (e) => {
           const data = Object.fromEntries(new FormData(e.target).entries());
           // verb, rating, comment
@@ -32,11 +44,10 @@ export default function init(verb) {
             reviewFeedbackAlloy(verb, '5');
           });
         }
-      }
-      // Rnr block handling
-      const [rnrForm] = document.querySelectorAll('.rnr-form');
-      if (rnrForm) {
-        clearInterval(reviewWait);
+      });
+    }
+    if (rnrBlock) {
+      whenElementExists(rnrBlock, '.rnr-form', (rnrForm) => {
         rnrForm.addEventListener('submit', (e) => {
           const data = Object.fromEntries(new FormData(e.target).entries());
           // verb, rating, comment
@@ -51,8 +62,8 @@ export default function init(verb) {
             reviewFeedbackAlloy(verb, '5');
           });
         }
-      }
-    }, 1000);
+      });
+    }
   }
 
   // Browser Ext. Alloy
