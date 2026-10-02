@@ -8,6 +8,12 @@ const { default: init } = await import(
   '../../../acrobat/blocks/unity-marquee/unity-marquee.js'
 );
 
+const DESKTOP_QUERY = '(min-width: 1200px)';
+const stubDesktopQuery = (matches) => sinon.stub(window, 'matchMedia').callsFake((query) => (
+  query === DESKTOP_QUERY
+    ? { matches, media: query }
+    : window.matchMedia.wrappedMethod.call(window, query)));
+
 describe('unity-marquee block', () => {
   let xhr;
   let placeholders;
@@ -318,12 +324,64 @@ describe('unity-marquee block', () => {
     document.body.innerHTML = await readFile({ path: './mocks/body-mobile-copy.html' });
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
-    Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 375 });
+    stubDesktopQuery(false);
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    expect(window.matchMedia.calledWith(DESKTOP_QUERY)).to.be.true;
+    const copy = block.querySelector('.unity-marquee-copy:not(.unity-marquee-copy-sub)');
+    expect(copy.textContent.trim()).to.equal('Mobile copy text.');
+  });
+
+  it('prefers desktop-copy and desktop-sub-copy at and above the 1200px breakpoint', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-mobile-copy.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    stubDesktopQuery(true);
+    const block = document.body.querySelector('.unity-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-desktop-sub-copy</div><div>Desktop sub-copy text.</div></div>
+      <div><div>dc-block-row-mobile-sub-copy</div><div>Mobile sub-copy text.</div></div>`);
+    await init(block);
+    expect(window.matchMedia.calledWith(DESKTOP_QUERY)).to.be.true;
+    const copy = block.querySelector('.unity-marquee-copy:not(.unity-marquee-copy-sub)');
+    expect(copy.textContent.trim()).to.equal('Desktop copy text.');
+    expect(block.querySelector('.unity-marquee-copy-sub').textContent.trim()).to.equal('Desktop sub-copy text.');
+  });
+
+  it('prefers mobile-sub-copy over desktop-sub-copy below the 1200px breakpoint', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-mobile-copy.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    stubDesktopQuery(false);
+    const block = document.body.querySelector('.unity-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-desktop-sub-copy</div><div>Desktop sub-copy text.</div></div>
+      <div><div>dc-block-row-mobile-sub-copy</div><div>Mobile sub-copy text.</div></div>`);
+    await init(block);
+    expect(block.querySelector('.unity-marquee-copy-sub').textContent.trim()).to.equal('Mobile sub-copy text.');
+  });
+
+  it('uses the mobile copy placeholder below the 1200px breakpoint when no copy is authored', async () => {
+    window.mph['study-marquee-quiz-maker-mobile-copy'] = 'Mobile placeholder copy.';
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    stubDesktopQuery(false);
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    expect(window.matchMedia.calledWith(DESKTOP_QUERY)).to.be.true;
+    const copy = block.querySelector('.unity-marquee-copy:not(.unity-marquee-copy-sub)');
+    expect(copy.textContent.trim()).to.equal('Mobile placeholder copy.');
+  });
+
+  it('uses the desktop copy placeholder at and above the 1200px breakpoint when no copy is authored', async () => {
+    window.mph['study-marquee-quiz-maker-mobile-copy'] = 'Mobile placeholder copy.';
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    stubDesktopQuery(true);
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
     const copy = block.querySelector('.unity-marquee-copy:not(.unity-marquee-copy-sub)');
-    expect(copy.textContent.trim()).to.equal('Mobile copy text.');
-    Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 1280 });
+    expect(copy.textContent.trim()).to.equal('Create quizzes from any document.');
   });
 
   it('video media is not decorated with image class', async () => {
