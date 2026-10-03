@@ -81,4 +81,58 @@ describe('verb-widget early prefetch', () => {
 
     expect(getPrefetchLinks()).to.have.lengthOf(0);
   });
+
+  describe('target iframe prefetch', () => {
+    const REDIRECT_URL = 'about:blank#redirect';
+    const getIframes = () => [...document.body.querySelectorAll('iframe')];
+    const track = (block, event, data = {}) => {
+      block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event, data, sendToSplunk: false } }));
+    };
+
+    beforeEach(() => {
+      window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+      // The uploading event's beforeunload handler blocks WTR from closing the page
+      const addListener = window.addEventListener.bind(window);
+      sinon.stub(window, 'addEventListener').callsFake((type, ...args) => {
+        if (type !== 'beforeunload') addListener(type, ...args);
+      });
+    });
+
+    it('does not load an iframe with a null src when uploading starts before redirectUrl', async () => {
+      document.body.innerHTML = await readFile({ path: './mocks/body-pdf-to-word.html' });
+      const block = document.body.querySelector('.verb-widget');
+      await init(block);
+
+      track(block, 'uploading');
+
+      expect(getIframes()).to.have.lengthOf(0);
+      expect(window.prefetchTargetLoaded).to.not.equal(true);
+    });
+
+    it('loads the target iframe once redirectUrl arrives after uploading', async () => {
+      document.body.innerHTML = await readFile({ path: './mocks/body-pdf-to-word.html' });
+      const block = document.body.querySelector('.verb-widget');
+      await init(block);
+
+      track(block, 'uploading');
+      track(block, 'redirectUrl', { redirectUrl: REDIRECT_URL });
+
+      const iframes = getIframes();
+      expect(iframes).to.have.lengthOf(1);
+      expect(iframes[0].getAttribute('src')).to.equal(REDIRECT_URL);
+    });
+
+    it('loads the target iframe when redirectUrl arrives before uploading (chunked upload order)', async () => {
+      document.body.innerHTML = await readFile({ path: './mocks/body-pdf-to-word.html' });
+      const block = document.body.querySelector('.verb-widget');
+      await init(block);
+
+      track(block, 'redirectUrl', { redirectUrl: REDIRECT_URL });
+      track(block, 'uploading');
+
+      const iframes = getIframes();
+      expect(iframes).to.have.lengthOf(1);
+      expect(iframes[0].getAttribute('src')).to.equal(REDIRECT_URL);
+    });
+  });
 });
