@@ -247,6 +247,7 @@ export async function responseProvider(request) {
         headerLink = [...headerLink,
           `</acrobat/blocks/verb-widget/verb-widget.js>;rel="preload";as="script";crossorigin="anonymous"`,
           `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
+          `</acrobat/blocks/verb-widget/icons/${last}.svg>;rel="preload";as="fetch";fetchpriority="high";crossorigin="anonymous"`,
         ];
       }
     }

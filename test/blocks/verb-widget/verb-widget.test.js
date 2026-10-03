@@ -2,7 +2,7 @@
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
-import { delay } from '../../helpers/waitfor.js';
+import { delay, waitForElement } from '../../helpers/waitfor.js';
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
 
 const { default: init } = await import(
@@ -45,9 +45,30 @@ describe('verb-widget block', () => {
     const block = document.body.querySelector('.verb-widget');
     await init(block);
     expect(document.querySelector('.verb-widget .acrobat-icon svg')).to.exist;
-    expect(document.querySelector('.verb-widget .verb-image svg')).to.exist;
+    const verbImage = document.querySelector('.verb-widget .verb-image');
+    expect(await waitForElement('.verb-widget .verb-image svg')).to.exist;
+    expect(verbImage.classList.contains('generated')).to.be.true;
     expect(document.querySelector('.verb-widget .security-icon svg')).to.exist;
     expect(document.querySelector('.verb-widget .info-icon svg')).to.exist;
+  });
+
+  it('does not apply generated icon sizing to an authored image', async () => {
+    const block = document.body.querySelector('.verb-widget');
+    const authoredIcon = document.createElement('img');
+    authoredIcon.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 120%22%3E%3C/svg%3E';
+    authoredIcon.alt = 'Custom non-square icon';
+    authoredIcon.width = 240;
+    authoredIcon.height = 120;
+    block.querySelector(':scope > div > div').append(authoredIcon);
+
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+
+    const verbImage = block.querySelector('.verb-image');
+    expect(verbImage.classList.contains('generated')).to.be.false;
+    expect(verbImage.querySelector('img')).to.equal(authoredIcon);
+    expect(authoredIcon.width / authoredIcon.height).to.equal(2);
   });
 
   it('signed in', async () => {
@@ -64,7 +85,7 @@ describe('verb-widget block', () => {
     expect(block.classList.contains('signed-in')).to.be.true;
 
     expect(document.querySelector('.verb-widget .acrobat-icon svg')).to.exist;
-    expect(document.querySelector('.verb-widget .verb-image svg')).to.exist;
+    expect(await waitForElement('.verb-widget .verb-image svg')).to.exist;
   });
 
   it('show error toast', async () => {
