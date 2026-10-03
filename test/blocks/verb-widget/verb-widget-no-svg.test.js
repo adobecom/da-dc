@@ -50,8 +50,6 @@ describe('verb-widget block', () => {
     setConfig({ ...conf, locale: { prefix: '' }, codeRoot: '/acrobat' });
     const block = document.body.querySelector('.verb-widget');
     await init(block);
-    // The hero SVG now loads off the critical path (fire-and-forget), so the
-    // failure is logged after init() resolves; wait for it before asserting.
     await waitFor(() => window.lana.log.calledOnce);
     expect(window.lana.log.calledOnce).to.be.true;
   });
