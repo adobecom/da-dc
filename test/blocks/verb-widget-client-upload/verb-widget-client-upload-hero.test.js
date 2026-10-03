@@ -39,8 +39,6 @@ function addSnapshot() {
   return snapshot;
 }
 
-// Test order matters: the block caches the hero SVG only after a successful fetch,
-// so only the last test lets the hero fetch succeed.
 describe('verb-widget-client-upload hero image', () => {
   let xhr;
   let heroResponse;

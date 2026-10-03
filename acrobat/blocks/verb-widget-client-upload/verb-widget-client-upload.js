@@ -537,9 +537,7 @@ export default async function init(element) {
     fillVerbImage(authoredIcon);
   } else {
     widgetImage.classList.add('generated');
-    // Show the prerender snapshot's hero until the fetched one arrives, so the swap can't blink.
     fillVerbImage(prerenderElement?.querySelector('.verb-image svg')?.cloneNode(true));
-    // Don't hold the widget's first paint on the hero fetch; fill it when it arrives.
     createSvgElement(VERB).then(fillVerbImage);
   }
 
