@@ -87,9 +87,6 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
   });
 
   it("responseProvider verb-widget hero SVG preload", async () => {
-    // Simulate a standard unity verb-widget page: fire only the
-    // `.unity.workflow-acrobat` marker so the Link header takes the default
-    // verb-widget branch (no study-marquee / verb-marquee / client-upload).
     const originalOnElement = mockOnElement.getMockImplementation();
     mockOnElement.mockImplementation((elem, fn) => {
       if (elem === '.unity.workflow-acrobat') {

@@ -620,10 +620,8 @@ export default async function init(element) {
     widgetImage.appendChild(verbImageSvg);
   };
   if (authoredIcon) {
-    // Authored icon is a synchronous <img>; fill immediately.
     fillVerbImage(authoredIcon);
   } else {
-    // Don't block widget paint (LCP) on the hero SVG fetch; fill when ready.
     createSvgElement(`${VERB}`).then(fillVerbImage);
   }
 

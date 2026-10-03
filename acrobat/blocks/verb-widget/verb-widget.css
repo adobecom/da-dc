@@ -189,7 +189,6 @@
 }
 
 .verb-image.generated {
-  /* Reserve space so the async-filled hero SVG can't shift layout (CLS). */
   aspect-ratio: 1 / 1;
 }
 
