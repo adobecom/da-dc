@@ -134,7 +134,6 @@ describe('verb-widget-client-upload init', () => {
       const verbImage = block.querySelector('.verb-image');
       expect(verbImage).to.exist;
       expect(verbImage.classList.contains('generated')).to.be.true;
-      // The hero fills asynchronously once the SVG loads.
       const heroSvg = await waitForElement('.verb-image svg.icon-verb-image');
       expect(heroSvg.getAttribute('alt')).to.equal(VERB);
       // built-in loads an SVG element (not an IMG tag)

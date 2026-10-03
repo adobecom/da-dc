@@ -131,8 +131,6 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
   });
 
   it("responseProvider client-upload hero SVG preload", async () => {
-    // Fire only the `.verb-widget-client-upload` marker so the Link header takes
-    // the client-upload branch.
     const originalOnElement = mockOnElement.getMockImplementation();
     mockOnElement.mockImplementation((elem, fn) => {
       if (elem === '.verb-widget-client-upload') {
@@ -149,7 +147,6 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
       expect(response.headers.Link).toContain('</acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.js>');
       expect(response.headers.Link).toContain(heroPreload);
 
-      // Localized pages load the same icon path; it has no locale prefix.
       response = await replaceResponseProvider(new Request({ path: '/jp/acrobat/online/image-to-pdf' }));
       expect(response.status).toEqual(200);
       expect(response.headers.Link).toContain('</jp/dc-shared/placeholders.json>');
