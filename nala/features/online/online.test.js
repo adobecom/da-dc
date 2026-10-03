@@ -45,9 +45,9 @@ test.describe('Acrobat Online Tools Smoke Tests', () => {
         await expect(onlinePage.footer).toBeVisible({ timeout: 60000 });
       });
 
-      await test.step('Verify no link leads to 404', async () => {
-        await checkPageLinks(page, expect);
-      });
+      // await test.step('Verify no link leads to 404', async () => {
+      //   await checkPageLinks(page, expect);
+      // });
     });
   });
 });

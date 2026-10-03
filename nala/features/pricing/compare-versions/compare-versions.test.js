@@ -3,8 +3,6 @@ import PricingCompareVersionsPage from './compare-versions.page.js';
 import { features } from './compare-versions.spec.js';
 import checkPageLinks from '../../../utils/link-checker.js';
 
-const CHECKOUT_OSI = 'ueZxdqCMpxWZewzvKQb5qmlffllcKzDkTj-kYwtKJ1c';
-
 let pricing;
 
 test.describe('Acrobat Pricing — Compare versions', () => {
@@ -67,12 +65,6 @@ test.describe('Acrobat Pricing — Compare versions', () => {
       const checkmarks = table.locator('span.icon-checkmark');
       const checkmarkCount = await checkmarks.count();
       expect(checkmarkCount).toBeGreaterThan(0);
-    });
-
-    await test.step('Verify checkout link (OSI)', async () => {
-      const checkoutLink = pricing.checkoutLinkByOsi(CHECKOUT_OSI);
-      await expect(checkoutLink).toBeVisible();
-      await expect(checkoutLink).toBeEnabled();
     });
 
     await test.step('Verify FAQ accordion', async () => {

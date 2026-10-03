@@ -1,6 +1,5 @@
 import { expect } from '@playwright/test';
 import HeroMarquee from './blocks/hero-marquee.js';
-import MerchCards from './blocks/merch-cards.js';
 
 export default class BasePage {
   constructor(page) {
@@ -58,9 +57,6 @@ export default class BasePage {
     this.acrobatOverviewFAQ = this.page.locator('div[data-path*="/dc-shared/fragments/faq/acrobat-overview-faq"]');
     this.acrobatOverviewFAQTitle = this.acrobatOverviewFAQ.locator('h2');
     this.acrobatOverviewFAQButton = this.acrobatOverviewFAQ.locator('button');
-
-    // Merch Cards Block
-    this.merchCards = new MerchCards(page);
 
     // Comparison Table Section
     this.comparisonTableSection = this.page.locator('div.section.table-section');
@@ -343,34 +339,6 @@ export default class BasePage {
     await expect(this.promoStickyCheckoutLinks.last()).toBeEnabled();
   }
 
-  async verifyMerchCardPlans() {
-    await this.merchCards.verifyMerchCardPlans();
-  }
-
-  async verifyIndividualMerchCards() {
-    await this.merchCards.verifyIndividualMerchCards();
-  }
-
-  async verifyIndividualStandardMerchCards() {
-    await this.merchCards.verifyIndividualStandardMerchCards();
-  }
-
-  async verifyBusinessStandardMerchCards() {
-    await this.merchCards.verifyBusinessStandardMerchCards();
-  }
-
-  async verifyBusinessMerchCards() {
-    await this.merchCards.verifyBusinessMerchCards();
-  }
-
-  async verifyStudentsAndTeachersMerchCards() {
-    await this.merchCards.verifyStudentsAndTeachersMerchCards();
-  }
-
-  async verifyPlansAndPricingTabsPDFSolution() {
-    await this.merchCards.verifyPlansAndPricingTabsPDFSolution();
-  }
-
   async verifyCompareVersionsTable() {
     const table = this.page.locator('div[data-path*="/dc-shared/fragments/merch/acrobat/pricing/compare-versions/table/default"] div.table[role="table"]');
     await expect(table).toBeVisible();
@@ -473,14 +441,6 @@ export default class BasePage {
 
     await expandButton.first().click();
     await expect(expandButton.first()).toHaveAttribute('aria-expanded', 'true');
-  }
-
-  async verifyPricingPageMerchCards() {
-    await this.merchCards.verifyPricingPageMerchCards();
-  }
-
-  async verifyPricingBusinessPageMerchCards() {
-    await this.merchCards.verifyPricingBusinessPageMerchCards();
   }
 
   async verifyTabbedComparisonTable() {
@@ -599,10 +559,6 @@ export default class BasePage {
     expect(checkmarkCount).toBeGreaterThan(0);
   }
 
-  async verifyPricingStudentsPageMerchCards() {
-    await this.merchCards.verifyPricingStudentsPageMerchCards();
-  }
-
   async verifyGenAiStudentsPromptTabs() {
     await expect(this.genAiStudentsTabs).toBeVisible();
     await expect(this.genAiStudentsTabButtons).toHaveCount(5);
@@ -652,10 +608,6 @@ export default class BasePage {
       await expect(link).toBeVisible();
       await expect(link).toBeEnabled();
     }
-  }
-
-  async verifyBusinessSignMerchCards() {
-    await this.merchCards.verifyBusinessSignMerchCards();
   }
 
   async verifyLink(selectorOrLocator, hrefPattern = null, container = null) {

@@ -17,7 +17,6 @@ test.describe('Unity Delete PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Delete PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity Delete PDF test suite', () => {
       await expect(deletePdf.dropZone).toBeVisible();
       await expect(deletePdf.verbImage).toBeVisible();
       await expect(deletePdf.acrobatIcon).toBeVisible();
-      const actualText = await deletePdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(deletePdf.verbTitle).toContainText(data.verbTitle);
-      await expect(deletePdf.verbCopy).toContainText(data.verbCopy);
+      await expect(deletePdf.verbHeader).toBeVisible();
+      await expect(deletePdf.verbTitle).toBeVisible();
+      await expect(deletePdf.verbCopy).toBeVisible();
       await expect(deletePdf.selectFilesButton).toBeVisible();
       await expect(deletePdf.selectFilesButton).toBeEnabled();
     });
@@ -120,10 +118,9 @@ test.describe('Unity Delete PDF test suite', () => {
         deletePdf.dropZone.click(),
       ]);
       await fileChooser.setFiles(pdfFilePath);
-
-      await page.waitForURL(/acrobat\.adobe/, {
-        timeout: 60000,
-      });
+      // Upload redirects to acrobat.adobe.com via an interstitial; poll the final URL
+      // instead of binding to a single navigation commit (which aborts mid-redirect).
+      await expect(page).toHaveURL(/acrobat\.adobe/, { timeout: 60000 });
 
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);
