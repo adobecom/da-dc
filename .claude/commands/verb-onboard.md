@@ -74,7 +74,6 @@ Also use this answer to set the `file-limit` placeholder value in Step 6 (e.g. `
 
 Ask as a multi-select, all optional:
 - `mobileApp` — show app-store link on mobile instead of file picker
-- `typeOneLanding` — keep type1 accounts on the landing page
 - `level: 0` — trial mode (no file picker, shows pricing CTA)
 - `subCopy` — show sub-description text from placeholders
 
