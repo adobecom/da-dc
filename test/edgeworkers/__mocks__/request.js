@@ -19,9 +19,9 @@ export const mockJson = jest.fn();
 export const mockText = jest.fn();
 export const mockArrayBuffer = jest.fn();
 
-const Request = jest.fn().mockImplementation(({path, device}) => {
+const Request = jest.fn().mockImplementation(({path, device, host = 'www.adobe.com'}) => {
   return {
-    host: "www.adobe.com",
+    host,
     method: "GET",
     path,
     scheme: "https",
