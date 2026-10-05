@@ -48,6 +48,7 @@ describe('verb-widget block', () => {
     expect(document.querySelector('.verb-widget .verb-image svg')).to.exist;
     expect(document.querySelector('.verb-widget .security-icon svg')).to.exist;
     expect(document.querySelector('.verb-widget .info-icon svg')).to.exist;
+    expect(block.classList.contains('ready')).to.be.true;
   });
 
   it('signed in', async () => {
