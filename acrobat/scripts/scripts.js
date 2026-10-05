@@ -527,7 +527,7 @@ function getMasLocale(miloLocale, geoCountry) {
   let [country = 'US', language = 'en'] = (MAS_GEO_MAP[geo] ?? geo).split('_', 2);
   country = country.toUpperCase();
   language = language.toLowerCase();
-  const marketOverride = MARKET_LOCALE_OVERRIDES[language]?.[geoCountry]; 
+  const marketOverride = MARKET_LOCALE_OVERRIDES[language]?.[geoCountry];
   return { locale: marketOverride ?? MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`, country: geoCountry ?? country };
 }
 
