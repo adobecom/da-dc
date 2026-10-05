@@ -91,7 +91,14 @@ const deviceConfig = {
     const { pathname: urlPath, hostname } = new URL(url);
     const pathParts = urlPath.split('/').filter(Boolean);
     const isAcrobatSubdomain = ['acrobat.adobe.com', 'stage.acrobat.adobe.com'].includes(hostname);
-    const locale = pathParts[0] === 'acrobat' || (isAcrobatSubdomain && pathParts.length <= 1)
+    const acrobatLocales = new Set([
+      'cz', 'de', 'dk', 'es', 'fi', 'fr', 'id_id', 'in_hi', 'it', 'jp', 'kr',
+      'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'se', 'th_th', 'tr', 'tw',
+    ]);
+    const hasLocalePrefix = isAcrobatSubdomain
+      ? pathParts.length > 1 && acrobatLocales.has(pathParts[0])
+      : pathParts[0] !== 'acrobat';
+    const locale = !hasLocalePrefix
       ? ''
       : `_${pathParts[0]}`;
     const basename = path.basename(urlPath, '.html');
