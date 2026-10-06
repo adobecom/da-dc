@@ -134,11 +134,12 @@ let tabClosureSent = false;
 let isUploading = false;
 
 function prefetchTarget() {
-  if (!window.prefetchTargetUrl) return;
+  if (window.prefetchTargetLoaded || !window.prefetchTargetUrl) return;
   const iframe = document.createElement('iframe');
   iframe.src = window.prefetchTargetUrl;
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
+  window.prefetchTargetLoaded = true;
 }
 
 function prefetchNextPage(url) {
