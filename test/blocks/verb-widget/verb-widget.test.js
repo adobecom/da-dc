@@ -12,6 +12,11 @@ const { default: init } = await import(
 describe('verb-widget block', () => {
   let xhr;
   let placeholders;
+  let dest = null;
+  const onNav = (e) => { dest = e.destination.url; e.preventDefault(); };
+  // Signed-in users are redirected; block navigation (including late IMS:Ready redirects)
+  before(() => window.navigation.addEventListener('navigate', onNav));
+  after(() => window.navigation.removeEventListener('navigate', onNav));
 
   beforeEach(async () => {
     sinon.stub(window, 'fetch');
@@ -65,6 +70,39 @@ describe('verb-widget block', () => {
 
     expect(document.querySelector('.verb-widget .acrobat-icon svg')).to.exist;
     expect(document.querySelector('.verb-widget .verb-image svg')).to.exist;
+  });
+
+  describe('signed-in redirect', () => {
+    const runSignedIn = async (verb, accountType) => {
+      dest = null;
+      window.adobeIMS = { isSignedInUser: () => true, getAccountType: () => accountType };
+      setConfig({ ...getConfig(), locale: { prefix: '' } });
+      const block = document.body.querySelector('.verb-widget');
+      block.className = `verb-widget ${verb}`;
+      await init(block);
+      await delay(200);
+      return dest;
+    };
+
+    // Fallback for when the Akamai signed-in 302 doesn't fire (MWPW-189255)
+    ['fillsign', 'compress-pdf', 'add-comment', 'crop-pages', 'number-pages'].forEach((verb) => {
+      ['type1', 'type2'].forEach((accountType) => {
+        it(`redirects ${accountType} signed-in users on ${verb}`, async () => {
+          expect(await runSignedIn(verb, accountType)).to.include('/go/acrobat-');
+        });
+      });
+    });
+
+    // Excluded from redirect by MWPW-208582 (#237)
+    ['split-pdf', 'pdf-to-word'].forEach((verb) => {
+      it(`keeps signed-in users on ${verb}`, async () => {
+        expect(await runSignedIn(verb, 'type2')).to.be.null;
+      });
+    });
+
+    it('redirects signed-in users on other verbs', async () => {
+      expect(await runSignedIn('combine-pdf', 'type1')).to.include('/go/acrobat-combine');
+    });
   });
 
   it('show error toast', async () => {
