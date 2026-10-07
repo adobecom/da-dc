@@ -138,7 +138,7 @@ const setDraggingClass = (widget, shouldToggle) => {
 };
 
 function prefetchTarget() {
-  if (window.prefetchTargetLoaded) return;
+  if (window.prefetchTargetLoaded || !window.prefetchTargetUrl) return;
   const iframe = document.createElement('iframe');
   iframe.src = window.prefetchTargetUrl;
   iframe.style.display = 'none';
@@ -932,6 +932,7 @@ export default async function init(element) {
       uploaded: () => handleUploadedEvent(data, userAttempts, cookieExp, canSendDataToSplunk),
       redirectUrl: () => {
         if (data) initiatePrefetch(data.redirectUrl);
+        if (isUploading) prefetchTarget();
         handleAnalyticsEvent('job:redirect-success', metadata, false, canSendDataToSplunk);
       },
       chunk_uploaded: () => {

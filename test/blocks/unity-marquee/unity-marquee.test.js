@@ -338,15 +338,93 @@ describe('unity-marquee block', () => {
     expect(block.querySelector('.unity-marquee-media .image')).to.not.exist;
   });
 
-  it('removes #prerender_verb-widget element after init', async () => {
+  async function initWithPrerender() {
     const prerender = document.createElement('div');
     prerender.id = 'prerender_verb-widget';
     document.body.appendChild(prerender);
+    const frames = [];
+    sinon.stub(window, 'requestAnimationFrame').callsFake((callback) => {
+      frames.push(callback);
+      return frames.length;
+    });
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
-    await new Promise((r) => { setTimeout(r, 100); });
-    expect(document.getElementById('prerender_verb-widget')).to.not.exist;
+    sinon.stub(block, 'getBoundingClientRect').returns({ width: 100, height: 100 });
+    return { block, prerender, frames };
+  }
+
+  it('removes prerender after two frames when the block is visible', async () => {
+    const { prerender, frames } = await initWithPrerender();
+    expect(prerender.isConnected).to.be.true;
+    frames.shift()();
+    expect(prerender.isConnected).to.be.true;
+    frames.shift()();
+    expect(prerender.isConnected).to.be.false;
+    expect(frames).to.be.empty;
+  });
+
+  ['display', 'visibility', 'opacity'].forEach((property) => {
+    [false, true].forEach((hideParent) => {
+      it(`retains prerender until the ${hideParent ? 'parent' : 'block'} is visible (${property})`, async () => {
+        const { block, prerender, frames } = await initWithPrerender();
+        const hiddenElement = hideParent ? block.parentElement : block;
+        const hiddenValue = { display: 'none', visibility: 'hidden', opacity: '0' };
+        hiddenElement.style[property] = hiddenValue[property];
+        frames.shift()();
+        frames.shift()();
+        expect(prerender.isConnected).to.be.true;
+        expect(frames).to.have.lengthOf(1);
+        hiddenElement.style.removeProperty(property);
+        frames.shift()();
+        expect(prerender.isConnected).to.be.false;
+        expect(frames).to.be.empty;
+      });
+    });
+  });
+
+  ['width', 'height'].forEach((dimension) => {
+    it(`retains prerender until the block has nonzero ${dimension}`, async () => {
+      const { block, prerender, frames } = await initWithPrerender();
+      block.getBoundingClientRect.returns({ width: 100, height: 100, [dimension]: 0 });
+      frames.shift()();
+      frames.shift()();
+      expect(prerender.isConnected).to.be.true;
+      block.getBoundingClientRect.returns({ width: 100, height: 100 });
+      frames.shift()();
+      expect(prerender.isConnected).to.be.false;
+      expect(frames).to.be.empty;
+    });
+  });
+
+  it('stops polling and logs if the block never becomes visible', async () => {
+    const { block, prerender, frames } = await initWithPrerender();
+    block.style.display = 'none';
+    let polls = 0;
+    while (frames.length) {
+      frames.shift()();
+      polls += 1;
+    }
+    expect(prerender.isConnected).to.be.true;
+    expect(polls).to.be.lessThan(1000);
+    expect(window.lana.log.calledWithMatch(/prerender retained/)).to.be.true;
+  });
+
+  it('stops cleanup retries if the block is detached', async () => {
+    const { block, prerender, frames } = await initWithPrerender();
+    block.remove();
+    frames.shift()();
+    frames.shift()();
+    expect(prerender.isConnected).to.be.true;
+    expect(frames).to.be.empty;
+  });
+
+  it('stops cleanup retries if prerender has already been removed', async () => {
+    const { prerender, frames } = await initWithPrerender();
+    prerender.remove();
+    frames.shift()();
+    frames.shift()();
+    expect(frames).to.be.empty;
   });
 });
