@@ -20,6 +20,8 @@ const ICONS = {
 
 const GENAI_VERBS = new Set(['quiz-maker', 'flashcard-maker', 'mindmap-maker']);
 
+const MAX_PRERENDER_FRAMES = 600;
+
 function waitForLCP(timeout = 3000) {
   /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
   return new Promise((resolve) => {
@@ -152,6 +154,20 @@ function processMedia(mediaDiv) {
   return mediaDiv;
 }
 
+function isBlockVisible(element) {
+  const { width, height } = element.getBoundingClientRect();
+  if (!width || !height) return false;
+  let current = element;
+  while (current) {
+    const { display, visibility, opacity } = window.getComputedStyle(current);
+    if (display === 'none' || visibility === 'hidden' || visibility === 'collapse' || opacity === '0') {
+      return false;
+    }
+    current = current.parentElement;
+  }
+  return true;
+}
+
 export default async function init(element) {
   ({ createTag, getConfig } = (await import(`${miloLibs}/utils/utils.js`)));
   ({ decorateBlockBg } = (await import(`${miloLibs}/utils/decorate.js`)));
@@ -163,7 +179,22 @@ export default async function init(element) {
   }
 
   const prerenderElement = document.querySelector('#prerender_verb-widget');
-  const removePrerender = () => prerenderElement?.remove();
+  let prerenderFrames = 0;
+  const removePrerender = () => {
+    if (!prerenderElement?.isConnected || !element.isConnected) return;
+    if (isBlockVisible(element)) {
+      prerenderElement.remove();
+    } else if (prerenderFrames < MAX_PRERENDER_FRAMES) {
+      prerenderFrames += 1;
+      /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
+      requestAnimationFrame(removePrerender);
+    } else {
+      window.lana?.log(
+        `Error Code: Unknown, Status: 'Unknown', Message: unity-marquee never became visible; prerender retained on ${element.classList[1]}`,
+        lanaOptions,
+      );
+    }
+  };
 
   window.mph = window.mph || {};
   const VERB = element.classList[1];
