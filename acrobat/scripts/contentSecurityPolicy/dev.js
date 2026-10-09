@@ -222,7 +222,8 @@ const scriptSrc = [
   '*.aem.page',
   '*.aem.live',
   'tr.snapchat.com',
-  '\'sha256-dg0pQ3tkJ9KWGwSBExDwP6bSUKm2FRzq/s0tHhkcDtk=\'', // for this repo
+  '\'sha256-dg0pQ3tkJ9KWGwSBExDwP6bSUKm2FRzq/s0tHhkcDtk=\'', // for head.html main script
+  '\'sha256-JAN45Y86DTmoejy8WxqTSfbIwwE5R4Cp+DVJT05YB1I=\'', // for head.html utils.js preload
   '\'sha256-/B9aRx/bHjiUGWHC/33Ku1McTNnFGEiLwTJdRki4www=\'', // for acrobat subdomain dc-frictionless
   't.contentsquare.net/ss/4451/2/uxa.js',
   ';',
