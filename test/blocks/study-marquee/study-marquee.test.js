@@ -214,6 +214,24 @@ describe('study-marquee block', () => {
     }
   });
 
+  it('adds only one prefetch iframe per page across uploading and redirectUrl', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+    const target = 'about:blank#prefetch-target';
+    window.prefetchTargetUrl = target;
+    delete window.prefetchTargetLoaded;
+    try {
+      block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'uploading', data: {} } }));
+      block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'redirectUrl', data: { redirectUrl: target } } }));
+      expect(document.querySelectorAll(`iframe[src="${target}"]`).length).to.equal(1);
+    } finally {
+      delete window.prefetchTargetUrl;
+      delete window.prefetchTargetLoaded;
+    }
+  });
+
   it('show error toast', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
