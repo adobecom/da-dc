@@ -204,6 +204,31 @@ function getDemoEndpoint(verb) {
   return demoUrl;
 }
 
+function getUnityReferrer() {
+  const unityBlock = document.querySelector('.unity');
+  const referrerClass = unityBlock && [...unityBlock.classList].find((cn) => cn.startsWith('referrer-'));
+  return referrerClass ? referrerClass.replace('referrer-', '') : '';
+}
+
+function getDemoHref(verb, authoredHref) {
+  const defaultHref = getDemoEndpoint(verb);
+  const referrer = getUnityReferrer();
+  if (!authoredHref && !referrer) return defaultHref;
+  try {
+    const defaults = new URL(defaultHref).searchParams;
+    const url = new URL(authoredHref || defaultHref);
+    if (!url.searchParams.has('x_api_client_id')) {
+      url.searchParams.set('x_api_client_id', defaults.get('x_api_client_id'));
+    }
+    if (!authoredHref || !url.searchParams.has('x_api_client_location')) {
+      url.searchParams.set('x_api_client_location', referrer || defaults.get('x_api_client_location'));
+    }
+    return url.toString();
+  } catch (e) {
+    return authoredHref || defaultHref;
+  }
+}
+
 function getCookie(name) {
   const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
   return match ? decodeURIComponent(match[1]) : null;
@@ -517,7 +542,19 @@ export default async function init(element) {
   const touURL = window.mph['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
   const genAIurl = window.mph['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`;
 
-  const children = element.querySelectorAll(':scope > div');
+  const LABEL_PREFIX = 'dc-block-row-';
+  const authored = new Map();
+  const children = [];
+  element.querySelectorAll(':scope > div').forEach((rowEl) => {
+    const label = rowEl.firstElementChild?.textContent?.trim() || '';
+    if (label.startsWith(LABEL_PREFIX)) {
+      authored.set(label.slice(LABEL_PREFIX.length), rowEl.children[1] || null);
+      rowEl.remove();
+    } else {
+      children.push(rowEl);
+    }
+  });
+  const cellText = (key) => authored.get(key)?.textContent?.trim() || '';
   const VERB = element.classList[1];
   const widgetHeading = createTag('h1', { class: 'verb-heading' }, children[0].textContent);
   let widgetSubHeading = window.mph[`verb-widget-${VERB}-description`];
@@ -567,7 +604,8 @@ export default async function init(element) {
   }
 
   if (LIMITS[VERB].subCopy) {
-    widgetSubCopy = createTag('p', { class: 'verb-copy verb-sub-copy' }, window.mph[`verb-widget-${VERB}-sub-description`]);
+    const subCopyText = cellText('sub-copy') || window.mph[`verb-widget-${VERB}-sub-description`];
+    widgetSubCopy = createTag('p', { class: 'verb-copy verb-sub-copy' }, subCopyText);
     widgetCopy.append(widgetSubCopy);
   }
 
@@ -676,9 +714,12 @@ export default async function init(element) {
       widgetLeft.insertBefore(widgetButton, errorState);
       widgetLeft.insertBefore(button, errorState);
     }
-  } else if ((VERB.indexOf('chat-pdf') > -1 || VERB.indexOf('pdf-ai') > -1) && window.mph['verb-widget-cta-demo']) {
+  } else if ((VERB.indexOf('chat-pdf') > -1 || VERB.indexOf('pdf-ai') > -1)
+    && (cellText('demo-cta') || window.mph['verb-widget-cta-demo'])) {
     const demoBtnWrapper = createTag('div', { class: 'demo-button-wrapper' });
-    widgetDemoButton = createTag('a', { href: getDemoEndpoint(VERB), class: 'verb-cta demo-cta', tabindex: 0 }, window.mph['verb-widget-cta-demo']);
+    const demoText = cellText('demo-cta') || window.mph['verb-widget-cta-demo'];
+    const demoHref = getDemoHref(VERB, authored.get('demo-cta')?.querySelector('a[href]')?.href);
+    widgetDemoButton = createTag('a', { href: demoHref, class: 'verb-cta demo-cta', tabindex: 0 }, demoText);
     widgetDemoButton.addEventListener('click', () => {
       window.analytics.verbAnalytics('Try with a demo file', VERB, { userAttempts });
     });
