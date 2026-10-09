@@ -417,18 +417,32 @@ function replaceDotMedia(area = document) {
 
 replaceDotMedia(document);
 
-// Default to loading the first image as eager.
 (async function loadLCPImage() {
-  const blocks = '.marquee,.hero-marquee,.study-marquee,.unity-marquee';
-  const marquee = document.querySelector(blocks); // first marquee only
-  if (marquee) {
-    if (window?.browser?.isMobile) {
-      marquee.querySelectorAll('img')[0]?.setAttribute('loading', 'eager');
-    } else {
-      marquee.querySelectorAll('img')[1]?.setAttribute('loading', 'eager');
-      marquee.querySelectorAll('img')[2]?.setAttribute('loading', 'eager');
-    }
+  const blocks = '.marquee, .hero-marquee, .study-marquee, .unity-marquee, .verb-marquee';
+  const marquee = document.querySelector('main')?.querySelector(blocks);
+  const text = marquee?.querySelector('h1, h2, h3, h4, h5, h6')?.closest('div');
+  if (!text) return;
+  const eagerLoad = (img) => {
+    img?.setAttribute('fetchpriority', 'high');
+    img?.setAttribute('loading', 'eager');
+  };
+
+  let viewport = 'mobile';
+  if (window.matchMedia('(min-width: 600px)').matches) viewport = 'tablet';
+  if (window.matchMedia('(min-width: 1200px)').matches) viewport = 'desktop';
+
+  const background = marquee.firstElementChild;
+  if (background !== text.parentElement) {
+    const [mobile, tablet = mobile, desktop = tablet] = background.children;
+    const cell = { mobile, tablet, desktop }[viewport];
+    eagerLoad(cell?.querySelector('img'));
   }
+
+  const mediaBelowText = viewport !== 'desktop'
+    && marquee.matches('.study-marquee, .unity-marquee, .verb-marquee');
+  if (mediaBelowText || marquee.classList.contains(`media-hidden-${viewport}`)) return;
+  const media = text.nextElementSibling || text.previousElementSibling;
+  eagerLoad(media?.querySelector('img'));
 }());
 
 const MAS_FRAGMENT_API = 'https://www.adobe.com/mas/io/fragment';
