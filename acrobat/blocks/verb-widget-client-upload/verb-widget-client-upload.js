@@ -527,11 +527,18 @@ export default async function init(element) {
   });
 
   const widgetImage = createTag('div', { class: 'verb-image' });
-  const verbImageSvg = authoredIcon || await createSvgElement(VERB);
-  if (verbImageSvg) {
+  const fillVerbImage = (verbImageSvg) => {
+    if (!verbImageSvg) return;
     verbImageSvg.classList.add('icon-verb-image');
     verbImageSvg.setAttribute('alt', window.mph?.[`verb-widget-${VERB}-alt`] || VERB);
-    widgetImage.appendChild(verbImageSvg);
+    widgetImage.replaceChildren(verbImageSvg);
+  };
+  if (authoredIcon) {
+    fillVerbImage(authoredIcon);
+  } else {
+    widgetImage.classList.add('generated');
+    fillVerbImage(prerenderElement?.querySelector('.verb-image svg')?.cloneNode(true));
+    createSvgElement(VERB).then(fillVerbImage);
   }
 
   const footer = createTag('div', { class: 'verb-footer' });
