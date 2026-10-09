@@ -707,14 +707,19 @@ async function loadPage() {
   const { default: lanaLogging } = await import('./dcLana.js');
   lanaLogging();
 
-  // DC Hosted Ready...
-  const dcHostedReady = setInterval(() => {
-    if (window.dc_hosted) {
-      clearInterval(dcHostedReady);
-      const imsIsReady = new CustomEvent('DC_Hosted:Ready');
-      window.dispatchEvent(imsIsReady);
-    }
-  }, 1000);
+  const dispatchDcHostedReady = () => window.dispatchEvent(new CustomEvent('DC_Hosted:Ready'));
+  if (window.dc_hosted) {
+    dispatchDcHostedReady();
+  } else {
+    document.getElementById('adobe_dc_sdk_launcher')?.addEventListener('load', () => {
+      if (window.dc_hosted) {
+        dispatchDcHostedReady();
+        return;
+      }
+      const lanaOptions = { sampleRate: 1, tags: 'DC_Milo,Frictionless', severity: 'error' };
+      window.lana?.log('DC Hosted launcher loaded without setting window.dc_hosted', lanaOptions);
+    }, { once: true });
+  }
 
   if (document.querySelectorAll('a[class*="geo-pn"]').length > 0 || document.querySelectorAll('a[href*="geo"]').length > 0) {
     const { default: geoPhoneNumber } = await import('./geo-phoneNumber.js');
