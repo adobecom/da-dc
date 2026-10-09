@@ -164,6 +164,53 @@ describe('verb-widget reskin overrides (dc-block-row-*)', () => {
     expect(block.textContent).to.not.include('dc-block-row-');
   });
 
+  describe('with desktop copy, mobile copy and an authored SVG icon', () => {
+    const single = (html) => `<div><div>${html}</div></div>`;
+    const svgHref = '/acrobat/blocks/verb-widget/icons/compress-pdf.svg';
+    const fullRows = [
+      row('dc-block-row-sub-copy', 'Authored sub copy'),
+      row('dc-block-row-demo-cta', '<a href="https://acrobat.adobe.com/link/demo.pdf">Authored demo</a>'),
+      single('Desktop copy'),
+      single('Mobile copy'),
+      single(`<a href="${svgHref}">compress-pdf.svg</a>`),
+    ];
+    let originalUserAgent;
+
+    beforeEach(() => {
+      originalUserAgent = window.navigator.userAgent;
+    });
+
+    afterEach(() => {
+      Object.defineProperty(window.navigator, 'userAgent', { value: originalUserAgent, configurable: true });
+    });
+
+    it('applies all overrides together on desktop', async () => {
+      const block = await render('chat-pdf', fullRows, 'workflow-acrobat referrer-ai-chat-reskin');
+      expect(block.querySelector('.verb-copy').textContent).to.include('Desktop copy');
+      expect(block.textContent.includes('Mobile copy')).to.be.false;
+      expect(block.querySelector('.verb-image img')?.getAttribute('src')).to.equal(svgHref);
+      expect(block.querySelector('.verb-sub-copy').textContent).to.equal('Authored sub copy');
+      const demo = block.querySelector('.demo-cta');
+      expect(demo.textContent).to.equal('Authored demo');
+      const params = new URL(demo.href).searchParams;
+      expect(params.get('x_api_client_id')).to.equal('ChatPDFTryDemoFile');
+      expect(params.get('x_api_client_location')).to.equal('ai-chat-reskin');
+      expect(block.textContent.includes('dc-block-row-')).to.be.false;
+    });
+
+    it('uses the mobile copy and authored SVG icon on mobile', async () => {
+      Object.defineProperty(window.navigator, 'userAgent', {
+        value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148',
+        configurable: true,
+      });
+      const block = await render('chat-pdf', fullRows);
+      expect(block.textContent.includes('Mobile copy')).to.be.true;
+      expect(block.textContent.includes('Desktop copy')).to.be.false;
+      expect(block.querySelector('.verb-image img')?.getAttribute('src')).to.equal(svgHref);
+      expect(block.textContent.includes('dc-block-row-')).to.be.false;
+    });
+  });
+
   it('keeps the demo CTA analytics label fixed', async () => {
     const block = await render('chat-pdf', [row('dc-block-row-demo-cta', 'Authored demo')]);
     const verbAnalytics = sinon.stub(window.analytics, 'verbAnalytics');

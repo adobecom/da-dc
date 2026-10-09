@@ -210,8 +210,6 @@ function getUnityReferrer() {
   return referrerClass ? referrerClass.replace('referrer-', '') : '';
 }
 
-// Same as Unity: x_api_client_location = unity referrer-* class, else the verb default.
-// Params already in an authored link stay as they are.
 function getDemoHref(verb, authoredHref) {
   const defaultHref = getDemoEndpoint(verb);
   const referrer = getUnityReferrer();
@@ -544,8 +542,6 @@ export default async function init(element) {
   const touURL = window.mph['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
   const genAIurl = window.mph['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`;
 
-  // Labeled rows (dc-block-row-<key>) let reskin pages override verb-keyed placeholder copy.
-  // Remove them first so they do not count as positional rows or authored icons.
   const LABEL_PREFIX = 'dc-block-row-';
   const authored = new Map();
   const children = [];
