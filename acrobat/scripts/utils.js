@@ -67,6 +67,17 @@ export function isOldBrowser() {
   );
 }
 
+// Keep arbitrary messages and payloads out of diagnostic error names.
+const LANA_ERROR_NAMES = new Set([
+  'Error', 'TypeError', 'RangeError', 'ReferenceError', 'SyntaxError', 'URIError',
+  'AbortError', 'NotAllowedError', 'NotFoundError', 'QuotaExceededError',
+  'SecurityError', 'InvalidStateError', 'DataError', 'OperationError',
+]);
+
+export const getLanaErrorName = (error) => (
+  LANA_ERROR_NAMES.has(error?.name) ? error.name : 'UnknownError'
+);
+
 /**
  * Loads placeholders, if SOME were not already loaded
  * @param {string | string[] | undefined} prefix Optional
@@ -99,9 +110,17 @@ export async function loadPlaceholders(prefix) {
           if (prefixes.length && !keyMatches(key)) return;
           window.mph[key] = value.replace(/\u00A0/g, ' ');
         });
+      } else {
+        window.lana?.log(
+          `Utils: placeholder request failed; HTTP ${response.status}`,
+          { severity: 'error', tags: 'DC_Milo,utils,placeholders' },
+        );
       }
     } catch (error) {
-      window.lana?.log(`Failed to load placeholders: ${error?.message}`, { severity: 'error' });
+      window.lana?.log(
+        `Utils: placeholder load failed; ${getLanaErrorName(error)}`,
+        { severity: 'error', tags: 'DC_Milo,utils,placeholders' },
+      );
     }
   }
 }

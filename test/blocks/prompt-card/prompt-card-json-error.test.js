@@ -1,26 +1,51 @@
 /* eslint-disable compat/compat */
-import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
-import { delay } from '../../helpers/waitfor.js';
+
+const { default: init } = await import('../../../acrobat/blocks/prompt-card/prompt-card.js');
 
 describe('prompt-cards using json feature', () => {
-  before(async () => {
+  let originalLana;
+  let section;
+
+  beforeEach(() => {
+    originalLana = window.lana;
+    window.lana = { log: sinon.stub() };
     sinon.stub(window, 'fetch');
-    const res = new window.Response('Not Found', { status: 404 });
-    window.fetch.returns(Promise.resolve(res));
-    document.head.innerHTML = await readFile({ path: './mocks/head.html' });
-    document.body.innerHTML = await readFile({ path: './mocks/body-json.html' });
-    await import('../../../acrobat/scripts/scripts.js');
-    await delay(500);
+    section = document.createElement('div');
+    section.innerHTML = `
+      <div class="prompt-card json">
+        <div><div>Json</div><div>/dc-shared/promptcards.json</div></div>
+      </div>`;
+    document.body.append(section);
   });
 
-  after(() => {
+  afterEach(() => {
     sinon.restore();
+    section.remove();
+    window.lana = originalLana;
   });
 
-  it('shows no prompt card', async () => {
-    const promptcard = document.querySelector('.prompt-card');
-    expect(promptcard).to.not.exist;
+  it('logs an unsuccessful response once and removes the block', async () => {
+    window.fetch.resolves(new Response('Not Found', { status: 404 }));
+
+    await init(section.querySelector('.prompt-card'));
+
+    expect(section.querySelector('.prompt-card')).to.be.null;
+    expect(window.lana.log.calledOnce).to.be.true;
+    expect(window.lana.log.firstCall.args).to.deep.equal([
+      'Prompt Card: data request failed; HTTP 404',
+      { severity: 'error', tags: 'DC_Milo,prompt-card' },
+    ]);
+  });
+
+  it('renders valid data without a failure log', async () => {
+    const data = [{ prefix: 'Ask', title: 'Summary', prompt: 'Summarize this document.' }];
+    window.fetch.resolves(new Response(JSON.stringify({ data })));
+
+    await init(section.querySelector('.prompt-card'));
+
+    expect(section.querySelector('.prompt-copy').textContent).to.equal('Summarize this document.');
+    expect(window.lana.log.called).to.be.false;
   });
 });

@@ -1,5 +1,5 @@
 /* eslint-disable compat/compat */
-import { setLibs, getEnv, isOldBrowser } from '../../scripts/utils.js';
+import { setLibs, getEnv, isOldBrowser, getLanaErrorName } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
 
@@ -193,7 +193,7 @@ async function showUpSell(verb, element) {
 
 const setUser = () => { localStorage.setItem('unity.user', 'true'); };
 
-const lanaOptions = { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'error' };
+const lanaOptions = { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC),verb-widget-client-upload', severity: 'error' };
 
 window.analytics = {
   verbAnalytics: () => {},
@@ -683,9 +683,12 @@ export default async function init(element) {
     window.analytics.sendAnalyticsToSplunk(eventName, VERB, metadata, getSplunkEndpoint());
   }
 
-  function dispatchError(code, message, metadata = {}) {
+  function dispatchError(code, message, metadata = {}, diagnostic = '') {
     showError(message);
-    window.lana?.log(`Error Code: ${code}, Message: ${message}`, lanaOptions);
+    window.lana?.log(
+      `verb-widget-client-upload: ${VERB}; Error Code: ${code}, Message: ${message}${diagnostic ? `, Diagnostic: ${diagnostic}` : ''}`,
+      lanaOptions,
+    );
     const analyticsKey = Object.keys(errorAnalyticsMap).find((k) => code.includes(k));
     if (analyticsKey) {
       window.analytics.verbAnalytics(errorAnalyticsMap[analyticsKey], VERB, analyticsKey === 'error_generic' ? { errorInfo: message } : {});
@@ -714,8 +717,10 @@ export default async function init(element) {
     ctaButton.disabled = true;
     ctaButton.querySelector('.verb-cta-label').textContent = window.mph?.['verb-widget-processing'] || 'Processing…';
 
+    let operation = 'file encryption and storage';
     try {
       const id = await encryptAndStore(file);
+      operation = 'upload completion';
 
       const uploadTimestamp = Date.now();
       setCookie('UTS_Uploaded', uploadTimestamp);
@@ -734,13 +739,19 @@ export default async function init(element) {
       const originalParams = DC_ENV === 'stage' ? `${window.location.search.slice(1)}&` : '';
       const localeParam = locale.ietf ? `&localeCode=${encodeURIComponent(locale.ietf)}` : '';
       const redirectUrl = `${redirectBase}?${originalParams}clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${localeParam}`;
+      operation = 'redirect handoff';
       handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
       window.location.href = redirectUrl;
     } catch (err) {
       isUploading = false;
       ctaButton.disabled = false;
       ctaButton.querySelector('.verb-cta-label').textContent = ctaLabel;
-      dispatchError('error_generic', window.mph?.['verb-widget-error-generic'] || 'Unable to process the request.', filesData);
+      dispatchError(
+        'error_generic',
+        window.mph?.['verb-widget-error-generic'] || 'Unable to process the request.',
+        filesData,
+        `${operation}; ${getLanaErrorName(err)}`,
+      );
     }
   }
 
