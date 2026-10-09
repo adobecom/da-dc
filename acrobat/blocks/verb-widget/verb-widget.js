@@ -580,13 +580,19 @@ export default async function init(element) {
     ...(LIMITS[VERB]?.multipleFiles && { multiple: '' }),
   });
   const widgetImage = createTag('div', { class: 'verb-image' });
-  const verbImageSvg = authoredIcon || await createSvgElement(`${VERB}`);
-  if (verbImageSvg) {
+  if (!authoredIcon) widgetImage.classList.add('generated');
+  const fillVerbImage = (verbImageSvg) => {
+    if (!verbImageSvg) return;
     verbImageSvg.classList.add('icon-verb-image');
     if (!verbImageSvg.getAttribute('alt')) {
       verbImageSvg.setAttribute('alt', window.mph[`verb-widget-${VERB}-alt`] || VERB);
     }
     widgetImage.appendChild(verbImageSvg);
+  };
+  if (authoredIcon) {
+    fillVerbImage(authoredIcon);
+  } else {
+    createSvgElement(`${VERB}`).then(fillVerbImage);
   }
 
   // Since we're using placeholders we need a solution for the hyperlinks
