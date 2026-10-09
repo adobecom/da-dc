@@ -31,6 +31,12 @@ export async function responseProvider(request) {
       const err = new Error(`Failed to fetch doc: ${path}`);
       err.body = htmlResponse.body;
       err.status = htmlResponse.status;
+      if (htmlResponse.status === 301) {
+        const { location } = htmlResponse.getHeaders();
+        if (location) {
+          err.headers = { location };
+        }
+      }
       throw err;
     }
 
@@ -310,7 +316,7 @@ export async function responseProvider(request) {
       responseStream.pipeThrough(rewriter),
     );
   } catch (error) {
-    return createResponse(error.status ?? 500, {}, error.body ?? error.message);
+    return createResponse(error.status ?? 500, error.headers ?? {}, error.body ?? error.message);
   }
 }
 
