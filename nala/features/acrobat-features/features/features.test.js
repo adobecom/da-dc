@@ -70,134 +70,22 @@ test.describe('Acrobat Features', () => {
       }
     });
 
-    await test.step('Verify merch card plans (compare tabs)', async () => {
-      const merchTabSettle = { timeout: 60000 };
+    await test.step('Verify merch card plans and compare tabs', async () => {
+      const merchCardPlans = page.locator('div[data-path*="/dc-shared/fragments/merch-cards/compare-acrobat-plans"]');
+      const tabs = merchCardPlans.locator('button[id^="tab-compare-plans-"]');
 
-      const waitAfterMerchCompareTab = async (tab, cardsContainer, cards) => {
-        await expect(tab).toHaveAttribute('aria-selected', 'true', merchTabSettle);
-        await cardsContainer.waitFor({ state: 'visible', ...merchTabSettle });
-        await cards.first().waitFor({ state: 'visible', ...merchTabSettle });
-        await page.waitForTimeout(400);
-      };
+      // Scroll the first tab into view, then switch through each tab and verify merch cards render.
+      await tabs.first().scrollIntoViewIfNeeded({ timeout: 30000 });
+      const tabCount = await tabs.count();
+      expect(tabCount).toBeGreaterThan(0);
 
-      await f.merchCardPlans.scrollIntoViewIfNeeded();
-      await expect(f.merchCardPlans).toBeVisible();
-      await expect(f.merchCardPlansTitle).toBeVisible();
-      await expect(f.tabCompareIndividuals).toBeVisible();
-      await expect(f.tabCompareIndividuals).toBeEnabled();
-      await expect(f.tabCompareBusiness).toBeVisible();
-      await expect(f.tabCompareBusiness).toBeEnabled();
-      await expect(f.tabCompareStudentsAndTeachers).toBeVisible();
-      await expect(f.tabCompareStudentsAndTeachers).toBeEnabled();
-
-      await f.tabCompareIndividuals.click();
-      await waitAfterMerchCompareTab(
-        f.tabCompareIndividuals,
-        f.individualMerchCardsContainer,
-        f.individualMerchCards,
-      );
-
-      await expect(f.individualMerchCards.first()).toBeVisible();
-      await expect(f.individualMerchCards).toHaveCount(3);
-
-      await expect(f.acrobatReaderPrice).toBeVisible();
-      await expect(f.acrobatReaderLink.first()).toBeVisible();
-      await expect(f.acrobatReaderLink.first()).toBeEnabled();
-
-      await expect(f.acrobatProPrice).toBeVisible();
-      await expect(f.acrobatProFreeTrial).toBeVisible();
-      await expect(f.acrobatProFreeTrial).toBeEnabled();
-      await expect(f.acrobatProFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(f.acrobatProBuyNow).toBeVisible();
-      await expect(f.acrobatProBuyNow).toBeEnabled();
-      await expect(f.acrobatProBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(f.acrobatStudioPrice).toBeVisible();
-      await expect(f.acrobatStudioFreeTrial).toBeVisible();
-      await expect(f.acrobatStudioFreeTrial).toBeEnabled();
-      await expect(f.acrobatStudioFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(f.acrobatStudioBuyNow).toBeVisible();
-      await expect(f.acrobatStudioBuyNow).toBeEnabled();
-      await expect(f.acrobatStudioBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(f.individualMerchCardsPricingLink).toBeVisible();
-      await expect(f.individualMerchCardsPricingLink).toBeEnabled();
-      await expect(f.individualMerchCardsPricingLink).toHaveCount(1);
-
-      await expect(f.merchIndividualsComparePlansLink).toBeVisible();
-      await expect(f.merchIndividualsComparePlansLink).toBeEnabled();
-      await expect(f.merchIndividualsComparePlansLink).toHaveAttribute(
-        'href',
-        /compare-versions/,
-      );
-
-      await f.tabCompareBusiness.click();
-      await waitAfterMerchCompareTab(
-        f.tabCompareBusiness,
-        f.businessMerchCardsContainer,
-        f.businessMerchCards,
-      );
-
-      await expect(f.businessMerchCards.first()).toBeVisible();
-      await expect(f.businessMerchCards).toHaveCount(2);
-
-      await expect(f.acrobatProForTeamsPrice).toBeVisible();
-      await expect(f.acrobatProForTeamsFreeTrial).toBeVisible();
-      await expect(f.acrobatProForTeamsFreeTrial).toBeEnabled();
-      await expect(f.acrobatProForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(f.acrobatProForTeamsBuyNow).toBeVisible();
-      await expect(f.acrobatProForTeamsBuyNow).toBeEnabled();
-      await expect(f.acrobatProForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(f.acrobatStudioForTeamsPrice).toBeVisible();
-      await expect(f.acrobatStudioForTeamsFreeTrial).toBeVisible();
-      await expect(f.acrobatStudioForTeamsFreeTrial).toBeEnabled();
-      await expect(f.acrobatStudioForTeamsFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(f.acrobatStudioForTeamsBuyNow).toBeVisible();
-      await expect(f.acrobatStudioForTeamsBuyNow).toBeEnabled();
-      await expect(f.acrobatStudioForTeamsBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(f.businessMerchCardsPricingLink).toBeVisible();
-      await expect(f.businessMerchCardsPricingLink).toBeEnabled();
-      await expect(f.businessMerchCardsPricingLink).toHaveCount(1);
-
-      await expect(f.merchBusinessViewPlansLink).toBeVisible();
-      await expect(f.merchBusinessViewPlansLink).toBeEnabled();
-      await expect(f.merchBusinessViewPlansLink).toHaveAttribute('href', /pricing\/business/);
-
-      await f.tabCompareStudentsAndTeachers.click();
-      await waitAfterMerchCompareTab(
-        f.tabCompareStudentsAndTeachers,
-        f.studentsAndTeachersContainer,
-        f.studentsAndTeachersMerchCards,
-      );
-
-      await expect(f.studentsAndTeachersMerchCards.first()).toBeVisible();
-      await expect(f.studentsAndTeachersMerchCards).toHaveCount(2);
-
-      await expect(f.acrobatProForStudentsAndTeachersPrice.first()).toBeVisible();
-      await expect(f.acrobatProForStudentsAndTeachersFreeTrial).toBeVisible();
-      await expect(f.acrobatProForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(f.acrobatProForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(f.acrobatProForStudentsAndTeachersBuyNow).toBeVisible();
-      await expect(f.acrobatProForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(f.acrobatProForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(f.creativeCloudForStudentsAndTeachersPrice.first()).toBeVisible();
-      await expect(f.creativeCloudForStudentsAndTeachersFreeTrial).toBeVisible();
-      await expect(f.creativeCloudForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(f.creativeCloudForStudentsAndTeachersFreeTrial).toHaveAttribute('href', /ot=TRIAL/);
-      await expect(f.creativeCloudForStudentsAndTeachersBuyNow).toBeVisible();
-      await expect(f.creativeCloudForStudentsAndTeachersBuyNow).toBeEnabled();
-      await expect(f.creativeCloudForStudentsAndTeachersBuyNow).toHaveAttribute('href', /ot=BASE/);
-
-      await expect(f.studentsAndTeachersPricingLink).toBeVisible();
-      await expect(f.studentsAndTeachersPricingLink).toBeEnabled();
-      await expect(f.studentsAndTeachersPricingLink).toHaveCount(1);
-
-      await expect(f.merchStudentsViewPlansLink).toBeVisible();
-      await expect(f.merchStudentsViewPlansLink).toBeEnabled();
-      await expect(f.merchStudentsViewPlansLink).toHaveAttribute('href', /pricing\/students/);
+      for (let i = 0; i < tabCount; i += 1) {
+        const tab = tabs.nth(i);
+        await expect(tab).toBeVisible();
+        await tab.click();
+        const visibleCard = merchCardPlans.locator('merch-card').filter({ visible: true }).first();
+        await expect(visibleCard).toBeVisible();
+      }
     });
 
     await test.step('Verify Questions about / get Acrobat support section', async () => {

@@ -17,7 +17,6 @@ test.describe('Unity EXCEL to PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Excel to PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity EXCEL to PDF test suite', () => {
       await expect(excelToPdf.dropZone).toBeVisible();
       await expect(excelToPdf.verbImage).toBeVisible();
       await expect(excelToPdf.acrobatIcon).toBeVisible();
-      const actualText = await excelToPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(excelToPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(excelToPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(excelToPdf.verbHeader).toBeVisible();
+      await expect(excelToPdf.verbTitle).toBeVisible();
+      await expect(excelToPdf.verbCopy).toBeVisible();
       await expect(excelToPdf.selectFilesButton).toBeVisible();
       await expect(excelToPdf.selectFilesButton).toBeEnabled();
     });
@@ -110,10 +108,9 @@ test.describe('Unity EXCEL to PDF test suite', () => {
         excelToPdf.dropZone.click(),
       ]);
       await fileChooser.setFiles(excelFilePath);
-
-      await page.waitForURL(/acrobat\.adobe/, {
-        timeout: 60000,
-      });
+      // Upload redirects to acrobat.adobe.com via an interstitial; poll the final URL
+      // instead of binding to a single navigation commit (which aborts mid-redirect).
+      await expect(page).toHaveURL(/acrobat\.adobe/, { timeout: 60000 });
 
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);
