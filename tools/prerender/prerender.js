@@ -72,7 +72,8 @@ const deviceConfig = {
 
   try {
     await page.goto(url, { timeout: 60000 });
-    await page.waitForLoadState('networkidle', { timeout: 60000 });
+    await page.waitForSelector('div[daa-lh="s1"]', { timeout: 60000 });
+    await page.evaluate(() => document.fonts.ready);
 
     const element = await page.locator('div[daa-lh="s1"]');
     const elementHtml = await element.innerHTML();
@@ -128,7 +129,8 @@ const deviceConfig = {
 
       eg.send((error, response, body) => {
         if (error) {
-          console.warn('Warning: EdgeKV write failed:', error);
+          console.error('EdgeKV write failed:', error);
+          process.exitCode = 1;
         } else {
           console.log('EdgeKV write response:', body);
         }
@@ -136,6 +138,7 @@ const deviceConfig = {
     }
   } catch (error) {
     console.error('An error occurred:', error);
+    process.exitCode = 1;
   } finally {
     await browser.close();
   }
