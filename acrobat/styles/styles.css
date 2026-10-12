@@ -473,6 +473,80 @@ main {
   }
 }
 
+/* EDU typography, opt-in per page: metadata typography = edu */
+:root:has(meta[name="typography"][content="edu"]) main {
+  --type-heading-xxxxl-weight: 900;
+  --type-heading-all-weight: 800;
+  --type-heading-xxxxl-size: calc(var(--font-size-multiplier, 1) * 44px);
+  --type-heading-xxxxl-lh: 1.10;
+  --type-heading-xxxxl-ls: -0.04em;
+  --type-heading-xxxl-size: calc(var(--font-size-multiplier, 1) * 36px);
+  --type-heading-xxxl-lh: 1.10;
+  --type-heading-xxxl-ls: -0.04em;
+  --type-heading-xxl-size: calc(var(--font-size-multiplier, 1) * 32px);
+  --type-heading-xxl-lh: 1.10;
+  --type-heading-xxl-ls: -0.04em;
+  --type-heading-xl-size: calc(var(--font-size-multiplier, 1) * 28px);
+  --type-heading-xl-lh: 1.10;
+  --type-heading-xl-ls: -0.03em;
+  --type-heading-l-size: calc(var(--font-size-multiplier, 1) * 24px);
+  --type-heading-l-lh: 1.25;
+  --type-heading-l-ls: -0.03em;
+  --type-heading-m-size: calc(var(--font-size-multiplier, 1) * 24px);
+  --type-heading-m-lh: 1.25;
+  --type-heading-m-ls: -0.03em;
+  --type-heading-s-size: calc(var(--font-size-multiplier, 1) * 20px);
+  --type-heading-s-lh: 1.25;
+  --type-heading-xs-size: calc(var(--font-size-multiplier, 1) * 18px);
+  --type-heading-xs-lh: 1.25;
+  --type-heading-xxs-size: calc(var(--font-size-multiplier, 1) * 16px);
+  --type-heading-xxs-lh: 1.25;
+
+  .heading-xxxxl {
+    font-weight: var(--type-heading-xxxxl-weight);
+    font-size: var(--type-heading-xxxxl-size);
+    letter-spacing: var(--type-heading-xxxxl-ls);
+    line-height: var(--type-heading-xxxxl-lh);
+
+    strong {
+      font-weight: var(--type-heading-xxxxl-weight);
+    }
+  }
+
+  .heading-xxxl, .heading-xxl, .heading-xl, .heading-l,
+  .heading-m, .heading-s, .heading-xs, .heading-xxs {
+    font-weight: var(--type-heading-all-weight);
+  }
+
+  .heading-xxxl { letter-spacing: var(--type-heading-xxxl-ls); }
+  .heading-xxl { letter-spacing: var(--type-heading-xxl-ls); }
+  .heading-xl { letter-spacing: var(--type-heading-xl-ls); }
+  .heading-l { letter-spacing: var(--type-heading-l-ls); }
+  .heading-m { letter-spacing: var(--type-heading-m-ls); }
+
+  @media screen and (min-width: 600px) and (max-width: 1199px) {
+    --type-heading-xxxxl-size: calc(var(--font-size-multiplier, 1) * 64px);
+    --type-heading-xxxxl-lh: 0.98;
+    --type-heading-xxxxl-ls: -0.045em;
+  }
+
+  @media screen and (min-width: 1200px) {
+    --type-heading-xxxxl-size: calc(var(--font-size-multiplier, 1) * 96px);
+    --type-heading-xxxxl-lh: 0.98;
+    --type-heading-xxxxl-ls: -0.045em;
+    --type-heading-xxxl-size: calc(var(--font-size-multiplier, 1) * 64px);
+    --type-heading-xxxl-lh: 0.98;
+    --type-heading-xxl-size: calc(var(--font-size-multiplier, 1) * 42px);
+    --type-heading-xxl-ls: -0.03em;
+    --type-heading-xl-size: calc(var(--font-size-multiplier, 1) * 36px);
+    --type-heading-l-size: calc(var(--font-size-multiplier, 1) * 28px);
+    --type-heading-m-size: calc(var(--font-size-multiplier, 1) * 28px);
+    --type-heading-s-size: calc(var(--font-size-multiplier, 1) * 24px);
+    --type-heading-xs-size: calc(var(--font-size-multiplier, 1) * 20px);
+    --type-heading-xxs-size: calc(var(--font-size-multiplier, 1) * 18px);
+  }
+}
+
 #CID div,
 #CID p,
 #CID span,
