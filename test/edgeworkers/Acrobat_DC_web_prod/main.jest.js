@@ -110,6 +110,47 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     jest.restoreAllMocks();
   });
 
+  it.each(['www.adobe.com', 'www.stage.adobe.com'])("preserves upstream 301 Location on %s", async (host) => {
+    const location = ['https://www.adobe.com/acrobat/online/new-path'];
+    httpRequest.mockResolvedValueOnce({
+      ok: false,
+      status: 301,
+      body: 'Moved Permanently',
+      getHeaders: () => ({ location, 'content-length': ['17'] }),
+    });
+    const response = await replaceResponseProvider(new Request({path: '/acrobat/online/old-path', host}));
+    expect(response.status).toBe(301);
+    expect(response.headers).toEqual({ location });
+    expect(response.body).toBe('Moved Permanently');
+    expect(mockOnElement).not.toHaveBeenCalled();
+  });
+
+  it.each([301, 404, 500])("keeps existing error handling for status %s without a redirect Location", async (status) => {
+    httpRequest.mockResolvedValueOnce({
+      ok: false,
+      status,
+      body: 'Upstream error',
+      getHeaders: () => status === 301 ? {} : { location: ['/not-a-redirect'] },
+    });
+    const response = await replaceResponseProvider(new Request({path: '/acrobat/online/old-path', host: 'www.adobe.com'}));
+    expect(response.status).toBe(status);
+    expect(response.headers).toEqual({});
+    expect(response.body).toBe('Upstream error');
+  });
+
+  it.each(['acrobat.adobe.com', 'stage.acrobat.adobe.com'])("leaves 301 handling unchanged on %s", async (host) => {
+    httpRequest.mockResolvedValueOnce({
+      ok: false,
+      status: 301,
+      body: 'Moved Permanently',
+      getHeaders: () => ({ location: ['/new-path'] }),
+    });
+    const response = await replaceResponseProvider(new Request({path: '/old-path', host}));
+    expect(response.status).toBe(301);
+    expect(response.headers).toEqual({});
+    expect(response.body).toBe('Moved Permanently');
+  });
+
   it.each(['www.adobe.com', 'www.stage.adobe.com', 'sign.ing', 'edit.ing'])("selects Unity marquee styles and preloads on %s", async (host) => {
     authoredBlocks.add('.unity.workflow-acrobat');
     const request = new Request({path: '/acrobat/online/pdf-to-ppt', host});
