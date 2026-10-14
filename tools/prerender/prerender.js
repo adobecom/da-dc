@@ -72,8 +72,23 @@ const deviceConfig = {
 
   try {
     await page.goto(url, { timeout: 60000 });
-    await page.waitForSelector('div[daa-lh="s1"]', { timeout: 60000 });
-    await page.evaluate(() => document.fonts.ready);
+    await page.waitForSelector('div[daa-lh="s1"]', { state: 'visible', timeout: 60000 });
+    await page.waitForFunction(() => {
+      const header = document.querySelector('header');
+      const navRendered = !header || header.classList.contains('ready')
+        || !!header.querySelector(':scope > nav');
+      const jpWordWrapDisabled = document.querySelector('meta[name="jpwordwrap:disabled"]');
+      const jpWordWrapPending = document.documentElement.lang === 'ja-JP'
+        && !(jpWordWrapDisabled && jpWordWrapDisabled.content === 'true')
+        && !document.querySelector('div[daa-lh="s1"] [style*="keep-all"]');
+      return navRendered && !jpWordWrapPending;
+    }, null, { timeout: 60000 });
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      await new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
+      });
+    });
 
     const element = await page.locator('div[daa-lh="s1"]');
     const elementHtml = await element.innerHTML();

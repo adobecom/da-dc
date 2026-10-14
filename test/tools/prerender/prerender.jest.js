@@ -20,7 +20,7 @@ jest.mock('akamai-edgegrid', () => jest.fn().mockImplementation(() => ({
 
 const SECTION = 'div[daa-lh="s1"]';
 
-function createPage({ selectorError } = {}) {
+function createPage({ selectorError, readyError } = {}) {
   const element = {
     innerHTML: jest.fn(async () => '<div class="verb-widget">Delete PDF pages</div>'),
     evaluate: jest.fn(async () => ({ top: '126px', height: '800px' })),
@@ -31,9 +31,28 @@ function createPage({ selectorError } = {}) {
     waitForSelector: jest.fn(async () => {
       if (selectorError) throw selectorError;
     }),
+    waitForFunction: jest.fn(async () => {
+      if (readyError) throw readyError;
+    }),
     evaluate: jest.fn(async () => {}),
     locator: jest.fn(() => element),
   };
+}
+
+function fakeDocument(options = {}) {
+  const { header = 'c2', lang = 'en-US' } = options;
+  const { jpWordWrapDisabled = false, keepAllApplied = false } = options;
+  const headers = {
+    c1: { classList: { contains: (name) => name === 'ready' }, querySelector: () => null },
+    c2: { classList: { contains: () => false }, querySelector: (sel) => (sel === ':scope > nav' ? {} : null) },
+    loading: { classList: { contains: () => false }, querySelector: () => null },
+  };
+  const elements = {
+    header: header ? headers[header] : null,
+    'meta[name="jpwordwrap:disabled"]': jpWordWrapDisabled ? { content: 'true' } : null,
+    'div[daa-lh="s1"] [style*="keep-all"]': keepAllApplied ? {} : null,
+  };
+  return { documentElement: { lang }, querySelector: (sel) => elements[sel] || null };
 }
 
 async function runPrerender(page, args) {
@@ -66,11 +85,13 @@ describe('prerender.js', () => {
     jest.restoreAllMocks();
   });
 
-  it('waits for the first section to be built instead of network idle', async () => {
+  it('waits for the first section to be built and visible instead of network idle', async () => {
     const page = createPage();
     await runPrerender(page, [url, '--layout', 'mobile']);
 
-    expect(page.waitForSelector).toHaveBeenCalledWith(SECTION, { timeout: 60000 });
+    expect(page.waitForSelector).toHaveBeenCalledWith(SECTION, { state: 'visible', timeout: 60000 });
+    expect(page.waitForFunction)
+      .toHaveBeenCalledWith(expect.any(Function), null, { timeout: 60000 });
     expect(page.evaluate).toHaveBeenCalledTimes(1);
     expect(page.waitForLoadState).not.toHaveBeenCalled();
     expect(page.locator).toHaveBeenCalledWith(SECTION);
@@ -80,6 +101,41 @@ describe('prerender.js', () => {
     expect(process.exitCode).toBe(0);
   });
 
+  describe('page readiness check', () => {
+    let isReady;
+    const realDocument = global.document;
+
+    beforeAll(async () => {
+      const page = createPage();
+      jest.spyOn(console, 'log').mockImplementation(() => {});
+      await runPrerender(page, [url, '--layout', 'mobile']);
+      [[isReady]] = page.waitForFunction.mock.calls;
+    });
+
+    afterEach(() => {
+      global.document = realDocument;
+    });
+
+    const check = (doc) => {
+      global.document = doc;
+      return isReady();
+    };
+
+    it('waits until the global navigation has rendered', () => {
+      expect(check(fakeDocument({ header: 'loading' }))).toBe(false);
+      expect(check(fakeDocument({ header: 'c2' }))).toBe(true);
+      expect(check(fakeDocument({ header: 'c1' }))).toBe(true);
+      expect(check(fakeDocument({ header: null }))).toBe(true);
+    });
+
+    it('waits for Japanese word wrapping on ja-JP pages', () => {
+      expect(check(fakeDocument({ lang: 'ja-JP' }))).toBe(false);
+      expect(check(fakeDocument({ lang: 'ja-JP', keepAllApplied: true }))).toBe(true);
+      expect(check(fakeDocument({ lang: 'ja-JP', jpWordWrapDisabled: true }))).toBe(true);
+      expect(check(fakeDocument({ lang: 'fr-FR' }))).toBe(true);
+    });
+  });
+
   it('sets a failing exit code when the page never finishes building', async () => {
     const page = createPage({ selectorError: new Error('page.waitForSelector: Timeout 60000ms exceeded.') });
     await runPrerender(page, [url, '--layout', 'mobile']);
@@ -87,6 +143,16 @@ describe('prerender.js', () => {
     expect(errorSpy).toHaveBeenCalledWith('An error occurred:', expect.any(Error));
     expect(mockWriteFile).not.toHaveBeenCalled();
     expect(mockBrowser.close).toHaveBeenCalled();
+    expect(process.exitCode).toBe(1);
+  });
+
+  it('sets a failing exit code when the navigation never renders', async () => {
+    const page = createPage({ readyError: new Error('page.waitForFunction: Timeout 60000ms exceeded.') });
+    await runPrerender(page, [url, '--layout', 'mobile']);
+
+    expect(errorSpy).toHaveBeenCalledWith('An error occurred:', expect.any(Error));
+    expect(page.evaluate).not.toHaveBeenCalled();
+    expect(mockWriteFile).not.toHaveBeenCalled();
     expect(process.exitCode).toBe(1);
   });
 
