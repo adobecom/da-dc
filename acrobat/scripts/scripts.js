@@ -674,12 +674,30 @@ async function loadPage() {
     }
   });
 
-  loadIms().then(() => {
-    const imsIsReady = new CustomEvent('IMS:Ready');
-    window.dispatchEvent(imsIsReady);
-  }).catch((err) => {
-    window.dispatchEvent(new CustomEvent('DC_Hosted:Error', { detail: { wrappedException: err } }));
-  });
+  // Everything that reads window.adobeIMS. Pages without these leave IMS to gnav.
+  const IMS_CONSUMERS = [
+    '#dc-converter-widget',
+    '.dc-converter-widget',
+    '#mobile-widget',
+    '.mobile-widget',
+    '.rnr',
+    '.study-marquee',
+    '.unity-marquee',
+    '.verb-marquee',
+    '.verb-redesign-test',
+    '.verb-widget',
+    '.verb-widget-client-upload',
+    'a[href*="susi"]',
+  ].join(',');
+
+  if (document.querySelector(IMS_CONSUMERS)) {
+    loadIms().then(() => {
+      const imsIsReady = new CustomEvent('IMS:Ready');
+      window.dispatchEvent(imsIsReady);
+    }).catch((err) => {
+      window.dispatchEvent(new CustomEvent('DC_Hosted:Error', { detail: { wrappedException: err } }));
+    });
+  }
 
   loadLana({ clientId: 'dxdc', tags: 'DC_Milo' });
 
