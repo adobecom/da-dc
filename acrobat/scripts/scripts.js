@@ -675,7 +675,6 @@ async function loadPage() {
   });
 
   // Everything that reads window.adobeIMS. Pages without these leave IMS to gnav.
-  // The fast-tracked widgets above swap their class for an id, so match both.
   const IMS_CONSUMERS = [
     '#dc-converter-widget',
     '.dc-converter-widget',
