@@ -419,8 +419,6 @@ window.analytics = {
   sendAnalyticsToSplunk: () => {},
 };
 
-// Upsell "shown" events fire during init (before the real analytics is loaded),
-// so defer them to post-LCP instead of dropping them on the no-op stub.
 export async function fireUpsellAnalytics(verb, userAttempts) {
   try {
     await new Promise((res) => {
