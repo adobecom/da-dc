@@ -6,16 +6,10 @@ const { fireUpsellAnalytics } = await import(
   '../../../acrobat/blocks/verb-widget/verb-widget.js'
 );
 
-// Verifies the ticket's "no change in data" guarantee for the upsell path:
-// the upsell "shown" events are emitted during init (before the real analytics
-// is loaded), so they must be deferred to post-LCP and still reach the real
-// analytics pipeline instead of being dropped on the no-op stub.
 describe('verb-widget upsell analytics deferral', () => {
   let originalPO;
 
   beforeEach(() => {
-    // Resolve the LCP gate immediately so the deferred events fire without a
-    // multi-second wait; the real LCP timing is irrelevant to what we assert.
     originalPO = window.PerformanceObserver;
     window.PerformanceObserver = class {
       constructor(cb) { this.cb = cb; }
