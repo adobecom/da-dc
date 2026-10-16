@@ -666,6 +666,19 @@ async function loadPage() {
   setConfig({ ...CONFIG, miloLibs, decorateArea });
   decorateArea();
 
+  // Render M@S CTAs without waiting for IMS; upgrade and download CTAs swap in once it is ready.
+  document.addEventListener('wcms:commerce:ready', ({ detail: service }) => {
+    // eslint-disable-next-line compat/compat
+    const modules = Promise.all([
+      import(`${miloLibs}/blocks/merch/merch.js`),
+      import('./checkoutAction.js'),
+    ]);
+    service.registerCheckoutAction(async (...args) => {
+      const [{ getCheckoutAction }, { default: resolveCheckoutAction }] = await modules;
+      return resolveCheckoutAction(getCheckoutAction, ...args);
+    });
+  });
+
   window.addEventListener('IMS:Ready', async () => {
     const susiElems = document.querySelectorAll('a[href*="susi"]');
     if (susiElems.length > 0) {
