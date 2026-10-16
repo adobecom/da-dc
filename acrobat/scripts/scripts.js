@@ -357,6 +357,7 @@ const CONFIG = {
     /www\.adobe\.com\/(\w\w(_\w\w)?\/)?learn(\/.*)?/,
   ],
   uniqueSiteId: 'da-dc',
+  dynamicNavKey: 'bacom',
   mepLingoCountryToRegion: {
     africa: ['ke', 'mu', 'ng', 'za'],
     la: ['ag', 'ar', 'bo', 'cl', 'co', 'cr', 'cu', 'do', 'ec', 'gt', 'hn', 'mx', 'ni', 'pa', 'pe', 'pr', 'py', 'sv', 'uy', 've'],
