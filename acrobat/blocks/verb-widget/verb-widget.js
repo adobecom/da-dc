@@ -444,6 +444,23 @@ window.analytics = {
   sendAnalyticsToSplunk: () => {},
 };
 
+export async function fireUpsellAnalytics(verb, userAttempts) {
+  try {
+    await new Promise((res) => {
+      setTimeout(res, 3000);
+      try {
+        const obs = new PerformanceObserver(() => { obs.disconnect(); res(); });
+        obs.observe({ type: 'largest-contentful-paint', buffered: true });
+      } catch (e) { res(); }
+    });
+    const { default: verbAnalytics } = await import('../../scripts/alloy/verb-widget.js');
+    verbAnalytics('upsell:shown', verb, { userAttempts });
+    verbAnalytics('upsell-wall:shown', verb, { userAttempts });
+  } catch (error) {
+    window.lana?.log(`Upsell analytics failed: ${error.message} on ${verb}`, lanaOptions);
+  }
+}
+
 async function loadAnalyticsAfterLCP(analyticsData) {
   const { verb, userAttempts } = analyticsData;
   try {
@@ -837,8 +854,7 @@ export default async function init(element) {
 
   if (!window.adobeIMS?.isSignedInUser?.() && isLimitExhausted) {
     await showUpSell(VERB, element);
-    window.analytics.verbAnalytics('upsell:shown', VERB, { userAttempts });
-    window.analytics.verbAnalytics('upsell-wall:shown', VERB, { userAttempts });
+    fireUpsellAnalytics(VERB, userAttempts);
   }
 
   // Race the condition
