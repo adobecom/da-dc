@@ -10,6 +10,7 @@ async function processGist(gistId, network, namespace, group) {
   try {
     // Fetch gist content
     const response = await fetch(`https://api.github.com/gists/${gistId}`);
+    if (!response.ok) throw new Error(`Failed to fetch gist ${gistId}: HTTP ${response.status}`);
     const gistData = await response.json();
     const gistContent = gistData.files[Object.keys(gistData.files)[0]].content;
 
@@ -17,6 +18,7 @@ async function processGist(gistId, network, namespace, group) {
     const urls = gistContent.split('\n').filter((url) => url.trim());
 
     console.log(`Found ${urls.length} URLs to process`);
+    const failures = [];
 
     // Process each URL
     for (const url of urls) {
@@ -35,11 +37,16 @@ async function processGist(gistId, network, namespace, group) {
           if (stderr) console.error(stderr);
         } catch (error) {
           console.error(`Error processing URL ${url} for ${layout} layout:`, error.message);
+          failures.push(`${url} (${layout})`);
         }
       }
     }
 
-    console.log('Finished processing all URLs');
+    console.log(`Finished processing all URLs: ${urls.length * 2 - failures.length} succeeded, ${failures.length} failed`);
+    if (failures.length) {
+      console.error(`Failed prerenders:\n${failures.join('\n')}`);
+      process.exitCode = 1;
+    }
   } catch (error) {
     console.error('Error:', error.message);
     process.exit(1);
