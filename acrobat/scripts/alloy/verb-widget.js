@@ -1,3 +1,5 @@
+import { getLanaErrorName } from '../utils.js';
+
 const params = new Proxy(
   // eslint-disable-next-line compat/compat
   new URLSearchParams(window.location.search),
@@ -121,6 +123,14 @@ function createPayloadForSplunk(metaData) {
 
 // eslint-disable-next-line max-len, compat/compat
 export function sendAnalyticsToSplunk(eventName, verb, metaData, splunkEndpoint, sendBeacon = false) {
+  const logFailure = (message) => {
+    window.lana?.log(`Alloy verb-widget: ${verb}; eventName: ${eventName}; ${message}`, {
+      sampleRate: 1,
+      tags: 'DC_Milo,Project Unity (DC),alloy',
+      severity: 'error',
+    });
+  };
+
   try {
     const eventDataPayload = createPayloadForSplunk({ ...metaData, eventName, verb });
     const payloadString = JSON.stringify(eventDataPayload);
@@ -131,12 +141,18 @@ export function sendAnalyticsToSplunk(eventName, verb, metaData, splunkEndpoint,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: payloadString,
-    });
-  } catch (error) {
-    window.lana?.log(
-      `An error occurred while sending ${eventName} to splunk, verb: ${verb}, metadata: ${metaData}, error: ${error}`,
-      { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC)', severity: 'error' },
+    }).then(
+      (response) => {
+        if (!response.ok) {
+          logFailure(`Splunk telemetry request failed; HTTP ${response.status}`);
+        }
+      },
+      (error) => {
+        logFailure(`Splunk telemetry request rejected; ${getLanaErrorName(error)}`);
+      },
     );
+  } catch (error) {
+    logFailure(`Splunk telemetry preparation or dispatch failed; ${getLanaErrorName(error)}`);
   }
 }
 
