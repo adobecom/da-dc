@@ -11,6 +11,9 @@ const DISCOVERY_URL_PROD = 'https://dc-api.adobe.io/discovery';
 const DISCOVERY_URL_STAGE = 'https://dc-api-stage.adobe.io/discovery';
 const KWCOLLECTION_ID = 'curated';
 
+const COLLECTIONS_ACCEPT_PROD = 'application/vnd.adobe.dc+json;profile="https://dc-kwcollection.adobe.io/schemas/kwcollection_curated_listing_v1.json"';
+const COLLECTIONS_ACCEPT_STAGE = 'application/vnd.adobe.dc+json;profile="https://dc-kwcollection-stage.adobe.io/schemas/kwcollection_curated_listing_v1.json"';
+
 const VARIANTS = ['featured', 'productivity', 'lifestyle', 'all'];
 const CATEGORY_LABELS = {
   featured: 'Featured',
@@ -105,16 +108,18 @@ async function fetchCuratedSpaces() {
   const [, country = 'US'] = ietf.split('-');
   const kwUrl = `${kwPath}?country=${encodeURIComponent(country)}&language=${encodeURIComponent(ietf)}`;
 
+  const collectionsAccept = getConfig?.().env?.name === 'prod'
+    ? COLLECTIONS_ACCEPT_PROD : COLLECTIONS_ACCEPT_STAGE;
   const collectionsResp = await fetch(kwUrl, {
     headers: {
       ...collectionsHeaders,
-      Accept: 'application/vnd.adobe.dc+json;profile="https://dc-kwcollection.adobe.io/schemas/kwcollection_curated_listing_v1.json"',
+      Accept: collectionsAccept,
     },
   });
   if (!collectionsResp.ok) {
     throw new Error(`Curated Collections API ${collectionsResp.status} ${collectionsResp.statusText}`);
   }
-  return collectionsResp.json();
+  return { data: await collectionsResp.json(), token };
 }
 
 let curatedPromise = null;
@@ -173,7 +178,28 @@ const PLACEHOLDER_IMG = `data:image/svg+xml;utf8,${encodeURIComponent(
   + '</g></svg>',
 )}`;
 
-function buildCard(item, ctaText) {
+async function loadThumbnail(img, thumbUrl, token) {
+  try {
+    const resp = await fetch(thumbUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Api-Key': PDFSPACES_API_KEY,
+        'Client-Agent': 'v=2; app=DCWeb; os=na; device=na; surface=na',
+        'acpc-published-links': 'true',
+        directive: 'link-2023',
+        'link-options': 'absolute-base,long-form-rel',
+      },
+    });
+    if (!resp.ok) return;
+    const blob = await resp.blob();
+    img.src = URL.createObjectURL(blob);
+    img.classList.remove('pdf-spaces-placeholder-img');
+  } catch {
+    // leave the placeholder in place
+  }
+}
+
+function buildCard(item, ctaText, token) {
   const card = createTag('div', { class: 'editorial-card l-rounded-corners hover-scale click pdf-spaces-card' });
 
   const bgRow = createTag('div', { class: 'pdf-spaces-bg' }, createTag('div', {}, '#fafafa'));
@@ -182,17 +208,12 @@ function buildCard(item, ctaText) {
   const img = createTag('img', {
     loading: 'lazy',
     alt: '',
-    src: thumbUrl || PLACEHOLDER_IMG,
+    src: PLACEHOLDER_IMG,
+    class: 'pdf-spaces-placeholder-img',
     width: 400,
     height: 400,
   });
-  if (!thumbUrl) img.classList.add('pdf-spaces-placeholder-img');
-  img.addEventListener('error', () => {
-    if (img.src !== PLACEHOLDER_IMG) {
-      img.src = PLACEHOLDER_IMG;
-      img.classList.add('pdf-spaces-placeholder-img');
-    }
-  }, { once: true });
+  if (thumbUrl && token) loadThumbnail(img, thumbUrl, token);
   const picture = createTag('picture', {}, img);
   const imgRow = createTag('div', { class: 'pdf-spaces-media' }, createTag('div', {}, picture));
 
@@ -221,8 +242,10 @@ export default async function init(element) {
   const ctaText = window.mph?.['pdf-spaces-cta'] || 'Explore now';
 
   let spaces;
+  let token;
   try {
-    const data = await getCuratedSpaces();
+    const { data, token: fetchedToken } = await getCuratedSpaces();
+    token = fetchedToken;
     const all = data?.children || [];
     spaces = category === 'all'
       ? all
@@ -245,7 +268,7 @@ export default async function init(element) {
   // (slides = page sections with section-metadata), so calling loadBlock on a
   // carousel wrapper does not work programmatically.
   await Promise.all(spaces.map(async (item) => {
-    const card = buildCard(item, ctaText);
+    const card = buildCard(item, ctaText, token);
     container.append(card);
     try {
       await loadBlock(card);
@@ -260,9 +283,9 @@ export const testables = {
   matchesCategory,
   buildDestinationUrl,
   buildThumbnailUrl,
-  buildCard: (item, ctaText, tagFn) => {
+  buildCard: (item, ctaText, tagFn, token) => {
     createTag = tagFn;
-    return buildCard(item, ctaText);
+    return buildCard(item, ctaText, token);
   },
   CATEGORY_LABELS,
 };
