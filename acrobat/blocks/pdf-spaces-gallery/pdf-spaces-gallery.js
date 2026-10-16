@@ -78,16 +78,11 @@ async function fetchCuratedSpaces() {
     throw new Error('No IMS guest token available — verify ims-cid: acrobatmiloguest is set in the metadata sheet for this URL');
   }
 
-  // Discovery reads the client identifier from `x-api-key`; Curated
-  // Collections reads it from `x-api-client-id` instead — sending the wrong
-  // one to either produces a generic ErrInvalidAPIKey regardless of
-  // subscription status.
   const authHeader = { Authorization: `Bearer ${token}` };
   const discoveryHeaders = { ...authHeader, 'x-api-key': PDFSPACES_API_KEY };
   const collectionsHeaders = { ...authHeader, 'x-api-client-id': PDFSPACES_API_KEY };
 
-  // The IMS token's issuing environment (prod vs stage) must match the API's
-  // environment — dc-api.adobe.io rejects stage-issued tokens outright.
+  // IMS token environment must match the API environment (prod vs stage).
   const discoveryUrl = getConfig?.().env?.name === 'prod'
     ? DISCOVERY_URL_PROD : DISCOVERY_URL_STAGE;
   const discoveryResp = await fetch(discoveryUrl, {
@@ -139,8 +134,7 @@ function getCategory(block) {
   return found || 'featured';
 }
 
-// Extend CATEGORY_ALIASES once we confirm whether the API returns localized
-// category values (e.g. "Empfohlen" for de-DE) or keeps them in English.
+// Extend with localized category values if the API returns them per-locale.
 const CATEGORY_ALIASES = {
   featured: ['featured'],
   productivity: ['productivity'],
@@ -162,12 +156,13 @@ function buildThumbnailUrl(item) {
   const rel = 'http://ns.adobe.com/adobecloud/rel/rendition';
   const template = item.acpc_links?.[rel]?.[0]?.href;
   if (!template) return null;
-  // URI template contains {&size,type,c2paSign,transparentBackground} — expand for 400px JPG.
-  return template.replace(/\{[^}]+\}/g, '&size=400&type=jpg');
+  // On this endpoint `type` is the output MIME type, not "png"/"jpg".
+  const base = template.replace(/\{[^{}]*\}/g, '');
+  const sep = base.includes('?') ? '&' : '?';
+  return `${base}${sep}size=400&type=${encodeURIComponent('image/png')}`;
 }
 
-// Neutral placeholder used when the rendition URL is missing or the CDN
-// rejects the request (until acrobatmiloguest is subscribed on adobe.io).
+// Neutral placeholder shown until the real thumbnail loads.
 const PLACEHOLDER_IMG = `data:image/svg+xml;utf8,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">'
   + '<rect width="400" height="400" fill="#e8e8e8"/>'
@@ -213,7 +208,7 @@ function buildCard(item, ctaText, token) {
     width: 400,
     height: 400,
   });
-  if (thumbUrl && token) loadThumbnail(img, thumbUrl, token);
+  if (thumbUrl && token) void loadThumbnail(img, thumbUrl, token);
   const picture = createTag('picture', {}, img);
   const imgRow = createTag('div', { class: 'pdf-spaces-media' }, createTag('div', {}, picture));
 
@@ -264,9 +259,8 @@ export default async function init(element) {
   const container = createTag('div', { class: 'pdf-spaces-cards' });
   element.replaceChildren(container);
 
-  // Load each editorial-card individually — Milo's carousel is section-level
-  // (slides = page sections with section-metadata), so calling loadBlock on a
-  // carousel wrapper does not work programmatically.
+  // Load each card individually — Milo's carousel is section-level, so it can't
+  // be driven programmatically from a block.
   await Promise.all(spaces.map(async (item) => {
     const card = buildCard(item, ctaText, token);
     container.append(card);
