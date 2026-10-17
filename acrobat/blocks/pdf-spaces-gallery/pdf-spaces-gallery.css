@@ -1,6 +1,5 @@
 .pdf-spaces-gallery {
   position: relative;
-  /* Milo container gutter so cards aren't flush to the page edges. */
   width: 83.4vw;
   max-width: 1200px;
   margin-inline: auto;
@@ -28,7 +27,6 @@
 .pdf-spaces-gallery .pdf-spaces-cards {
   display: grid;
   grid-auto-flow: column;
-  /* 4-up with 32px gaps, matching carousel show-4 + m-gap. */
   grid-auto-columns: calc(25% - 24px);
   gap: 32px;
   overflow-x: auto;
@@ -67,6 +65,7 @@
 
 /* Clamp title/description so uneven content doesn't inflate card height. */
 .pdf-spaces-gallery .pdf-spaces-text > div > h3 {
+  /* stylelint-disable-next-line value-no-vendor-prefix */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -75,6 +74,7 @@
 }
 
 .pdf-spaces-gallery .pdf-spaces-text > div > p:last-child {
+  /* stylelint-disable-next-line value-no-vendor-prefix */
   display: -webkit-box;
   -webkit-line-clamp: 6;
   line-clamp: 6;
@@ -93,6 +93,7 @@
 }
 
 /* Hide the raw authored-content hints (line is drawn via border-top). */
+/* stylelint-disable-next-line no-descending-specificity */
 .pdf-spaces-gallery .pdf-spaces-cta p:first-child {
   display: none;
 }
@@ -111,7 +112,6 @@
 .pdf-spaces-gallery .editorial-card picture img {
   width: 100%;
   height: auto;
-  /* Cap image height like the authored card instead of a fixed ratio. */
   max-height: var(--card-height-default, 213px);
   object-fit: cover;
   display: block;

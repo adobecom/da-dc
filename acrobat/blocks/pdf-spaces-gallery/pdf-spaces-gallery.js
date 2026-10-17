@@ -208,7 +208,7 @@ function buildCard(item, ctaText, token) {
     width: 400,
     height: 400,
   });
-  if (thumbUrl && token) void loadThumbnail(img, thumbUrl, token);
+  if (thumbUrl && token) loadThumbnail(img, thumbUrl, token).catch(() => {});
   const picture = createTag('picture', {}, img);
   const imgRow = createTag('div', { class: 'pdf-spaces-media' }, createTag('div', {}, picture));
 
