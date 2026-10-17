@@ -30,9 +30,4 @@ export default class PricingCompareVersionsPage {
     this.fedsFooterLegalWrapper = this.footer.locator('div[class*="feds-footer-legalWrapper"]');
     this.fedsFooterPrivacyListItems = this.fedsFooterLegalWrapper.locator('li[class*="feds-footer-privacy-list"]');
   }
-
-  /** @param {string} osi */
-  checkoutLinkByOsi(osi) {
-    return this.page.locator(`a[is*="checkout-link"][data-wcs-osi="${osi}"]`);
-  }
 }

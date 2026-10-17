@@ -2,7 +2,7 @@ import AcrobatWidget from '../../widget/acrobat-widget.js';
 
 export default class ImageToPdf extends AcrobatWidget {
   constructor(page, nth = 0) {
-    super(page, '.image-to-pdf.unity-enabled', nth);
+    super(page, '.verb-widget-client-upload.image-to-pdf', nth);
 
     this.gnav = page.locator('nav.feds-topnav');
     this.gnavBreadcrumbs = page.locator('nav.feds-breadcrumbs');

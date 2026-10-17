@@ -15,11 +15,11 @@ export default class QuizMakerPage extends BasePage {
     this.acrobatIcon = this.root.locator('.study-marquee-header .acrobat-icon svg');
     this.studyMarqueeMedia = this.root.locator('.study-marquee-media').first();
 
-    this.howToHeading = page.locator('#how-to-use-our-ai-quiz-maker');
+    this.howToHeading = page.locator('#how-to-use-the-ai-quiz-maker-from-student-spaces-in-acrobat');
     this.threeUpSections = page.locator('div[class*="three-up"]');
     this.twoUpSections = page.locator('div[class*="two-up"]');
     this.studentSpacesHeading = page.locator('#what-can-i-make-with-student-spaces');
-    this.carousels = page.locator('div.carousel');
+    this.carousels = page.locator('div.carousel').first();
     this.faqSection = page.locator('div[class*="accordion-container"]').first();
     this.faqAccordionTriggers = this.faqSection.locator('button.accordion-trigger');
     this.footer = page.locator('footer[class="global-footer"]');

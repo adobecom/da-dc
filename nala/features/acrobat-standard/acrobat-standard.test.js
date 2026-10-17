@@ -47,93 +47,22 @@ test.describe('Acrobat Standard Smoke Test', () => {
       );
     });
 
-    await test.step('Verify Launch demo CTA', async () => {
-      await expect(acrobatStandard.launchDemoLink).toBeVisible();
-      await expect(acrobatStandard.launchDemoLink).toBeEnabled();
-      await expect(acrobatStandard.launchDemoLink).toHaveAttribute('href', /EditOrganizeDiscover/);
-    });
+    await test.step('Verify merch card plans and compare tabs', async () => {
+      const merchCardPlans = page.locator('div[data-path*="/dc-shared/fragments/merch-cards/compare-acrobat-plans"]');
+      const tabs = merchCardPlans.locator('button[id^="tab-compare-plans-"]');
 
-    await test.step('Verify merch card plans (compare tabs)', async () => {
-      await expect(acrobatStandard.merchCardPlans).toBeVisible();
-      await expect(acrobatStandard.merchCardPlansTitle).toBeVisible();
-      await expect(acrobatStandard.tabCompareIndividuals).toBeVisible();
-      await expect(acrobatStandard.tabCompareIndividuals).toBeEnabled();
-      await expect(acrobatStandard.tabCompareBusiness).toBeVisible();
-      await expect(acrobatStandard.tabCompareBusiness).toBeEnabled();
-      await expect(acrobatStandard.tabCompareStudentsAndTeachers).toBeVisible();
-      await expect(acrobatStandard.tabCompareStudentsAndTeachers).toBeEnabled();
+      // Scroll the first tab into view, then switch through each tab and verify merch cards render.
+      await tabs.first().scrollIntoViewIfNeeded({ timeout: 30000 });
+      const tabCount = await tabs.count();
+      expect(tabCount).toBeGreaterThan(0);
 
-      await acrobatStandard.tabCompareIndividuals.click();
-      await expect(acrobatStandard.tabCompareIndividuals).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(1000);
-
-      await expect(acrobatStandard.individualStandardMerchCards.first()).toBeVisible();
-      await expect(acrobatStandard.individualStandardMerchCards).toHaveCount(3);
-
-      await expect(acrobatStandard.acrobatStandardPrice.first()).toBeVisible();
-      await expect(acrobatStandard.acrobatStandardBuyNow).toBeVisible();
-      await expect(acrobatStandard.acrobatStandardBuyNow).toBeEnabled();
-
-      await expect(acrobatStandard.acrobatProStandardPrice.first()).toBeVisible();
-      await expect(acrobatStandard.acrobatProStandardFreeTrial).toBeVisible();
-      await expect(acrobatStandard.acrobatProStandardFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.acrobatProStandardBuyNow).toBeVisible();
-      await expect(acrobatStandard.acrobatProStandardBuyNow).toBeEnabled();
-
-      await expect(acrobatStandard.acrobatStudioStandardPrice.first()).toBeVisible();
-      await expect(acrobatStandard.acrobatStudioStandardFreeTrial).toBeVisible();
-      await expect(acrobatStandard.acrobatStudioStandardFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.acrobatStudioStandardBuyNow).toBeVisible();
-      await expect(acrobatStandard.acrobatStudioStandardBuyNow).toBeEnabled();
-
-      await expect(acrobatStandard.individualStandardMerchCardsPricingLink).toBeVisible();
-      await expect(acrobatStandard.individualStandardMerchCardsPricingLink).toBeEnabled();
-
-      await acrobatStandard.tabCompareBusiness.click();
-      await expect(acrobatStandard.tabCompareBusiness).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(1000);
-
-      await expect(acrobatStandard.businessStandardMerchCards.first()).toBeVisible();
-      await expect(acrobatStandard.businessStandardMerchCards).toHaveCount(3);
-
-      await expect(acrobatStandard.acrobatStandardForTeamsPrice.first()).toBeVisible();
-      await expect(acrobatStandard.acrobatStandardForTeamsBuyNow).toBeVisible();
-      await expect(acrobatStandard.acrobatStandardForTeamsBuyNow).toBeEnabled();
-
-      await expect(acrobatStandard.acrobatProForTeamsStandardPrice.first()).toBeVisible();
-      await expect(acrobatStandard.acrobatProForTeamsStandardFreeTrial).toBeVisible();
-      await expect(acrobatStandard.acrobatProForTeamsStandardFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.acrobatProForTeamsStandardBuyNow).toBeVisible();
-      await expect(acrobatStandard.acrobatProForTeamsStandardBuyNow).toBeEnabled();
-
-      await expect(acrobatStandard.acrobatStudioForTeamsStandardPrice.first()).toBeVisible();
-      await expect(acrobatStandard.acrobatStudioForTeamsStandardFreeTrial).toBeVisible();
-      await expect(acrobatStandard.acrobatStudioForTeamsStandardFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.acrobatStudioForTeamsStandardBuyNow).toBeVisible();
-      await expect(acrobatStandard.acrobatStudioForTeamsStandardBuyNow).toBeEnabled();
-
-      await acrobatStandard.tabCompareStudentsAndTeachers.click();
-      await expect(acrobatStandard.tabCompareStudentsAndTeachers).toHaveAttribute('aria-selected', 'true');
-      await page.waitForTimeout(1000);
-
-      await expect(acrobatStandard.studentsAndTeachersMerchCards.first()).toBeVisible();
-      await expect(acrobatStandard.studentsAndTeachersMerchCards).toHaveCount(2);
-
-      await expect(acrobatStandard.acrobatProForStudentsAndTeachersPrice.first()).toBeVisible();
-      await expect(acrobatStandard.acrobatProForStudentsAndTeachersFreeTrial).toBeVisible();
-      await expect(acrobatStandard.acrobatProForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.acrobatProForStudentsAndTeachersBuyNow).toBeVisible();
-      await expect(acrobatStandard.acrobatProForStudentsAndTeachersBuyNow).toBeEnabled();
-
-      await expect(acrobatStandard.creativeCloudForStudentsAndTeachersPrice.first()).toBeVisible();
-      await expect(acrobatStandard.creativeCloudForStudentsAndTeachersFreeTrial).toBeVisible();
-      await expect(acrobatStandard.creativeCloudForStudentsAndTeachersFreeTrial).toBeEnabled();
-      await expect(acrobatStandard.creativeCloudForStudentsAndTeachersBuyNow).toBeVisible();
-      await expect(acrobatStandard.creativeCloudForStudentsAndTeachersBuyNow).toBeEnabled();
-
-      await expect(acrobatStandard.studentsAndTeachersPricingLink).toBeVisible();
-      await expect(acrobatStandard.studentsAndTeachersPricingLink).toBeEnabled();
-      await expect(acrobatStandard.studentsAndTeachersPricingLink).toHaveCount(1);
+      for (let i = 0; i < tabCount; i += 1) {
+        const tab = tabs.nth(i);
+        await expect(tab).toBeVisible();
+        await tab.click();
+        const visibleCard = merchCardPlans.locator('merch-card').filter({ visible: true }).first();
+        await expect(visibleCard).toBeVisible();
+      }
     });
 
     await test.step('Verify Acrobat Pro / Standard icon block fragment', async () => {

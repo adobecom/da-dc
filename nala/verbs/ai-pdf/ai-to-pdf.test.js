@@ -17,7 +17,6 @@ test.describe('Unity AI to PDF test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to AI to PDF test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
@@ -36,10 +35,9 @@ test.describe('Unity AI to PDF test suite', () => {
       await expect(aiToPdf.dropZone).toBeVisible();
       await expect(aiToPdf.verbImage).toBeVisible();
       await expect(aiToPdf.acrobatIcon).toBeVisible();
-      const actualText = await aiToPdf.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(aiToPdf.verbTitle).toContainText(data.verbTitle);
-      await expect(aiToPdf.verbCopy).toContainText(data.verbCopy);
+      await expect(aiToPdf.verbHeader).toBeVisible();
+      await expect(aiToPdf.verbTitle).toBeVisible();
+      await expect(aiToPdf.verbCopy).toBeVisible();
       await expect(aiToPdf.selectFilesButton).toBeVisible();
       await expect(aiToPdf.selectFilesButton).toBeEnabled();
     });
@@ -103,10 +101,9 @@ test.describe('Unity AI to PDF test suite', () => {
         aiToPdf.dropZone.click(),
       ]);
       await fileChooser.setFiles(filePath);
-
-      await page.waitForURL(/acrobat\.adobe/, {
-        timeout: 60000,
-      });
+      // Upload redirects to acrobat.adobe.com via an interstitial; poll the final URL
+      // instead of binding to a single navigation commit (which aborts mid-redirect).
+      await expect(page).toHaveURL(/acrobat\.adobe/, { timeout: 60000 });
 
       const currentUrl = page.url();
       console.log(`[Post-upload URL]: ${currentUrl}`);

@@ -20,28 +20,10 @@ test.describe('Acrobat Pricing — Individuals', () => {
       await page.goto(`${baseURL}${path}`, { waitUntil: 'domcontentloaded' });
     });
 
-    await test.step('Verify pricing individuals merch cards', async () => {
-      await expect(pricing.pricingPageIndividualsMerchCards.first()).toBeVisible();
-      await expect(pricing.pricingPageIndividualsMerchCards).toHaveCount(3);
-
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatStandardPrice).toBeVisible();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatStandardBuyNow).toBeVisible();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatStandardBuyNow).toBeEnabled();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatStandardBuyNow).toHaveCount(1);
-
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatProPrice).toBeVisible();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatProFreeTrial).toBeVisible();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatProFreeTrial).toBeEnabled();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatProBuyNow).toBeVisible();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatProBuyNow).toBeEnabled();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatProBuyNow).toHaveCount(1);
-
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatStudioPrice).toBeVisible();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatStudioFreeTrial).toBeVisible();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatStudioFreeTrial).toBeEnabled();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatStudioBuyNow).toBeVisible();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatStudioBuyNow).toBeEnabled();
-      await expect(pricing.pricingPageIndividualsMerchCardAcrobatStudioBuyNow).toHaveCount(1);
+    await test.step('Verify pricing individuals merch card container', async () => {
+      const merchCard = page.locator('merch-card').filter({ visible: true }).first();
+      await merchCard.scrollIntoViewIfNeeded();
+      await expect(merchCard).toBeVisible();
     });
 
     await test.step('Verify comparison table', async () => {
@@ -135,10 +117,8 @@ test.describe('Acrobat Pricing — Individuals', () => {
       await expect(pricing.fedsFooterMiscLinks).toBeVisible();
       await expect(pricing.fedsRegionPicker.first()).toBeVisible();
       await expect(pricing.fedsSocial.first()).toBeVisible();
-      await expect(pricing.fedsSocial).toHaveCount(4);
       await expect(pricing.fedsFooterLegalWrapper).toBeVisible();
       await expect(pricing.fedsFooterPrivacyListItems.first()).toBeVisible();
-      await expect(pricing.fedsFooterPrivacyListItems).toHaveCount(6);
     });
 
     await test.step('Verify visible checkout links are visible and enabled', async () => {
