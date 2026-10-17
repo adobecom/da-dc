@@ -1,0 +1,131 @@
+.pdf-spaces-gallery {
+  position: relative;
+  width: 83.4vw;
+  max-width: 1200px;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+.pdf-spaces-gallery:empty {
+  display: none;
+}
+
+/* Full-bleed radial glow mirroring the authored Lifestyle section background. */
+.pdf-spaces-gallery::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  height: 140%;
+  background: radial-gradient(50% 50% at 50% 50%, #cda3ea 0%, #e48be8 15.76%, #f0b5b8 50%, #fff 88.46%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.pdf-spaces-gallery .pdf-spaces-cards {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc(25% - 24px);
+  gap: 32px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-block: 8px 16px;
+  scrollbar-width: none;
+}
+
+.pdf-spaces-gallery .pdf-spaces-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.pdf-spaces-gallery .pdf-spaces-cards .editorial-card {
+  scroll-snap-align: start;
+  background: #fafafa;
+  border: 1px solid #eaeaea;
+  border-radius: var(--l-rounded-corners, 16px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-spaces-gallery .pdf-spaces-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 24px 12px;
+}
+
+.pdf-spaces-gallery .pdf-spaces-text > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Clamp title/description so uneven content doesn't inflate card height. */
+.pdf-spaces-gallery .pdf-spaces-text > div > h3 {
+  /* stylelint-disable-next-line value-no-vendor-prefix */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pdf-spaces-gallery .pdf-spaces-text > div > p:last-child {
+  /* stylelint-disable-next-line value-no-vendor-prefix */
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pdf-spaces-gallery .pdf-spaces-cta {
+  margin-top: auto;
+  padding: 12px 24px 24px;
+}
+
+.pdf-spaces-gallery .pdf-spaces-cta > div {
+  padding-top: 12px;
+  border-top: 1px solid #d8d8d8;
+}
+
+/* Hide the raw authored-content hints (line is drawn via border-top). */
+/* stylelint-disable-next-line no-descending-specificity */
+.pdf-spaces-gallery .pdf-spaces-cta p:first-child {
+  display: none;
+}
+
+.pdf-spaces-gallery .pdf-spaces-bg {
+  display: none;
+}
+
+.pdf-spaces-gallery .editorial-card picture {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.pdf-spaces-gallery .editorial-card picture img {
+  width: 100%;
+  height: auto;
+  max-height: var(--card-height-default, 213px);
+  object-fit: cover;
+  display: block;
+}
+
+.pdf-spaces-gallery .editorial-card .pdf-spaces-placeholder-img {
+  object-fit: contain;
+  padding: 32px;
+  background: #f5f5f5;
+}
+
+/* Single card per view below 900px, matching the authored carousel. */
+@media (max-width: 899px) {
+  .pdf-spaces-gallery .pdf-spaces-cards {
+    grid-auto-columns: 100%;
+  }
+}
