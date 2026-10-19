@@ -112,7 +112,6 @@ div [class *= PdfnowLifecycle__dropzone2___] {
   padding-left: 10px;
 }
 
-/* `verb-subfooter-moblie` is a legacy misspelling kept for already-authored blocks. */
 @media (min-width: 1075px) {
   .accordion-container.verb-subfooter-moblie,
   .accordion-container.verb-subfooter-mobile {
