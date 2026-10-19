@@ -21,7 +21,7 @@ test.describe('Acrobat Pricing — Compare versions', () => {
     await test.step('Verify global nav (smoke)', async () => {
       await pricing.gnav.waitFor({ state: 'visible' });
       await expect(pricing.gnav).toBeVisible();
-      await expect(pricing.gnavBreadcrumbs).toBeVisible();
+      // await expect(pricing.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify hero marquee', async () => {

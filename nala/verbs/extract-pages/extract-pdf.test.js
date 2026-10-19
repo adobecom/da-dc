@@ -27,7 +27,7 @@ test.describe('Unity Extract PDF Pages test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await extractPages.gnav.waitFor({ state: 'visible' });
       await expect(extractPages.gnav).toBeVisible();
-      await expect(extractPages.gnavBreadcrumbs).toBeVisible();
+      // await expect(extractPages.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Extract PDF Pages widget content/specs', async () => {

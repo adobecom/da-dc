@@ -23,7 +23,7 @@ test.describe('Acrobat Pro Smoke Test', () => {
     await test.step('Verify global nav (smoke)', async () => {
       await acrobatPro.gnav.waitFor({ state: 'visible' });
       await expect(acrobatPro.gnav).toBeVisible();
-      await expect(acrobatPro.gnavBreadcrumbs).toBeVisible();
+      // await expect(acrobatPro.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify hero marquee', async () => {

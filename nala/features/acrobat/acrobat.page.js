@@ -3,8 +3,8 @@ export default class AcrobatPage {
     this.page = page;
 
     // Global navigation (smoke)
-    this.gnav = page.locator('nav.feds-topnav');
-    this.gnavBreadcrumbs = page.locator('nav.feds-breadcrumbs');
+    this.gnav = page.locator('header');
+    this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs');
 
     // Hero
     this.heroMarquee = page.locator('div[class*="hero-marquee"]');

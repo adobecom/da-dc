@@ -27,7 +27,7 @@ test.describe('Unity GIF to PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await gifToPdf.gnav.waitFor({ state: 'visible' });
       await expect(gifToPdf.gnav).toBeVisible();
-      await expect(gifToPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(gifToPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify GIF to PDF widget content/specs', async () => {

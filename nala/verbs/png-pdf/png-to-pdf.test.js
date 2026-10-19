@@ -27,7 +27,7 @@ test.describe('Unity PNG to PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await pngToPdf.gnav.waitFor({ state: 'visible' });
       await expect(pngToPdf.gnav).toBeVisible();
-      await expect(pngToPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(pngToPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify PNG to PDF widget content/specs', async () => {

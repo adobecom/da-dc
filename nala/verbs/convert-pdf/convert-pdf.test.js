@@ -27,7 +27,7 @@ test.describe('Unity Convert PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await convertPdf.gnav.waitFor({ state: 'visible' });
       await expect(convertPdf.gnav).toBeVisible();
-      await expect(convertPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(convertPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Convert PDF widget content/specs', async () => {

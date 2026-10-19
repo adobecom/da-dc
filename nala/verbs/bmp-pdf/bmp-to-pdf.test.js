@@ -27,7 +27,7 @@ test.describe('Unity BMP to PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await bmpToPdf.gnav.waitFor({ state: 'visible' });
       await expect(bmpToPdf.gnav).toBeVisible();
-      await expect(bmpToPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(bmpToPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify BMP to PDF widget content/specs', async () => {

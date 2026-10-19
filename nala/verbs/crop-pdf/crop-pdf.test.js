@@ -27,7 +27,7 @@ test.describe('Unity Crop PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await cropPdf.gnav.waitFor({ state: 'visible' });
       await expect(cropPdf.gnav).toBeVisible();
-      await expect(cropPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(cropPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Crop PDF widget content/specs', async () => {

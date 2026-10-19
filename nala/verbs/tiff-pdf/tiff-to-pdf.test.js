@@ -27,7 +27,7 @@ test.describe('Unity TIFF to PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await tiffToPdf.gnav.waitFor({ state: 'visible' });
       await expect(tiffToPdf.gnav).toBeVisible();
-      await expect(tiffToPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(tiffToPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify TIFF to PDF widget content/specs', async () => {

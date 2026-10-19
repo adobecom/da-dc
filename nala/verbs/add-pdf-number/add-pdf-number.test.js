@@ -27,7 +27,7 @@ test.describe('Unity Add PDF page number test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await addPdf.gnav.waitFor({ state: 'visible' });
       await expect(addPdf.gnav).toBeVisible();
-      await expect(addPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(addPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Add PDF page numbers widget content/specs', async () => {

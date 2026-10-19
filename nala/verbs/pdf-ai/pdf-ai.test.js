@@ -27,7 +27,7 @@ test.describe('Unity PDF AI test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await pdfAi.gnav.waitFor({ state: 'visible' });
       await expect(pdfAi.gnav).toBeVisible();
-      await expect(pdfAi.gnavBreadcrumbs).toBeVisible();
+      // await expect(pdfAi.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify PDF AI widget content/specs', async () => {

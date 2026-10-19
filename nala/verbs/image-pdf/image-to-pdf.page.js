@@ -4,8 +4,8 @@ export default class ImageToPdf extends AcrobatWidget {
   constructor(page, nth = 0) {
     super(page, '.verb-widget-client-upload.image-to-pdf', nth);
 
-    this.gnav = page.locator('nav.feds-topnav');
-    this.gnavBreadcrumbs = page.locator('nav.feds-breadcrumbs');
+    this.gnav = page.locator('header');
+    this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs');
 
     this.howToSection = page.locator('div[class*="how-to"]').first();
     this.selectFilesButton = this.widget.locator('button.verb-cta');

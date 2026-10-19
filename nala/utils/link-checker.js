@@ -50,7 +50,7 @@ async function fetchStatus(page, url) {
 async function waitForPageReady(page) {
   await page.waitForLoadState('load', { timeout: 60000 });
   // Gnav + breadcrumbs (matches your other verb tests)
-  await page.locator('nav.feds-topnav').waitFor({ state: 'visible', timeout: 60000 });
+  await page.locator('header').waitFor({ state: 'visible', timeout: 60000 });
   // Gnav block finished loading
   await page.locator('header[data-block-status="loaded"]').first()
     .waitFor({ state: 'attached', timeout: 60000 });

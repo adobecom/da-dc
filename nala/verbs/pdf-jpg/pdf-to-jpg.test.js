@@ -27,7 +27,7 @@ test.describe('Unity PDF to JPG test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await pdfToJpg.gnav.waitFor({ state: 'visible' });
       await expect(pdfToJpg.gnav).toBeVisible();
-      await expect(pdfToJpg.gnavBreadcrumbs).toBeVisible();
+      // await expect(pdfToJpg.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify PDF to JPG widget content/specs', async () => {

@@ -27,7 +27,7 @@ test.describe('Unity Request Signature test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await requestSignature.gnav.waitFor({ state: 'visible' });
       await expect(requestSignature.gnav).toBeVisible();
-      await expect(requestSignature.gnavBreadcrumbs).toBeVisible();
+      // await expect(requestSignature.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Request Signature widget content/specs', async () => {

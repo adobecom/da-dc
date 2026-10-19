@@ -6,7 +6,7 @@ export default class BusinessSignPage {
   constructor(page) {
     this.page = page;
 
-    this.gnav = page.locator('nav.feds-topnav');
+    this.gnav = page.locator('header');
     this.footer = page.locator('footer[class="global-footer"]');
 
     /** Promo / strip that uses a `notification` class (Milo). */

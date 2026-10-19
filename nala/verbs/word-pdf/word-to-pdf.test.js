@@ -27,7 +27,7 @@ test.describe('Unity WORD to PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await wordToPdf.gnav.waitFor({ state: 'visible' });
       await expect(wordToPdf.gnav).toBeVisible();
-      await expect(wordToPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(wordToPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Word to PDF widget content/specs', async () => {

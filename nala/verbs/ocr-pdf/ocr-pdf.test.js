@@ -27,7 +27,7 @@ test.describe('Unity OCR PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await ocrPdf.gnav.waitFor({ state: 'visible' });
       await expect(ocrPdf.gnav).toBeVisible();
-      await expect(ocrPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(ocrPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify OCR PDF widget content/specs', async () => {

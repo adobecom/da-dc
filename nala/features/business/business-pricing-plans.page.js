@@ -6,7 +6,7 @@ export default class BusinessPricingPlansPage {
   constructor(page) {
     this.page = page;
 
-    this.gnav = page.locator('nav.feds-topnav');
+    this.gnav = page.locator('header');
     this.footer = page.locator('footer[class="global-footer"]');
 
     /** Hero (“Explore PDF and e-signature plans for business.”). */

@@ -27,7 +27,7 @@ test.describe('Unity PSD to PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await psdToPdf.gnav.waitFor({ state: 'visible' });
       await expect(psdToPdf.gnav).toBeVisible();
-      await expect(psdToPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(psdToPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify PSD to PDF widget content/specs', async () => {

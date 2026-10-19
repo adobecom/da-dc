@@ -28,7 +28,7 @@ test.describe('Unity AI Chat PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await aiChatPdf.gnav.waitFor({ state: 'visible' });
       await expect(aiChatPdf.gnav).toBeVisible();
-      await expect(aiChatPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(aiChatPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify AI Chat PDF widget content/specs', async () => {

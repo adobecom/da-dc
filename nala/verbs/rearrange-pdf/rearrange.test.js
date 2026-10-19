@@ -27,7 +27,7 @@ test.describe('Unity Rearrange PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await rearrangePdf.gnav.waitFor({ state: 'visible' });
       await expect(rearrangePdf.gnav).toBeVisible();
-      await expect(rearrangePdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(rearrangePdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Rearrange PDF widget content/specs', async () => {

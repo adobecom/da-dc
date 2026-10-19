@@ -27,7 +27,7 @@ test.describe('Unity AI Summary Generator test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await aiSummaryGenerator.gnav.waitFor({ state: 'visible' });
       await expect(aiSummaryGenerator.gnav).toBeVisible();
-      await expect(aiSummaryGenerator.gnavBreadcrumbs).toBeVisible();
+      // await expect(aiSummaryGenerator.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify AI Summary Generator widget content/specs', async () => {

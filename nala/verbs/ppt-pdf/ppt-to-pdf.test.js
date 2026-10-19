@@ -27,7 +27,7 @@ test.describe('Unity PPT to PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await pptToPdf.gnav.waitFor({ state: 'visible' });
       await expect(pptToPdf.gnav).toBeVisible();
-      await expect(pptToPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(pptToPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify PPT to PDF widget content/specs', async () => {

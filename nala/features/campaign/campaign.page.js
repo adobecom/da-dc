@@ -2,8 +2,8 @@ export default class CampaignPage {
   constructor(page) {
     this.page = page;
 
-    this.gnav = page.locator('nav.feds-topnav');
-    this.gnavBreadcrumbs = page.locator('nav.feds-breadcrumbs');
+    this.gnav = page.locator('header');
+    this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs');
 
     this.acrobatsGotItMarqueeDesktop = page.locator(
       'div[data-path*="/dc-shared/fragments/campaign/acrobats-got-it/acrobats-got-it-marquee-desktop"]',

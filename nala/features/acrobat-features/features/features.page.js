@@ -6,8 +6,8 @@ export default class FeaturesPage {
   constructor(page) {
     this.page = page;
 
-    this.gnav = page.locator('nav.feds-topnav');
-    this.gnavBreadcrumbs = page.locator('nav.feds-breadcrumbs');
+    this.gnav = page.locator('header');
+    this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs').first();
 
     this.heroMarqueeSection = page.locator('div[class*="hero-marquee"]');
     this.heroTitle = this.heroMarqueeSection.locator('h1');

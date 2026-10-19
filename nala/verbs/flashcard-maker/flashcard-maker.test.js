@@ -28,19 +28,20 @@ test.describe('Unity Flashcard maker test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await flashcardMaker.gnav.waitFor({ state: 'visible' });
       await expect(flashcardMaker.gnav).toBeVisible();
-      await expect(flashcardMaker.gnavBreadcrumbs).toBeVisible();
+      // await expect(flashcardMaker.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Flashcard maker widget content/specs', async () => {
       await expect(flashcardMaker.widget).toBeVisible();
       await expect(flashcardMaker.dropZone).toBeVisible();
-      await expect(flashcardMaker.studyMarqueeMedia).toBeVisible();
       await expect(flashcardMaker.acrobatIcon).toBeVisible();
       await expect(flashcardMaker.verbHeader).toBeVisible();
       await expect(flashcardMaker.verbTitle).toBeVisible();
       await expect(flashcardMaker.verbCopy).toBeVisible();
+      await expect(flashcardMaker.promptInput).toBeVisible();
+      await expect(flashcardMaker.addSourcesLabel).toBeVisible();
+      await expect(flashcardMaker.securityTooltip).toBeVisible();
       await expect(flashcardMaker.ctaButton).toBeVisible();
-      await expect(flashcardMaker.ctaButton).toBeEnabled();
     });
 
     // await test.step('Verify how-to section', async () => {

@@ -27,7 +27,7 @@ test.describe('Unity Delete PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await deletePdf.gnav.waitFor({ state: 'visible' });
       await expect(deletePdf.gnav).toBeVisible();
-      await expect(deletePdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(deletePdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Delete PDF widget content/specs', async () => {

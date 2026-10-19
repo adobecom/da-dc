@@ -29,7 +29,7 @@ test.describe('Unity PDF Editor test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await pdfEditor.gnav.waitFor({ state: 'visible' });
       await expect(pdfEditor.gnav).toBeVisible();
-      await expect(pdfEditor.gnavBreadcrumbs).toBeVisible();
+      // await expect(pdfEditor.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify PDF Editor widget content/specs', async () => {

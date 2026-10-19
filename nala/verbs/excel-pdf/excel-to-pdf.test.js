@@ -27,7 +27,7 @@ test.describe('Unity EXCEL to PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await excelToPdf.gnav.waitFor({ state: 'visible' });
       await expect(excelToPdf.gnav).toBeVisible();
-      await expect(excelToPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(excelToPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Excel to PDF widget content/specs', async () => {

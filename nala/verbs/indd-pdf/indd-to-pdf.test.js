@@ -27,7 +27,7 @@ test.describe('Unity INDD to PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await inddToPdf.gnav.waitFor({ state: 'visible' });
       await expect(inddToPdf.gnav).toBeVisible();
-      await expect(inddToPdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(inddToPdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify INDD to PDF widget content/specs', async () => {

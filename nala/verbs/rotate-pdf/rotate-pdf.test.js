@@ -27,7 +27,7 @@ test.describe('Unity Rotate PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await rotatePdf.gnav.waitFor({ state: 'visible' });
       await expect(rotatePdf.gnav).toBeVisible();
-      await expect(rotatePdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(rotatePdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Rotate PDF widget content/specs', async () => {

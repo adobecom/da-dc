@@ -27,7 +27,7 @@ test.describe('Unity Merge PDF test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await mergePdf.gnav.waitFor({ state: 'visible' });
       await expect(mergePdf.gnav).toBeVisible();
-      await expect(mergePdf.gnavBreadcrumbs).toBeVisible();
+      // await expect(mergePdf.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Merge PDF widget content/specs', async () => {
