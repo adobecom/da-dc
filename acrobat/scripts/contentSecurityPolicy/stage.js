@@ -272,7 +272,7 @@ const scriptSrc = [
   's.yimg.jp',
   'yjtag.yahoo.co.jp',
   'tr.snapchat.com',
-  '\'sha256-2DC5dZbFilC0rC4TOnfN/d4Dw/H54dVTaW3iuOD7Nko=\'', // for this repo
+  '\'sha256-d46gYEdEOx5rPjP7o6sFkWyTCsuFCiwMZpV8Tqfd7Z8=\'', // for this repo
   '\'sha256-/B9aRx/bHjiUGWHC/33Ku1McTNnFGEiLwTJdRki4www=\'', // for acrobat subdomain dc-frictionless
   't.contentsquare.net/ss/4451/2/uxa.js',
   ';',
