@@ -4,10 +4,10 @@ module.exports = {
   features: [
     {
       tcid: '0',
-      name: '@campaign-acrobats-got-it-smoke',
-      path: '/acrobat/campaign/acrobats-got-it',
+      name: '@campaign-do-that-with-acrobat-smoke',
+      path: '/acrobat/campaign/do-that-with-acrobat',
       data: {},
-      tags: '@campaign @acrobats-got-it @smoke @live',
+      tags: '@campaign @do-that-with-acrobat @smoke @live',
     },
   ],
 };

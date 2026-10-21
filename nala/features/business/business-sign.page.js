@@ -6,11 +6,11 @@ export default class BusinessSignPage {
   constructor(page) {
     this.page = page;
 
-    this.gnav = page.locator('nav.feds-topnav');
+    this.gnav = page.locator('header');
     this.footer = page.locator('footer[class="global-footer"]');
 
     /** Promo / strip that uses a `notification` class (Milo). */
-    this.notification = page.locator('div[class*="notification"]').first();
+    this.notification = page.locator('div[class*="notification"]').filter({ visible: true }).first();
 
     /**
      * “See how Acrobat with eSignatures can accelerate business workflows.”
@@ -24,10 +24,5 @@ export default class BusinessSignPage {
     /** “The Adobe difference.” — three-up, xl spacing on this route. */
     this.threeUpSection = page
       .locator('div.section.three-up').first();
-
-    this.businessSignMerchCardsContainer = page.locator(
-      'div[data-path="/dc-shared/fragments/merch/acrobat/business/acrobat-studio-teams/merch-card-blade"]',
-    );
-    this.businessSignMerchCards = this.businessSignMerchCardsContainer.locator('merch-card');
   }
 }

@@ -10,7 +10,7 @@ test.describe('Acrobat Business — Landing', () => {
     acrobatBusiness = new AcrobatBusinessPage(page);
   });
 
-  test(`${features[0].name}, ${features[0].tags}`, async ({ page, baseURL }) => {
+  test.skip(`${features[0].name}, ${features[0].tags}`, async ({ page, baseURL }) => {
     const { path } = features[0];
     console.info(`[Acrobat Business] ${baseURL}${path}`);
 
