@@ -554,12 +554,14 @@ async function preloadMasFragment(a, config) {
   // eslint-disable-next-line compat/compat
   const params = new URLSearchParams(url.hash.replace(/^#/, ''));
   const fragment = params.get('fragment') || params.get('query');
+  const mask = params.get('mask');
   if (!fragment) return;
 
   const { locale, country } = getMasLocale(config?.locale, await getMasMarket(config?.miloLibs));
   const apiKey = config?.commerce?.['wcs-api-key'] ?? DEFAULT_MAS_FRAGMENT_API_KEY;
   let endpoint = `${MAS_FRAGMENT_API}?id=${fragment}&api_key=${apiKey}&locale=${locale}`;
   if (country && !locale.endsWith(`_${country}`)) endpoint += `&country=${country}`;
+  if (mask) endpoint += `&mask=${mask}`;
 
   loadLink(endpoint, { rel: 'preload', as: 'fetch', crossorigin: 'anonymous', fetchpriority: 'low' });
 }
