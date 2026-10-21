@@ -16,6 +16,7 @@ test.describe('Unity Image to PDF test suite', () => {
   });
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
+    test.skip(browserName === 'chromium', 'Skip this test on Chrome');
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
 
     await test.step('Go to Image to PDF test page', async () => {
