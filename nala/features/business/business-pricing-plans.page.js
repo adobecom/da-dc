@@ -12,7 +12,7 @@ export default class BusinessPricingPlansPage {
     /** Hero (“Explore PDF and e-signature plans for business.”). */
     this.heroMarqueeSection = page.locator('div[class*="hero-marquee"]');
 
-    /** Both “Feature comparison” sticky highlight tables (merch blocks, top then “Discover more features”). */
+    /** “Discover more features” sticky table. The top table is now replaced by merch card tabs. */
     this.stickyComparisonTables = page.locator('div.table.sticky.highlight[role="table"]');
 
     /** e.g. “More solutions for large organizations.” */
