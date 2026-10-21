@@ -592,6 +592,83 @@ describe('rnr - Ratings and reviews', () => {
 
   // #endregion
 
+  // #region Linked data
+
+  const loadWithRatings = async (ratingHistogram, overallRating = 4.5) => {
+    sinon.stub(window, 'fetch');
+    window.fetch.returns(
+      Promise.resolve({
+        json: () => Promise.resolve({ overallRating, ratingHistogram }),
+        ok: true,
+      }),
+    );
+    document.body.innerHTML = await readFile({ path: './mocks/body.html' });
+    const rnr = document.querySelector('.rnr');
+    await init(rnr);
+    await waitForElement('.rnr-container');
+    return document.head.querySelector('script[type="application/ld+json"]');
+  };
+  const TEN_VOTES = { rating1: 0, rating2: 0, rating3: 0, rating4: 5, rating5: 5 };
+
+  it('should inject AggregateRating JSON-LD with bestRating, worstRating and @id', async () => {
+    const ldScript = await loadWithRatings(TEN_VOTES);
+    expect(ldScript).to.exist;
+
+    const linkedData = JSON.parse(ldScript.textContent);
+    expect(linkedData['@type']).to.equal('Product');
+    expect(linkedData['@id']).to.be.undefined;
+    expect(linkedData.name).to.equal('Word to PDF');
+
+    const { aggregateRating } = linkedData;
+    expect(aggregateRating['@type']).to.equal('AggregateRating');
+    expect(aggregateRating['@id']).to.equal(`${window.location.origin}${window.location.pathname}#aggregaterating`);
+    expect(aggregateRating.ratingValue).to.equal('4.5');
+    expect(aggregateRating.ratingCount).to.equal('10');
+    expect(aggregateRating.bestRating).to.equal('5');
+    expect(aggregateRating.worstRating).to.equal('1');
+  });
+
+  it('should build @id from the canonical URL without query string or hash', async () => {
+    const link = document.createElement('link');
+    link.rel = 'canonical';
+    link.href = 'https://www.adobe.com/acrobat/online/word-to-pdf.html?utm_source=test#top';
+    document.head.appendChild(link);
+
+    const ldScript = await loadWithRatings(TEN_VOTES);
+    const { aggregateRating } = JSON.parse(ldScript.textContent);
+    expect(aggregateRating['@id']).to.equal('https://www.adobe.com/acrobat/online/word-to-pdf.html#aggregaterating');
+  });
+
+  it('should strip query string and hash from @id when there is no canonical URL', async () => {
+    const { pathname, search, hash } = window.location;
+    const original = `${pathname}${search}${hash}`;
+    // Keep the runner's existing query params (e.g. wtr-session-id) intact.
+    window.history.replaceState(null, '', `${pathname}${search}${search ? '&' : '?'}utm_source=test#x`);
+    try {
+      const ldScript = await loadWithRatings(TEN_VOTES);
+      const { aggregateRating } = JSON.parse(ldScript.textContent);
+      expect(aggregateRating['@id']).to.equal(`${window.location.origin}${window.location.pathname}#aggregaterating`);
+    } finally {
+      window.history.replaceState(null, '', original);
+    }
+  });
+
+  it('should not inject JSON-LD when product-name metadata is missing', async () => {
+    document.head.querySelector('meta[name="product-name"]')?.remove();
+    const ldScript = await loadWithRatings(TEN_VOTES);
+    expect(ldScript === null).to.be.true;
+  });
+
+  it('should not inject JSON-LD when there are zero votes (Google requires a positive ratingCount)', async () => {
+    const ldScript = await loadWithRatings(
+      { rating1: 0, rating2: 0, rating3: 0, rating4: 0, rating5: 0 },
+      5,
+    );
+    expect(ldScript === null).to.be.true;
+  });
+
+  // #endregion
+
   it('should handle invalid rating submission', async () => {
     const containerElement = await waitForElement('.rnr-container');
     const formElement = containerElement.querySelector('.rnr-form');

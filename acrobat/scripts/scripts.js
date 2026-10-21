@@ -264,6 +264,7 @@ const CONFIG = {
   codeRoot: '/acrobat',
   contentRoot: '/dc-shared',
   imsClientId: 'acrobatmilo',
+  iconsExcludeBlocks: ['unity'],
   commerce: {
     checkoutClientId: 'doc_cloud',
     'wcs-api-key': 'wcms-commerce-ims-ro-user-milo-dc',
@@ -418,7 +419,7 @@ replaceDotMedia(document);
 
 // Default to loading the first image as eager.
 (async function loadLCPImage() {
-  const blocks = '.marquee,.hero-marquee,.study-marquee';
+  const blocks = '.marquee,.hero-marquee,.study-marquee,.unity-marquee';
   const marquee = document.querySelector(blocks); // first marquee only
   if (marquee) {
     if (window?.browser?.isMobile) {
@@ -519,12 +520,15 @@ const MAS_GEO_MAP = {
 
 const MAS_EXTRA_LOCALES = { pr: 'es_PR' };
 
+const MARKET_LOCALE_OVERRIDES = { en: { AU: 'en_GB', IN: 'en_GB', GB: 'en_GB' } };
+
 function getMasLocale(miloLocale, geoCountry) {
   const geo = (miloLocale?.prefix || 'US_en').replace('/', '');
   let [country = 'US', language = 'en'] = (MAS_GEO_MAP[geo] ?? geo).split('_', 2);
   country = country.toUpperCase();
   language = language.toLowerCase();
-  return { locale: MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`, country: geoCountry ?? country };
+  const marketOverride = MARKET_LOCALE_OVERRIDES[language]?.[geoCountry];
+  return { locale: marketOverride ?? MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`, country: geoCountry ?? country };
 }
 
 async function preloadMasFragment(a, config) {
@@ -662,6 +666,19 @@ async function loadPage() {
   setConfig({ ...CONFIG, miloLibs, decorateArea });
   decorateArea();
 
+  // Render M@S CTAs without waiting for IMS; upgrade and download CTAs swap in once it is ready.
+  document.addEventListener('wcms:commerce:ready', ({ detail: service }) => {
+    // eslint-disable-next-line compat/compat
+    const modules = Promise.all([
+      import(`${miloLibs}/blocks/merch/merch.js`),
+      import('./checkoutAction.js'),
+    ]);
+    service.registerCheckoutAction(async (...args) => {
+      const [{ getCheckoutAction }, { default: resolveCheckoutAction }] = await modules;
+      return resolveCheckoutAction(getCheckoutAction, ...args);
+    });
+  });
+
   window.addEventListener('IMS:Ready', async () => {
     const susiElems = document.querySelectorAll('a[href*="susi"]');
     if (susiElems.length > 0) {
@@ -670,12 +687,30 @@ async function loadPage() {
     }
   });
 
-  loadIms().then(() => {
-    const imsIsReady = new CustomEvent('IMS:Ready');
-    window.dispatchEvent(imsIsReady);
-  }).catch((err) => {
-    window.dispatchEvent(new CustomEvent('DC_Hosted:Error', { detail: { wrappedException: err } }));
-  });
+  // Everything that reads window.adobeIMS. Pages without these leave IMS to gnav.
+  const IMS_CONSUMERS = [
+    '#dc-converter-widget',
+    '.dc-converter-widget',
+    '#mobile-widget',
+    '.mobile-widget',
+    '.rnr',
+    '.study-marquee',
+    '.unity-marquee',
+    '.verb-marquee',
+    '.verb-redesign-test',
+    '.verb-widget',
+    '.verb-widget-client-upload',
+    'a[href*="susi"]',
+  ].join(',');
+
+  if (document.querySelector(IMS_CONSUMERS)) {
+    loadIms().then(() => {
+      const imsIsReady = new CustomEvent('IMS:Ready');
+      window.dispatchEvent(imsIsReady);
+    }).catch((err) => {
+      window.dispatchEvent(new CustomEvent('DC_Hosted:Error', { detail: { wrappedException: err } }));
+    });
+  }
 
   loadLana({ clientId: 'dxdc', tags: 'DC_Milo' });
 

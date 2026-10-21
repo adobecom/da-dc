@@ -72,7 +72,23 @@ const deviceConfig = {
 
   try {
     await page.goto(url, { timeout: 60000 });
-    await page.waitForLoadState('networkidle', { timeout: 60000 });
+    await page.waitForSelector('div[daa-lh="s1"]', { state: 'visible', timeout: 60000 });
+    await page.waitForFunction(() => {
+      const header = document.querySelector('header');
+      const navRendered = !header || header.classList.contains('ready')
+        || !!header.querySelector(':scope > nav');
+      const jpWordWrapDisabled = document.querySelector('meta[name="jpwordwrap:disabled"]');
+      const jpWordWrapPending = document.documentElement.lang === 'ja-JP'
+        && !(jpWordWrapDisabled && jpWordWrapDisabled.content === 'true')
+        && !document.querySelector('div[daa-lh="s1"] [style*="keep-all"]');
+      return navRendered && !jpWordWrapPending;
+    }, null, { timeout: 60000 });
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      await new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
+      });
+    });
 
     const element = await page.locator('div[daa-lh="s1"]');
     const elementHtml = await element.innerHTML();
@@ -128,7 +144,8 @@ const deviceConfig = {
 
       eg.send((error, response, body) => {
         if (error) {
-          console.warn('Warning: EdgeKV write failed:', error);
+          console.error('EdgeKV write failed:', error);
+          process.exitCode = 1;
         } else {
           console.log('EdgeKV write response:', body);
         }
@@ -136,6 +153,7 @@ const deviceConfig = {
     }
   } catch (error) {
     console.error('An error occurred:', error);
+    process.exitCode = 1;
   } finally {
     await browser.close();
   }

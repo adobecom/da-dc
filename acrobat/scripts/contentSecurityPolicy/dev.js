@@ -222,7 +222,7 @@ const scriptSrc = [
   '*.aem.page',
   '*.aem.live',
   'tr.snapchat.com',
-  '\'sha256-dg0pQ3tkJ9KWGwSBExDwP6bSUKm2FRzq/s0tHhkcDtk=\'', // for this repo
+  '\'sha256-2DC5dZbFilC0rC4TOnfN/d4Dw/H54dVTaW3iuOD7Nko=\'', // for this repo
   '\'sha256-/B9aRx/bHjiUGWHC/33Ku1McTNnFGEiLwTJdRki4www=\'', // for acrobat subdomain dc-frictionless
   't.contentsquare.net/ss/4451/2/uxa.js',
   ';',

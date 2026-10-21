@@ -382,7 +382,8 @@ html[dir="rtl"] .verb-cta .upload-icon {
 .verb-error {
   cursor: default;
   background: #D31510;
-  max-width: 435px;
+  width: max-content;
+  max-width: min(435px, calc(100vw - 48px));
   color: white;
   position: absolute;
   top: 90px;
@@ -618,6 +619,11 @@ html[dir="rtl"] .verb-cta .upload-icon {
   .verb-row {
     flex-direction: column;
     align-items: start;
+  }
+
+  .verb-error {
+    top: 55px;
+    transform: translateX(-50%);
   }
 
   .verb-col.right {

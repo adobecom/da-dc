@@ -31,6 +31,12 @@ export async function responseProvider(request) {
       const err = new Error(`Failed to fetch doc: ${path}`);
       err.body = htmlResponse.body;
       err.status = htmlResponse.status;
+      if (htmlResponse.status === 301) {
+        const { location } = htmlResponse.getHeaders();
+        if (location) {
+          err.headers = { location };
+        }
+      }
       throw err;
     }
 
@@ -44,6 +50,11 @@ export async function responseProvider(request) {
     firstPassRewriter.onElement('.unity.workflow-acrobat', el => {
       unityWorkflow = true;
     });
+    let promptUploadWorkflow;
+    firstPassRewriter.onElement('.unity', el => {
+      const classes = (el.getAttribute('class') || '').split(/\s+/);
+      if (classes.includes('workflow-prompt-upload')) promptUploadWorkflow = true;
+    });
     firstPassRewriter.onElement('.verb-widget-client-upload', el => {
       clientUploadWidget = true;
     });
@@ -54,6 +65,10 @@ export async function responseProvider(request) {
     let verbMarquee;
     firstPassRewriter.onElement('.verb-marquee', el => {
       verbMarquee = true;
+    });
+    let unityMarquee;
+    firstPassRewriter.onElement('.unity-marquee', el => {
+      unityMarquee = true;
     });
     const nullWriter = new WritableStream({
       write() {},
@@ -84,7 +99,7 @@ export async function responseProvider(request) {
       delete responseHeaders[prop];
     }
 
-    return [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget];
+    return [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, unityMarquee, promptUploadWorkflow];
   };
 
   const fetchResource = async path => {
@@ -159,12 +174,18 @@ export async function responseProvider(request) {
     });
   };
 
-  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop) => {
+  const inlineStyles = (dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, inlineUnityMarquee, unitySharedStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles) => {
     rewriter.onElement('head', el => {
       el.append(`<style id="inline-milo-styles">${miloStyles}</style>`);
       el.append(`<style id="inline-dc-styles">${dcStyles}</style>`);
       if (clientUploadWidget) {
         el.append(`<style id="inline-verb-widget-client-upload-styles">${verbWidgetClientUploadStyles}</style>`);
+        el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
+      } else if (inlineUnityMarquee) {
+        el.append(`<style id="inline-unity-shared-styles">${unitySharedStyles}</style>`);
+        el.append(`<style id="inline-unity-prompt-upload-styles">${unityPromptUploadStyles}</style>`);
+        el.append(`<style id="inline-unity-marquee-styles">${unityMarqueeBlockStyles}</style>`);
+        el.append(`<style id="inline-unity-styles">${unityBlockStyles}</style>`);
         el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
       } else if (unityWorkflow) {
         if (studyMarquee) {
@@ -181,7 +202,7 @@ export async function responseProvider(request) {
 
   try {
     const [
-      [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget],
+      [responseStream, responseHeaders, mobileWidget, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, unityMarquee, promptUploadWorkflow],
       scripts,
       dcConverter,
       dcStyles,
@@ -202,8 +223,17 @@ export async function responseProvider(request) {
       fetchResource('/acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css')
     ]);
 
-    await inlineScripts(unityWorkflow, mobileWidget, clientUploadWidget, scripts, dcConverter);
-    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop);
+    const inlineUnityMarquee = promptUploadWorkflow && unityMarquee;
+    const [unitySharedStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles] = inlineUnityMarquee
+      ? await Promise.all([
+        fetchResource('/unitylibs/core/widgets/shared/shared.css'),
+        fetchResource('/unitylibs/core/widgets/prompt-upload/prompt-upload.css'),
+        fetchResource('/acrobat/blocks/unity-marquee/unity-marquee.css'),
+        fetchResource('/acrobat/blocks/unity/unity.css')
+      ]) : [];
+
+    await inlineScripts(unityWorkflow || promptUploadWorkflow, mobileWidget, clientUploadWidget, scripts, dcConverter);
+    inlineStyles(dcStyles, miloStyles, verbWidgetStyles, studyMarqueeStyles, verbMarqueeStyles, verbWidgetClientUploadStyles, unityWorkflow, studyMarquee, verbMarquee, clientUploadWidget, prerenderTop, inlineUnityMarquee, unitySharedStyles, unityPromptUploadStyles, unityMarqueeBlockStyles, unityBlockStyles);
 
     const csp = contentSecurityPolicy(isProd, scriptHashes);
     const acrobat = isProd ? 'https://acrobat.adobe.com' : 'https://stage.acrobat.adobe.com';
@@ -249,6 +279,28 @@ export async function responseProvider(request) {
           `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
         ];
       }
+    } else if (promptUploadWorkflow) {
+      headerLink = [...headerLink,
+        `</acrobat/blocks/unity/unity.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</acrobat/blocks/unity/unity.css>;rel="preload";as="style"`,
+        `</acrobat/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+      ];
+      if (unityMarquee) {
+        headerLink = [...headerLink,
+          `</acrobat/blocks/unity-marquee/unity-marquee.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</acrobat/blocks/unity-marquee/unity-marquee.css>;rel="preload";as="style"`,
+          `</unitylibs/core/widgets/prompt-upload/prompt-upload.css>;rel="preload";as="style"`,
+          `</unitylibs/core/widgets/shared/shared.css>;rel="preload";as="style"`,
+          `</unitylibs/core/widgets/prompt-upload/prompt-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/workflow/workflow-prompt-upload/action-binder.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/workflow/workflow-prompt-upload/target-config.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/dropzone.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/dropdown.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/widget-base.js>;rel="preload";as="script";crossorigin="anonymous"`,
+          `</unitylibs/core/widgets/shared/prompt-input.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        ];
+      }
     }
     headerLink = headerLink.join();
 
@@ -264,7 +316,7 @@ export async function responseProvider(request) {
       responseStream.pipeThrough(rewriter),
     );
   } catch (error) {
-    return createResponse(error.status ?? 500, {}, error.body ?? error.message);
+    return createResponse(error.status ?? 500, error.headers ?? {}, error.body ?? error.message);
   }
 }
 
@@ -280,16 +332,25 @@ async function frictionlessResponseProvider(request) {
   const contentRoot = '/dc-shared';
   const rewriter = new HtmlRewritingStream();
 
+  // acrobat.adobe.com serves this fixed set of locale prefixes (English is prefix-less).
+  // A first segment in this set is a locale (e.g. /fr/heic-to-pdf → /fr/dc-shared/...);
+  // anything else is a non-locale section served directly under /dc-shared (e.g. /tools/).
+  const ACROBAT_LOCALES = new Set([
+    'cz', 'de', 'dk', 'es', 'fi', 'fr', 'id_id', 'in_hi', 'it', 'jp', 'kr',
+    'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'se', 'th_th', 'tr', 'tw',
+  ]);
+  const isLocalePrefix = request.path.split('/').filter(Boolean).length > 1
+    && ACROBAT_LOCALES.has(first);
+
   const fetchFrictionlessPage = async () => {
     // Setup: Fetch a stream containing HTML
-    const hasLocalePrefix = request.path.split('/').filter(Boolean).length > 1;
     let docPath;
-    if (hasLocalePrefix) {
+    if (isLocalePrefix) {
       docPath = `${origin}${request.path.replace(`/${first}/`, `/${first}/dc-shared/`)}`;
     } else {
       docPath = `${origin}/dc-shared${request.path}`;
     }
-    
+
     const htmlResponse = await httpRequest(docPath, { headers });
     if (!htmlResponse.ok) {
       const err = new Error(`Failed to fetch doc: ${docPath}`);
@@ -385,7 +446,7 @@ async function frictionlessResponseProvider(request) {
     const isIPadOS = ua.includes('Mac') && ua.includes('Version/') && !/iphone|ipod/i.test(ua);
     const isTablet = /ipad|android(?!.*mobile)/i.test(ua);    
     if (unityWorkflow && !(isTablet || isIPadOS)) {
-      const group = 'frictionless_acrobat' + `${request.path.split('/').filter(Boolean).length <= 1 ? '' : `_${first}`}`;
+      const group = 'frictionless_acrobat' + (isLocalePrefix ? `_${first}` : '');
       const edgeKv = new EdgeKV({namespace: isProd? 'prod' : 'stage', group});
       let prerenderHtml = '<!-- init -->';
       try {
@@ -478,7 +539,7 @@ async function frictionlessResponseProvider(request) {
         `<${codeRoot}/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `<${request.path.split('/').filter(Boolean).length <= 1 ? '' : `/${first}`}${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`
+        `<${isLocalePrefix ? `/${first}` : ''}${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`
       ];
     }
     headerLink = headerLink.join();
