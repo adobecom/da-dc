@@ -75,7 +75,7 @@ test.describe('Unity Quiz maker test suite', () => {
     });
 
     await test.step('Verify Student Spaces carousel', async () => {
-      const carousels = quizMaker.carousels;
+      const { carousels } = quizMaker;
       for (let i = 0; i < await carousels.count(); i += 1) {
         const carousel = carousels.nth(i);
         await carousel.scrollIntoViewIfNeeded();

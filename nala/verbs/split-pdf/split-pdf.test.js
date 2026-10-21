@@ -72,7 +72,7 @@
 //         await expect(button).toHaveAttribute('aria-expanded', 'false');
 //       }
 //     });
-  
+
 //     await test.step('Verify media block', async () => {
 //       await splitPdf.mediaSection.scrollIntoViewIfNeeded();
 //       await expect(splitPdf.mediaSection).toBeVisible({ timeout: 60000 });
