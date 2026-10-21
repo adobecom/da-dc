@@ -36,7 +36,7 @@ async function getGitHubPRBranchLiveUrl() {
 
   let prBranchLiveUrl;
   if (prBranch === 'main') {
-    prBranchLiveUrl = BASE_URLS.main;
+    prBranchLiveUrl = BASE_URLS.prod;
   } else {
     prBranchLiveUrl = `https://${prBranch}--${prFromRepoName}--${prFromOrg}.aem.live`;
   }
