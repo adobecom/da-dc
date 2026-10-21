@@ -5,19 +5,13 @@ export default class CampaignPage {
     this.gnav = page.locator('header');
     this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs');
 
-    this.acrobatsGotItMarqueeDesktop = page.locator(
-      'div[data-path*="/dc-shared/fragments/campaign/acrobats-got-it/acrobats-got-it-marquee-desktop"]',
-    );
+    this.heroMarquee = page.locator('div.hero-marquee');
+    this.mediaBlocks = page.locator('main div.media');
 
-    this.acrobatsGotItBody = page.locator(
-      'div[data-path*="/dc-shared/fragments/campaign/acrobats-got-it/acrobats-got-it-body"]',
+    /** “Compare Acrobat plans” merch cards fragment. */
+    this.compareAcrobatPlans = page.locator(
+      'div[data-path*="/dc-shared/fragments/merch-cards/compare-acrobat-plans"]',
     );
-
-    /**
-     * “Compare Acrobat plans” merch container — the merch-card-collection element
-     * (Acrobat Pro individual + Acrobat Pro for teams).
-     * @see https://www.adobe.com/acrobat/campaign/acrobats-got-it.html
-     */
 
     this.footer = page.locator('footer[class="global-footer"]');
     this.fedsFooterOptions = this.footer.locator('div[class*="feds-footer-options"]');
