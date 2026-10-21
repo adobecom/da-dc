@@ -666,6 +666,19 @@ async function loadPage() {
   setConfig({ ...CONFIG, miloLibs, decorateArea });
   decorateArea();
 
+  // Render M@S CTAs without waiting for IMS; upgrade and download CTAs swap in once it is ready.
+  document.addEventListener('wcms:commerce:ready', ({ detail: service }) => {
+    // eslint-disable-next-line compat/compat
+    const modules = Promise.all([
+      import(`${miloLibs}/blocks/merch/merch.js`),
+      import('./checkoutAction.js'),
+    ]);
+    service.registerCheckoutAction(async (...args) => {
+      const [{ getCheckoutAction }, { default: resolveCheckoutAction }] = await modules;
+      return resolveCheckoutAction(getCheckoutAction, ...args);
+    });
+  });
+
   window.addEventListener('IMS:Ready', async () => {
     const susiElems = document.querySelectorAll('a[href*="susi"]');
     if (susiElems.length > 0) {
@@ -674,12 +687,30 @@ async function loadPage() {
     }
   });
 
-  loadIms().then(() => {
-    const imsIsReady = new CustomEvent('IMS:Ready');
-    window.dispatchEvent(imsIsReady);
-  }).catch((err) => {
-    window.dispatchEvent(new CustomEvent('DC_Hosted:Error', { detail: { wrappedException: err } }));
-  });
+  // Everything that reads window.adobeIMS. Pages without these leave IMS to gnav.
+  const IMS_CONSUMERS = [
+    '#dc-converter-widget',
+    '.dc-converter-widget',
+    '#mobile-widget',
+    '.mobile-widget',
+    '.rnr',
+    '.study-marquee',
+    '.unity-marquee',
+    '.verb-marquee',
+    '.verb-redesign-test',
+    '.verb-widget',
+    '.verb-widget-client-upload',
+    'a[href*="susi"]',
+  ].join(',');
+
+  if (document.querySelector(IMS_CONSUMERS)) {
+    loadIms().then(() => {
+      const imsIsReady = new CustomEvent('IMS:Ready');
+      window.dispatchEvent(imsIsReady);
+    }).catch((err) => {
+      window.dispatchEvent(new CustomEvent('DC_Hosted:Error', { detail: { wrappedException: err } }));
+    });
+  }
 
   loadLana({ clientId: 'dxdc', tags: 'DC_Milo' });
 
