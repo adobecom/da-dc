@@ -9,9 +9,9 @@ export default class PdfReaderPage {
     /** Reader download CTA inside the hero */
     this.heroReaderDownloadLink = this.heroMarquee.locator('a[href*="get.adobe.com"]');
 
-    this.firstThreeUpSection = page.locator('div.section.three-up').first();
+    this.firstFourUpSection = page.locator('div.section.four-up').first();
 
-    this.splitImageBlock = page.locator('div.image.split-image');
+    this.splitAsideBlock = page.locator('div.aside.split');
 
     this.faqSection = page.locator('div[class*="accordion-container"]');
     this.faqAccordionTriggers = this.faqSection.locator('button.accordion-trigger');

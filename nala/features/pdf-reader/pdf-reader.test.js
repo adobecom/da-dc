@@ -37,14 +37,14 @@ test.describe('Acrobat PDF Reader Smoke Test', () => {
       await expect(link).toHaveAttribute('href', /get\.adobe\.com/);
     });
 
-    await test.step('Verify first three-up section', async () => {
-      const threeUp = pdfReader.firstThreeUpSection;
-      await threeUp.scrollIntoViewIfNeeded();
-      await expect(threeUp).toBeVisible();
+    await test.step('Verify first four-up section', async () => {
+      const fourUp = pdfReader.firstFourUpSection;
+      await fourUp.scrollIntoViewIfNeeded();
+      await expect(fourUp).toBeVisible();
     });
 
-    await test.step('Verify split-image block', async () => {
-      const block = pdfReader.splitImageBlock;
+    await test.step('Verify split aside block', async () => {
+      const block = pdfReader.splitAsideBlock;
       await block.scrollIntoViewIfNeeded();
       await expect(block).toBeVisible({ timeout: 60000 });
     });
