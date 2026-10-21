@@ -54,7 +54,7 @@ test.describe('Acrobat Generative AI PDF', () => {
     });
 
     await test.step('Verify merch card plans and compare tabs', async () => {
-      const merchCardPlans = page.locator('div[data-path*="/dc-shared/fragments/merch-cards/compare-acrobat-plans"]');
+      const merchCardPlans = page.locator('div[data-path*="/dc-shared/fragments/merch-cards/compare-acrobat-express-plans"]');
       const tabs = merchCardPlans.locator('button[id^="tab-compare-plans-"]');
 
       // Scroll the first tab into view, then switch through each tab and verify merch cards render.
