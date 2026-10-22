@@ -76,8 +76,8 @@
 .pdf-spaces-gallery .pdf-spaces-text > div > p:last-child {
   /* stylelint-disable-next-line value-no-vendor-prefix */
   display: -webkit-box;
-  -webkit-line-clamp: 6;
-  line-clamp: 6;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
