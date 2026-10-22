@@ -522,24 +522,35 @@ const MAS_EXTRA_LOCALES = { pr: 'es_PR' };
 
 const MARKET_LOCALE_OVERRIDES = { en: { AU: 'en_GB', IN: 'en_GB', GB: 'en_GB' } };
 
-function getMasLocale(miloLocale, geoCountry) {
+// Mirrors the locale/country Milo's merch.js stamps on mas-commerce-service: the market's
+// Global-EN locale override only applies when the page isn't already that market's own site.
+function getMasLocale(miloLocale, market) {
   const geo = (miloLocale?.prefix || 'US_en').replace('/', '');
   let [country = 'US', language = 'en'] = (MAS_GEO_MAP[geo] ?? geo).split('_', 2);
   country = country.toUpperCase();
   language = language.toLowerCase();
-  const marketOverride = MARKET_LOCALE_OVERRIDES[language]?.[geoCountry];
-  return { locale: marketOverride ?? MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`, country: geoCountry ?? country };
+  const locale = MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`;
+  if (!market) return { locale, country };
+  const marketOverride = market !== country
+    ? MARKET_LOCALE_OVERRIDES[language]?.[market] : undefined;
+  return { locale: marketOverride ?? locale, country: market };
 }
+
+let masMarketPromise;
 
 // Mirrors the country Milo's merch.js stamps on mas-commerce-service, so the preload URL matches
 // the fragment request MAS actually makes (a raw geo country would be an unused, uncached request).
-async function getMasMarket(miloLibs) {
-  const { getMetadata } = await import(`${miloLibs}/utils/utils.js`);
-  // eslint-disable-next-line compat/compat
-  const flag = new URLSearchParams(window.location.search).get('mas-geo-detection') ?? getMetadata('mas-geo-detection');
-  if (!['on', 'true'].includes(flag?.toLowerCase())) return undefined;
-  const { getValidatedMarket } = await import(`${miloLibs}/utils/market.js`);
-  return (await getValidatedMarket())?.toUpperCase();
+// Memoized so concurrent preloads share a single markets config lookup.
+function getMasMarket(miloLibs) {
+  masMarketPromise ??= (async () => {
+    const { getMetadata } = await import(`${miloLibs}/utils/utils.js`);
+    // eslint-disable-next-line compat/compat
+    const flag = new URLSearchParams(window.location.search).get('mas-geo-detection') ?? getMetadata('mas-geo-detection');
+    if (!['on', 'true'].includes(flag?.toLowerCase())) return undefined;
+    const { getValidatedMarket } = await import(`${miloLibs}/utils/market.js`);
+    return (await getValidatedMarket())?.toUpperCase();
+  })().catch(() => undefined);
+  return masMarketPromise;
 }
 
 async function preloadMasFragment(a, config) {
