@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './ai-summary-generator.spec.js';
 import AiSummaryGenerator from './ai-summary-generator.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-ai-summary-generator.pdf');
@@ -117,9 +118,7 @@ test.describe('Unity AI Summary Generator test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await aiSummaryGenerator.rnrSection.scrollIntoViewIfNeeded();
-      await expect(aiSummaryGenerator.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(aiSummaryGenerator.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, aiSummaryGenerator.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

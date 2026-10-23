@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './extract-pdf.spec.js';
 import ExtractPages from './extract-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-extract-pages-pdf.pdf');
@@ -91,9 +92,7 @@ test.describe('Unity Extract PDF Pages test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await extractPages.rnrSection.scrollIntoViewIfNeeded();
-      await expect(extractPages.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(extractPages.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, extractPages.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

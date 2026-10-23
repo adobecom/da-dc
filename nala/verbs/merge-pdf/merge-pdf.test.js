@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './merge-pdf.spec.js';
 import MergePdf from './merge-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-merge-pdf.pdf');
@@ -96,9 +97,7 @@ test.describe('Unity Merge PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await mergePdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(mergePdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(mergePdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, mergePdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {
