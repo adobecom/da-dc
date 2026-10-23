@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './add-pdf-number.spec.js';
 import AddPdfNumberPage from './add-pdf-number.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-AddPageNumbers-pdf.pdf');
@@ -91,9 +92,7 @@ test.describe('Unity Add PDF page number test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await addPdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(addPdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(addPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, addPdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

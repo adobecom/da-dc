@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './ocr-pdf.spec.js';
 import OcrPdf from './ocr-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-ocr-pdf.pdf');
@@ -100,9 +101,7 @@ test.describe('Unity OCR PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await ocrPdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(ocrPdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(ocrPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, ocrPdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

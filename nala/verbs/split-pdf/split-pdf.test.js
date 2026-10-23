@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './split-pdf.spec.js';
 import SplitPdf from './split-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-split-pdf.pdf');
@@ -91,9 +92,7 @@ test.describe('Unity Split PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await splitPdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(splitPdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(splitPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, splitPdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

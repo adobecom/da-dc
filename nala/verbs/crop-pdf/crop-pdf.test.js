@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './crop-pdf.spec.js';
 import CropPdf from './crop-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-crop-pdf.pdf');
@@ -91,9 +92,7 @@ test.describe('Unity Crop PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await cropPdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(cropPdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(cropPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, cropPdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {
