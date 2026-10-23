@@ -160,21 +160,21 @@ const LIBS = '/libs';
 
 const locales = {
   // Americas
-  ar: { ietf: 'es-AR', tk: 'oln4yqj.css' },
+  ar: { ietf: 'es-AR', tk: 'oln4yqj.css', base: 'es' },
   br: { ietf: 'pt-BR', tk: 'inq1xob.css' },
   ca: { ietf: 'en-CA', tk: 'pps7abe.css', base: '' },
   ca_fr: { ietf: 'fr-CA', tk: 'vrk5vyv.css', base: 'fr' },
-  cl: { ietf: 'es-CL', tk: 'oln4yqj.css' },
-  co: { ietf: 'es-CO', tk: 'oln4yqj.css' },
+  cl: { ietf: 'es-CL', tk: 'oln4yqj.css', base: 'es' },
+  co: { ietf: 'es-CO', tk: 'oln4yqj.css', base: 'es' },
   la: { ietf: 'es', tk: 'oln4yqj.css' },
-  mx: { ietf: 'es-MX', tk: 'oln4yqj.css' },
-  pe: { ietf: 'es-PE', tk: 'oln4yqj.css' },
+  mx: { ietf: 'es-MX', tk: 'oln4yqj.css', base: 'es' },
+  pe: { ietf: 'es-PE', tk: 'oln4yqj.css', base: 'es' },
   '': { ietf: 'en-US', tk: 'hah7vzn.css' },
   // EMEA
   africa: { ietf: 'en', tk: 'pps7abe.css', base: '' },
   be_fr: { ietf: 'fr-BE', tk: 'vrk5vyv.css', base: 'fr' },
   be_en: { ietf: 'en-BE', tk: 'pps7abe.css', base: '' },
-  be_nl: { ietf: 'nl-BE', tk: 'cya6bri.css' },
+  be_nl: { ietf: 'nl-BE', tk: 'cya6bri.css', base: 'nl' },
   cy_en: { ietf: 'en-CY', tk: 'pps7abe.css' },
   dk: { ietf: 'da-DK', tk: 'aaz7dvd.css' },
   de: { ietf: 'de-DE', tk: 'vin7zsi.css' },
@@ -187,7 +187,7 @@ const locales = {
   it: { ietf: 'it-IT', tk: 'bbf5pok.css' },
   lv: { ietf: 'lv-LV', tk: 'aaz7dvd.css' },
   lt: { ietf: 'lt-LT', tk: 'aaz7dvd.css' },
-  lu_de: { ietf: 'de-LU', tk: 'vin7zsi.css' },
+  lu_de: { ietf: 'de-LU', tk: 'vin7zsi.css', base: 'de' },
   lu_en: { ietf: 'en-LU', tk: 'pps7abe.css', base: '' },
   lu_fr: { ietf: 'fr-LU', tk: 'vrk5vyv.css', base: 'fr' },
   hu: { ietf: 'hu-HU', tk: 'aaz7dvd.css' },
@@ -199,17 +199,17 @@ const locales = {
   pt: { ietf: 'pt-PT', tk: 'inq1xob.css' },
   ro: { ietf: 'ro-RO', tk: 'qxw8hzm.css' },
   sa_en: { ietf: 'en-SA', tk: 'pps7abe.css', base: '' },
-  ch_de: { ietf: 'de-CH', tk: 'vin7zsi.css' },
+  ch_de: { ietf: 'de-CH', tk: 'vin7zsi.css', base: 'de' },
   si: { ietf: 'sl-SI', tk: 'aaz7dvd.css' },
   sk: { ietf: 'sk-SK', tk: 'aaz7dvd.css' },
   ch_fr: { ietf: 'fr-CH', tk: 'vrk5vyv.css', base: 'fr' },
   fi: { ietf: 'fi-FI', tk: 'aaz7dvd.css' },
   se: { ietf: 'sv-SE', tk: 'fpk1pcd.css' },
-  ch_it: { ietf: 'it-CH', tk: 'bbf5pok.css' },
+  ch_it: { ietf: 'it-CH', tk: 'bbf5pok.css', base: 'it' },
   tr: { ietf: 'tr-TR', tk: 'aaz7dvd.css' },
   ae_en: { ietf: 'en', tk: 'pps7abe.css', dir: 'ltr', base: '' },
   uk: { ietf: 'en-GB', tk: 'pps7abe.css' },
-  at: { ietf: 'de-AT', tk: 'vin7zsi.css' },
+  at: { ietf: 'de-AT', tk: 'vin7zsi.css', base: 'de' },
   cz: { ietf: 'cs-CZ', tk: 'aaz7dvd.css' },
   bg: { ietf: 'bg-BG', tk: 'aaz7dvd.css' },
   ru: { ietf: 'ru-RU', tk: 'aaz7dvd.css' },
@@ -243,10 +243,10 @@ const locales = {
   // geo expansion MWPW-124903
   za: { ietf: 'en-ZA', tk: 'pps7abe.css', base: '' }, // South Africa (GB English)
   ng: { ietf: 'en-NG', tk: 'pps7abe.css', base: '' }, // Nigeria (GB English)
-  cr: { ietf: 'es-CR', tk: 'oln4yqj.css' }, // Costa Rica (Spanish Latin America)
-  ec: { ietf: 'es-EC', tk: 'oln4yqj.css' }, // Ecuador (Spanish Latin America)
-  pr: { ietf: 'es-PR', tk: 'oln4yqj.css' }, // Puerto Rico (Spanish Latin America)
-  gt: { ietf: 'es-GT', tk: 'oln4yqj.css' }, // Guatemala (Spanish Latin America)
+  cr: { ietf: 'es-CR', tk: 'oln4yqj.css', base: 'es' }, // Costa Rica (Spanish Latin America)
+  ec: { ietf: 'es-EC', tk: 'oln4yqj.css', base: 'es' }, // Ecuador (Spanish Latin America)
+  pr: { ietf: 'es-PR', tk: 'oln4yqj.css', base: 'es' }, // Puerto Rico (Spanish Latin America)
+  gt: { ietf: 'es-GT', tk: 'oln4yqj.css', base: 'es' }, // Guatemala (Spanish Latin America)
   eg_ar: { ietf: 'ar-EG', tk: 'dis2dpj.css', dir: 'rtl' }, // Egypt (Arabic)
   kw_ar: { ietf: 'ar-KW', tk: 'dis2dpj.css', dir: 'rtl' }, // Kuwait (Arabic)
   qa_ar: { ietf: 'ar-QA', tk: 'dis2dpj.css', dir: 'rtl' }, // Quatar (Arabic)
