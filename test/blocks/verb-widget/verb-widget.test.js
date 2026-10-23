@@ -93,10 +93,9 @@ describe('verb-widget block', () => {
       });
     });
 
-    // Excluded from redirect by MWPW-208582 (#237)
-    ['split-pdf', 'pdf-to-word'].forEach((verb) => {
-      it(`keeps signed-in users on ${verb}`, async () => {
-        expect(await runSignedIn(verb, 'type2')).to.be.null;
+    ['split-pdf', 'pdf-to-word', 'jpg-to-pdf'].forEach((verb) => {
+      it(`redirects signed-in users on ${verb}`, async () => {
+        expect(await runSignedIn(verb, 'type2')).to.include('/go/acrobat-');
       });
     });
 
