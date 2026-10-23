@@ -229,6 +229,47 @@ function buildCard(item, ctaText, token) {
   return card;
 }
 
+// Prev/next controls for mouse users (a vertical wheel can't scroll horizontal
+// overflow). Uses relative scrollBy + scroll-snap, wrapping at the ends, and
+// hides itself when the cards don't overflow.
+function setupCarouselNav(element, container) {
+  const prev = createTag('button', { type: 'button', class: 'pdf-spaces-nav-btn pdf-spaces-prev', 'aria-label': 'Previous PDF Spaces' });
+  const next = createTag('button', { type: 'button', class: 'pdf-spaces-nav-btn pdf-spaces-next', 'aria-label': 'Next PDF Spaces' });
+  const nav = createTag('div', { class: 'pdf-spaces-nav' }, [prev, next]);
+
+  const cardStep = () => {
+    const first = container.querySelector('.editorial-card');
+    if (!first) return container.clientWidth;
+    const gap = parseFloat(getComputedStyle(container).columnGap) || 0;
+    return first.getBoundingClientRect().width + gap;
+  };
+  const go = (dir) => {
+    const maxLeft = container.scrollWidth - container.clientWidth;
+    if (dir > 0 && container.scrollLeft >= maxLeft - 1) {
+      container.scrollTo({ left: 0, behavior: 'smooth' });
+    } else if (dir < 0 && container.scrollLeft <= 1) {
+      container.scrollTo({ left: maxLeft, behavior: 'smooth' });
+    } else {
+      container.scrollBy({ left: dir * cardStep(), behavior: 'smooth' });
+    }
+  };
+  prev.addEventListener('click', () => go(-1));
+  next.addEventListener('click', () => go(1));
+
+  const updateVisibility = () => {
+    nav.style.display = container.scrollWidth > container.clientWidth + 1 ? 'flex' : 'none';
+  };
+  element.append(nav);
+  // ResizeObserver fires once after the initial layout (so the arrows show on
+  // first paint, not just after a manual resize) and on every size change.
+  if (window.ResizeObserver) {
+    new ResizeObserver(updateVisibility).observe(container);
+  } else {
+    updateVisibility();
+    window.addEventListener('resize', updateVisibility);
+  }
+}
+
 export default async function init(element) {
   ({ createTag, loadBlock, getConfig } = await import(`${miloLibs}/utils/utils.js`));
   await loadPlaceholders(['pdf-spaces']);
@@ -270,6 +311,8 @@ export default async function init(element) {
       window.lana?.log(`PDF Spaces: card load failed — ${err.message}`, lanaOptions);
     }
   }));
+
+  setupCarouselNav(element, container);
 }
 
 export const testables = {

@@ -123,6 +123,54 @@
   background: #f5f5f5;
 }
 
+.pdf-spaces-gallery .pdf-spaces-nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.pdf-spaces-gallery .pdf-spaces-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid #d5d5d5;
+  border-radius: 50%;
+  background: #fff;
+  color: #292929;
+  cursor: pointer;
+}
+
+.pdf-spaces-gallery .pdf-spaces-nav-btn::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-top: 2px solid currentcolor;
+  border-right: 2px solid currentcolor;
+}
+
+.pdf-spaces-gallery .pdf-spaces-prev::before {
+  margin-left: 4px;
+  transform: rotate(-135deg);
+}
+
+.pdf-spaces-gallery .pdf-spaces-next::before {
+  margin-right: 4px;
+  transform: rotate(45deg);
+}
+
+.pdf-spaces-gallery .pdf-spaces-nav-btn:hover {
+  background: #f0f0f0;
+}
+
+.pdf-spaces-gallery .pdf-spaces-nav-btn:focus-visible {
+  outline: 2px solid #1473e6;
+  outline-offset: 2px;
+}
+
 /* Single card per view below 900px, matching the authored carousel. */
 @media (max-width: 899px) {
   .pdf-spaces-gallery .pdf-spaces-cards {
