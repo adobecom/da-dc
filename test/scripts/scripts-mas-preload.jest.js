@@ -22,7 +22,7 @@ async function waitForPreloads(count) {
 
 async function loadScripts({ prefix = '', geoDetection, market, links, marketError } = {}) {
   jest.resetModules();
-  document.head.innerHTML = '';
+  document.head.innerHTML = geoDetection ? `<meta name="mas-geo-detection" content="${geoDetection}">` : '';
   document.body.innerHTML = `<header></header><main><div>${links ?? MAS_LINK('fragment=abc')}</div></main>`;
   const getValidatedMarket = marketError
     ? jest.fn().mockRejectedValue(new Error('boom'))
@@ -111,5 +111,14 @@ describe('M@S fragment preload', () => {
     expect(urls[1].searchParams.has('mask')).toBe(false);
     urls.forEach((u) => expect(u.searchParams.get('country')).toBe('DE'));
     expect(getValidatedMarket).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    [undefined, 0],
+    ['on', 1],
+  ])('preloads market.js when geo detection is %s', async (geoDetection, count) => {
+    await loadScripts({ geoDetection, market: 'fr' });
+    await waitForPreloads(1);
+    expect(document.head.querySelectorAll('link[rel="modulepreload"][href="/libs/utils/market.js"]')).toHaveLength(count);
   });
 });

@@ -659,6 +659,15 @@ async function loadPage() {
   // Setup Milo
   const miloLibs = setLibs(LIBS);
 
+  // The MAS fragment preload awaits market.js when geo detection is on; preloading it now, before
+  // utils.js resolves, keeps it off the critical path.
+  // eslint-disable-next-line compat/compat
+  const masGeoDetection = new URLSearchParams(window.location.search).get('mas-geo-detection')
+    ?? getCustomMetadata('mas-geo-detection');
+  if (['on', 'true'].includes(masGeoDetection?.toLowerCase())) {
+    loadLink(`${miloLibs}/utils/market.js`, { rel: 'modulepreload' });
+  }
+
   // Milo and site styles
   if (!document.getElementById('inline-milo-styles')) {
     const paths = [];
