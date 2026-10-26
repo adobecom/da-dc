@@ -2,8 +2,8 @@ export default class PricingCompareVersionsPage {
   constructor(page) {
     this.page = page;
 
-    this.gnav = page.locator('nav.feds-topnav');
-    this.gnavBreadcrumbs = page.locator('nav.feds-breadcrumbs');
+    this.gnav = page.locator('header');
+    this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs');
 
     this.heroMarquee = page.locator('div[class*="hero-marquee"]');
     // First three-up above the compare table; `.first()` avoids lower-page three-ups
@@ -29,10 +29,5 @@ export default class PricingCompareVersionsPage {
     this.fedsSocial = this.footer.locator('ul[class*="feds-social"] a');
     this.fedsFooterLegalWrapper = this.footer.locator('div[class*="feds-footer-legalWrapper"]');
     this.fedsFooterPrivacyListItems = this.fedsFooterLegalWrapper.locator('li[class*="feds-footer-privacy-list"]');
-  }
-
-  /** @param {string} osi */
-  checkoutLinkByOsi(osi) {
-    return this.page.locator(`a[is*="checkout-link"][data-wcs-osi="${osi}"]`);
   }
 }

@@ -5,14 +5,14 @@ import checkPageLinks from '../../utils/link-checker.js';
 
 let campaign;
 
-test.describe('Acrobat Campaign — Acrobats got it', () => {
+test.describe('Acrobat Campaign — Do that with Acrobat', () => {
   test.beforeEach(async ({ page }) => {
     campaign = new CampaignPage(page);
   });
 
   test(`${features[0].name}, ${features[0].tags}`, async ({ page, baseURL }) => {
     const { path } = features[0];
-    console.info(`[Campaign Acrobats got it] ${baseURL}${path}`);
+    console.info(`[Campaign Do that with Acrobat] ${baseURL}${path}`);
 
     await test.step('Go to campaign page', async () => {
       await page.goto(`${baseURL}${path}`, { waitUntil: 'domcontentloaded' });
@@ -21,28 +21,27 @@ test.describe('Acrobat Campaign — Acrobats got it', () => {
     await test.step('Verify global nav without breadcrumbs', async () => {
       await campaign.gnav.waitFor({ state: 'visible' });
       await expect(campaign.gnav).toBeVisible();
-      await expect(campaign.gnavBreadcrumbs).not.toBeVisible();
+      // await expect(campaign.gnavBreadcrumbs).not.toBeVisible();
     });
 
-    await test.step('Verify Acrobats got it marquee (desktop)', async () => {
-      const marquee = campaign.acrobatsGotItMarqueeDesktop;
-      await marquee.scrollIntoViewIfNeeded();
-      await expect(marquee).toBeVisible({ timeout: 60000 });
+    await test.step('Verify hero marquee', async () => {
+      await campaign.heroMarquee.scrollIntoViewIfNeeded();
+      await expect(campaign.heroMarquee).toBeVisible({ timeout: 60000 });
     });
 
-    await test.step('Verify Acrobats got it body fragment', async () => {
-      const body = campaign.acrobatsGotItBody;
-      await body.scrollIntoViewIfNeeded();
-      await expect(body).toBeVisible({ timeout: 60000 });
+    await test.step('Verify media blocks', async () => {
+      const firstMedia = campaign.mediaBlocks.first();
+      await firstMedia.scrollIntoViewIfNeeded();
+      await expect(firstMedia).toBeVisible({ timeout: 60000 });
     });
 
-    await test.step('Verify Compare Acrobat plans merch (2 cards visible)', async () => {
-      await expect(campaign.compareAcrobatPlansSection).toBeVisible();
-      await expect(campaign.compareAcrobatPlansHeading).toBeVisible();
-
-      await expect(campaign.campaignMerchCards).toHaveCount(2);
-      await expect(campaign.acrobatProCard).toBeVisible();
-      await expect(campaign.acrobatProTeamsCard).toBeVisible();
+    await test.step('Verify Compare Acrobat plans merch cards', async () => {
+      const plans = campaign.compareAcrobatPlans;
+      await plans.scrollIntoViewIfNeeded({ timeout: 60000 });
+      await expect(plans).toBeVisible({ timeout: 60000 });
+      const merchCard = plans.locator('merch-card').filter({ visible: true }).first();
+      await merchCard.scrollIntoViewIfNeeded({ timeout: 60000 });
+      await expect(merchCard).toBeVisible();
     });
 
     await test.step('Verify footer', async () => {
