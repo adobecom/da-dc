@@ -522,8 +522,6 @@ const MAS_EXTRA_LOCALES = { pr: 'es_PR' };
 
 const MARKET_LOCALE_OVERRIDES = { en: { AU: 'en_GB', IN: 'en_GB', GB: 'en_GB' } };
 
-// Mirrors the locale/country Milo's merch.js stamps on mas-commerce-service: the market's
-// Global-EN locale override only applies when the page isn't already that market's own site.
 function getMasLocale(miloLocale, market) {
   const geo = (miloLocale?.prefix || 'US_en').replace('/', '');
   let [country = 'US', language = 'en'] = (MAS_GEO_MAP[geo] ?? geo).split('_', 2);
@@ -538,9 +536,6 @@ function getMasLocale(miloLocale, market) {
 
 let masMarketPromise;
 
-// Mirrors the country Milo's merch.js stamps on mas-commerce-service, so the preload URL matches
-// the fragment request MAS actually makes (a raw geo country would be an unused, uncached request).
-// Memoized so concurrent preloads share a single markets config lookup.
 function getMasMarket(miloLibs) {
   masMarketPromise ??= (async () => {
     const { getMetadata } = await import(`${miloLibs}/utils/utils.js`);
@@ -659,8 +654,6 @@ async function loadPage() {
   // Setup Milo
   const miloLibs = setLibs(LIBS);
 
-  // The MAS fragment preload awaits market.js when geo detection is on; preloading it now, before
-  // utils.js resolves, keeps it off the critical path.
   // eslint-disable-next-line compat/compat
   const masGeoDetection = new URLSearchParams(window.location.search).get('mas-geo-detection')
     ?? getCustomMetadata('mas-geo-detection');
