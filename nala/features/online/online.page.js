@@ -6,7 +6,7 @@ export default class OnlinePage {
   constructor(page) {
     this.page = page;
 
-    this.gnav = page.locator('nav.feds-topnav');
+    this.gnav = page.locator('header');
     this.footer = page.locator('footer[class="global-footer"]');
 
     /** Hero (“Do your best work online with Adobe Acrobat”). */

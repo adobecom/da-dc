@@ -1,5 +1,5 @@
 /* eslint-disable compat/compat */
-import { readFile } from '@web/test-runner-commands';
+import { readFile, setViewport } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved
@@ -610,6 +610,37 @@ describe('study-marquee block', () => {
     expect(media).to.exist;
     expect(media.parentElement).to.equal(block);
     expect(block.querySelector('.study-marquee-col-right .study-marquee-media')).to.not.exist;
+  });
+
+  it('avalon: keeps the video pause-play control in the bottom-right of the cover media on desktop', async () => {
+    await setViewport({ width: 1440, height: 900 });
+    const miloVideoStyles = document.createElement('style');
+    miloVideoStyles.textContent = `
+      .pause-play-wrapper { display: flex; width: fit-content; }
+      .video-container { display: flex; position: relative; height: 100%; }
+      .video-container .pause-play-wrapper { position: absolute; bottom: 2%; right: 2%; }
+      .video-container .pause-play-wrapper .offset-filler { width: 40px; height: 40px; }`;
+    document.head.append(miloVideoStyles);
+    try {
+      const conf = getConfig();
+      setConfig({ ...conf, locale: { prefix: '' } });
+      const block = document.body.querySelector('.study-marquee');
+      block.classList.add('avalon');
+      const mediaCell = block.querySelector(':scope > div:last-child > div:last-child');
+      mediaCell.innerHTML = '<div class="video-container video-holder"><video></video><a class="pause-play-wrapper" role="button"><div class="offset-filler"></div></a></div>';
+      await init(block);
+      await delay(100);
+      const media = block.querySelector('.study-marquee-media').getBoundingClientRect();
+      const control = block.querySelector('.study-marquee-media .pause-play-wrapper').getBoundingClientRect();
+      expect(control.width).to.be.below(media.width / 2);
+      expect(control.left).to.be.above(media.left + media.width / 2);
+      expect(control.top).to.be.above(media.top + media.height / 2);
+      expect(control.right).to.be.at.most(media.right);
+      expect(control.bottom).to.be.at.most(media.bottom);
+    } finally {
+      miloVideoStyles.remove();
+      await setViewport({ width: 800, height: 600 });
+    }
   });
 
   it('base variation keeps media inside the right column', async () => {

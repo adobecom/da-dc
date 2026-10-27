@@ -4,8 +4,8 @@ export default class WordToPdf extends AcrobatWidget {
   constructor(page, nth = 0) {
     super(page, '.word-to-pdf.unity-enabled', nth);
 
-    this.gnav = page.locator('nav.feds-topnav');
-    this.gnavBreadcrumbs = page.locator('nav.feds-breadcrumbs');
+    this.gnav = page.locator('header');
+    this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs');
 
     this.howToSection = page.locator('div[class*="how-to"]').first();
     this.selectFilesButton = this.widget.locator('button.verb-cta');

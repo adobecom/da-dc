@@ -899,7 +899,7 @@
   }
 
   .study-marquee.avalon .study-marquee-media h1,
-  .study-marquee.avalon .study-marquee-media a,
+  .study-marquee.avalon .study-marquee-media a:not(.pause-play-wrapper),
   .study-marquee.avalon .study-marquee-media picture {
     display: block;
     width: 100%;
