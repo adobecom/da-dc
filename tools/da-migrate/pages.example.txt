@@ -1,0 +1,14 @@
+# One path or URL per line. Blank lines and # comments are ignored.
+# Run with: npm run da-migrate -- -c tools/da-migrate/config.json -f tools/da-migrate/pages.example.txt
+
+https://main--da-dc--adobecom.aem.live/acrobat/online/word-to-pdf
+https://main--da-dc--adobecom.aem.live/acrobat/online/compress-pdf
+https://main--da-dc--adobecom.aem.live/acrobat/online/pdf-to-word
+
+# Locale pages land under /<locale>/dc-shared/tools/content/
+https://main--da-dc--adobecom.aem.live/fr/acrobat/online/word-to-pdf
+https://main--da-dc--adobecom.aem.live/jp/acrobat/online/word-to-pdf
+
+# Bare paths work too; a path without an extension is walked as a folder
+# /acrobat/online/split-pdf.html
+# /acrobat/online

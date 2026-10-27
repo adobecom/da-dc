@@ -1,0 +1,47 @@
+{
+  "source": {
+    "org": "adobecom",
+    "repo": "da-dc",
+    "ref": "main"
+  },
+  "dest": {
+    "org": "adobecom",
+    "repo": "dc-frictionless",
+    "ref": "main",
+    "contentRoot": "/dc-shared/tools/content"
+  },
+  "copyMedia": true,
+  "copyDependencies": {
+    "blocks": ["how-to"],
+    "pathPrefixes": [
+      "/dc-shared/fragments/modals/videos/",
+      "/dc-shared/assets/"
+    ],
+    "preview": true
+  },
+  "publish": "none",
+  "linkCheck": {
+    "enabled": true,
+    "concurrency": 8,
+    "timeoutMs": 15000,
+    "reportPath": "./.da-migrate-output/broken-links.json"
+  },
+  "transforms": {
+    "rewriteOrigin": {
+      "target": "https://main--dc-frictionless--adobecom.aem.live",
+      "matchHosts": ["aem.page", "aem.live"]
+    },
+    "removeNamedBlocks": [
+      "breadcrumbs",
+      "verb-widget",
+      "unity",
+      "metadata"
+    ],
+    "removeSectionsWithLink": [
+      "https://milo.adobe.com/tools/caas"
+    ],
+    "textReplacements": [
+      { "pattern": "verb-subfooter-moblie", "flags": "g", "replacement": "verb-subfooter-mobile" }
+    ]
+  }
+}

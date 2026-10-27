@@ -1,0 +1,69 @@
+{
+  "source": {
+    "org": "adobecom",
+    "repo": "da-dc",
+    "ref": "main"
+  },
+  "dest": {
+    "org": "adobecom",
+    "repo": "dc-frictionless",
+    "ref": "main",
+    "contentRoot": "/dc-shared/tools/content"
+  },
+  "paths": [
+    "/acrobat/online"
+  ],
+  "exclude": [
+    "\\.json$",
+    "/drafts/"
+  ],
+  "pathMap": [
+    { "from": "^/acrobat/online/", "to": "/tools/" }
+  ],
+  "copyMedia": true,
+  "copyDependencies": {
+    "blocks": ["how-to"],
+    "pathPrefixes": [
+      "/dc-shared/fragments/modals/videos/",
+      "/dc-shared/assets/"
+    ],
+    "preview": true
+  },
+  "publish": "none",
+  "customTransform": "./custom-transform.example.js",
+  "linkCheck": {
+    "enabled": true,
+    "concurrency": 8,
+    "timeoutMs": 15000,
+    "reportPath": "./.da-migrate-output/broken-links.json"
+  },
+  "transforms": {
+    "rewriteOrigin": {
+      "target": "https://main--dc-frictionless--adobecom.aem.live",
+      "matchHosts": ["aem.page", "aem.live"]
+    },
+    "removeNamedBlocks": [
+      "breadcrumbs",
+      "verb-widget",
+      "unity",
+      "metadata"
+    ],
+    "removeSectionsWithLink": [
+      "https://milo.adobe.com/tools/caas"
+    ],
+    "linkRewrites": [
+      { "from": "https://www.adobe.com/acrobat/online/", "to": "https://www.adobe.com/tools/" }
+    ],
+    "blockRenames": {},
+    "removeBlocks": [
+      ".section-metadata.legacy-only"
+    ],
+    "metadata": {
+      "set": {},
+      "remove": []
+    },
+    "textReplacements": [
+      { "pattern": "main--da-dc--adobecom", "flags": "g", "replacement": "main--dc-frictionless--adobecom" }
+    ]
+  }
+}

@@ -83,6 +83,21 @@ module.exports = {
       rules: { 'no-console': 0 },
     },
     {
+      // Node CLI, so browser-compat and browser-ES-level rules do not apply.
+      files: [
+        'tools/da-migrate/**/*.js',
+      ],
+      env: { browser: false, node: true },
+      rules: {
+        'compat/compat': 'off',
+        'ecmalist/no-object-fromentries': 'off',
+        'import/extensions': 'off',
+        'import/no-extraneous-dependencies': 'off',
+        'no-console': 'off',
+        'object-curly-newline': 'off',
+      },
+    },
+    {
       files: [
         'nala/**/*.js',
         'nala/**/*.test.js',
