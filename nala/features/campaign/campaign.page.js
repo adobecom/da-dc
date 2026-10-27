@@ -8,6 +8,10 @@ export default class CampaignPage {
     this.heroMarquee = page.locator('div.hero-marquee');
     this.mediaBlocks = page.locator('main div.media');
 
+    this.studyMarquee = page.locator('div.study-marquee');
+    this.studyMarqueeMedia = this.studyMarquee.locator('.study-marquee-media');
+    this.studyMarqueePausePlay = this.studyMarqueeMedia.locator('.pause-play-wrapper');
+
     /** “Compare Acrobat plans” merch cards fragment. */
     this.compareAcrobatPlans = page.locator(
       'div[data-path*="/dc-shared/fragments/merch-cards/compare-acrobat-plans"]',
