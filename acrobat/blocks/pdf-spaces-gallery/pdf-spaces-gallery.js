@@ -64,7 +64,14 @@ const getImsToken = async () => {
 
 const waitForIms = (timeout = 1000) => new Promise((resolve) => {
   if (window.adobeIMS) { resolve(true); return; }
-  setTimeout(() => resolve(!!window.adobeIMS), timeout);
+  // Poll until IMS is ready (or the timeout elapses) rather than sampling once.
+  const start = Date.now();
+  const id = setInterval(() => {
+    if (window.adobeIMS || Date.now() - start >= timeout) {
+      clearInterval(id);
+      resolve(!!window.adobeIMS);
+    }
+  }, 100);
 });
 
 const getAndValidateImsToken = async () => {
@@ -187,7 +194,10 @@ async function loadThumbnail(img, thumbUrl, token) {
     });
     if (!resp.ok) return;
     const blob = await resp.blob();
-    img.src = URL.createObjectURL(blob);
+    const objectUrl = URL.createObjectURL(blob);
+    img.addEventListener('load', () => URL.revokeObjectURL(objectUrl), { once: true });
+    img.addEventListener('error', () => URL.revokeObjectURL(objectUrl), { once: true });
+    img.src = objectUrl;
     img.classList.remove('pdf-spaces-placeholder-img');
   } catch {
     // leave the placeholder in place
@@ -212,11 +222,13 @@ function buildCard(item, ctaText, token) {
   const picture = createTag('picture', {}, img);
   const imgRow = createTag('div', { class: 'pdf-spaces-media' }, createTag('div', {}, picture));
 
-  const textInner = createTag('div', {}, [
-    createTag('p', {}, item.category || ''),
-    createTag('h3', {}, item.name || ''),
-    createTag('p', {}, item.description || ''),
-  ]);
+  const categoryEl = createTag('p');
+  categoryEl.textContent = item.category || '';
+  const nameEl = createTag('h3');
+  nameEl.textContent = item.name || '';
+  const descEl = createTag('p');
+  descEl.textContent = item.description || '';
+  const textInner = createTag('div', {}, [categoryEl, nameEl, descEl]);
   const textRow = createTag('div', { class: 'pdf-spaces-text' }, textInner);
 
   const cta = createTag('a', { href: buildDestinationUrl(item.id), 'aria-label': `${ctaText} ${item.name}` }, ctaText);
@@ -233,14 +245,16 @@ function buildCard(item, ctaText, token) {
 // overflow). Uses relative scrollBy + scroll-snap, wrapping at the ends, and
 // hides itself when the cards don't overflow.
 function setupCarouselNav(element, container) {
-  const prev = createTag('button', { type: 'button', class: 'pdf-spaces-nav-btn pdf-spaces-prev', 'aria-label': 'Previous PDF Spaces' });
-  const next = createTag('button', { type: 'button', class: 'pdf-spaces-nav-btn pdf-spaces-next', 'aria-label': 'Next PDF Spaces' });
+  const prevLabel = window.mph?.['pdf-spaces-prev'] || 'Previous PDF Spaces';
+  const nextLabel = window.mph?.['pdf-spaces-next'] || 'Next PDF Spaces';
+  const prev = createTag('button', { type: 'button', class: 'pdf-spaces-nav-btn pdf-spaces-prev', 'aria-label': prevLabel });
+  const next = createTag('button', { type: 'button', class: 'pdf-spaces-nav-btn pdf-spaces-next', 'aria-label': nextLabel });
   const nav = createTag('div', { class: 'pdf-spaces-nav' }, [prev, next]);
 
   const cardStep = () => {
     const first = container.querySelector('.editorial-card');
     if (!first) return container.clientWidth;
-    const gap = parseFloat(getComputedStyle(container).columnGap) || 0;
+    const gap = Number.parseFloat(getComputedStyle(container).columnGap) || 0;
     return first.getBoundingClientRect().width + gap;
   };
   const go = (dir) => {
@@ -297,7 +311,12 @@ export default async function init(element) {
     return;
   }
 
-  const container = createTag('div', { class: 'pdf-spaces-cards' });
+  const container = createTag('div', {
+    class: 'pdf-spaces-cards',
+    role: 'region',
+    'aria-label': window.mph?.['pdf-spaces-label'] || 'PDF Spaces',
+    tabindex: '0',
+  });
   element.replaceChildren(container);
 
   // Load each card individually — Milo's carousel is section-level, so it can't

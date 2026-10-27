@@ -4,7 +4,8 @@ Dynamic gallery that renders the curated list of PDF Spaces on
 `adobe.com/acrobat/generative-ai-pdf/pdf-spaces.html`, pulling from the same
 in-product source of truth as `acrobat.adobe.com/curatedpdfspaces`.
 
-**Ticket:** [MWPW-189601](https://jira.corp.adobe.com/browse/MWPW-189601)
+**Ticket:** [MWPW-200364](https://jira.corp.adobe.com/browse/MWPW-200364)
+(due diligence: [MWPW-189601](https://jira.corp.adobe.com/browse/MWPW-189601))
 
 Replaces the four hand-authored DA fragments (Featured / Productivity /
 Lifestyle / All) with a single block that fetches the curated list at runtime,
@@ -18,8 +19,9 @@ so a.com stays in sync with the in-product list automatically.
 - **Required:** add `ims-cid = acrobatmiloguest` and `ims-guest = TRUE` to the
   page **metadata** block. Without it the block silently removes itself (no
   visible error for authors).
-- CTA text defaults to "Explore now"; override with a `pdf-spaces-cta` key in
-  the locale's `placeholders.json`.
+- Localizable strings via the locale's `placeholders.json`: `pdf-spaces-cta`
+  (button, default "Explore now"), `pdf-spaces-prev` / `pdf-spaces-next` (arrow
+  aria-labels), `pdf-spaces-label` (gallery region label).
 - The API assigns one category per space, so a space may appear in only one tab.
 - If the API is unavailable the block hides itself (no fallback content yet).
 
@@ -75,4 +77,5 @@ Cards are `editorial-card`s decorated via `loadBlock` (inheriting Milo's card
 visuals). The carousel layout is **custom CSS** — Milo's `carousel` is
 section-level and can't be driven from a block — mirroring the authored
 `carousel show-4` + `editorial-card` (4-up, single card below 900px, image
-height capped at `--card-height-default`). No infinite loop / arrows yet.
+height capped at `--card-height-default`). Prev/next arrows handle mouse
+navigation and wrap around at the ends.
