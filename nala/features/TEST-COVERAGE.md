@@ -73,6 +73,7 @@ Use the **test name** (from `feature.name` + `feature.tags`) when filtering in C
 |------|-----|----------|
 | `campaign.spec.js` | `/acrobat/campaign/acrobats-got-it` | `@campaign`, `@acrobats-got-it`, `@smoke`, `@live`. |
 | `campaign.test.js` | same | **Campaign merch:** exactly **2** cards; Acrobat Pro card, price, free trial + **Buy now** visibility, enabled state, and **specific `data-wcs-osi` attributes**; Acrobat Pro **Teams** card, price, free trial, pricing link (href matches `pricing/business`); `verifyAllCheckoutLinks`. |
+| | **`/acrobat/campaign/interactive-report`** | `study-marquee` (avalon) video **pause/play control** is visible and sits in the **bottom-right** of the cover media. Tags: `@campaign`, `@interactive-report`, `@study-marquee`. |
 
 ---
 

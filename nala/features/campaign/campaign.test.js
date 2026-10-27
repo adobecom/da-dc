@@ -65,3 +65,33 @@ test.describe('Acrobat Campaign — Do that with Acrobat', () => {
     });
   });
 });
+
+test.describe('Acrobat Campaign — Interactive Report', () => {
+  test.beforeEach(async ({ page }) => {
+    campaign = new CampaignPage(page);
+  });
+
+  test(`${features[1].name}, ${features[1].tags}`, async ({ page, baseURL }) => {
+    const { path } = features[1];
+    console.info(`[Campaign Interactive Report] ${baseURL}${path}`);
+
+    await test.step('Go to campaign page', async () => {
+      await page.goto(`${baseURL}${path}`, { waitUntil: 'domcontentloaded' });
+    });
+
+    await test.step('Verify study marquee', async () => {
+      await expect(campaign.studyMarquee).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify video pause/play control is in the bottom-right of the media', async () => {
+      await expect(campaign.studyMarqueePausePlay).toBeVisible({ timeout: 60000 });
+      const media = await campaign.studyMarqueeMedia.boundingBox();
+      const control = await campaign.studyMarqueePausePlay.boundingBox();
+      expect(control.width).toBeLessThan(media.width / 2);
+      expect(control.x).toBeGreaterThan(media.x + media.width / 2);
+      expect(control.y).toBeGreaterThan(media.y + media.height / 2);
+      expect(control.x + control.width).toBeLessThanOrEqual(media.x + media.width);
+      expect(control.y + control.height).toBeLessThanOrEqual(media.y + media.height);
+    });
+  });
+});
