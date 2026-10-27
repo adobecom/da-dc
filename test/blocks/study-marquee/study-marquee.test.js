@@ -53,6 +53,63 @@ describe('study-marquee block', () => {
     expect(LIMITS['mindmap-maker'].genAI).to.be.true;
   });
 
+  it('exports LIMITS for gen-presentation-v2, interactive-report, and stylize as single-file PDF-only verbs', () => {
+    ['gen-presentation-v2', 'interactive-report', 'stylize'].forEach((verb) => {
+      expect(LIMITS).to.have.property(verb);
+      expect(LIMITS[verb].acceptedFiles).to.deep.equal(['.pdf']);
+      expect(LIMITS[verb].maxFileSize).to.equal(104857600);
+      expect(LIMITS[verb].maxNumFiles).to.equal(1);
+      expect(LIMITS[verb].multipleFiles).to.not.be.ok;
+      expect(LIMITS[verb].genAI).to.be.true;
+    });
+  });
+
+  it('init gen-presentation-v2 block', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.classList.contains('gen-presentation-v2')).to.be.true;
+    expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
+  });
+
+  it('init interactive-report block', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-interactive-report.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.classList.contains('interactive-report')).to.be.true;
+    expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
+  });
+
+  it('renders pdf-only accept attribute for gen-presentation-v2 and interactive-report', async () => {
+    const cases = [
+      ['gen-presentation-v2', './mocks/body-gen-presentation-v2.html'],
+      ['interactive-report', './mocks/body-interactive-report.html'],
+    ];
+    for (const [verb, path] of cases) {
+      document.body.innerHTML = await readFile({ path });
+      const block = document.body.querySelector('.study-marquee');
+      const conf = getConfig();
+      setConfig({ ...conf, locale: { prefix: '' } });
+      await init(block);
+      expect(document.querySelector('.study-marquee #file-upload').getAttribute('accept'), `${verb} should only accept .pdf`).to.equal('.pdf');
+    }
+  });
+
+  it('init stylize block', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-stylize.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.classList.contains('stylize')).to.be.true;
+    expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
+    expect(document.querySelector('.study-marquee #file-upload').getAttribute('accept')).to.equal('.pdf');
+  });
+
   it('init study-marquee', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
@@ -60,6 +117,53 @@ describe('study-marquee block', () => {
     await init(block);
     expect(document.querySelector('.study-marquee .acrobat-icon svg')).to.exist;
     expect(document.querySelector('.study-marquee .info-icon svg')).to.exist;
+  });
+
+  it('uses the authored title and removes authored rows', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div class="authored-title-row">
+        <div>dc-block-row-title</div>
+        <div>Authored title</div>
+      </div>
+      <div class="authored-copy-row">
+        <div>dc-block-row-copy</div>
+        <div>Authored copy</div>
+      </div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+
+    await init(block);
+
+    expect(block.querySelector('.study-marquee-title').textContent).to.equal('Authored title');
+    expect(block.querySelector('.authored-title-row')).to.not.exist;
+    expect(block.querySelector('.authored-copy-row')).to.not.exist;
+  });
+
+  it('falls back to Adobe Acrobat when no authored title exists', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+
+    await init(block);
+
+    expect(block.querySelector('.study-marquee-title').textContent).to.equal('Adobe Acrobat');
+  });
+
+  it('falls back to Adobe Acrobat when the authored title row is blank', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div class="authored-title-row">
+        <div>dc-block-row-title</div>
+        <div>   </div>
+      </div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+
+    await init(block);
+
+    expect(block.querySelector('.study-marquee-title').textContent).to.equal('Adobe Acrobat');
+    expect(block.querySelector('.authored-title-row')).to.not.exist;
   });
 
   it('init flashcard-maker block', async () => {
@@ -81,6 +185,51 @@ describe('study-marquee block', () => {
     await init(block);
     expect(block.classList.contains('mindmap-maker')).to.be.true;
     expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
+  });
+
+  it('delays redirect by 3 seconds and logs a warning on uploaded for all verbs', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+    const clock = sinon.useFakeTimers();
+    const redirectSpy = sinon.spy();
+    window.addEventListener('DCUnity:RedirectReady', redirectSpy);
+
+    try {
+      block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'uploaded', data: {}, sendToSplunk: true } }));
+
+      expect(redirectSpy.called).to.be.false;
+      clock.tick(3000);
+      expect(redirectSpy.called).to.be.true;
+      expect(window.lana.log.calledWith(sinon.match(/3 second timeout dispatched event/))).to.be.true;
+      expect(window.analytics.verbAnalytics.calledWith('job:uploaded')).to.be.true;
+    } finally {
+      clock.restore();
+      window.removeEventListener('DCUnity:RedirectReady', redirectSpy);
+    }
+  });
+
+  it('adds only one prefetch iframe per page across uploading and redirectUrl', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+    const target = 'about:blank#prefetch-target';
+    window.prefetchTargetUrl = target;
+    delete window.prefetchTargetLoaded;
+    try {
+      block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'uploading', data: {} } }));
+      block.dispatchEvent(new CustomEvent('unity:track-analytics', { detail: { event: 'redirectUrl', data: { redirectUrl: target } } }));
+      expect(document.querySelectorAll(`iframe[src="${target}"]`).length).to.equal(1);
+    } finally {
+      delete window.prefetchTargetUrl;
+      delete window.prefetchTargetLoaded;
+    }
   });
 
   it('show error toast', async () => {
@@ -110,6 +259,72 @@ describe('study-marquee block', () => {
     expect(window.analytics.sendAnalyticsToSplunk.called).to.be.true;
 
     expect(window.lana.log.called).to.be.true;
+  });
+
+  it('maps password-protected validation errors (single and multi) to analytics', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    ['validation_error_password_protected', 'validation_error_password_protected_multi'].forEach((code) => {
+      block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code, message: 'This file is password protected.', sendToSplunk: true } }));
+    });
+
+    expect(window.analytics.verbAnalytics.calledWith('error:password_protected')).to.be.true;
+    expect(window.analytics.sendAnalyticsToSplunk.calledWith('error_password_protected')).to.be.true;
+  });
+
+  it('maps acroform-not-supported validation errors (single and multi) to analytics', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-stylize.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    ['validation_error_acroform_not_supported', 'validation_error_acroform_not_supported_multi'].forEach((code) => {
+      block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code, message: 'Forms are not supported.', sendToSplunk: true } }));
+    });
+
+    expect(window.analytics.verbAnalytics.calledWith('error:acroform_not_supported')).to.be.true;
+    expect(window.analytics.sendAnalyticsToSplunk.calledWith('error_acroform_not_supported')).to.be.true;
+  });
+
+  it('maps scanned-document validation errors (single and multi) to analytics', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-stylize.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    ['validation_error_scanned_document', 'validation_error_scanned_document_multi'].forEach((code) => {
+      block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code, message: 'Scanned documents are not supported.', sendToSplunk: true } }));
+    });
+
+    expect(window.analytics.verbAnalytics.calledWith('error:scanned_document')).to.be.true;
+    expect(window.analytics.sendAnalyticsToSplunk.calledWith('error_scanned_document')).to.be.true;
+  });
+
+  it('displays the error toast message for the new validation error codes', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+    block.dispatchEvent(new CustomEvent('unity:show-error-toast', { detail: { code: 'validation_error_password_protected', message: 'This file is password protected.', sendToSplunk: false } }));
+    const errorState = block.querySelector('.error');
+    expect(errorState.classList.contains('hide')).to.be.false;
+    expect(block.querySelector('.study-marquee-error-text').textContent).to.equal('This file is password protected.');
   });
 
   it('error close button hides error state', async () => {
@@ -368,6 +583,122 @@ describe('study-marquee block', () => {
     expect(hrefs.some((h) => h && h.includes('privacy'))).to.be.true;
   });
 
+  it('avalon: loads the legal text from the avalon placeholder with decorated links', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.add('avalon');
+    await init(block);
+    await delay(100);
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal).to.exist;
+    expect(legal.textContent).to.contain(window.mph['study-marquee-avalon-legal']);
+    // links are decorated the same way as the base legal text
+    const links = legal.querySelectorAll('a.study-marquee-legal-url');
+    expect(links.length).to.equal(2);
+    expect([...links].map((a) => a.textContent)).to.include.members(['Terms of Use', 'Privacy Policy']);
+  });
+
+  it('avalon: cover media is a direct child of the block (hero-marquee media-cover)', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.add('avalon');
+    await init(block);
+    await delay(100);
+    const media = block.querySelector('.study-marquee-media');
+    expect(media).to.exist;
+    expect(media.parentElement).to.equal(block);
+    expect(block.querySelector('.study-marquee-col-right .study-marquee-media')).to.not.exist;
+  });
+
+  it('base variation keeps media inside the right column', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    expect(block.querySelector('.study-marquee-col-right .study-marquee-media')).to.exist;
+  });
+
+  it('base variation loads the base legal text, not the avalon placeholder', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal.textContent).to.not.contain('Avalon legal:');
+    expect(legal.textContent).to.contain('By using this service');
+  });
+
+  it('CTA text: verb-specific placeholder overrides the default', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    window.mph['study-marquee-quiz-maker-upload-cta'] = 'Make my quiz';
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    const label = block.querySelector('.study-marquee-cta-label');
+    expect(label.textContent).to.equal('Make my quiz');
+    delete window.mph['study-marquee-quiz-maker-upload-cta'];
+  });
+
+  it('CTA text: falls back to the uploadType key when no verb-specific text', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    await delay(100);
+    const label = block.querySelector('.study-marquee-cta-label');
+    expect(label.textContent).to.equal(window.mph['verb-widget-cta-multifile-only']);
+  });
+
+  it('resolves the verb when the avalon token precedes the verb class', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    window.mph['study-marquee-quiz-maker-upload-cta'] = 'Quiz specific CTA';
+    const block = document.body.querySelector('.study-marquee');
+    // author order: study-marquee avalon quiz-maker (avalon becomes classList[1])
+    block.classList.remove('quiz-maker');
+    block.classList.add('avalon');
+    block.classList.add('quiz-maker');
+    await init(block);
+    await delay(100);
+    // VERB must still resolve to quiz-maker (classList[2]), proven by the verb-specific CTA
+    const label = block.querySelector('.study-marquee-cta-label');
+    expect(label.textContent).to.equal('Quiz specific CTA');
+    delete window.mph['study-marquee-quiz-maker-upload-cta'];
+  });
+
+  it('avalon: verb-specific legal key overrides the generic avalon legal', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    window.mph['study-marquee-avalon-quiz-maker-legal'] = 'Verb-specific avalon legal line';
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.add('avalon');
+    await init(block);
+    await delay(100);
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal.textContent).to.contain('Verb-specific avalon legal line');
+    expect(legal.textContent).to.not.contain(window.mph['study-marquee-avalon-legal']);
+    delete window.mph['study-marquee-avalon-quiz-maker-legal'];
+  });
+
+  it('avalon: falls back to the base legal text when no avalon placeholder is authored', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const saved = window.mph['study-marquee-avalon-legal'];
+    delete window.mph['study-marquee-avalon-legal'];
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.add('avalon');
+    await init(block);
+    await delay(100);
+    const legal = block.querySelector('.study-marquee-footer .study-marquee-legal');
+    expect(legal.textContent).to.contain('By using this service');
+    window.mph['study-marquee-avalon-legal'] = saved;
+  });
+
   it('upload button exists', async () => {
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
@@ -476,5 +807,281 @@ describe('study-marquee block', () => {
       value: false,
       writable: false,
     });
+  });
+
+  it('authored copy is rendered instead of placeholder', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-copy</div><div>Authored copy text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-copy').textContent).to.equal('Authored copy text');
+  });
+
+  it('falls back to placeholder copy when not authored', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    const isMobileOrTablet = window.innerWidth < 1200;
+    const expectedCopy = isMobileOrTablet
+      ? (window.mph['study-marquee-gen-presentation-v2-mobile-copy'] || window.mph['study-marquee-gen-presentation-v2-copy'])
+      : window.mph['study-marquee-gen-presentation-v2-copy'];
+    expect(block.querySelector('.study-marquee-copy').textContent).to.equal(expectedCopy);
+  });
+
+  it('falls back to placeholder copy when the authored copy row is blank', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-copy</div><div>   </div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    const isMobileOrTablet = window.innerWidth < 1200;
+    const expectedCopy = isMobileOrTablet
+      ? (window.mph['study-marquee-gen-presentation-v2-mobile-copy'] || window.mph['study-marquee-gen-presentation-v2-copy'])
+      : window.mph['study-marquee-gen-presentation-v2-copy'];
+    expect(block.querySelector('.study-marquee-copy').textContent).to.equal(expectedCopy);
+  });
+
+  it('falls back to placeholder copy on desktop when the authored copy row is blank', async () => {
+    const originalWidth = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1280 });
+    try {
+      document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+      const block = document.body.querySelector('.study-marquee');
+      block.insertAdjacentHTML('afterbegin', `
+        <div><div>dc-block-row-copy</div><div>   </div></div>`);
+      const conf = getConfig();
+      setConfig({ ...conf, locale: { prefix: '' } });
+      await init(block);
+      expect(block.querySelector('.study-marquee-copy').textContent)
+        .to.equal(window.mph['study-marquee-gen-presentation-v2-copy']);
+    } finally {
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalWidth });
+    }
+  });
+
+  it('authored sub-copy is rendered instead of placeholder', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-sub-copy</div><div>Authored sub-copy text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-copy-sub').textContent).to.equal('Authored sub-copy text');
+  });
+
+  it('falls back to placeholder sub-copy when not authored', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-copy-sub').textContent)
+      .to.equal(window.mph['study-marquee-gen-presentation-v2-sub-copy']);
+  });
+
+  it('falls back to placeholder sub-copy when the authored sub-copy row is blank', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-sub-copy</div><div>   </div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-copy-sub').textContent)
+      .to.equal(window.mph['study-marquee-gen-presentation-v2-sub-copy']);
+  });
+
+  it('falls back to placeholder sub-copy on desktop when the authored sub-copy row is blank', async () => {
+    const originalWidth = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1280 });
+    try {
+      document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+      const block = document.body.querySelector('.study-marquee');
+      block.insertAdjacentHTML('afterbegin', `
+        <div><div>dc-block-row-sub-copy</div><div>   </div></div>`);
+      const conf = getConfig();
+      setConfig({ ...conf, locale: { prefix: '' } });
+      await init(block);
+      expect(block.querySelector('.study-marquee-copy-sub').textContent)
+        .to.equal(window.mph['study-marquee-gen-presentation-v2-sub-copy']);
+    } finally {
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalWidth });
+    }
+  });
+
+  it('authored upload-cta overrides placeholder CTA', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-upload-cta</div><div>Authored CTA text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-cta-label').textContent).to.equal('Authored CTA text');
+  });
+
+  it('falls back to placeholder CTA when the authored upload-cta row is blank', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-upload-cta</div><div>   </div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-cta-label').textContent)
+      .to.equal(window.mph['verb-widget-cta-multifile-only']);
+  });
+
+  it('authored dragndrop-text overrides placeholder', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-dragndrop-text</div><div>Authored drag text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-drag').textContent).to.equal('Authored drag text');
+  });
+
+  it('falls back to placeholder dragndrop-text when not authored', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-drag').textContent)
+      .to.equal(window.mph['study-widget-gen-presentation-v2-dragndrop-text']);
+  });
+
+  it('falls back to placeholder dragndrop-text when the authored row is blank', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-dragndrop-text</div><div>   </div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-drag').textContent)
+      .to.equal(window.mph['study-widget-gen-presentation-v2-dragndrop-text']);
+  });
+
+  it('authored file-limit overrides placeholder', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-file-limit</div><div>Authored file limit text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-file-limit').textContent).to.equal('Authored file limit text');
+  });
+
+  it('falls back to placeholder file-limit when not authored', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-file-limit').textContent)
+      .to.equal(window.mph['study-widget-gen-presentation-v2-file-limit']);
+  });
+
+  it('falls back to placeholder file-limit when the authored row is blank', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-gen-presentation-v2.html' });
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-file-limit</div><div>   </div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-file-limit').textContent)
+      .to.equal(window.mph['study-widget-gen-presentation-v2-file-limit']);
+  });
+
+  it('authored tool-tip overrides placeholder tooltip', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-tool-tip</div><div>Authored tooltip text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    const infoIcon = block.querySelector('.info-icon');
+    expect(infoIcon.getAttribute('data-tooltip')).to.equal('Authored tooltip text');
+    expect(infoIcon.getAttribute('aria-label')).to.equal('Authored tooltip text');
+  });
+
+  it('falls back to placeholder tooltip when the authored tool-tip row is blank', async () => {
+    window.mph['verb-widget-tool-tip'] = 'Placeholder tooltip text';
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-tool-tip</div><div>   </div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    const infoIcon = block.querySelector('.info-icon');
+    expect(infoIcon.getAttribute('data-tooltip')).to.equal('Placeholder tooltip text');
+    delete window.mph['verb-widget-tool-tip'];
+  });
+
+  it('authored legal-text overrides placeholder fallback chain', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-legal-text</div><div>Authored legal text</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.querySelector('.study-marquee-legal').textContent).to.contain('Authored legal text');
+  });
+
+  it('authored legal-text takes precedence over avalon placeholders', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.add('avalon');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-legal-text</div><div>Authored avalon legal override</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    const legal = block.querySelector('.study-marquee-legal');
+    expect(legal.textContent).to.contain('Authored avalon legal override');
+    expect(legal.textContent).to.not.contain('Avalon legal:');
+  });
+
+  it('authored legal-text uses innerHTML as-is without placeholder link injection', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-legal-text</div><div>By using this, you agree to our <a href="https://example.com/terms">custom terms</a>.</div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    const legal = block.querySelector('.study-marquee-legal');
+    const links = legal.querySelectorAll('a');
+    expect(links.length).to.equal(1);
+    expect(links[0].getAttribute('href')).to.equal('https://example.com/terms');
+    expect(links[0].textContent).to.equal('custom terms');
+  });
+
+  it('placeholder legal-text still applies link injection when not authored', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    await init(block);
+    const legal = block.querySelector('.study-marquee-legal');
+    const links = legal.querySelectorAll('a.study-marquee-legal-url');
+    expect(links.length).to.be.greaterThan(0);
+  });
+
+  it('falls back to placeholder legal text when the authored legal-text row is blank', async () => {
+    const block = document.body.querySelector('.study-marquee');
+    block.insertAdjacentHTML('afterbegin', `
+      <div><div>dc-block-row-legal-text</div><div>   </div></div>`);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    const legal = block.querySelector('.study-marquee-legal');
+    expect(legal.textContent).to.contain('By using this service');
+    const links = legal.querySelectorAll('a.study-marquee-legal-url');
+    expect(links.length).to.be.greaterThan(0);
   });
 });

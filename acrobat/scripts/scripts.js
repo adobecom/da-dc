@@ -228,7 +228,7 @@ const locales = {
   my_en: { ietf: 'en-MY', tk: 'pps7abe.css', base: '' },
   nz: { ietf: 'en-NZ', tk: 'pps7abe.css', base: '' },
   ph_en: { ietf: 'en-PH', tk: 'pps7abe.css', base: '' },
-  ph_fil: { ietf: 'tl-PH', tk: 'ict8rmp.css' },
+  ph_fil: { ietf: 'fil-PH', tk: 'ict8rmp.css' },
   sg: { ietf: 'en-SG', tk: 'pps7abe.css', base: '' },
   th_en: { ietf: 'en-TH', tk: 'pps7abe.css', base: '' },
   in_hi: { ietf: 'hi-IN', tk: 'aaa8deh.css' },
@@ -264,6 +264,7 @@ const CONFIG = {
   codeRoot: '/acrobat',
   contentRoot: '/dc-shared',
   imsClientId: 'acrobatmilo',
+  iconsExcludeBlocks: ['unity'],
   commerce: {
     checkoutClientId: 'doc_cloud',
     'wcs-api-key': 'wcms-commerce-ims-ro-user-milo-dc',
@@ -418,7 +419,7 @@ replaceDotMedia(document);
 
 // Default to loading the first image as eager.
 (async function loadLCPImage() {
-  const blocks = '.marquee,.hero-marquee,.study-marquee';
+  const blocks = '.marquee,.hero-marquee,.study-marquee,.unity-marquee';
   const marquee = document.querySelector(blocks); // first marquee only
   if (marquee) {
     if (window?.browser?.isMobile) {
@@ -429,6 +430,160 @@ replaceDotMedia(document);
     }
   }
 }());
+
+const MAS_FRAGMENT_API = 'https://www.adobe.com/mas/io/fragment';
+const DEFAULT_MAS_FRAGMENT_API_KEY = 'wcms-commerce-ims-ro-user-milo';
+const MAS_LINK_SELECTOR = 'a[href*="mas.adobe.com/studio.html"]';
+
+// Kept in sync with GeoMap in Milo's blocks/merch/merch.js.
+const MAS_GEO_MAP = {
+  ar: 'AR_es',
+  be_en: 'BE_en',
+  be_fr: 'BE_fr',
+  be_nl: 'BE_nl',
+  br: 'BR_pt',
+  ca: 'CA_en',
+  ch_de: 'CH_de',
+  ch_fr: 'CH_fr',
+  ch_it: 'CH_it',
+  cl: 'CL_es',
+  co: 'CO_es',
+  la: 'DO_es',
+  mx: 'MX_es',
+  pe: 'PE_es',
+  africa: 'MU_en',
+  dk: 'DK_da',
+  de: 'DE_de',
+  ee: 'EE_et',
+  eg_ar: 'EG_ar',
+  eg_en: 'EG_en',
+  es: 'ES_es',
+  fr: 'FR_fr',
+  gr_el: 'GR_el',
+  gr_en: 'GR_en',
+  ie: 'IE_en',
+  il_he: 'IL_he',
+  it: 'IT_it',
+  lv: 'LV_lv',
+  lt: 'LT_lt',
+  lu_de: 'LU_de',
+  lu_en: 'LU_en',
+  lu_fr: 'LU_fr',
+  my_en: 'MY_en',
+  my_ms: 'MY_ms',
+  hu: 'HU_hu',
+  mt: 'MT_en',
+  mena_en: 'DZ_en',
+  mena_ar: 'DZ_ar',
+  nl: 'NL_nl',
+  no: 'NO_nb',
+  pl: 'PL_pl',
+  pt: 'PT_pt',
+  ro: 'RO_ro',
+  si: 'SI_sl',
+  sk: 'SK_sk',
+  fi: 'FI_fi',
+  se: 'SE_sv',
+  tr: 'TR_tr',
+  uk: 'GB_en',
+  at: 'AT_de',
+  cz: 'CZ_cs',
+  bg: 'BG_bg',
+  ru: 'RU_ru',
+  ua: 'UA_uk',
+  au: 'AU_en',
+  in_en: 'IN_en',
+  in_hi: 'IN_hi',
+  id_en: 'ID_en',
+  id_id: 'ID_id',
+  nz: 'NZ_en',
+  sa_ar: 'SA_ar',
+  sa_en: 'SA_en',
+  sg: 'SG_en',
+  cn: 'CN_zh',
+  tw: 'TW_zh',
+  hk_zh: 'HK_zh',
+  jp: 'JP_ja',
+  kr: 'KR_ko',
+  za: 'ZA_en',
+  ng: 'NG_en',
+  cr: 'CR_es',
+  ec: 'EC_es',
+  pr: 'US_es',
+  gt: 'GT_es',
+  cis_en: 'TM_en',
+  cis_ru: 'TM_ru',
+  sea: 'SG_en',
+  th_en: 'TH_en',
+  th_th: 'TH_th',
+};
+
+const MAS_EXTRA_LOCALES = { pr: 'es_PR' };
+
+const MARKET_LOCALE_OVERRIDES = { en: { AU: 'en_GB', IN: 'en_GB', GB: 'en_GB' } };
+
+function getMasLocale(miloLocale, market) {
+  const geo = (miloLocale?.prefix || 'US_en').replace('/', '');
+  let [country = 'US', language = 'en'] = (MAS_GEO_MAP[geo] ?? geo).split('_', 2);
+  country = country.toUpperCase();
+  language = language.toLowerCase();
+  const locale = MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`;
+  if (!market) return { locale, country };
+  const marketOverride = market !== country
+    ? MARKET_LOCALE_OVERRIDES[language]?.[market] : undefined;
+  return { locale: marketOverride ?? locale, country: market };
+}
+
+let masMarketPromise;
+
+function getMasMarket(miloLibs) {
+  masMarketPromise ??= (async () => {
+    const { getMetadata } = await import(`${miloLibs}/utils/utils.js`);
+    // eslint-disable-next-line compat/compat
+    const flag = new URLSearchParams(window.location.search).get('mas-geo-detection') ?? getMetadata('mas-geo-detection');
+    if (!['on', 'true'].includes(flag?.toLowerCase())) return undefined;
+    const { getValidatedMarket } = await import(`${miloLibs}/utils/market.js`);
+    return (await getValidatedMarket())?.toUpperCase();
+  })().catch(() => undefined);
+  return masMarketPromise;
+}
+
+async function preloadMasFragment(a, config) {
+  let url;
+  try {
+    // eslint-disable-next-line compat/compat
+    url = new URL(a.href);
+  } catch {
+    return;
+  }
+  if (url.hostname !== 'mas.adobe.com' || !url.pathname.endsWith('/studio.html')) return;
+  // eslint-disable-next-line compat/compat
+  const params = new URLSearchParams(url.hash.replace(/^#/, ''));
+  const fragment = params.get('fragment') || params.get('query');
+  const mask = params.get('mask');
+  if (!fragment) return;
+
+  const { locale, country } = getMasLocale(config?.locale, await getMasMarket(config?.miloLibs));
+  const apiKey = config?.commerce?.['wcs-api-key'] ?? DEFAULT_MAS_FRAGMENT_API_KEY;
+  let endpoint = `${MAS_FRAGMENT_API}?id=${fragment}&api_key=${apiKey}&locale=${locale}`;
+  if (country && !locale.endsWith(`_${country}`)) endpoint += `&country=${country}`;
+  if (mask) endpoint += `&mask=${mask}`;
+
+  loadLink(endpoint, { rel: 'preload', as: 'fetch', crossorigin: 'anonymous', fetchpriority: 'low' });
+}
+
+function scanForMasLinks(area, options, config) {
+  const { fragmentLink } = options || {};
+  if (fragmentLink) {
+    if (fragmentLink.closest('.section')?.dataset.idx === '0') {
+      area?.querySelectorAll(MAS_LINK_SELECTOR).forEach((a) => preloadMasFragment(a, config));
+    }
+    return;
+  }
+  (area ?? document).querySelector('body > main > div')
+    ?.querySelectorAll(MAS_LINK_SELECTOR)
+    .forEach((a) => preloadMasFragment(a, config));
+}
 
 /*
  * ------------------------------------------------------------
@@ -499,6 +654,13 @@ async function loadPage() {
   // Setup Milo
   const miloLibs = setLibs(LIBS);
 
+  // eslint-disable-next-line compat/compat
+  const masGeoDetection = new URLSearchParams(window.location.search).get('mas-geo-detection')
+    ?? getCustomMetadata('mas-geo-detection');
+  if (['on', 'true'].includes(masGeoDetection?.toLowerCase())) {
+    loadLink(`${miloLibs}/utils/market.js`, { rel: 'modulepreload' });
+  }
+
   // Milo and site styles
   if (!document.getElementById('inline-milo-styles')) {
     const paths = [];
@@ -511,7 +673,9 @@ async function loadPage() {
   }
 
   // Import base milo features and run them
-  const { loadArea, setConfig, loadLana, getMetadata, loadIms } = await import(`${miloLibs}/utils/utils.js`);
+  const {
+    loadArea, setConfig, loadLana, getMetadata, loadIms, getConfig,
+  } = await import(`${miloLibs}/utils/utils.js`);
   addLocale(ietf);
 
   if (getMetadata('commerce')) {
@@ -519,7 +683,25 @@ async function loadPage() {
     replacePlaceholdersWithImages(ietf, miloLibs);
   }
 
-  setConfig({ ...CONFIG, miloLibs });
+  // Preload first-section M@S fragments so their fetch stops blocking LCP. Wired
+  // as Milo's decorateArea: our initial call scans the authored document, and Milo re-invokes
+  // it per loaded fragment (with { fragmentLink }), catching a marquee that MEP swaps in.
+  const decorateArea = (area, options) => scanForMasLinks(area, options, getConfig());
+  setConfig({ ...CONFIG, miloLibs, decorateArea });
+  decorateArea();
+
+  // Render M@S CTAs without waiting for IMS; upgrade and download CTAs swap in once it is ready.
+  document.addEventListener('wcms:commerce:ready', ({ detail: service }) => {
+    // eslint-disable-next-line compat/compat
+    const modules = Promise.all([
+      import(`${miloLibs}/blocks/merch/merch.js`),
+      import('./checkoutAction.js'),
+    ]);
+    service.registerCheckoutAction(async (...args) => {
+      const [{ getCheckoutAction }, { default: resolveCheckoutAction }] = await modules;
+      return resolveCheckoutAction(getCheckoutAction, ...args);
+    });
+  });
 
   window.addEventListener('IMS:Ready', async () => {
     const susiElems = document.querySelectorAll('a[href*="susi"]');
@@ -529,12 +711,30 @@ async function loadPage() {
     }
   });
 
-  loadIms().then(() => {
-    const imsIsReady = new CustomEvent('IMS:Ready');
-    window.dispatchEvent(imsIsReady);
-  }).catch((err) => {
-    window.dispatchEvent(new CustomEvent('DC_Hosted:Error', { detail: { wrappedException: err } }));
-  });
+  // Everything that reads window.adobeIMS. Pages without these leave IMS to gnav.
+  const IMS_CONSUMERS = [
+    '#dc-converter-widget',
+    '.dc-converter-widget',
+    '#mobile-widget',
+    '.mobile-widget',
+    '.rnr',
+    '.study-marquee',
+    '.unity-marquee',
+    '.verb-marquee',
+    '.verb-redesign-test',
+    '.verb-widget',
+    '.verb-widget-client-upload',
+    'a[href*="susi"]',
+  ].join(',');
+
+  if (document.querySelector(IMS_CONSUMERS)) {
+    loadIms().then(() => {
+      const imsIsReady = new CustomEvent('IMS:Ready');
+      window.dispatchEvent(imsIsReady);
+    }).catch((err) => {
+      window.dispatchEvent(new CustomEvent('DC_Hosted:Error', { detail: { wrappedException: err } }));
+    });
+  }
 
   loadLana({ clientId: 'dxdc', tags: 'DC_Milo' });
 

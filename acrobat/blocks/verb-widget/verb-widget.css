@@ -188,7 +188,8 @@
   width: var(--verb-widget-image-width);
 }
 
-.verb-image svg {
+.verb-image svg,
+.verb-image img {
   display: block;
   width: 100%;
   height: 100%;
@@ -381,7 +382,8 @@ html[dir="rtl"] .verb-cta .upload-icon {
 .verb-error {
   cursor: default;
   background: #D31510;
-  max-width: 435px;
+  width: max-content;
+  max-width: min(435px, calc(100vw - 48px));
   color: white;
   position: absolute;
   top: 90px;
@@ -419,6 +421,11 @@ html[dir="rtl"] .verb-cta .upload-icon {
   background: none;
   border: none;
   outline: none;
+}
+
+.verb-errorBtn:focus {
+  box-shadow: 0 0 0 2px var(--consonant-color-white);
+  border-radius: 2px;
 }
 
 .verb-errorIcon {
@@ -612,6 +619,11 @@ html[dir="rtl"] .verb-cta .upload-icon {
   .verb-row {
     flex-direction: column;
     align-items: start;
+  }
+
+  .verb-error {
+    top: 55px;
+    transform: translateX(-50%);
   }
 
   .verb-col.right {

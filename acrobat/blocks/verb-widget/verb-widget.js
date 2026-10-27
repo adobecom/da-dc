@@ -16,7 +16,12 @@ let soloClicked;
 const fallBack = 'https://www.adobe.com/go/acrobat-overview';
 const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 const demoPath = 'blob/JTdCJTIyc291cmNlJTIyJTNBJTIyY2RuJTIyJTJDJTIyZmlsZVBhdGglMjIlM0ElMjIlMkZkYy1maWxlczItZHJvcGluJTJGZGVtby1maWxlcyUyRmVuLVVTJTJGY2hhdC1wZGYtZGVtby12NCUyRmNoYXQtcGRmLWRlbW8tdjQucGRmJTIyJTJDJTIyaXRlbU5hbWUlMjIlM0ElMjJBSSUyMEFzc2lzdGFudCUyMGRlbW8lMjBmaWxlLnBkZiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJjaGF0LXBkZi1kZW1vLXY0JTIyJTJDJTIyaXRlbVR5cGUlMjIlM0ElMjJhcHBsaWNhdGlvbiUyRnBkZiUyMiU3RA/?defaultRHPFeature=verb-qanda&x_api_client_id=ChatPDFTryDemoFile&x_api_client_location=chat_pdf&try-ai-demo=true&demo-mode=true&promoid=HHJ4X8CS&mv=product&mv2=acrobat-web';
-
+const EARLY_PREFETCH_DUMMY_ASSET = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
+const EARLY_PREFETCH_CONFIG = {
+  'word-to-pdf': { path: 'word-to-pdf/av', clientLocation: 'word-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+  'excel-to-pdf': { path: 'excel-to-pdf', clientLocation: 'excel-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+  'ppt-to-pdf': { path: 'ppt-to-pdf', clientLocation: 'ppt-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+};
 const redirectReady = new CustomEvent('DCUnity:RedirectReady');
 
 const verbRedirMap = {
@@ -71,7 +76,7 @@ const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.x
 const STUDENT_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt'];
 const SIGNED_IN_FILES = ['.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
 const COMMON_TO_PDF_FILES = ['.jpg', '.jpeg', '.png', '.heic', '.tif', '.tiff', '.bmp', '.gif', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text'];
-const CREATEPDF_FILES = [...COMMON_TO_PDF_FILES, '.psd', '.ai', '.indd'];
+const CREATEPDF_FILES = [...COMMON_TO_PDF_FILES, '.pdf', '.psd', '.ai', '.indd'];
 
 const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
 const MULTI_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, multipleFiles: true };
@@ -85,7 +90,7 @@ const GENAI_MULTI = { ...MULTI_ALL, maxNumFiles: 100, uploadType: 'multifile-onl
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
 export const LIMITS = {
-  fillsign: { ...SINGLE_PDF, mobileApp: true, typeOneLanding: true },
+  fillsign: { ...SINGLE_PDF, mobileApp: true },
   'ocr-pdf': { ...MULTI_PDF, maxNumFiles: 100 },
   'chat-pdf-student': {
     maxFileSize: MB100,
@@ -97,16 +102,16 @@ export const LIMITS = {
     genAI: true,
   },
   'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, subCopy: true, genAI: true },
-  'split-pdf': { ...SINGLE_PDF, signedInAcceptedFiles: SIGNED_IN_FILES, typeOneLanding: true },
-  'add-comment': { ...SINGLE_PDF, typeOneLanding: true },
-  'compress-pdf': { maxFileSize: 2147483648, acceptedFiles: ALL_FILES, multipleFiles: true, typeOneLanding: true },
+  'split-pdf': { ...SINGLE_PDF, signedInAcceptedFiles: SIGNED_IN_FILES },
+  'add-comment': { ...SINGLE_PDF },
+  'compress-pdf': { maxFileSize: 2147483648, acceptedFiles: ALL_FILES, multipleFiles: true },
   sendforsignature: {
     maxFileSize: 5242880,
     acceptedFiles: PDF_ONLY,
     maxNumFiles: 1,
     mobileApp: true,
   },
-  ...group(['number-pages', 'crop-pages'], { ...SINGLE_PDF, level: 0, typeOneLanding: true }),
+  ...group(['number-pages', 'crop-pages'], { ...SINGLE_PDF, level: 0 }),
   ...group(['protect-pdf', 'delete-pages', 'insert-pdf', 'extract-pages', 'reorder-pages'], SINGLE_PDF),
   ...group(['chat-pdf', 'pdf-ai'], GENAI_MULTI),
   ...group(['combine-pdf', 'rotate-pages'], { ...MULTI_PDF, maxNumFiles: 100, uploadType: 'multifile-only' }),
@@ -133,7 +138,7 @@ const setDraggingClass = (widget, shouldToggle) => {
 };
 
 function prefetchTarget() {
-  if (window.prefetchTargetLoaded) return;
+  if (window.prefetchTargetLoaded || !window.prefetchTargetUrl) return;
   const iframe = document.createElement('iframe');
   iframe.src = window.prefetchTargetUrl;
   iframe.style.display = 'none';
@@ -158,13 +163,14 @@ function initiatePrefetch(url) {
   }
 }
 
-function buildWordToPdfEarlyPrefetchUrl() {
+function buildEarlyPrefetchUrl(verb) {
+  const config = EARLY_PREFETCH_CONFIG[verb];
+  if (!config) return null;
   const langFromPath = window.location.pathname.split('/')[1];
   const locale = localeMap[langFromPath] || 'en-us';
   const [languageCode, languageRegion] = locale.split('-');
   const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
-  const dummyAssets = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
-  return `https://${domain}/${languageRegion}/${languageCode}/word-to-pdf/av?x_api_client_id=unity&x_api_client_location=word-to-pdf&user=frictionless_return_user&attempts=2%2B#assets=${dummyAssets}`;
+  return `https://${domain}/${languageRegion}/${languageCode}/${config.path}?x_api_client_id=unity&x_api_client_location=${config.clientLocation}&user=frictionless_return_user&attempts=2%2B#assets=${config.assets}`;
 }
 
 function redDirLink(verb) {
@@ -195,6 +201,31 @@ function getDemoEndpoint(verb) {
     demoUrl = demoUrl.replace('x_api_client_location=chat_pdf', 'x_api_client_location=chat_pdf_pdf_ai');
   }
   return demoUrl;
+}
+
+function getUnityReferrer() {
+  const unityBlock = document.querySelector('.unity');
+  const referrerClass = unityBlock && [...unityBlock.classList].find((cn) => cn.startsWith('referrer-'));
+  return referrerClass ? referrerClass.replace('referrer-', '') : '';
+}
+
+function getDemoHref(verb, authoredHref) {
+  const defaultHref = getDemoEndpoint(verb);
+  const referrer = getUnityReferrer();
+  if (!authoredHref && !referrer) return defaultHref;
+  try {
+    const defaults = new URL(defaultHref).searchParams;
+    const url = new URL(authoredHref || defaultHref);
+    if (!url.searchParams.has('x_api_client_id')) {
+      url.searchParams.set('x_api_client_id', defaults.get('x_api_client_id'));
+    }
+    if (!authoredHref || !url.searchParams.has('x_api_client_location')) {
+      url.searchParams.set('x_api_client_location', referrer || defaults.get('x_api_client_location'));
+    }
+    return url.toString();
+  } catch (e) {
+    return authoredHref || defaultHref;
+  }
 }
 
 function getCookie(name) {
@@ -395,12 +426,39 @@ async function createSvgElement(iconName) {
   return svgElement.cloneNode(true);
 }
 
+function getAuthoredVerbIcon(element) {
+  const img = element.querySelector('img');
+  if (img) return img;
+  const svgLink = element.querySelector('a[href$=".svg"]');
+  if (svgLink) {
+    return createTag('img', { src: svgLink.getAttribute('href'), alt: '' });
+  }
+  return null;
+}
+
 // Initialize analytics functions as no-ops until loaded
 window.analytics = {
   verbAnalytics: () => {},
   reviewAnalytics: () => {},
   sendAnalyticsToSplunk: () => {},
 };
+
+export async function fireUpsellAnalytics(verb, userAttempts) {
+  try {
+    await new Promise((res) => {
+      setTimeout(res, 3000);
+      try {
+        const obs = new PerformanceObserver(() => { obs.disconnect(); res(); });
+        obs.observe({ type: 'largest-contentful-paint', buffered: true });
+      } catch (e) { res(); }
+    });
+    const { default: verbAnalytics } = await import('../../scripts/alloy/verb-widget.js');
+    verbAnalytics('upsell:shown', verb, { userAttempts });
+    verbAnalytics('upsell-wall:shown', verb, { userAttempts });
+  } catch (error) {
+    window.lana?.log(`Upsell analytics failed: ${error.message} on ${verb}`, lanaOptions);
+  }
+}
 
 async function loadAnalyticsAfterLCP(analyticsData) {
   const { verb, userAttempts } = analyticsData;
@@ -484,37 +542,6 @@ export default async function init(element) {
   }
 
   const prerenderElement = document.querySelector('#prerender_verb-widget');
-  if (prerenderElement && window.PerformanceObserver) {
-    Promise.race([
-      new Promise((resolve) => {
-        try {
-          const lcpObserver = new PerformanceObserver((entries) => {
-            if (entries.getEntries().length > 0) {
-              prerenderElement.remove();
-              lcpObserver.disconnect();
-              resolve();
-            }
-          });
-          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-        } catch (error) {
-          prerenderElement.remove();
-          resolve();
-        }
-      }),
-      // Fallback timeout - remove after 3 seconds if LCP not detected
-      new Promise((resolve) => {
-        setTimeout(() => {
-          prerenderElement.remove();
-          resolve();
-        }, 3000);
-      }),
-    ]);
-  } else if (prerenderElement) {
-    // Fallback for browsers without PerformanceObserver support
-    setTimeout(() => {
-      prerenderElement.remove();
-    }, 3000);
-  }
 
   const isMobile = isMobileDevice();
   const isTablet = isTabletDevice();
@@ -531,7 +558,19 @@ export default async function init(element) {
   const touURL = window.mph['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
   const genAIurl = window.mph['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`;
 
-  const children = element.querySelectorAll(':scope > div');
+  const LABEL_PREFIX = 'dc-block-row-';
+  const authored = new Map();
+  const children = [];
+  element.querySelectorAll(':scope > div').forEach((rowEl) => {
+    const label = rowEl.firstElementChild?.textContent?.trim() || '';
+    if (label.startsWith(LABEL_PREFIX)) {
+      authored.set(label.slice(LABEL_PREFIX.length), rowEl.children[1] || null);
+      rowEl.remove();
+    } else {
+      children.push(rowEl);
+    }
+  });
+  const cellText = (key) => authored.get(key)?.textContent?.trim() || '';
   const VERB = element.classList[1];
   const widgetHeading = createTag('h1', { class: 'verb-heading' }, children[0].textContent);
   let widgetSubHeading = window.mph[`verb-widget-${VERB}-description`];
@@ -540,6 +579,7 @@ export default async function init(element) {
     widgetSubHeading = children[1].textContent;
     widgetMobSubHeading = children[2].textContent;
   }
+  const authoredIcon = getAuthoredVerbIcon(element);
   let noOfFiles = null;
   let openFilePicker = true;
   const userAttempts = getVerbKey(`${VERB}_attempts`);
@@ -580,7 +620,8 @@ export default async function init(element) {
   }
 
   if (LIMITS[VERB].subCopy) {
-    widgetSubCopy = createTag('p', { class: 'verb-copy verb-sub-copy' }, window.mph[`verb-widget-${VERB}-sub-description`]);
+    const subCopyText = cellText('sub-copy') || window.mph[`verb-widget-${VERB}-sub-description`];
+    widgetSubCopy = createTag('p', { class: 'verb-copy verb-sub-copy' }, subCopyText);
     widgetCopy.append(widgetSubCopy);
   }
 
@@ -593,11 +634,12 @@ export default async function init(element) {
     ...(LIMITS[VERB]?.multipleFiles && { multiple: '' }),
   });
   const widgetImage = createTag('div', { class: 'verb-image' });
-  const verbIconName = `${VERB}`;
-  const verbImageSvg = await createSvgElement(verbIconName);
+  const verbImageSvg = authoredIcon || await createSvgElement(`${VERB}`);
   if (verbImageSvg) {
     verbImageSvg.classList.add('icon-verb-image');
-    verbImageSvg.setAttribute('alt', window.mph[`verb-widget-${VERB}-alt`] || VERB);
+    if (!verbImageSvg.getAttribute('alt')) {
+      verbImageSvg.setAttribute('alt', window.mph[`verb-widget-${VERB}-alt`] || VERB);
+    }
     widgetImage.appendChild(verbImageSvg);
   }
 
@@ -688,9 +730,12 @@ export default async function init(element) {
       widgetLeft.insertBefore(widgetButton, errorState);
       widgetLeft.insertBefore(button, errorState);
     }
-  } else if ((VERB.indexOf('chat-pdf') > -1 || VERB.indexOf('pdf-ai') > -1) && window.mph['verb-widget-cta-demo']) {
+  } else if ((VERB.indexOf('chat-pdf') > -1 || VERB.indexOf('pdf-ai') > -1)
+    && (cellText('demo-cta') || window.mph['verb-widget-cta-demo'])) {
     const demoBtnWrapper = createTag('div', { class: 'demo-button-wrapper' });
-    widgetDemoButton = createTag('a', { href: getDemoEndpoint(VERB), class: 'verb-cta demo-cta', tabindex: 0 }, window.mph['verb-widget-cta-demo']);
+    const demoText = cellText('demo-cta') || window.mph['verb-widget-cta-demo'];
+    const demoHref = getDemoHref(VERB, authored.get('demo-cta')?.querySelector('a[href]')?.href);
+    widgetDemoButton = createTag('a', { href: demoHref, class: 'verb-cta demo-cta', tabindex: 0 }, demoText);
     widgetDemoButton.addEventListener('click', () => {
       window.analytics.verbAnalytics('Try with a demo file', VERB, { userAttempts });
     });
@@ -736,20 +781,11 @@ export default async function init(element) {
     element.classList.remove('upsell');
     element.classList.add('signed-in');
 
-    let accountType;
-    try {
-      accountType = window.adobeIMS.getAccountType();
-    } catch {
-      accountType = (await window.adobeIMS.getProfile()).account_type;
-    }
-
     if (LIMITS[VERB].signedInAcceptedFiles) {
       button.accept = [...LIMITS[VERB].acceptedFiles, ...LIMITS[VERB].signedInAcceptedFiles];
     }
 
-    if (accountType && LIMITS[VERB].neverRedirect) return;
-    if (accountType !== 'type1') redDir(VERB);
-    if (accountType === 'type1' && !LIMITS[VERB].typeOneLanding) redDir(VERB);
+    redDir(VERB);
   }
 
   function handleAnalyticsEvent(
@@ -817,8 +853,7 @@ export default async function init(element) {
 
   if (!window.adobeIMS?.isSignedInUser?.() && isLimitExhausted) {
     await showUpSell(VERB, element);
-    window.analytics.verbAnalytics('upsell:shown', VERB, { userAttempts });
-    window.analytics.verbAnalytics('upsell-wall:shown', VERB, { userAttempts });
+    fireUpsellAnalytics(VERB, userAttempts);
   }
 
   // Race the condition
@@ -829,9 +864,9 @@ export default async function init(element) {
 
   window.prefetchTargetUrl = null;
 
-  if (VERB === 'word-to-pdf') {
+  if (EARLY_PREFETCH_CONFIG[VERB]) {
     const triggerEarlyPrefetch = () => {
-      initiatePrefetch(buildWordToPdfEarlyPrefetchUrl());
+      initiatePrefetch(buildEarlyPrefetchUrl(VERB));
       prefetchTarget();
     };
     document.addEventListener('click', triggerEarlyPrefetch, { once: true });
@@ -839,6 +874,8 @@ export default async function init(element) {
   }
 
   element.parentNode.style.display = 'block';
+
+  requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
 
   widget.addEventListener('click', (e) => {
     if (e.srcElement.classList.value.includes('error')) { return; }
@@ -942,6 +979,7 @@ export default async function init(element) {
       uploaded: () => handleUploadedEvent(data, userAttempts, cookieExp, canSendDataToSplunk),
       redirectUrl: () => {
         if (data) initiatePrefetch(data.redirectUrl);
+        if (isUploading) prefetchTarget();
         handleAnalyticsEvent('job:redirect-success', metadata, false, canSendDataToSplunk);
       },
       chunk_uploaded: () => {

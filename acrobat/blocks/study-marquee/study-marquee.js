@@ -22,6 +22,7 @@ const ICONS = {
 
 const MB100 = 104857600;
 const STUDY_FILES = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.rtf', '.txt', '.text', '.vtt'];
+const STUDY_FILES_EXTENDED = [...STUDY_FILES, '.eml', '.msg', '.jpg', '.jpeg', '.png', '.tif', '.tiff'];
 const STUDY_GENAI = {
   maxFileSize: MB100,
   acceptedFiles: STUDY_FILES,
@@ -30,9 +31,20 @@ const STUDY_GENAI = {
   uploadType: 'multifile-only',
   genAI: true,
 };
+const STUDY_GENAI_SINGLE = {
+  maxFileSize: MB100,
+  acceptedFiles: STUDY_FILES_EXTENDED,
+  maxNumFiles: 1,
+  genAI: true,
+};
 const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
-export const LIMITS = { ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI) };
+const SIGNED_IN_UPLOAD_VERBS = new Set(['gen-presentation-v2', 'interactive-report', 'stylize']);
+
+export const LIMITS = {
+  ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI),
+  ...group(['gen-presentation-v2', 'interactive-report', 'stylize'], { ...STUDY_GENAI_SINGLE, acceptedFiles: ['.pdf'] }),
+};
 
 function createSvgElement(iconName) {
   const svgString = ICONS[iconName];
@@ -50,7 +62,10 @@ function createSvgElement(iconName) {
 
 const getCTA = (verb) => {
   const verbConfig = LIMITS[verb];
-  return window.mph?.[`verb-widget-cta-${verbConfig?.uploadType}`] || window.mph?.['verb-widget-cta'] || '';
+  return window.mph?.[`study-marquee-${verb}-upload-cta`]
+    || window.mph?.[`verb-widget-cta-${verbConfig?.uploadType}`]
+    || window.mph?.['verb-widget-cta']
+    || '';
 };
 
 function getEnv() {
@@ -119,10 +134,12 @@ let tabClosureSent = false;
 let isUploading = false;
 
 function prefetchTarget() {
+  if (window.prefetchTargetLoaded || !window.prefetchTargetUrl) return;
   const iframe = document.createElement('iframe');
   iframe.src = window.prefetchTargetUrl;
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
+  window.prefetchTargetLoaded = true;
 }
 
 function prefetchNextPage(url) {
@@ -256,41 +273,11 @@ export default async function init(element) {
   }
 
   const prerenderElement = document.querySelector('#prerender_verb-widget');
-  if (prerenderElement && window.PerformanceObserver) {
-    Promise.race([
-      new Promise((resolve) => {
-        try {
-          const lcpObserver = new PerformanceObserver((entries) => {
-            if (entries.getEntries().length > 0) {
-              prerenderElement.remove();
-              lcpObserver.disconnect();
-              resolve();
-            }
-          });
-          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-        } catch (error) {
-          prerenderElement.remove();
-          resolve();
-        }
-      }),
-      // Fallback timeout - remove after 3 seconds if LCP not detected
-      new Promise((resolve) => {
-        setTimeout(() => {
-          prerenderElement.remove();
-          resolve();
-        }, 3000);
-      }),
-    ]);
-  } else if (prerenderElement) {
-    // Fallback for browsers without PerformanceObserver support
-    setTimeout(() => {
-      prerenderElement.remove();
-    }, 3000);
-  }
 
   window.mph = window.mph || {};
   await loadPlaceholders(['study', 'verb-widget']);
-  const VERB = element.classList[1];
+  const isAvalon = element.classList.contains('avalon');
+  const VERB = element.classList[1] === 'avalon' ? element.classList[2] : element.classList[1];
   // Initialize analytics - track attempts for analytics data (no UI changes based on attempts)
   const userAttempts = getVerbKey(`${VERB}_attempts`);
   let noOfFiles = null;
@@ -344,6 +331,16 @@ export default async function init(element) {
     initializePingService();
     window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: VERB, userAttempts } }));
   });
+  const LABEL_PREFIX = 'dc-block-row-';
+  const authored = new Map();
+  element.querySelectorAll(':scope > div').forEach((rowEl) => {
+    const label = rowEl.firstElementChild?.textContent?.trim() || '';
+    if (label.startsWith(LABEL_PREFIX)) {
+      authored.set(label.slice(LABEL_PREFIX.length), rowEl.children[1] || null);
+      rowEl.remove();
+    }
+  });
+  const cellText = (key) => authored.get(key)?.textContent?.trim() || '';
   const children = element.querySelectorAll(':scope > div');
   const foreground = children[children.length - 1];
   foreground.classList.add('foreground', 'container');
@@ -374,25 +371,29 @@ export default async function init(element) {
     iconWrapper.appendChild(widgetIconSvg);
   }
   const title = createTag('div', { class: 'study-marquee-title' });
-  const adobeText = createTag('span', {}, 'Adobe');
-  const studySpaceText = createTag('span', {}, ' Acrobat');
-  title.append(adobeText, studySpaceText);
+  if (cellText('title')) {
+    title.textContent = cellText('title');
+  } else {
+    const adobeText = createTag('span', {}, 'Adobe');
+    const studySpaceText = createTag('span', {}, ' Acrobat');
+    title.append(adobeText, studySpaceText);
+  }
   header.append(iconWrapper, title);
   const headingEl = createTag('h1', { class: 'study-marquee-heading' }, heading);
   const isMobileOrTablet = window.innerWidth < 1200;
   const copy1Text = isMobileOrTablet
-    ? (window.mph?.[`study-marquee-${VERB}-mobile-copy`] || window.mph?.[`study-marquee-${VERB}-copy`] || '')
-    : (window.mph?.[`study-marquee-${VERB}-copy`] || '');
+    ? (cellText('mobile-copy') || window.mph?.[`study-marquee-${VERB}-mobile-copy`] || cellText('copy') || window.mph?.[`study-marquee-${VERB}-copy`] || '')
+    : (cellText('copy') || window.mph?.[`study-marquee-${VERB}-copy`] || '');
   const copy2Text = isMobileOrTablet
-    ? (window.mph?.[`study-marquee-${VERB}-mobile-sub-copy`] || window.mph?.[`study-marquee-${VERB}-sub-copy`] || '')
-    : (window.mph?.[`study-marquee-${VERB}-sub-copy`] || '');
+    ? (cellText('mobile-sub-copy') || window.mph?.[`study-marquee-${VERB}-mobile-sub-copy`] || cellText('sub-copy') || window.mph?.[`study-marquee-${VERB}-sub-copy`] || '')
+    : (cellText('sub-copy') || window.mph?.[`study-marquee-${VERB}-sub-copy`] || '');
   const copy1 = createTag('p', { class: 'study-marquee-copy' }, copy1Text);
   const copy2 = createTag('p', { class: 'study-marquee-copy study-marquee-copy-sub' }, copy2Text);
   const dropzone = createTag('div', {
     class: 'study-marquee-dropzone',
     id: 'drop-zone',
   });
-  const ctaButtonLabel = getCTA(VERB);
+  const ctaButtonLabel = cellText('upload-cta') || getCTA(VERB);
   const ctaButton = createTag('button', {
     class: 'study-marquee-cta',
     type: 'button',
@@ -406,11 +407,11 @@ export default async function init(element) {
   }
   const ctaLabel = createTag('span', { class: 'study-marquee-cta-label' }, ctaButtonLabel);
   ctaButton.appendChild(ctaLabel);
-  const dragText = createTag('p', { class: 'study-marquee-drag' }, window.mph?.[`study-widget-${VERB}-dragndrop-text`] || '');
+  const dragText = createTag('p', { class: 'study-marquee-drag' }, cellText('dragndrop-text') || window.mph?.[`study-widget-${VERB}-dragndrop-text`] || '');
   const fileLimitText = createTag('p', {
     class: 'study-marquee-file-limit',
     id: 'file-upload-description',
-  }, window.mph?.[`study-widget-${VERB}-file-limit`] || '');
+  }, cellText('file-limit') || window.mph?.[`study-widget-${VERB}-file-limit`] || '');
   const fileInput = createTag('input', {
     type: 'file',
     accept: LIMITS[VERB]?.acceptedFiles,
@@ -471,23 +472,35 @@ export default async function init(element) {
   const ppURL = window.mph?.['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`;
   const touURL = window.mph?.['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`;
   const genAIurl = window.mph?.['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`;
-  const legalText = createTag('p', { class: 'study-marquee-legal' }, window.mph?.['study-marquee-legal-text'] || '');
-  if (legalText.textContent) {
-    const createLegalLink = (label, url) => `<a class="study-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
-    const legalLinks = [
-      ['verb-widget-terms-of-use', touURL],
-      ['verb-widget-privacy-policy', ppURL],
-      ...(LIMITS[VERB]?.genAI ? [['verb-widget-genai-guidelines', genAIurl]] : []),
-    ];
-    legalText.innerHTML = legalLinks.reduce(
-      (html, [key, url]) => {
-        const linkText = window.mph?.[key];
-        return linkText ? html.replace(linkText, createLegalLink(linkText, url)) : html;
-      },
-      legalText.textContent,
-    );
+  const authoredLegalEl = cellText('legal-text') ? authored.get('legal-text') : null;
+  const legalText = createTag('p', { class: 'study-marquee-legal' });
+  if (authoredLegalEl) {
+    legalText.innerHTML = authoredLegalEl.innerHTML;
+  } else {
+    const baseLegalText = window.mph?.['study-marquee-legal-text'] || '';
+    const legalTextContent = isAvalon
+      ? (window.mph?.[`study-marquee-avalon-${VERB}-legal`]
+        || window.mph?.['study-marquee-avalon-legal']
+        || baseLegalText)
+      : baseLegalText;
+    legalText.textContent = legalTextContent;
+    if (legalText.textContent) {
+      const createLegalLink = (label, url) => `<a class="study-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
+      const legalLinks = [
+        ['verb-widget-terms-of-use', touURL],
+        ['verb-widget-privacy-policy', ppURL],
+        ...(LIMITS[VERB]?.genAI ? [['verb-widget-genai-guidelines', genAIurl]] : []),
+      ];
+      legalText.innerHTML = legalLinks.reduce(
+        (html, [key, url]) => {
+          const linkText = window.mph?.[key];
+          return linkText ? html.replace(linkText, createLegalLink(linkText, url)) : html;
+        },
+        legalText.textContent,
+      );
+    }
   }
-  const tooltipContent = window.mph?.['verb-widget-tool-tip'] || '';
+  const tooltipContent = cellText('tool-tip') || window.mph?.['verb-widget-tool-tip'] || '';
   const infoIcon = createTag('button', {
     class: 'info-icon milo-tooltip top',
     type: 'button',
@@ -511,17 +524,19 @@ export default async function init(element) {
     header, headingEl, copy1, ...(copy2Text ? [copy2] : []), dropzone, fileInput, footer,
   ];
   leftCol.append(...leftColChildren);
+  let mediaWrapper = null;
   if (media) {
-    const mediaWrapper = createTag('div', { class: 'study-marquee-media' });
+    mediaWrapper = createTag('div', { class: 'study-marquee-media' });
     while (media.firstChild) {
       mediaWrapper.appendChild(media.firstChild);
     }
-    rightCol.appendChild(mediaWrapper);
+    if (!isAvalon) rightCol.appendChild(mediaWrapper);
   }
   row.append(leftCol, rightCol);
   container.appendChild(row);
   foreground.innerHTML = '';
   foreground.append(container);
+  if (isAvalon && mediaWrapper) element.append(mediaWrapper);
   element.append(errorState);
 
   function handleAnalyticsEvent(
@@ -705,6 +720,7 @@ export default async function init(element) {
       },
       redirectUrl: () => {
         if (data) initiatePrefetch(data.redirectUrl);
+        if (isUploading) prefetchTarget();
         handleAnalyticsEvent('job:redirect-success', metadata, false, canSendDataToSplunk);
       },
     };
@@ -737,6 +753,9 @@ export default async function init(element) {
       error_duplicate_asset: 'error:duplicate_asset',
       warn_chunk_upload: 'warn:verb_upload_warn_chunk_upload',
       error_file_same_type: 'error:file_same_type',
+      error_password_protected: 'error:password_protected',
+      error_acroform_not_supported: 'error:acroform_not_supported',
+      error_scanned_document: 'error:scanned_document',
       error_fetch_redirect_url: 'error:fetch_redirect_url',
       error_finalize_asset: 'error:finalize_asset',
       error_verify_page_count: 'error:verify_page_count',
@@ -779,6 +798,7 @@ export default async function init(element) {
   });
 
   async function checkSignedInUser() {
+    if (SIGNED_IN_UPLOAD_VERBS.has(VERB)) return;
     if (!window.adobeIMS?.isSignedInUser?.()) return;
     let accountType;
     try {
@@ -792,6 +812,10 @@ export default async function init(element) {
   window.addEventListener('IMS:Ready', checkSignedInUser);
   window.prefetchTargetUrl = null;
   element.parentNode.style.display = 'block';
+
+  // eslint-disable-next-line compat/compat
+  requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
+
   window.addEventListener('pageshow', (event) => {
     const historyTraversal = event.persisted
       || (typeof window.performance !== 'undefined'

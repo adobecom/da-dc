@@ -33,7 +33,13 @@ export default async function geoPhoneNumber() {
   };
 
   const placeHolderJson = await fetch(`${newLocale}dc-shared/placeholders.json`);
-  if (placeHolderJson.status !== 200) return;
+  if (placeHolderJson.status !== 200) {
+    window.lana?.log(
+      `Geo Phone: phone placeholder request failed; HTTP ${placeHolderJson.status}`,
+      { severity: 'error', tags: 'DC_Milo,geo-phone' },
+    );
+    return;
+  }
   const placeHolderJsonData = await placeHolderJson.json();
   placeHolderJsonData.data = placeHolderJsonData.data.map((val) => ({
     ...val,

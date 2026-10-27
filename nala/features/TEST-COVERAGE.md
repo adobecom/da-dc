@@ -127,13 +127,13 @@ Use the **test name** (from `feature.name` + `feature.tags`) when filtering in C
 
 ## `pricing/`
 
+The old `/acrobat/pricing`, `/acrobat/pricing/business`, and `/acrobat/pricing/students` pages redirect to `/acrobat/plans` (DOTCOM-195584). One plans test replaces their tests.
+
 | File | URL | Coverage |
 |------|-----|----------|
-| `pricing.spec.js` | `/acrobat/pricing`, `/acrobat/pricing/students`, `/acrobat/pricing/compare-versions`, `/acrobat/pricing/business` | `@pricing`, `@students`, `@compare`, `@business`, `@smoke`, `@live`. |
-| `pricing.test.js` | **Individuals** | Pricing merch cards; comparison table; section toggle; compare link; FAQ; questions-about (`acrobat-here-to-help-blade`); footer options; all checkout links. |
-| | **Students** | Students pricing merch cards; checkout link in editorial card; **table basics**; legal text block visible; questions-about; footer options; checkouts. |
-| | **Compare versions** | Gnav smoke; compare-versions table; one specific checkout OSI visible/enabled; FAQ; **standard** `verifyFooter` (not footer options); checkouts. |
-| | **Business** | Business pricing merch cards; business comparison table; comparison section toggle; FAQ; questions-about; footer options; checkouts. |
+| `plans/plans.spec.js` | `/acrobat/plans`, `?tab=compare-plans-2`, `?tab=compare-plans-3` | `@plans`, `@pricing-individuals`, `@pricing-business`, `@business`, `@pricing-students`, `@students`, `@smoke`, `@live`. |
+| `plans/plans.test.js` | **Individuals / Business / Students & Teachers tabs** | Gnav smoke; 3 plan tabs and the correct selected tab; visible merch card in the selected panel; visible checkout links enabled; footer; link check (no 404). |
+| `compare-versions/` | `/acrobat/pricing/compare-versions` | Gnav smoke; compare-versions table; one checkout OSI visible/enabled; FAQ; footer; checkouts. |
 
 ---
 

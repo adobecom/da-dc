@@ -135,6 +135,10 @@ async function processGroup(element, cfg, startIndex) {
   } else {
     const resp = await fetch(cfg.json);
     if (!resp.ok) {
+      window.lana?.log(
+        `Prompt Card: data request failed; HTTP ${resp.status}`,
+        { severity: 'error', tags: 'DC_Milo,prompt-card' },
+      );
       element.remove();
       return;
     }

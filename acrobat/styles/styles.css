@@ -113,7 +113,8 @@ div [class *= PdfnowLifecycle__dropzone2___] {
 }
 
 @media (min-width: 1075px) {
-  .accordion-container.verb-subfooter-moblie {
+  .accordion-container.verb-subfooter-moblie,
+  .accordion-container.verb-subfooter-mobile {
     display: none;
   }
 }
@@ -124,19 +125,26 @@ div [class *= PdfnowLifecycle__dropzone2___] {
   }
 }
 
-.accordion-container.verb-subfooter-moblie {
+.accordion-container.verb-subfooter-moblie,
+.accordion-container.verb-subfooter-mobile {
   background: #fbfbfb;
 }
 
 .accordion-container.verb-subfooter-moblie .accordion dt.is-open,
 .accordion-container.verb-subfooter-moblie .accordion dd.is-open,
 .accordion-container.verb-subfooter-moblie .accordion dt.has-focus,
-.accordion-container.verb-subfooter-moblie .accordion dd.has-focus {
+.accordion-container.verb-subfooter-moblie .accordion dd.has-focus,
+.accordion-container.verb-subfooter-mobile .accordion dt.is-open,
+.accordion-container.verb-subfooter-mobile .accordion dd.is-open,
+.accordion-container.verb-subfooter-mobile .accordion dt.has-focus,
+.accordion-container.verb-subfooter-mobile .accordion dd.has-focus {
   border-left: none;
 }
 
 .accordion-container.verb-subfooter-moblie .accordion dt.is-open,
-.accordion-container.verb-subfooter-moblie .accordion dd.is-open {
+.accordion-container.verb-subfooter-moblie .accordion dd.is-open,
+.accordion-container.verb-subfooter-mobile .accordion dt.is-open,
+.accordion-container.verb-subfooter-mobile .accordion dd.is-open {
   padding: 0;
 }
 
@@ -158,25 +166,30 @@ div [class *= PdfnowLifecycle__dropzone2___] {
   object-fit: contain;
 }
 
-.accordion-container.verb-subfooter-moblie .accordion ul {
+.accordion-container.verb-subfooter-moblie .accordion ul,
+.accordion-container.verb-subfooter-mobile .accordion ul {
   padding-left: 20px;
 }
 
-.accordion-container.verb-subfooter-moblie .accordion li {
+.accordion-container.verb-subfooter-moblie .accordion li,
+.accordion-container.verb-subfooter-mobile .accordion li {
   list-style-type: none;
   padding: 8px 0;
 }
 
-.accordion-container.verb-subfooter-moblie .accordion li a {
+.accordion-container.verb-subfooter-moblie .accordion li a,
+.accordion-container.verb-subfooter-mobile .accordion li a {
   color: #000;
 }
 
-.accordion-container.verb-subfooter-moblie picture {
+.accordion-container.verb-subfooter-moblie picture,
+.accordion-container.verb-subfooter-mobile picture {
   vertical-align: middle;
   padding-right: 10px;
 }
 
-.accordion-container.verb-subfooter-moblie  dd.is-open.has-focus {
+.accordion-container.verb-subfooter-moblie dd.is-open.has-focus,
+.accordion-container.verb-subfooter-mobile dd.is-open.has-focus {
   background-color: transparent;
 }
 
@@ -388,9 +401,9 @@ main {
     .media [class*="heading-"] {
       font-family: "Adobe Clean ExtraBold", var(--body-font-family);
       font-weight: 800;
-      line-height: 1;
+      line-height: 1.1;
       letter-spacing: -0.04em;
-      font-size: 36px;
+      font-size: 32px;
     }
 
     .media [class*="body-"] {
@@ -399,7 +412,8 @@ main {
     }
 
     .media.medium-compact [class*="heading-"] {
-      line-height: 0.98 !important;
+      line-height: 1.1 !important;
+      font-size: 32px !important;
     }
 
     @media screen and (min-width: 600px) and (max-width: 1199px) {
@@ -424,8 +438,8 @@ main {
       }
 
       .media [class*="heading-"] {
-        line-height: 0.98;
-        font-size: 42px;
+        line-height: 1.1;
+        font-size: 32px;
       }
     }
 
@@ -456,8 +470,8 @@ main {
       }
 
       .media [class*="heading-"] {
-        line-height: 0.98;
-        font-size: 64px;
+        line-height: 1.1;
+        font-size: 42px;
       }
 
       .media [class*="body-"] {
@@ -465,8 +479,8 @@ main {
       }
 
       .media.medium-compact [class*="heading-"] {
-        line-height: 1.25 !important;
-        font-size: 54px !important;
+        line-height: 1.1 !important;
+        font-size: 42px !important;
       }
     }
   }

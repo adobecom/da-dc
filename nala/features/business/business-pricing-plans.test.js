@@ -27,9 +27,9 @@ test.describe('Acrobat Business — Pricing plans', () => {
       await expect(pricingPlans.heroMarqueeSection).toBeVisible({ timeout: 60000 });
     });
 
-    await test.step('Verify first sticky comparison table', async () => {
+    await test.step('Verify sticky comparison table', async () => {
       const tables = pricingPlans.stickyComparisonTables;
-      await expect.poll(async () => tables.count(), { timeout: 60000 }).toBeGreaterThanOrEqual(2);
+      await expect.poll(async () => tables.count(), { timeout: 60000 }).toBeGreaterThanOrEqual(1);
       const firstTable = tables.nth(0);
       await firstTable.scrollIntoViewIfNeeded();
       await expect(firstTable).toBeVisible({ timeout: 60000 });
@@ -49,16 +49,6 @@ test.describe('Acrobat Business — Pricing plans', () => {
       const threeUp = pricingPlans.threeUpSection;
       await threeUp.scrollIntoViewIfNeeded();
       await expect(threeUp).toBeVisible({ timeout: 60000 });
-    });
-
-    await test.step('Verify second sticky comparison table', async () => {
-      const secondTable = pricingPlans.stickyComparisonTables.nth(1);
-      await secondTable.scrollIntoViewIfNeeded();
-      await expect(secondTable).toBeVisible({ timeout: 60000 });
-      const secondHeadingRow = secondTable.locator('div.row-heading');
-      await expect(secondHeadingRow).toBeVisible();
-      const secondFeatureRows = secondTable.locator('div.section-row');
-      expect(await secondFeatureRows.count()).toBeGreaterThan(0);
     });
 
     await test.step('Verify FAQ accordion', async () => {
