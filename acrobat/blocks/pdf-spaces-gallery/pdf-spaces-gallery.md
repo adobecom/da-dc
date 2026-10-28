@@ -21,7 +21,10 @@ so a.com stays in sync with the in-product list automatically.
   visible error for authors).
 - Localizable strings via the locale's `placeholders.json`: `pdf-spaces-cta`
   (button, default "Explore now"), `pdf-spaces-prev` / `pdf-spaces-next` (arrow
-  aria-labels), `pdf-spaces-label` (gallery region label).
+  aria-labels), `pdf-spaces-label` (gallery region label). These keys are not in
+  the `dc-shared` placeholder sheets yet — the block falls back to English, so
+  en-US ships without them; **for localization, add the `pdf-spaces-*` keys to
+  the `{locale}/dc-shared` placeholder sheets per locale.**
 - The API assigns one category per space, so a space may appear in only one tab.
 - If the API is unavailable the block hides itself (no fallback content yet).
 
