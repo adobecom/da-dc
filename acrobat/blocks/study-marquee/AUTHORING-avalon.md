@@ -37,6 +37,24 @@ Author the title as a heading (H1–H6) directly in the block. This is the only 
 
 Add the image in the second cell of the foreground row. On desktop the avalon variant renders it as a full-height cover occupying the right half of the viewport; on smaller screens it stacks per the block's responsive rules.
 
+### Cover media focus
+
+For images or videos, add one optional focus modifier to the block name, following Milo's hero-marquee convention:
+
+```
+study-marquee (avalon, stylize, light, media-cover-left)
+```
+
+| Modifier | Focus |
+| --- | --- |
+| `media-cover-left` | Left, vertically centered |
+| `media-cover-right` | Right, vertically centered |
+| `media-cover-top` | Top, horizontally centered |
+| `media-cover-bottom` | Bottom, horizontally centered |
+| `media-cover-center` | Center, horizontally and vertically |
+
+Choose only one focus modifier. With no modifier (or with `media-cover`), the existing center-top focus is preserved. These options apply only to Avalon's desktop cover layout at 1200px and above; smaller-screen and base study-marquee layouts are unchanged.
+
 ---
 
 ## Placeholder keys
