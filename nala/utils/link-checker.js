@@ -16,6 +16,8 @@ const LOCALE_PREFIX = /^\/[a-z]{2}(-[a-z]{2})?(?=\/)/i;
 
 const withoutLocalePrefix = (pathname) => pathname.replace(LOCALE_PREFIX, '');
 
+const AEM_HOST = /\.aem\.(live|page)$/;
+
 async function requestStatus(page, url) {
   const opts = { maxRedirects: 10, timeout: 30000 };
   // HEAD first (fast); uses browser cookies/session via page.request
@@ -40,6 +42,18 @@ async function fetchStatus(page, url) {
     if (unlocalized !== u.pathname) {
       u.pathname = unlocalized || '/';
       status = await requestStatus(page, u.href);
+    }
+
+    // AEM hosts serve only da-dc pages, and only without ".html".
+    // www.adobe.com also serves ".html" links and the other Adobe sites (e.g. /education).
+    const { hostname, pathname, search } = new URL(url);
+    if (status === 404 && AEM_HOST.test(hostname)) {
+      if (pathname.endsWith('.html')) {
+        const sameHost = new URL(url);
+        sameHost.pathname = pathname.replace(/\.html$/, '');
+        status = await requestStatus(page, sameHost.href);
+      }
+      if (status === 404) status = await requestStatus(page, `https://www.adobe.com${pathname}${search}`);
     }
     return status;
   } catch {
@@ -67,7 +81,10 @@ async function waitForPageReady(page) {
         const current = count();
         if (current === last) {
           stableMs += 200;
-          if (stableMs >= 1000) return resolve(true);
+          if (stableMs >= 1000) {
+            resolve(true);
+            return;
+          }
         } else {
           last = current;
           stableMs = 0;
