@@ -4,8 +4,8 @@ export default class AiResumeBuilderPage extends AcrobatWidget {
   constructor(page, nth = 0) {
     super(page, '.resume-builder.unity-enabled', nth);
 
-    this.gnav = page.locator('nav.feds-topnav');
-    this.gnavBreadcrumbs = page.locator('nav.feds-breadcrumbs');
+    this.gnav = page.locator('header');
+    this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs');
 
     this.dropZone = this.widget.locator('#drop-zone');
     this.verbHeader = this.widget.locator('.verb-marquee-heading');
