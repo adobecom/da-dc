@@ -72,6 +72,7 @@ test.describe('Ratings and Reviews (RnR) block test suite', () => {
     let ratings;
 
     await test.step('Go to the test page and wait for the ratings data', async () => {
+      await rnr.trackBlockJsonLd();
       const ratingsResponse = waitForRatingsResponse(page);
       await page.goto(pageUrl(baseURL, en.path), { waitUntil: 'domcontentloaded' });
       const response = await ratingsResponse;
@@ -124,6 +125,19 @@ test.describe('Ratings and Reviews (RnR) block test suite', () => {
         bestRating: '5',
         worstRating: '1',
       });
+
+      // Milo's JSON-LD graph manager merges the block data with the page data. Search engines read the result.
+      await expect.poll(() => rnr.readPageRatings(), { message: 'The page has 1 rating with the live data' }).toEqual([
+        expect.objectContaining({
+          name: productName,
+          aggregateRating: expect.objectContaining({
+            ratingValue: String(ratings.overallRating),
+            ratingCount: String(votes),
+            bestRating: '5',
+            worstRating: '1',
+          }),
+        }),
+      ]);
     });
 
     await test.step('Verify the block fits in the viewport', async () => {
@@ -296,6 +310,7 @@ test.describe('Ratings and Reviews (RnR) block test suite', () => {
     await fakeReviewPost(page);
 
     await test.step('Go to the test page with a failed ratings call', async () => {
+      await rnr.trackBlockJsonLd();
       await page.goto(pageUrl(baseURL, en.path), { waitUntil: 'domcontentloaded' });
       await rnr.scrollIntoView();
       expect(ratingsRequests.length).toBeGreaterThan(0);

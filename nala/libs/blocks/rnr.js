@@ -150,12 +150,43 @@ export default class Rnr {
     );
   }
 
-  /** The Product JSON-LD that the block adds to <head>. Other JSON-LD on the page is ignored. */
+  /**
+   * Records the Product JSON-LD that the block adds to <head>. Call before page.goto.
+   * Milo's JSON-LD graph manager removes this script later and merges it into one @graph script.
+   */
+  async trackBlockJsonLd() {
+    await this.page.addInitScript(() => {
+      window.nalaBlockJsonLd = [];
+      new MutationObserver((mutations) => mutations.forEach(({ addedNodes }) => addedNodes.forEach((node) => {
+        if (node.type !== 'application/ld+json' || node.parentElement !== document.head) return;
+        try {
+          const data = JSON.parse(node.textContent);
+          if (data?.['@type'] === 'Product' && data.aggregateRating) window.nalaBlockJsonLd.push(data);
+        } catch { /* Other scripts can have invalid JSON. */ }
+      }))).observe(document, { childList: true, subtree: true });
+    });
+  }
+
+  /** The Product JSON-LD that the block added to <head>. Needs trackBlockJsonLd(). */
   async readBlockJsonLd() {
-    return this.page.evaluate(() => [...document.head.querySelectorAll('script[type="application/ld+json"]')]
-      .map((script) => {
-        try { return JSON.parse(script.textContent); } catch { return null; }
-      })
-      .filter((data) => data?.['@type'] === 'Product' && data.aggregateRating));
+    return this.page.evaluate(() => window.nalaBlockJsonLd);
+  }
+
+  /** Every entity with rating data in the current page JSON-LD. Rating references by @id are resolved. */
+  async readPageRatings() {
+    return this.page.evaluate(() => {
+      const nodes = [...document.head.querySelectorAll('script[type="application/ld+json"]')].flatMap((script) => {
+        try {
+          const data = JSON.parse(script.textContent);
+          return data['@graph'] || [data];
+        } catch { return []; }
+      });
+      const byId = new Map(nodes.filter((node) => node['@id']).map((node) => [node['@id'], node]));
+      return nodes.filter((node) => node.aggregateRating).map((node) => {
+        const rating = node.aggregateRating;
+        const isReference = Object.keys(rating).length === 1 && rating['@id'];
+        return { ...node, aggregateRating: (isReference && byId.get(rating['@id'])) || rating };
+      });
+    });
   }
 }
