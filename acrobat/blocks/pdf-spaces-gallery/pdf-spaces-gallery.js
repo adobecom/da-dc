@@ -185,7 +185,7 @@ async function loadThumbnail(img, thumbUrl, token) {
     const resp = await fetch(thumbUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
-        'X-Api-Key': PDFSPACES_API_KEY,
+        'x-api-key': PDFSPACES_API_KEY,
         'Client-Agent': 'v=2; app=DCWeb; os=na; device=na; surface=na',
         'acpc-published-links': 'true',
         directive: 'link-2023',
@@ -199,8 +199,9 @@ async function loadThumbnail(img, thumbUrl, token) {
     img.addEventListener('error', () => URL.revokeObjectURL(objectUrl), { once: true });
     img.src = objectUrl;
     img.classList.remove('pdf-spaces-placeholder-img');
-  } catch {
-    // leave the placeholder in place
+  } catch (err) {
+    // Log but keep the placeholder in place — this is a new API integration.
+    window.lana?.log(`PDF Spaces: thumbnail load failed — ${err.message}`, lanaOptions);
   }
 }
 
@@ -307,6 +308,7 @@ export default async function init(element) {
   }
 
   if (!spaces.length) {
+    window.lana?.log(`PDF Spaces: no spaces for category "${category}"`, lanaOptions);
     element.remove();
     return;
   }
