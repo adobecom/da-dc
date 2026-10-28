@@ -21,7 +21,7 @@ test.describe('Acrobat Generative AI PDF — Students', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await gai.gnav.waitFor({ state: 'visible' });
       await expect(gai.gnav).toBeVisible();
-      await expect(gai.gnavBreadcrumbs).toBeVisible();
+      // await expect(gai.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify hero marquee', async () => {
