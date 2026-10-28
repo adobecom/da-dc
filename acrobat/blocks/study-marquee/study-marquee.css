@@ -907,10 +907,30 @@
     margin: 0;
   }
 
-  .study-marquee.avalon .study-marquee-media picture img,
+  .study-marquee.avalon.media-cover-left {
+    --media-cover-position: left;
+  }
+
+  .study-marquee.avalon.media-cover-right {
+    --media-cover-position: right;
+  }
+
+  .study-marquee.avalon.media-cover-top {
+    --media-cover-position: top;
+  }
+
+  .study-marquee.avalon.media-cover-bottom {
+    --media-cover-position: bottom;
+  }
+
+  .study-marquee.avalon.media-cover-center {
+    --media-cover-position: center;
+  }
+
+  .study-marquee.avalon .study-marquee-media img,
   .study-marquee.avalon .study-marquee-media video {
     object-fit: cover;
-    object-position: center top;
+    object-position: var(--media-cover-position, center top);
     width: 100%;
     height: 100%;
     display: block;

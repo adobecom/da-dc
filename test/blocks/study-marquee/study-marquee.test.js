@@ -612,6 +612,50 @@ describe('study-marquee block', () => {
     expect(block.querySelector('.study-marquee-col-right .study-marquee-media')).to.not.exist;
   });
 
+  it('avalon: positions cover images and videos without changing the base or smaller-screen layout', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    block.classList.add('avalon');
+    await init(block);
+    await delay(100);
+    const media = block.querySelector('.study-marquee-media');
+    const video = document.createElement('video');
+    media.append(video);
+    const assets = [media.querySelector('img'), video];
+    const positions = [
+      ['', '50% 0%'],
+      ['media-cover', '50% 0%'],
+      ['media-cover-left', '0% 50%'],
+      ['media-cover-right', '100% 50%'],
+      ['media-cover-top', '50% 0%'],
+      ['media-cover-bottom', '50% 100%'],
+      ['media-cover-center', '50% 50%'],
+    ];
+    try {
+      for (const width of [1440, 800, 375]) {
+        await setViewport({ width, height: 900 });
+        for (const [className, position] of positions) {
+          if (className) block.classList.add(className);
+          assets.forEach((asset) => {
+            expect(getComputedStyle(asset).objectFit).to.equal('cover');
+            expect(getComputedStyle(asset).objectPosition, `${asset.tagName}, ${className}, ${width}px`)
+              .to.equal(width >= 1200 ? position : '50% 50%');
+          });
+          if (className) block.classList.remove(className);
+        }
+      }
+      await setViewport({ width: 1440, height: 900 });
+      block.classList.remove('avalon');
+      block.classList.add('media-cover-left');
+      assets.forEach((asset) => {
+        expect(getComputedStyle(asset).objectPosition).to.equal('50% 50%');
+      });
+    } finally {
+      await setViewport({ width: 800, height: 600 });
+    }
+  });
+
   it('avalon: keeps the video pause-play control in the bottom-right of the cover media on desktop', async () => {
     await setViewport({ width: 1440, height: 900 });
     const miloVideoStyles = document.createElement('style');
