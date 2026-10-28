@@ -1,4 +1,6 @@
+/* eslint-disable compat/compat */
 import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
 
 const { testables } = await import(
   '../../../acrobat/blocks/pdf-spaces-gallery/pdf-spaces-gallery.js'
@@ -125,6 +127,106 @@ describe('pdf-spaces-gallery block', () => {
       const card = buildCard(item, 'Explore now', createTag, null);
       const img = card.querySelector('img');
       expect(img.classList.contains('pdf-spaces-placeholder-img')).to.be.true;
+    });
+  });
+});
+
+describe('pdf-spaces-gallery data + ui helpers', () => {
+  afterEach(() => {
+    sinon.restore();
+    delete window.adobeIMS;
+  });
+
+  describe('getImsToken', () => {
+    it('returns the current access token when it is valid', async () => {
+      const getAccessToken = () => ({ token: 'valid', expire: new Date(Date.now() + 3600000) });
+      window.adobeIMS = { getAccessToken };
+      expect(await testables.getImsToken()).to.equal('valid');
+    });
+
+    it('refreshes when there is no current access token', async () => {
+      const refreshToken = async () => ({ tokenInfo: { token: 'refreshed' } });
+      window.adobeIMS = { getAccessToken: () => null, refreshToken };
+      expect(await testables.getImsToken()).to.equal('refreshed');
+    });
+  });
+
+  describe('fetchCuratedSpaces', () => {
+    beforeEach(() => {
+      testables.setDeps({ config: () => ({ env: { name: 'stage' }, locale: { ietf: 'en-US' } }) });
+      const getAccessToken = () => ({ token: 'tok', expire: new Date(Date.now() + 3600000) });
+      window.adobeIMS = { getAccessToken };
+    });
+
+    it('fetches discovery, then the curated collections', async () => {
+      const discovery = { templates: { kwcollection_uri: 'https://dc.example/dckwcs/1/kwcollections/{+kwcollection_id}' } };
+      const collections = { children: [{ id: '1', name: 'A' }] };
+      const fetchStub = sinon.stub(window, 'fetch').callsFake((url) => {
+        if (String(url).includes('/discovery')) return Promise.resolve({ ok: true, json: async () => discovery });
+        return Promise.resolve({ ok: true, json: async () => collections });
+      });
+      const result = await testables.fetchCuratedSpaces();
+      expect(result.token).to.equal('tok');
+      expect(result.data.children[0].name).to.equal('A');
+      expect(String(fetchStub.firstCall.args[0])).to.contain('dc-api-stage.adobe.io/discovery');
+    });
+
+    it('throws when discovery responds with an error', async () => {
+      sinon.stub(window, 'fetch').resolves({ ok: false, status: 403, statusText: 'Forbidden' });
+      let error;
+      try { await testables.fetchCuratedSpaces(); } catch (e) { error = e; }
+      expect(error).to.be.an('error');
+      expect(error.message).to.contain('Discovery API 403');
+    });
+
+    it('throws when no IMS token is available', async () => {
+      const refreshToken = async () => ({ tokenInfo: null });
+      window.adobeIMS = { getAccessToken: () => null, refreshToken };
+      let error;
+      try { await testables.fetchCuratedSpaces(); } catch (e) { error = e; }
+      expect(error.message).to.contain('No IMS guest token');
+    });
+  });
+
+  describe('loadThumbnail', () => {
+    it('swaps the image src on a successful response', async () => {
+      const blob = async () => new Blob(['x'], { type: 'image/png' });
+      sinon.stub(window, 'fetch').resolves({ ok: true, blob });
+      const img = document.createElement('img');
+      img.classList.add('pdf-spaces-placeholder-img');
+      await testables.loadThumbnail(img, 'https://ren.example/rendition/id/x', 'tok');
+      expect(img.src).to.contain('blob:');
+      expect(img.classList.contains('pdf-spaces-placeholder-img')).to.be.false;
+    });
+
+    it('leaves the placeholder in place on a failed response', async () => {
+      sinon.stub(window, 'fetch').resolves({ ok: false, status: 403 });
+      const img = document.createElement('img');
+      img.classList.add('pdf-spaces-placeholder-img');
+      await testables.loadThumbnail(img, 'https://ren.example/x', 'tok');
+      expect(img.classList.contains('pdf-spaces-placeholder-img')).to.be.true;
+    });
+  });
+
+  describe('setupCarouselNav', () => {
+    it('adds prev/next controls that trigger scrolling', () => {
+      testables.setDeps({ tag: createTag });
+      const element = document.createElement('div');
+      const container = document.createElement('div');
+      container.className = 'pdf-spaces-cards';
+      const card = document.createElement('div');
+      card.className = 'editorial-card';
+      container.append(card);
+      element.append(container);
+      document.body.append(element);
+      const scrollTo = sinon.spy(container, 'scrollTo');
+      const scrollBy = sinon.spy(container, 'scrollBy');
+      testables.setupCarouselNav(element, container);
+      const buttons = element.querySelectorAll('.pdf-spaces-nav-btn');
+      expect(buttons.length).to.equal(2);
+      buttons[1].click();
+      expect(scrollTo.called || scrollBy.called).to.be.true;
+      element.remove();
     });
   });
 });

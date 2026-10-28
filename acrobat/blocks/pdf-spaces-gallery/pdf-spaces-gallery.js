@@ -339,9 +339,20 @@ export const testables = {
   matchesCategory,
   buildDestinationUrl,
   buildThumbnailUrl,
+  getImsToken,
+  fetchCuratedSpaces,
+  getCuratedSpaces,
+  loadThumbnail,
+  setupCarouselNav,
   buildCard: (item, ctaText, tagFn, token) => {
     createTag = tagFn;
     return buildCard(item, ctaText, token);
+  },
+  // Inject the deps normally wired up in init(), so the fetch/nav helpers can be
+  // unit-tested in isolation.
+  setDeps: ({ tag, config } = {}) => {
+    if (tag) createTag = tag;
+    if (config) getConfig = config;
   },
   CATEGORY_LABELS,
 };
