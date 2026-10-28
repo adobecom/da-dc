@@ -36,3 +36,6 @@ https://main--da-dc--adobecom.aem.live/acrobat/online/text-summarizer
 https://main--da-dc--adobecom.aem.live/acrobat/online/tiff-to-pdf
 https://main--da-dc--adobecom.aem.live/acrobat/online/txt-to-pdf
 https://main--da-dc--adobecom.aem.live/acrobat/online/word-to-pdf
+https://main--da-dc--adobecom.aem.live/acrobat/online/pdf-filler
+https://main--da-dc--adobecom.aem.live/acrobat/online/add-text-to-pdf
+https://main--da-dc--adobecom.aem.live/acrobat/online/screenshot-to-pdf
