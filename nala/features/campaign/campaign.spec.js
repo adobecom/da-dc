@@ -9,5 +9,12 @@ module.exports = {
       data: {},
       tags: '@campaign @do-that-with-acrobat @smoke @live',
     },
+    {
+      tcid: '1',
+      name: '@campaign-interactive-report-video-control',
+      path: '/acrobat/campaign/interactive-report',
+      data: {},
+      tags: '@campaign @interactive-report @study-marquee',
+    },
   ],
 };
