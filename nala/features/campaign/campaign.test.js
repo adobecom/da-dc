@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import CampaignPage from './campaign.page.js';
 import { features } from './campaign.spec.js';
 import checkPageLinks from '../../utils/link-checker.js';
+import MerchCards from '../../libs/blocks/merch-card.js';
 
 let campaign;
 
@@ -39,9 +40,7 @@ test.describe('Acrobat Campaign — Do that with Acrobat', () => {
       const plans = campaign.compareAcrobatPlans;
       await plans.scrollIntoViewIfNeeded({ timeout: 60000 });
       await expect(plans).toBeVisible({ timeout: 60000 });
-      const merchCard = plans.locator('merch-card').filter({ visible: true }).first();
-      await merchCard.scrollIntoViewIfNeeded({ timeout: 60000 });
-      await expect(merchCard).toBeVisible();
+      await new MerchCards(page, plans).verifyVisibleCards();
     });
 
     await test.step('Verify footer', async () => {

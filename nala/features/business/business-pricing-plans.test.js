@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import BusinessPricingPlansPage from './business-pricing-plans.page.js';
 import { features } from './business-pricing-plans.spec.js';
 import checkPageLinks from '../../utils/link-checker.js';
+import MerchCards from '../../libs/blocks/merch-card.js';
 
 let pricingPlans;
 
@@ -83,6 +84,10 @@ test.describe('Acrobat Business — Pricing plans', () => {
     await test.step('Verify footer', async () => {
       await pricingPlans.footer.scrollIntoViewIfNeeded();
       await expect(pricingPlans.footer).toBeVisible({ timeout: 60000 });
+    });
+
+    await test.step('Verify merch cards', async () => {
+      await new MerchCards(page).verifyVisibleCards();
     });
 
     await test.step('Verify visible checkout links are visible and enabled', async () => {
