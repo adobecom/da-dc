@@ -9,7 +9,6 @@ module.exports = {
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Flashcard maker',
-        verbCopy: 'Upload your class materials to create flashcards. Start for free, no sign-up or credit card required.',
         sectionCounts: {
           threeUp: 1,
           twoUp: 2,

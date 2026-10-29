@@ -523,13 +523,30 @@ const MAS_EXTRA_LOCALES = { pr: 'es_PR' };
 
 const MARKET_LOCALE_OVERRIDES = { en: { AU: 'en_GB', IN: 'en_GB', GB: 'en_GB' } };
 
-function getMasLocale(miloLocale, geoCountry) {
+function getMasLocale(miloLocale, market) {
   const geo = (miloLocale?.prefix || 'US_en').replace('/', '');
   let [country = 'US', language = 'en'] = (MAS_GEO_MAP[geo] ?? geo).split('_', 2);
   country = country.toUpperCase();
   language = language.toLowerCase();
-  const marketOverride = MARKET_LOCALE_OVERRIDES[language]?.[geoCountry];
-  return { locale: marketOverride ?? MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`, country: geoCountry ?? country };
+  const locale = MAS_EXTRA_LOCALES[geo] ?? `${language}_${country}`;
+  if (!market) return { locale, country };
+  const marketOverride = market !== country
+    ? MARKET_LOCALE_OVERRIDES[language]?.[market] : undefined;
+  return { locale: marketOverride ?? locale, country: market };
+}
+
+let masMarketPromise;
+
+function getMasMarket(miloLibs) {
+  masMarketPromise ??= (async () => {
+    const { getMetadata } = await import(`${miloLibs}/utils/utils.js`);
+    // eslint-disable-next-line compat/compat
+    const flag = new URLSearchParams(window.location.search).get('mas-geo-detection') ?? getMetadata('mas-geo-detection');
+    if (!['on', 'true'].includes(flag?.toLowerCase())) return undefined;
+    const { getValidatedMarket } = await import(`${miloLibs}/utils/market.js`);
+    return (await getValidatedMarket())?.toUpperCase();
+  })().catch(() => undefined);
+  return masMarketPromise;
 }
 
 async function preloadMasFragment(a, config) {
@@ -544,14 +561,14 @@ async function preloadMasFragment(a, config) {
   // eslint-disable-next-line compat/compat
   const params = new URLSearchParams(url.hash.replace(/^#/, ''));
   const fragment = params.get('fragment') || params.get('query');
+  const mask = params.get('mask');
   if (!fragment) return;
 
-  const { getCountry } = await import(`${config?.miloLibs}/utils/utils.js`);
-
-  const { locale, country } = getMasLocale(config?.locale, (await getCountry())?.toUpperCase());
+  const { locale, country } = getMasLocale(config?.locale, await getMasMarket(config?.miloLibs));
   const apiKey = config?.commerce?.['wcs-api-key'] ?? DEFAULT_MAS_FRAGMENT_API_KEY;
   let endpoint = `${MAS_FRAGMENT_API}?id=${fragment}&api_key=${apiKey}&locale=${locale}`;
   if (country && !locale.endsWith(`_${country}`)) endpoint += `&country=${country}`;
+  if (mask) endpoint += `&mask=${mask}`;
 
   loadLink(endpoint, { rel: 'preload', as: 'fetch', crossorigin: 'anonymous', fetchpriority: 'low' });
 }
@@ -638,6 +655,13 @@ async function loadPage() {
   // Setup Milo
   const miloLibs = setLibs(LIBS);
 
+  // eslint-disable-next-line compat/compat
+  const masGeoDetection = new URLSearchParams(window.location.search).get('mas-geo-detection')
+    ?? getCustomMetadata('mas-geo-detection');
+  if (['on', 'true'].includes(masGeoDetection?.toLowerCase())) {
+    loadLink(`${miloLibs}/utils/market.js`, { rel: 'modulepreload' });
+  }
+
   // Milo and site styles
   if (!document.getElementById('inline-milo-styles')) {
     const paths = [];
@@ -666,6 +690,19 @@ async function loadPage() {
   const decorateArea = (area, options) => scanForMasLinks(area, options, getConfig());
   setConfig({ ...CONFIG, miloLibs, decorateArea });
   decorateArea();
+
+  // Render M@S CTAs without waiting for IMS; upgrade and download CTAs swap in once it is ready.
+  document.addEventListener('wcms:commerce:ready', ({ detail: service }) => {
+    // eslint-disable-next-line compat/compat
+    const modules = Promise.all([
+      import(`${miloLibs}/blocks/merch/merch.js`),
+      import('./checkoutAction.js'),
+    ]);
+    service.registerCheckoutAction(async (...args) => {
+      const [{ getCheckoutAction }, { default: resolveCheckoutAction }] = await modules;
+      return resolveCheckoutAction(getCheckoutAction, ...args);
+    });
+  });
 
   window.addEventListener('IMS:Ready', async () => {
     const susiElems = document.querySelectorAll('a[href*="susi"]');

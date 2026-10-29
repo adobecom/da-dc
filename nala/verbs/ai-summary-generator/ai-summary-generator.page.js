@@ -4,8 +4,8 @@ export default class AiSummaryGenerator extends AcrobatWidget {
   constructor(page, nth = 0) {
     super(page, '.summarize-pdf.unity-enabled', nth);
 
-    this.gnav = page.locator('nav.feds-topnav');
-    this.gnavBreadcrumbs = page.locator('nav.feds-breadcrumbs');
+    this.gnav = page.locator('header');
+    this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs');
 
     this.howToSection = page.locator('div[class*="how-to"]').first();
     this.fourUpSection = page.locator('div[class*="four-up"]').first();

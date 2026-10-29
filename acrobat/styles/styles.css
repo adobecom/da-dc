@@ -113,7 +113,8 @@ div [class *= PdfnowLifecycle__dropzone2___] {
 }
 
 @media (min-width: 1075px) {
-  .accordion-container.verb-subfooter-moblie {
+  .accordion-container.verb-subfooter-moblie,
+  .accordion-container.verb-subfooter-mobile {
     display: none;
   }
 }
@@ -124,19 +125,26 @@ div [class *= PdfnowLifecycle__dropzone2___] {
   }
 }
 
-.accordion-container.verb-subfooter-moblie {
+.accordion-container.verb-subfooter-moblie,
+.accordion-container.verb-subfooter-mobile {
   background: #fbfbfb;
 }
 
 .accordion-container.verb-subfooter-moblie .accordion dt.is-open,
 .accordion-container.verb-subfooter-moblie .accordion dd.is-open,
 .accordion-container.verb-subfooter-moblie .accordion dt.has-focus,
-.accordion-container.verb-subfooter-moblie .accordion dd.has-focus {
+.accordion-container.verb-subfooter-moblie .accordion dd.has-focus,
+.accordion-container.verb-subfooter-mobile .accordion dt.is-open,
+.accordion-container.verb-subfooter-mobile .accordion dd.is-open,
+.accordion-container.verb-subfooter-mobile .accordion dt.has-focus,
+.accordion-container.verb-subfooter-mobile .accordion dd.has-focus {
   border-left: none;
 }
 
 .accordion-container.verb-subfooter-moblie .accordion dt.is-open,
-.accordion-container.verb-subfooter-moblie .accordion dd.is-open {
+.accordion-container.verb-subfooter-moblie .accordion dd.is-open,
+.accordion-container.verb-subfooter-mobile .accordion dt.is-open,
+.accordion-container.verb-subfooter-mobile .accordion dd.is-open {
   padding: 0;
 }
 
@@ -158,25 +166,30 @@ div [class *= PdfnowLifecycle__dropzone2___] {
   object-fit: contain;
 }
 
-.accordion-container.verb-subfooter-moblie .accordion ul {
+.accordion-container.verb-subfooter-moblie .accordion ul,
+.accordion-container.verb-subfooter-mobile .accordion ul {
   padding-left: 20px;
 }
 
-.accordion-container.verb-subfooter-moblie .accordion li {
+.accordion-container.verb-subfooter-moblie .accordion li,
+.accordion-container.verb-subfooter-mobile .accordion li {
   list-style-type: none;
   padding: 8px 0;
 }
 
-.accordion-container.verb-subfooter-moblie .accordion li a {
+.accordion-container.verb-subfooter-moblie .accordion li a,
+.accordion-container.verb-subfooter-mobile .accordion li a {
   color: #000;
 }
 
-.accordion-container.verb-subfooter-moblie picture {
+.accordion-container.verb-subfooter-moblie picture,
+.accordion-container.verb-subfooter-mobile picture {
   vertical-align: middle;
   padding-right: 10px;
 }
 
-.accordion-container.verb-subfooter-moblie  dd.is-open.has-focus {
+.accordion-container.verb-subfooter-moblie dd.is-open.has-focus,
+.accordion-container.verb-subfooter-mobile dd.is-open.has-focus {
   background-color: transparent;
 }
 

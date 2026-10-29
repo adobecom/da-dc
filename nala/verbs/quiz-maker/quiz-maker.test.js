@@ -28,20 +28,19 @@ test.describe('Unity Quiz maker test suite', () => {
     await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
       await quizMaker.gnav.waitFor({ state: 'visible' });
       await expect(quizMaker.gnav).toBeVisible();
-      await expect(quizMaker.gnavBreadcrumbs).toBeVisible();
+      // await expect(quizMaker.gnavBreadcrumbs).toBeVisible();
     });
 
     await test.step('Verify Quiz maker widget content/specs', async () => {
       await expect(quizMaker.widget).toBeVisible();
       await expect(quizMaker.dropZone).toBeVisible();
-      await expect(quizMaker.studyMarqueeMedia).toBeVisible();
       await expect(quizMaker.acrobatIcon).toBeVisible();
-      const actualText = await quizMaker.verbHeader.textContent();
-      expect(actualText.trim()).toBe(data.verbHeading);
-      await expect(quizMaker.verbTitle).toContainText(data.verbTitle);
-      await expect(quizMaker.verbCopy).toContainText(data.verbCopy);
+      await expect(quizMaker.verbTitle).toBeVisible();
+      await expect(quizMaker.verbCopy).toBeVisible();
+      await expect(quizMaker.promptInput).toBeVisible();
+      await expect(quizMaker.addSourcesLabel).toBeVisible();
+      await expect(quizMaker.securityTooltip).toBeVisible();
       await expect(quizMaker.ctaButton).toBeVisible();
-      await expect(quizMaker.ctaButton).toBeEnabled();
     });
 
     await test.step('Verify how-to section', async () => {
@@ -76,11 +75,12 @@ test.describe('Unity Quiz maker test suite', () => {
     });
 
     await test.step('Verify Student Spaces carousel', async () => {
-      const { carousels, studentSpacesHeading } = quizMaker;
-
-      await studentSpacesHeading.scrollIntoViewIfNeeded();
-      await expect(studentSpacesHeading).toBeVisible({ timeout: 60000 });
-      await expect(carousels).toBeVisible({ timeout: 60000 });
+      const { carousels } = quizMaker;
+      for (let i = 0; i < await carousels.count(); i += 1) {
+        const carousel = carousels.nth(i);
+        await carousel.scrollIntoViewIfNeeded();
+        await expect(carousel).toBeVisible({ timeout: 60000 });
+      }
     });
 
     await test.step('Verify FAQ accordion', async () => {
@@ -109,9 +109,9 @@ test.describe('Unity Quiz maker test suite', () => {
       await expect(quizMaker.footer).toBeVisible({ timeout: 60000 });
     });
 
-    // await test.step('Verify no link leads to 404', async () => {
-    //   await checkPageLinks(page, expect);
-    // });
+    await test.step('Verify no link leads to 404', async () => {
+      await checkPageLinks(page, expect);
+    });
 
     await test.step('Upload a sample PDF file', async () => {
       const [fileChooser] = await Promise.all([

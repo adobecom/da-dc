@@ -1,6 +1,7 @@
 /* eslint-disable compat/compat */
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
+import { waitFor } from '../../helpers/waitfor.js';
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
 
 const { default: init } = await import(
@@ -31,8 +32,11 @@ async function setup(block) {
 
 describe('verb-widget-client-upload init', () => {
   let xhr;
+  let originalLana;
 
   beforeEach(() => {
+    originalLana = window.lana;
+    window.lana = { log: sinon.stub() };
     sinon.stub(window, 'fetch');
     window.fetch.callsFake((url) => {
       if (typeof url === 'string' && url.endsWith('.svg')) {
@@ -56,6 +60,45 @@ describe('verb-widget-client-upload init', () => {
     xhr.restore();
     sinon.restore();
     document.body.innerHTML = '';
+    window.lana = originalLana;
+  });
+
+  it('logs one safe diagnostic and restores the CTA when file encryption fails', async () => {
+    const block = makeBlock(['<h1>Image to PDF</h1>']);
+    await setup(block);
+    sinon.stub(crypto.subtle, 'encrypt').rejects(new DOMException(
+      'private-file.jpg token=secret',
+      'QuotaExceededError',
+    ));
+    const input = block.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', {
+      configurable: true,
+      value: [new File(['image'], 'private-file.jpg', { type: 'image/jpeg' })],
+    });
+
+    input.dispatchEvent(new Event('change'));
+    await waitFor(() => window.lana.log.called);
+
+    expect(window.lana.log.calledOnce).to.be.true;
+    expect(window.lana.log.firstCall.args).to.deep.equal([
+      'verb-widget-client-upload: image-to-pdf; Error Code: error_generic, Message: Unable to process the request., Diagnostic: file encryption and storage; QuotaExceededError',
+      {
+        sampleRate: 1,
+        tags: 'DC_Milo,Project Unity (DC),verb-widget-client-upload',
+        severity: 'error',
+      },
+    ]);
+    expect(block.querySelector('.verb-cta-label').textContent).to.equal('Select a file');
+    expect(block.querySelector('.verb-cta-label').closest('button').disabled).to.be.false;
+    expect(block.querySelector('.error').classList.contains('hide')).to.be.false;
+  });
+
+  it('initializes the upload UI without a failure log', async () => {
+    const block = makeBlock(['<h1>Image to PDF</h1>']);
+    await setup(block);
+
+    expect(block.querySelector('input[type="file"]')).to.exist;
+    expect(window.lana.log.called).to.be.false;
   });
 
   describe('authored copy', () => {

@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable compat/compat */
 /* eslint-disable no-underscore-dangle */
-import { setLibs, getEnv } from '../../scripts/utils.js';
+import { setLibs, getEnv, getLanaErrorName } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
 const { createTag, loadScript, getConfig, getLingoRegion, lingoActive } = await import(`${miloLibs}/utils/utils.js`);
@@ -18,8 +18,12 @@ const onRedirect = (e) => {
     // temporary solution: allows analytics to go thru
   }, 100);
 };
-const onError = () => {
-  window.lana?.log('on error', { severity: 'error' });
+const onError = (event) => {
+  const error = event.detail?.error || event.detail;
+  window.lana?.log(
+    `SUSI Light: authentication component reported an error; ${getLanaErrorName(error)}`,
+    { severity: 'error', tags: 'DC_Milo,susi-light' },
+  );
 };
 
 export function loadWrapper() {
