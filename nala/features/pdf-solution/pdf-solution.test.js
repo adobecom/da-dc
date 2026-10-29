@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import PdfSolutionPage from './pdf-solution.page.js';
 import { features } from './pdf-solution.spec.js';
 import checkPageLinks from '../../utils/link-checker.js';
+import MerchCards from '../../libs/blocks/merch-card.js';
 
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/acrobat-here-to-help-blade';
 
@@ -76,8 +77,7 @@ async function runCompletePdfSolutionSmoke(page, baseURL, path) {
       const tab = tabs.nth(i);
       await expect(tab).toBeVisible();
       await tab.click();
-      const visibleCard = plansSection.locator('merch-card').filter({ visible: true }).first();
-      await expect(visibleCard).toBeVisible();
+      await new MerchCards(page, plansSection).verifyVisibleCards();
     }
   });
 

@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import PdfReaderPage from './pdf-reader.page.js';
 import { features } from './pdf-reader.spec.js';
 import checkPageLinks from '../../utils/link-checker.js';
+import MerchCards from '../../libs/blocks/merch-card.js';
 
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/get-acrobat-support';
 
@@ -66,8 +67,7 @@ test.describe('Acrobat PDF Reader Smoke Test', () => {
         const tab = tabs.nth(i);
         await expect(tab).toBeVisible();
         await tab.click();
-        const visibleCard = merchCardPlans.locator('merch-card').filter({ visible: true }).first();
-        await expect(visibleCard).toBeVisible();
+        await new MerchCards(page, merchCardPlans).verifyVisibleCards();
       }
     });
 
