@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './delete-pdf.spec.js';
 import DeletePdf from './delete-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-delete-pdf.pdf');
@@ -89,9 +90,7 @@ test.describe('Unity Delete PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await deletePdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(deletePdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(deletePdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, deletePdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

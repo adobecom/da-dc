@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './ai-chat-pdf.spec.js';
 import AiChatPdf from './ai-chat-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-ai-chat-pdf.pdf');
@@ -116,9 +117,7 @@ test.describe('Unity AI Chat PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await aiChatPdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(aiChatPdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(aiChatPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, aiChatPdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

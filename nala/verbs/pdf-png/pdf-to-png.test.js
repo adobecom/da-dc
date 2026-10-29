@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './pdf-to-png.spec.js';
 import PdfToPng from './pdf-to-png.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-pdf-png.pdf');
@@ -89,9 +90,7 @@ test.describe('Unity PDF to PNG test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await pdfToPng.rnrSection.scrollIntoViewIfNeeded();
-      await expect(pdfToPng.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(pdfToPng.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, pdfToPng.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

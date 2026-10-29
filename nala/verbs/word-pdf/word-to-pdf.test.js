@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './word-to-pdf.spec.js';
 import WordToPdf from './word-to-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const wordFilePath = path.resolve(__dirname, '../../assets/1-WORD-word-pdf.doc');
@@ -89,9 +90,7 @@ test.describe('Unity WORD to PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await wordToPdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(wordToPdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(wordToPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, wordToPdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

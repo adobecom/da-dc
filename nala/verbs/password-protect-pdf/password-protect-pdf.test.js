@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './password-protect-pdf.spec.js';
 import PasswordProtectPdf from './password-protect-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-password-protect-pdf.pdf');
@@ -89,9 +90,7 @@ test.describe('Unity Password Protect PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await passwordProtectPdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(passwordProtectPdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(passwordProtectPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, passwordProtectPdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

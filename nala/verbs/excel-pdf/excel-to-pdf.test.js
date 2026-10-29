@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './excel-to-pdf.spec.js';
 import ExcelToPdf from './excel-to-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const excelFilePath = path.resolve(__dirname, '../../assets/1-Excel-excel-pdf.xlsx');
@@ -79,9 +80,7 @@ test.describe('Unity EXCEL to PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await excelToPdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(excelToPdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(excelToPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, excelToPdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {
