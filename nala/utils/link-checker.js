@@ -48,12 +48,14 @@ async function fetchStatus(page, url) {
     // www.adobe.com also serves ".html" links and the other Adobe sites (e.g. /education).
     const { hostname, pathname, search } = new URL(url);
     if (status === 404 && AEM_HOST.test(hostname)) {
+      // A failed fallback request must not hide the 404 we already have.
+      const fallback = (href) => requestStatus(page, href).catch(() => 404);
       if (pathname.endsWith('.html')) {
         const sameHost = new URL(url);
         sameHost.pathname = pathname.replace(/\.html$/, '');
-        status = await requestStatus(page, sameHost.href);
+        status = await fallback(sameHost.href);
       }
-      if (status === 404) status = await requestStatus(page, `https://www.adobe.com${pathname}${search}`);
+      if (status === 404) status = await fallback(`https://www.adobe.com${pathname}${search}`);
     }
     return status;
   } catch {
