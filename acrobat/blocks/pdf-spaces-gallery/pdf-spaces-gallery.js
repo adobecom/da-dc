@@ -356,5 +356,6 @@ export const testables = {
     if (tag) createTag = tag;
     if (config) getConfig = config;
   },
+  resetCache: () => { curatedPromise = null; },
   CATEGORY_LABELS,
 };

@@ -2,7 +2,7 @@
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 
-const { testables } = await import(
+const { default: init, testables } = await import(
   '../../../acrobat/blocks/pdf-spaces-gallery/pdf-spaces-gallery.js'
 );
 
@@ -228,5 +228,144 @@ describe('pdf-spaces-gallery data + ui helpers', () => {
       expect(scrollTo.called || scrollBy.called).to.be.true;
       element.remove();
     });
+  });
+});
+
+describe('pdf-spaces-gallery coverage extras', () => {
+  afterEach(() => {
+    sinon.restore();
+    delete window.adobeIMS;
+    delete window.lana;
+    testables.resetCache();
+  });
+
+  it('getCuratedSpaces dedupes concurrent calls', async () => {
+    testables.setDeps({ config: () => ({ env: { name: 'stage' }, locale: { ietf: 'en-US' } }) });
+    const getAccessToken = () => ({ token: 'tok', expire: new Date(Date.now() + 3600000) });
+    window.adobeIMS = { getAccessToken };
+    const uri = 'https://dc.example/dckwcs/1/kwcollections/{+kwcollection_id}';
+    const discovery = { templates: { kwcollection_uri: uri } };
+    sinon.stub(window, 'fetch').callsFake((url) => {
+      const body = String(url).includes('/discovery') ? discovery : { children: [] };
+      return Promise.resolve({ ok: true, json: async () => body });
+    });
+    const a = testables.getCuratedSpaces();
+    const b = testables.getCuratedSpaces();
+    expect(a).to.equal(b);
+    const result = await a;
+    expect(result.data.children).to.be.an('array');
+  });
+
+  it('getImsToken returns null when getAccessToken throws', async () => {
+    window.lana = { log: () => {} };
+    window.adobeIMS = { getAccessToken: () => { throw new Error('boom'); } };
+    expect(await testables.getImsToken()).to.equal(null);
+  });
+
+  it('getImsToken returns null after a failed refresh and retry', async () => {
+    const clock = sinon.useFakeTimers();
+    window.lana = { log: () => {} };
+    const refreshToken = () => Promise.reject(new Error('x'));
+    window.adobeIMS = { getAccessToken: () => null, refreshToken };
+    const p = testables.getImsToken();
+    await clock.tickAsync(2100);
+    const result = await p;
+    clock.restore();
+    expect(result).to.equal(null);
+  });
+
+  it('fetchCuratedSpaces waits for IMS and fails when it never loads', async () => {
+    const clock = sinon.useFakeTimers();
+    delete window.adobeIMS;
+    testables.setDeps({ config: () => ({ env: { name: 'stage' }, locale: { ietf: 'en-US' } }) });
+    const p = testables.fetchCuratedSpaces();
+    await clock.tickAsync(1200);
+    let error;
+    try { await p; } catch (e) { error = e; }
+    clock.restore();
+    expect(error.message).to.contain('No IMS guest token');
+  });
+
+  it('buildCard starts a thumbnail fetch when a token and rendition exist', () => {
+    const blob = async () => new Blob(['x'], { type: 'image/png' });
+    const fetchStub = sinon.stub(window, 'fetch').resolves({ ok: true, blob });
+    const href = 'https://r/rendition/id/x{?size,type}';
+    const acpcLinks = { [RENDITION_REL]: [{ href }] };
+    const item = { id: 'x', name: 'N', description: 'D', category: 'C', acpc_links: acpcLinks };
+    buildCard(item, 'Explore now', createTag, 'tok');
+    expect(fetchStub.called).to.be.true;
+  });
+
+  it('setupCarouselNav falls back without ResizeObserver and scrolls by a card', () => {
+    testables.setDeps({ tag: createTag });
+    const element = document.createElement('div');
+    const container = document.createElement('div');
+    container.style.cssText = 'display:flex; width:100px; overflow:auto;';
+    for (let i = 0; i < 4; i += 1) {
+      const c = document.createElement('div');
+      c.className = 'editorial-card';
+      c.style.cssText = 'flex:0 0 100px; width:100px; height:10px;';
+      container.append(c);
+    }
+    element.append(container);
+    document.body.append(element);
+    const ro = window.ResizeObserver;
+    window.ResizeObserver = undefined;
+    const scrollBy = sinon.spy(container, 'scrollBy');
+    testables.setupCarouselNav(element, container);
+    container.scrollLeft = 50;
+    element.querySelector('.pdf-spaces-next').click();
+    window.ResizeObserver = ro;
+    expect(scrollBy.called).to.be.true;
+    element.remove();
+  });
+});
+
+describe('pdf-spaces-gallery init', () => {
+  let block;
+
+  beforeEach(() => {
+    window.mph = { 'pdf-spaces-cta': 'Explore now' };
+    window.lana = { log: () => {} };
+    const getAccessToken = () => ({ token: 'tok', expire: new Date(Date.now() + 3600000) });
+    window.adobeIMS = { getAccessToken };
+    const uri = 'https://dc.example/dckwcs/1/kwcollections/{+kwcollection_id}';
+    const discovery = { templates: { kwcollection_uri: uri } };
+    const collections = { children: [{ id: '1', name: 'A', category: 'Featured' }] };
+    sinon.stub(window, 'fetch').callsFake((url) => {
+      const u = String(url);
+      if (u.includes('/discovery')) return Promise.resolve({ ok: true, json: async () => discovery });
+      if (u.includes('/kwcollections/')) return Promise.resolve({ ok: true, json: async () => collections });
+      return Promise.resolve({ ok: false, status: 404 });
+    });
+    block = document.createElement('div');
+    block.className = 'pdf-spaces-gallery featured';
+    document.body.append(block);
+  });
+
+  afterEach(() => {
+    sinon.restore();
+    delete window.adobeIMS;
+    delete window.mph;
+    delete window.lana;
+    testables.resetCache();
+    block.remove();
+  });
+
+  it('removes itself when no spaces match the category', async function noMatch() {
+    this.timeout(15000);
+    block.className = 'pdf-spaces-gallery lifestyle';
+    await init(block);
+    expect(block.isConnected).to.be.false;
+  });
+
+  it('removes itself when the fetch fails', async function fetchFails() {
+    this.timeout(15000);
+    sinon.restore();
+    sinon.stub(window, 'fetch').resolves({ ok: false, status: 403, statusText: 'F' });
+    const getAccessToken = () => ({ token: 'tok', expire: new Date(Date.now() + 3600000) });
+    window.adobeIMS = { getAccessToken };
+    await init(block);
+    expect(block.isConnected).to.be.false;
   });
 });
