@@ -85,8 +85,11 @@ test.describe('Acrobat Campaign — Interactive Report', () => {
 
     await test.step('Verify video pause/play control is in the bottom-right of the media', async () => {
       await expect(campaign.studyMarqueePausePlay).toBeVisible({ timeout: 60000 });
-      const media = await campaign.studyMarqueeMedia.boundingBox();
-      const control = await campaign.studyMarqueePausePlay.boundingBox();
+      // Read both boxes in one call. The page can shift between separate boundingBox() calls.
+      const { media, control } = await campaign.studyMarqueePausePlay.evaluate((el) => ({
+        media: el.closest('.study-marquee-media').getBoundingClientRect().toJSON(),
+        control: el.getBoundingClientRect().toJSON(),
+      }));
       expect(control.width).toBeLessThan(media.width / 2);
       expect(control.x).toBeGreaterThan(media.x + media.width / 2);
       expect(control.y).toBeGreaterThan(media.y + media.height / 2);
