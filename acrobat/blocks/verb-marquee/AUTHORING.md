@@ -11,10 +11,10 @@ dc-block-row-copy | Build a standout resume with AI.
 | Row key | Overrides | Notes |
 | --- | --- | --- |
 | `dc-block-row-copy` | `verb-marquee-<verb>-copy` | |
-| `dc-block-row-mobile-copy` | `verb-marquee-<verb>-mobile-copy` | Used at <1200px; falls back to `copy` if absent. |
+| `dc-block-row-mobile-copy` | `verb-marquee-<verb>-mobile-copy` | Used at <1200px. Order: authored `mobile-copy` → placeholder `mobile-copy` → authored `copy` → placeholder `copy`. |
 | `dc-block-row-sub-copy` | `verb-marquee-<verb>-sub-copy` | |
 | `dc-block-row-sub-copy-2` | `verb-marquee-<verb>-sub-copy-2` | |
-| `dc-block-row-mobile-sub-copy` / `-mobile-sub-copy-2` | `verb-marquee-<verb>-mobile-sub-copy[-2]` | Used at <1200px; falls back to the non-mobile row. |
+| `dc-block-row-mobile-sub-copy` / `-mobile-sub-copy-2` | `verb-marquee-<verb>-mobile-sub-copy[-2]` | Used at <1200px. Same order as `mobile-copy` (authored mobile → placeholder mobile → authored non-mobile → placeholder non-mobile). |
 | `dc-block-row-upload-cta` | `verb-marquee-<verb>-upload-cta` / `verb-widget-cta` | |
 | `dc-block-row-dragndrop-text` | `verb-widget-<verb>-dragndrop-text` | |
 | `dc-block-row-file-limit` | `verb-widget-<verb>-file-limit` | |
