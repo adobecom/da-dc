@@ -1,6 +1,9 @@
 /* eslint-disable compat/compat */
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
+// Use Milo's real createTag so the no-HTML-injection test is exercised against
+// the actual helper (its string path uses insertAdjacentHTML, not textContent).
+import { createTag } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved
 
 const { default: init, testables } = await import(
   '../../../acrobat/blocks/pdf-spaces-gallery/pdf-spaces-gallery.js'
@@ -13,20 +16,6 @@ const {
   buildThumbnailUrl,
   buildCard,
 } = testables;
-
-// Minimal stand-in for Milo's createTag (element + attributes + children).
-function createTag(tag, attrs, content) {
-  const el = document.createElement(tag);
-  Object.entries(attrs || {}).forEach(([k, v]) => el.setAttribute(k, v));
-  const append = (c) => {
-    if (c === null || c === undefined) return;
-    if (Array.isArray(c)) { c.forEach(append); return; }
-    if (c instanceof Node) { el.append(c); return; }
-    el.append(document.createTextNode(String(c)));
-  };
-  append(content);
-  return el;
-}
 
 const RENDITION_REL = 'http://ns.adobe.com/adobecloud/rel/rendition';
 
