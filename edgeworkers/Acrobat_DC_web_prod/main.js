@@ -302,7 +302,8 @@ export async function responseProvider(request) {
         ];
       }
     }
-    if (clientUploadWidget || unityWorkflow || (promptUploadWorkflow && unityMarquee)) {
+    const verbsWithTooltips = clientUploadWidget || unityWorkflow || (promptUploadWorkflow && unityMarquee);
+    if (verbsWithTooltips) {
       headerLink.push('</acrobat/scripts/tooltips.js>;rel="preload";as="script";crossorigin="anonymous";fetchpriority="low"');
     }
     headerLink = headerLink.join();
