@@ -4,9 +4,10 @@ import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved
 
-const { default: init, fireUpsellAnalytics } = await import(
+const { default: init } = await import(
   '../../../acrobat/blocks/verb-widget/verb-widget.js'
 );
+const { fireUpsellAnalytics } = await import('../../../acrobat/scripts/verbWidgetUtils.js');
 
 describe('verb-widget upsell analytics deferral', () => {
   let originalPO;
