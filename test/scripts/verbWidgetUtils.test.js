@@ -8,6 +8,7 @@ const {
   FILE_PICKER_EVENTS,
   bindFilePicker,
   bindUnityEvents,
+  buildEarlyPrefetchUrl,
   createErrorToast,
   createFileInput,
   createFooter,
@@ -21,6 +22,7 @@ const {
   getAuthoredVerbIcon,
   getCookie,
   getCtaLabel,
+  getSplunkEndpoint,
   getVerbKey,
   handleSignedInUser,
   handleUpSell,
@@ -174,13 +176,19 @@ describe('verbWidgetUtils', () => {
       expect(window.analytics.sendAnalyticsToSplunk.calledOnce).to.be.true;
     });
 
-    it('registers the analytics loader only once', () => {
-      registerAnalyticsLoader(logger);
-      expect(window.analytics.verbAnalytics).to.be.a('function');
-      const replacement = { verbAnalytics() {}, reviewAnalytics() {}, sendAnalyticsToSplunk() {} };
-      window.analytics = replacement;
-      registerAnalyticsLoader(logger);
-      expect(window.analytics).to.equal(replacement);
+    it('registers one analytics loader per block and keeps existing analytics', () => {
+      const addEventListener = sinon.spy(window, 'addEventListener');
+      const existing = window.analytics;
+      registerAnalyticsLoader(createLogger('loader-a'));
+      registerAnalyticsLoader(createLogger('loader-a'));
+      registerAnalyticsLoader(createLogger('loader-b'));
+      expect(addEventListener.withArgs('analyticsLoad').callCount).to.equal(2);
+      expect(window.analytics).to.equal(existing);
+    });
+
+    it('picks the splunk endpoint for an explicit env', () => {
+      expect(getSplunkEndpoint('prod')).to.equal('https://unity.adobe.io/api/v1/log');
+      expect(getSplunkEndpoint('stage')).to.equal('https://unity-stage.adobe.io/api/v1/log');
     });
   });
 
@@ -284,6 +292,17 @@ describe('verbWidgetUtils', () => {
   });
 
   describe('icons', () => {
+    it('caches icons per icon set', async () => {
+      const custom = { WIDGET_ICON: '<svg id="custom"></svg>' };
+      expect((await createSvgElement('WIDGET_ICON', logger, custom)).id).to.equal('custom');
+      expect((await createSvgElement('WIDGET_ICON')).id).to.not.equal('custom');
+    });
+
+    it('builds the early prefetch url for configured verbs only', () => {
+      expect(buildEarlyPrefetchUrl('word-to-pdf')).to.include('stage.acrobat.adobe.com/us/en/word-to-pdf/av?x_api_client_id=unity');
+      expect(buildEarlyPrefetchUrl('compress-pdf')).to.be.null;
+    });
+
     it('returns independent clones of inline icons', async () => {
       const first = await createSvgElement('WIDGET_ICON');
       const second = await createSvgElement('WIDGET_ICON');

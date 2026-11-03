@@ -1,12 +1,12 @@
 /* eslint-disable compat/compat */
 import { getEnv } from '../../scripts/utils.js';
-import { localeMap } from '../unity/unity.js';
 import {
-  DC_ENV,
   bindFilePicker,
   bindUnityEvents,
+  buildEarlyPrefetchUrl,
   createLogger,
   createUploadSession,
+  getStoreType,
   getVerbKey,
   handleSignedInUser,
   handleUpSell,
@@ -24,12 +24,6 @@ const logger = createLogger('verb-widget');
 registerAnalyticsLoader(logger);
 
 const demoPath = 'blob/JTdCJTIyc291cmNlJTIyJTNBJTIyY2RuJTIyJTJDJTIyZmlsZVBhdGglMjIlM0ElMjIlMkZkYy1maWxlczItZHJvcGluJTJGZGVtby1maWxlcyUyRmVuLVVTJTJGY2hhdC1wZGYtZGVtby12NCUyRmNoYXQtcGRmLWRlbW8tdjQucGRmJTIyJTJDJTIyaXRlbU5hbWUlMjIlM0ElMjJBSSUyMEFzc2lzdGFudCUyMGRlbW8lMjBmaWxlLnBkZiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJjaGF0LXBkZi1kZW1vLXY0JTIyJTJDJTIyaXRlbVR5cGUlMjIlM0ElMjJhcHBsaWNhdGlvbiUyRnBkZiUyMiU3RA/?defaultRHPFeature=verb-qanda&x_api_client_id=ChatPDFTryDemoFile&x_api_client_location=chat_pdf&try-ai-demo=true&demo-mode=true&promoid=HHJ4X8CS&mv=product&mv2=acrobat-web';
-const EARLY_PREFETCH_DUMMY_ASSET = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
-const EARLY_PREFETCH_CONFIG = {
-  'word-to-pdf': { path: 'word-to-pdf/av', clientLocation: 'word-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
-  'excel-to-pdf': { path: 'excel-to-pdf', clientLocation: 'excel-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
-  'ppt-to-pdf': { path: 'ppt-to-pdf', clientLocation: 'ppt-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
-};
 
 const MB100 = 104857600;
 const MB250 = 262144000;
@@ -88,16 +82,6 @@ export const LIMITS = {
   'indd-to-pdf': { maxFileSize: MB100, acceptedFiles: ['.indd'], multipleFiles: true },
 };
 
-function buildEarlyPrefetchUrl(verb) {
-  const config = EARLY_PREFETCH_CONFIG[verb];
-  if (!config) return null;
-  const langFromPath = window.location.pathname.split('/')[1];
-  const locale = localeMap[langFromPath] || 'en-us';
-  const [languageCode, languageRegion] = locale.split('-');
-  const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
-  return `https://${domain}/${languageRegion}/${languageCode}/${config.path}?x_api_client_id=unity&x_api_client_location=${config.clientLocation}&user=frictionless_return_user&attempts=2%2B#assets=${config.assets}`;
-}
-
 function getDemoEndpoint(verb) {
   const baseUrl = (getEnv() === 'prod') ? 'https://acrobat.adobe.com' : 'https://stage.acrobat.adobe.com';
   let demoUrl = `${baseUrl}/${demoPath}`;
@@ -130,23 +114,6 @@ function getDemoHref(verb, authoredHref) {
   } catch (e) {
     return authoredHref || defaultHref;
   }
-}
-
-function getStoreType() {
-  const { ua } = window.browser;
-  if (/android/i.test(ua)) {
-    return 'google';
-  }
-  if (/iphone|ipod/i.test(ua)) {
-    return 'apple';
-  }
-  if (navigator.userAgent.includes('Mac') && 'ontouchend' in document && !/iphone|ipod/i.test(navigator.userAgent)) {
-    return 'apple';
-  }
-  if (/ipad/i.test(ua)) {
-    return 'apple';
-  }
-  return 'desktop';
 }
 
 function getPricingLink(locale) {

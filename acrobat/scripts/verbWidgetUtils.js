@@ -1,5 +1,7 @@
 /* eslint-disable compat/compat */
 import { getEnv, isOldBrowser, setLibs } from './utils.js';
+import { localeMap } from '../blocks/unity/unity.js';
+import verbRedirMap from './maps/verbRedirMap.js';
 
 const miloLibs = setLibs('/libs');
 
@@ -25,35 +27,7 @@ export function createLogger(blockName) {
 
 const defaultLogger = createLogger();
 
-export const verbRedirMap = {
-  createpdf: 'createpdf',
-  'crop-pages': 'crop',
-  'delete-pages': 'deletepages',
-  'extract-pages': 'extract',
-  'combine-pdf': 'combine',
-  'protect-pdf': 'protect',
-  'add-comment': 'addcomment',
-  'pdf-to-image': 'pdftoimage',
-  'reorder-pages': 'reorderpages',
-  sendforsignature: 'sendforsignature',
-  'rotate-pages': 'rotatepages',
-  fillsign: 'fillsign',
-  'split-pdf': 'split',
-  'insert-pdf': 'insert',
-  'compress-pdf': 'compress',
-  'png-to-pdf': 'jpgtopdf',
-  'image-to-pdf': 'jpgtopdf',
-  'bmp-to-pdf': 'jpgtopdf',
-  'gif-to-pdf': 'jpgtopdf',
-  'tiff-to-pdf': 'jpgtopdf',
-  'indd-to-pdf': 'createpdf',
-  'psd-to-pdf': 'createpdf',
-  'ai-to-pdf': 'createpdf',
-  'number-pages': 'number',
-  'ocr-pdf': 'ocr',
-  'chat-pdf': 'chat',
-  'chat-pdf-student': 'study',
-};
+export { verbRedirMap };
 
 export const exhLimitCookieMap = {
   'to-pdf': 'cr_p_c',
@@ -128,6 +102,41 @@ export function isTabletDevice() {
   return isIPadOS || /ipad|android(?!.*mobile)/i.test(ua);
 }
 
+const EARLY_PREFETCH_DUMMY_ASSET = 'urn%3Aaaid%3Asc%3AUS%3A1111111%7CSample%20word%20file_WordtoPDF.docx%7C386919%7Capplication%2Fvnd.openxmlformats-officedocument.wordprocessingml.document';
+
+export const EARLY_PREFETCH_CONFIG = {
+  'word-to-pdf': { path: 'word-to-pdf/av', clientLocation: 'word-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+  'excel-to-pdf': { path: 'excel-to-pdf', clientLocation: 'excel-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+  'ppt-to-pdf': { path: 'ppt-to-pdf', clientLocation: 'ppt-to-pdf', assets: EARLY_PREFETCH_DUMMY_ASSET },
+};
+
+export function buildEarlyPrefetchUrl(verb) {
+  const config = EARLY_PREFETCH_CONFIG[verb];
+  if (!config) return null;
+  const langFromPath = window.location.pathname.split('/')[1];
+  const locale = localeMap[langFromPath] || 'en-us';
+  const [languageCode, languageRegion] = locale.split('-');
+  const domain = DC_ENV === 'prod' ? 'acrobat.adobe.com' : 'stage.acrobat.adobe.com';
+  return `https://${domain}/${languageRegion}/${languageCode}/${config.path}?x_api_client_id=unity&x_api_client_location=${config.clientLocation}&user=frictionless_return_user&attempts=2%2B#assets=${config.assets}`;
+}
+
+export function getStoreType() {
+  const { ua } = window.browser;
+  if (/android/i.test(ua)) {
+    return 'google';
+  }
+  if (/iphone|ipod/i.test(ua)) {
+    return 'apple';
+  }
+  if (navigator.userAgent.includes('Mac') && 'ontouchend' in document && !/iphone|ipod/i.test(navigator.userAgent)) {
+    return 'apple';
+  }
+  if (/ipad/i.test(ua)) {
+    return 'apple';
+  }
+  return 'desktop';
+}
+
 export function redirectOldBrowser() {
   if (!isOldBrowser()) return false;
   window.location.href = EOLBrowserPage;
@@ -155,8 +164,8 @@ export function redDir(verb) {
   window.location.href = redDirLink(verb);
 }
 
-export function getSplunkEndpoint() {
-  return getEnv() === 'prod'
+export function getSplunkEndpoint(env = getEnv()) {
+  return env === 'prod'
     ? 'https://unity.adobe.io/api/v1/log'
     : 'https://unity-stage.adobe.io/api/v1/log';
 }
@@ -283,10 +292,11 @@ export function trackAnalyticsEvent(
   metadata,
   documentUnloading = true,
   sendToSplunk = true,
+  env = getEnv(),
 ) {
   window.analytics.verbAnalytics(eventName, verb, metadata, documentUnloading);
   if (!sendToSplunk) return;
-  window.analytics.sendAnalyticsToSplunk(eventName, verb, metadata, getSplunkEndpoint());
+  window.analytics.sendAnalyticsToSplunk(eventName, verb, metadata, getSplunkEndpoint(env));
 }
 
 async function loadAnalytics(verb, userAttempts, logger) {
@@ -302,13 +312,13 @@ async function loadAnalytics(verb, userAttempts, logger) {
   }
 }
 
-let analyticsLoaderRegistered = false;
+const analyticsLoaderBlocks = new Set();
 
 export function registerAnalyticsLoader(logger = defaultLogger) {
-  if (analyticsLoaderRegistered) return;
-  analyticsLoaderRegistered = true;
+  if (analyticsLoaderBlocks.has(logger.blockName)) return;
+  analyticsLoaderBlocks.add(logger.blockName);
 
-  window.analytics = {
+  window.analytics = window.analytics || {
     verbAnalytics: () => {},
     reviewAnalytics: () => {},
     sendAnalyticsToSplunk: () => {},
@@ -365,7 +375,7 @@ export async function initializePingService(logger = defaultLogger) {
   }
 }
 
-const svgCache = new Map();
+const svgCaches = new WeakMap();
 
 async function loadSvg(iconName) {
   try {
@@ -377,15 +387,21 @@ async function loadSvg(iconName) {
   }
 }
 
-export async function createSvgElement(iconName, logger = defaultLogger) {
-  if (svgCache.has(iconName)) return svgCache.get(iconName).cloneNode(true);
-  const svgString = ICONS[iconName] || await loadSvg(iconName);
+export function parseSvg(svgString) {
+  return new DOMParser().parseFromString(svgString, 'image/svg+xml').documentElement;
+}
+
+export async function createSvgElement(iconName, logger = defaultLogger, icons = ICONS) {
+  if (!svgCaches.has(icons)) svgCaches.set(icons, new Map());
+  const cache = svgCaches.get(icons);
+  if (cache.has(iconName)) return cache.get(iconName).cloneNode(true);
+  const svgString = icons[iconName] || await loadSvg(iconName);
   if (!svgString) {
     logger.error(`Error Code: Unknown, Status: 'Unknown', Message: Icon not found: ${iconName}`);
     return null;
   }
-  const svgElement = new DOMParser().parseFromString(svgString, 'image/svg+xml').documentElement;
-  svgCache.set(iconName, svgElement);
+  const svgElement = parseSvg(svgString);
+  cache.set(iconName, svgElement);
   return svgElement.cloneNode(true);
 }
 
@@ -771,7 +787,9 @@ export function createUploadSession({
   widget,
   showError,
   logger = defaultLogger,
+  env = getEnv(),
 }) {
+  const splunkEndpoint = getSplunkEndpoint(env);
   const state = {
     exitFlag: false,
     isUploading: false,
@@ -781,7 +799,9 @@ export function createUploadSession({
   };
   const exitWatches = [];
   const withMetadata = (data) => ({ ...data, userAttempts, noOfFiles: state.noOfFiles });
-  const track = (...args) => trackAnalyticsEvent(verb, ...args);
+  const track = (eventName, metadata, documentUnloading = true, sendToSplunk = true) => (
+    trackAnalyticsEvent(verb, eventName, metadata, documentUnloading, sendToSplunk, env)
+  );
 
   function sendTabClosure(event, metadata, workflowStep) {
     if (state.exitFlag || state.tabClosureSent) return;
@@ -790,7 +810,7 @@ export function createUploadSession({
     const uploadingStartTime = parseInt(getCookie('UTS_Uploading'), 10);
     const duration = uploadingStartTime ? ((Date.now() - uploadingStartTime) / 1000).toFixed(1) : 'N/A';
     window.analytics.verbAnalytics('job:browser-tab-closure', verb, metadata, false);
-    window.analytics.sendAnalyticsToSplunk('job:browser-tab-closure', verb, { ...metadata, workflowStep, uploadTime: duration }, getSplunkEndpoint(), true);
+    window.analytics.sendAnalyticsToSplunk('job:browser-tab-closure', verb, { ...metadata, workflowStep, uploadTime: duration }, splunkEndpoint, true);
     if (!state.isUploading) return;
     event.preventDefault();
     event.returnValue = true;
@@ -850,7 +870,7 @@ export function createUploadSession({
     },
     chunk_uploaded(data, sendToSplunk) {
       if (!sendToSplunk) return;
-      window.analytics.sendAnalyticsToSplunk('job:chunk-uploaded', verb, withMetadata(data), getSplunkEndpoint());
+      window.analytics.sendAnalyticsToSplunk('job:chunk-uploaded', verb, withMetadata(data), splunkEndpoint);
     },
   };
 
@@ -874,7 +894,7 @@ export function createUploadSession({
     }
     if (sendToSplunk) {
       const splunkData = { ...metaData, errorData };
-      window.analytics.sendAnalyticsToSplunk(key, verb, splunkData, getSplunkEndpoint());
+      window.analytics.sendAnalyticsToSplunk(key, verb, splunkData, splunkEndpoint);
     }
     state.exitFlag = true;
   }
