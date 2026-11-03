@@ -1,48 +1,30 @@
 /* eslint-disable compat/compat */
-import { setLibs, isOldBrowser, getLanaErrorName } from '../../scripts/utils.js';
+import { getLanaErrorName } from '../../scripts/utils.js';
 import {
   DC_ENV,
-  EOLBrowserPage,
-  FILE_PICKER_EVENTS,
-  FILES_DROPPED_EVENTS,
-  createCtaButton,
-  createErrorToast,
-  createFileInput,
-  createFooter,
-  createVerbImage,
-  createWidgetFrame,
-  createWidgetHeader,
-  errorAnalyticsMap,
-  getAuthoredVerbIcon,
-  getSplunkEndpoint,
+  bindFilePicker,
+  createLogger,
+  createUploadSession,
   getVerbKey,
+  handleSignedInUser,
   handleUpSell,
-  incrementVerbKey,
-  initializePingService,
-  isMobileDevice,
-  isTabletDevice,
-  onDocumentReady,
-  prefetchInIframe,
-  prefetchNextPage,
-  redDir,
+  loadMiloUtils,
+  redirectOldBrowser,
   registerAnalyticsLoader,
-  reloadOnHistoryTraversal,
-  setCookie,
-  setRedirectCookie,
-  setUser,
-  trackAnalyticsEvent,
-  uploadedTime,
+  renderVerbWidget,
+  revealWidget,
+  setupEarlyPrefetch,
+  startPageServices,
 } from '../../scripts/verbWidgetUtils.js';
 
-const miloLibs = setLibs('/libs');
+const logger = createLogger('verb-widget-client-upload');
 
-let createTag;
-let getConfig;
+registerAnalyticsLoader(logger);
 
 const MB25 = 26214400;
 const ACCEPTED_FILES = ['.jpg', '.jpeg', '.png'];
 
-const LIMITS = { 'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ACCEPTED_FILES, multipleFiles: false } };
+export const LIMITS = { 'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ACCEPTED_FILES, multipleFiles: false } };
 
 export const LOCALE_REDIRECT_MAP = {
   ar: 'es',
@@ -94,10 +76,6 @@ const MIME_TYPES = {
   '.jpeg': ['image/jpeg'],
   '.png': ['image/png'],
 };
-
-const lanaOptions = { sampleRate: 1, tags: 'DC_Milo,Project Unity (DC),verb-widget-client-upload', severity: 'error' };
-
-registerAnalyticsLoader('verb-widget-client-upload', lanaOptions);
 
 export const IDB_NAME = 'dc-file-transfer';
 export const IDB_STORE = 'encrypted-files';
@@ -217,235 +195,89 @@ function getRedirectBase(locale) {
   return `${domain}${redirectPrefix ? `/${redirectPrefix}` : ''}/acrobat-online/image-to-pdf.html`;
 }
 
-function prefetchRedirectPage(url) {
-  if (window.clientUploadPrefetchUrl) return;
-  window.clientUploadPrefetchUrl = url;
-  prefetchNextPage(url);
+function getRedirectUrl(locale, uploadedAt, fileId) {
+  const originalParams = DC_ENV === 'stage' ? `${window.location.search.slice(1)}&` : '';
+  const localeParam = locale.ietf ? `&localeCode=${encodeURIComponent(locale.ietf)}` : '';
+  return `${getRedirectBase(locale)}?${originalParams}clientConvert=true&UTS_Uploaded=${uploadedAt}&redirectTime=${Date.now()}&fileId=${fileId}${localeParam}`;
 }
 
-function prefetchTarget() {
-  if (window.clientUploadPrefetchLoaded || !window.clientUploadPrefetchUrl) return;
-  window.clientUploadPrefetchLoaded = true;
-  prefetchInIframe(window.clientUploadPrefetchUrl);
+async function uploadFile(file, { ui, session, locale }) {
+  const ctaLabel = ui.ctaButton.querySelector('.verb-cta-label');
+  const defaultLabel = ctaLabel.textContent;
+  const filesData = {
+    userAttempts: session.userAttempts,
+    size: file.size,
+    type: file.type,
+    count: 1,
+    uploadType: 'sfu',
+  };
+
+  ui.hideError();
+  session.track('uploading', filesData);
+  ui.ctaButton.disabled = true;
+  ctaLabel.textContent = window.mph?.['verb-widget-processing'] || 'Processing…';
+
+  let operation = 'file encryption and storage';
+  try {
+    const fileId = await encryptAndStore(file);
+    operation = 'upload completion';
+    const uploadedAt = session.track('uploaded', { ...filesData, assetId: fileId });
+    operation = 'redirect handoff';
+    session.redirect(getRedirectUrl(locale, uploadedAt, fileId), filesData);
+  } catch (err) {
+    ui.ctaButton.disabled = false;
+    ctaLabel.textContent = defaultLabel;
+    session.reportError({
+      code: 'error_generic',
+      message: window.mph?.['verb-widget-error-generic'] || 'Unable to process the request.',
+      info: `${operation}; ${getLanaErrorName(err)}`,
+      metaData: filesData,
+    });
+  }
+}
+
+function handleFiles(files, source, context) {
+  const { session } = context;
+  session.track(source);
+  const validation = validateFiles(files, session.verb);
+  if (!validation.valid) {
+    const { code, message } = validation;
+    session.reportError({ code, message, metaData: { userAttempts: session.userAttempts } });
+    return;
+  }
+  uploadFile(files[0], context);
 }
 
 export default async function init(element) {
-  ({ createTag, getConfig } = await import(`${miloLibs}/utils/utils.js`));
-
-  if (isOldBrowser()) {
-    window.location.href = EOLBrowserPage;
-    return;
-  }
-
-  const prerenderElement = document.querySelector('#prerender_verb-widget');
-  const removePrerender = () => prerenderElement?.remove();
-
+  if (redirectOldBrowser()) return;
+  const { getConfig } = await loadMiloUtils();
   const { locale } = getConfig();
 
-  const triggerEarlyPrefetch = () => {
-    prefetchRedirectPage(`${getRedirectBase(locale)}?clientConvert=true`);
-    prefetchTarget();
-  };
-  document.addEventListener('click', triggerEarlyPrefetch, { once: true });
-  document.addEventListener('dragover', triggerEarlyPrefetch, { once: true });
-
-  const children = [...element.querySelectorAll(':scope > div')];
   const VERB = element.classList[1];
   const limits = LIMITS[VERB] ?? LIMITS['image-to-pdf'];
   const userAttempts = getVerbKey(`${VERB}_attempts`);
-  const isMobile = isMobileDevice();
-  const isTablet = isTabletDevice();
 
-  const heading = children[0]?.textContent ?? '';
-  let subCopy = window.mph?.[`verb-widget-${VERB}-description`] ?? '';
-  let mobSubCopy = window.mph?.[`verb-widget-${VERB}-mobile-description`] ?? subCopy;
-  if (children.length > 2) {
-    subCopy = children[1].textContent;
-    mobSubCopy = children[2].textContent;
-  }
-  const ctaLabel = window.mph?.['verb-widget-cta'] ?? 'Select a file';
-  const authoredIcon = getAuthoredVerbIcon(element);
-
-  children.forEach((c) => c.remove());
-
-  const { widget, widgetLeft, widgetRight } = await createWidgetFrame();
-  const { errorState, showError, hideError } = await createErrorToast(widget, lanaOptions);
-  const ctaButton = await createCtaButton(ctaLabel, lanaOptions);
-  const fileInput = await createFileInput(limits.acceptedFiles, limits.multipleFiles);
-
-  widgetLeft.append(
-    await createWidgetHeader(lanaOptions),
-    createTag('h1', { class: 'verb-heading' }, heading),
-    createTag('p', { class: 'verb-copy' }, (isMobile || isTablet) ? mobSubCopy : subCopy),
-    errorState,
-    ctaButton,
-    fileInput,
-  );
-  widgetRight.append(await createVerbImage(VERB, authoredIcon, lanaOptions));
-  element.append(widget, await createFooter({ logOptions: lanaOptions }));
-  requestAnimationFrame(() => requestAnimationFrame(removePrerender));
-  element.classList.add('ready');
-  element.parentNode.style.display = 'block';
-
-  async function checkSignedInUser() {
-    if (!window.adobeIMS?.isSignedInUser?.()) return;
-
-    element.classList.remove('upsell');
-    element.classList.add('signed-in');
-
-    let accountType;
-    try {
-      accountType = window.adobeIMS.getAccountType();
-    } catch {
-      accountType = (await window.adobeIMS.getProfile()).account_type;
-    }
-
-    if (accountType && LIMITS[VERB].neverRedirect) return;
-    if (accountType !== 'type1') redDir(VERB);
-    if (accountType === 'type1' && !LIMITS[VERB].typeOneLanding) redDir(VERB);
-  }
-
-  await handleUpSell(VERB, element, userAttempts, lanaOptions);
-
-  await checkSignedInUser();
-  window.addEventListener('IMS:Ready', checkSignedInUser);
-
-  let exitFlag = false;
-  let isUploading = false;
-
-  const handleAnalyticsEvent = (...args) => trackAnalyticsEvent(VERB, ...args);
-
-  function dispatchError(code, message, metadata = {}, diagnostic = '') {
-    showError(message);
-    window.lana?.log(
-      `verb-widget-client-upload: ${VERB}; Error Code: ${code}, Message: ${message}${diagnostic ? `, Diagnostic: ${diagnostic}` : ''}`,
-      lanaOptions,
-    );
-    const analyticsKey = Object.keys(errorAnalyticsMap).find((k) => code.includes(k));
-    if (analyticsKey) {
-      window.analytics.verbAnalytics(errorAnalyticsMap[analyticsKey], VERB, analyticsKey === 'error_generic' ? { errorInfo: message } : {});
-      window.analytics.sendAnalyticsToSplunk(analyticsKey, VERB, metadata, getSplunkEndpoint());
-    }
-    exitFlag = true;
-  }
-
-  async function startUpload(files) {
-    hideError();
-
-    const [file] = files;
-    const filesData = {
-      userAttempts,
-      size: file.size,
-      type: file.type,
-      count: 1,
-      uploadType: 'sfu',
-    };
-
-    isUploading = true;
-    exitFlag = false;
-    setCookie('UTS_Uploading', Date.now());
-    handleAnalyticsEvent('job:uploading', filesData, false);
-
-    ctaButton.disabled = true;
-    ctaButton.querySelector('.verb-cta-label').textContent = window.mph?.['verb-widget-processing'] || 'Processing…';
-
-    let operation = 'file encryption and storage';
-    try {
-      const id = await encryptAndStore(file);
-      operation = 'upload completion';
-
-      const uploadTimestamp = Date.now();
-      setCookie('UTS_Uploaded', uploadTimestamp);
-      exitFlag = true;
-      isUploading = false;
-      incrementVerbKey(`${VERB}_attempts`);
-      setUser();
-
-      const uploadedMetadata = { ...filesData, assetId: id, uploadTime: uploadedTime() };
-      handleAnalyticsEvent('job:uploaded', uploadedMetadata, false);
-
-      const originalParams = DC_ENV === 'stage' ? `${window.location.search.slice(1)}&` : '';
-      const localeParam = locale.ietf ? `&localeCode=${encodeURIComponent(locale.ietf)}` : '';
-      const redirectUrl = `${getRedirectBase(locale)}?${originalParams}clientConvert=true&UTS_Uploaded=${uploadTimestamp}&redirectTime=${Date.now()}&fileId=${id}${localeParam}`;
-      operation = 'redirect handoff';
-      handleAnalyticsEvent('job:redirect-success', { ...filesData, redirectUrl }, false);
-      window.location.href = redirectUrl;
-    } catch (err) {
-      isUploading = false;
-      ctaButton.disabled = false;
-      ctaButton.querySelector('.verb-cta-label').textContent = ctaLabel;
-      dispatchError(
-        'error_generic',
-        window.mph?.['verb-widget-error-generic'] || 'Unable to process the request.',
-        filesData,
-        `${operation}; ${getLanaErrorName(err)}`,
-      );
-    }
-  }
-
-  fileInput.addEventListener('click', () => {
-    FILE_PICKER_EVENTS.forEach((evt) => {
-      window.analytics.verbAnalytics(evt, VERB, { userAttempts });
-    });
+  const ui = await renderVerbWidget(element, {
+    verb: VERB,
+    limits,
+    logger,
+  });
+  const session = createUploadSession({
+    verb: VERB,
+    limits,
+    userAttempts,
+    widget: ui.widget,
+    showError: ui.showError,
+    logger,
   });
 
-  fileInput.addEventListener('cancel', () => {
-    window.analytics.verbAnalytics('choose-file:close', VERB, { userAttempts });
+  await handleUpSell(VERB, element, userAttempts, logger);
+  handleSignedInUser({ element, verb: VERB, limits, fileInput: ui.fileInput });
+  setupEarlyPrefetch(`${getRedirectBase(locale)}?clientConvert=true`);
+  revealWidget(element);
+
+  bindFilePicker(ui, session, (files, source) => {
+    handleFiles(files, source, { ui, session, locale });
   });
-
-  fileInput.addEventListener('change', ({ target: { files } }) => {
-    if (!files?.length) return;
-    exitFlag = false;
-    handleAnalyticsEvent('choose-file:open', { userAttempts }, true);
-    const validation = validateFiles(files, VERB);
-    if (!validation.valid) {
-      dispatchError(validation.code, validation.message, { userAttempts });
-      return;
-    }
-    startUpload(Array.from(files));
-  });
-
-  widget.addEventListener('click', (e) => {
-    if (e.target.closest('.error')) return;
-    fileInput.click();
-  });
-
-  widget.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    widget.classList.add('dragging');
-  });
-
-  widget.addEventListener('dragleave', () => widget.classList.remove('dragging'));
-
-  widget.addEventListener('drop', (e) => {
-    e.preventDefault();
-    widget.classList.remove('dragging');
-    const { files } = e.dataTransfer;
-    if (!files?.length) return;
-    exitFlag = false;
-    FILES_DROPPED_EVENTS.forEach((evt) => {
-      handleAnalyticsEvent(evt, { userAttempts }, true);
-    });
-    const validation = validateFiles(files, VERB);
-    if (!validation.valid) {
-      dispatchError(validation.code, validation.message, { userAttempts });
-      return;
-    }
-    startUpload(Array.from(files));
-  });
-
-  window.addEventListener('beforeunload', (e) => {
-    if (exitFlag) setRedirectCookie();
-    if (isUploading) {
-      e.preventDefault();
-      e.returnValue = true;
-    }
-  });
-
-  reloadOnHistoryTraversal();
-
-  onDocumentReady(() => {
-    initializePingService(lanaOptions);
-    window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: VERB, userAttempts } }));
-  });
+  startPageServices(element, session);
 }

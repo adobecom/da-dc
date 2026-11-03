@@ -1,18 +1,29 @@
 /* eslint-disable compat/compat */
-import { getEnv, setLibs } from './utils.js';
+import { getEnv, isOldBrowser, setLibs } from './utils.js';
 
 const miloLibs = setLibs('/libs');
-const loadMiloUtils = () => import(`${miloLibs}/utils/utils.js`);
+
+export const loadMiloUtils = () => import(`${miloLibs}/utils/utils.js`);
 
 export const EOLBrowserPage = 'https://acrobat.adobe.com/home/index-browser-eol.html';
 
 export const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';
 
-export const lanaOptions = {
-  sampleRate: 1,
-  tags: 'DC_Milo,Project Unity (DC)',
-  severity: 'error',
-};
+export function createLogger(blockName) {
+  const options = {
+    sampleRate: 1,
+    tags: ['DC_Milo', 'Project Unity (DC)', blockName].filter(Boolean).join(','),
+    severity: 'error',
+  };
+  return {
+    blockName,
+    options,
+    error: (message) => window.lana?.log(message, options),
+    warn: (message) => window.lana?.log(message, { ...options, severity: 'warning' }),
+  };
+}
+
+const defaultLogger = createLogger();
 
 export const verbRedirMap = {
   createpdf: 'createpdf',
@@ -75,6 +86,14 @@ export const FILE_PICKER_EVENTS = [
   'discover:clicked',
 ];
 
+export const SOLO_PICKER_EVENTS = [
+  'filepicker:shown',
+  'cta:choose-file-clicked',
+  'files-selected',
+  'entry:clicked',
+  'discover:clicked',
+];
+
 export const FILES_DROPPED_EVENTS = ['files-dropped', 'entry:clicked', 'discover:clicked'];
 
 export const errorAnalyticsMap = {
@@ -107,6 +126,12 @@ export function isTabletDevice() {
   const ua = navigator.userAgent.toLowerCase();
   const isIPadOS = navigator.userAgent.includes('Mac') && 'ontouchend' in document && !/iphone|ipod/i.test(ua);
   return isIPadOS || /ipad|android(?!.*mobile)/i.test(ua);
+}
+
+export function redirectOldBrowser() {
+  if (!isOldBrowser()) return false;
+  window.location.href = EOLBrowserPage;
+  return true;
 }
 
 export function onDocumentReady(callback) {
@@ -180,6 +205,10 @@ export function isLimitExhausted(verb) {
   return !!limitCookie && document.cookie.includes(`${cookiePrefix}${limitCookie}`);
 }
 
+export function setDraggingClass(widget, isDragging) {
+  widget.classList.toggle('dragging', isDragging);
+}
+
 export function prefetchNextPage(url) {
   const link = document.createElement('link');
   link.rel = 'prefetch';
@@ -194,6 +223,29 @@ export function prefetchInIframe(url) {
   iframe.src = url;
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
+}
+
+export function initiatePrefetch(url) {
+  if (window.prefetchTargetUrl) return;
+  prefetchNextPage(url);
+  window.prefetchTargetUrl = url;
+}
+
+export function prefetchTarget() {
+  if (window.prefetchTargetLoaded || !window.prefetchTargetUrl) return;
+  prefetchInIframe(window.prefetchTargetUrl);
+  window.prefetchTargetLoaded = true;
+}
+
+export function setupEarlyPrefetch(url) {
+  window.prefetchTargetUrl = null;
+  if (!url) return;
+  const triggerEarlyPrefetch = () => {
+    initiatePrefetch(url);
+    prefetchTarget();
+  };
+  document.addEventListener('click', triggerEarlyPrefetch, { once: true });
+  document.addEventListener('dragover', triggerEarlyPrefetch, { once: true });
 }
 
 export function reloadOnHistoryTraversal() {
@@ -237,7 +289,7 @@ export function trackAnalyticsEvent(
   window.analytics.sendAnalyticsToSplunk(eventName, verb, metadata, getSplunkEndpoint());
 }
 
-async function loadAnalytics(verb, userAttempts, logOptions) {
+async function loadAnalytics(verb, userAttempts, logger) {
   try {
     const { default: verbAnalytics, reviewAnalytics, sendAnalyticsToSplunk } = await import('./alloy/verb-widget.js');
     window.analytics.verbAnalytics = verbAnalytics;
@@ -246,16 +298,13 @@ async function loadAnalytics(verb, userAttempts, logOptions) {
     window.analytics.verbAnalytics('landing:shown', verb, { userAttempts });
     window.analytics.reviewAnalytics(verb);
   } catch (error) {
-    window.lana?.log(
-      `Error Code: Unknown, Status: 'Unknown', Message: Analytics import failed: ${error.message} on ${verb}`,
-      logOptions,
-    );
+    logger.error(`Error Code: Unknown, Status: 'Unknown', Message: Analytics import failed: ${error.message} on ${verb}`);
   }
 }
 
 let analyticsLoaderRegistered = false;
 
-export function registerAnalyticsLoader(blockName, logOptions = lanaOptions) {
+export function registerAnalyticsLoader(logger = defaultLogger) {
   if (analyticsLoaderRegistered) return;
   analyticsLoaderRegistered = true;
 
@@ -268,30 +317,27 @@ export function registerAnalyticsLoader(blockName, logOptions = lanaOptions) {
   window.addEventListener('analyticsLoad', async ({ detail }) => {
     const stubs = { ...window.analytics };
     await waitForLcp();
-    await loadAnalytics(detail.verb, detail.userAttempts, logOptions);
+    await loadAnalytics(detail.verb, detail.userAttempts, logger);
     const stillStubbed = ['verbAnalytics', 'reviewAnalytics', 'sendAnalyticsToSplunk']
       .some((method) => window.analytics[method] === stubs[method]);
     if (stillStubbed) {
-      window.lana?.log(
-        `Analytics failed to initialize correctly: some methods remain no-ops on ${blockName} block`,
-        logOptions,
-      );
+      logger.error(`Analytics failed to initialize correctly: some methods remain no-ops on ${logger.blockName} block`);
     }
   });
 }
 
-export async function fireUpsellAnalytics(verb, userAttempts, logOptions = lanaOptions) {
+export async function fireUpsellAnalytics(verb, userAttempts, logger = defaultLogger) {
   try {
     await waitForLcp();
     const { default: verbAnalytics } = await import('./alloy/verb-widget.js');
     verbAnalytics('upsell:shown', verb, { userAttempts });
     verbAnalytics('upsell-wall:shown', verb, { userAttempts });
   } catch (error) {
-    window.lana?.log(`Upsell analytics failed: ${error.message} on ${verb}`, logOptions);
+    logger.error(`Upsell analytics failed: ${error.message} on ${verb}`);
   }
 }
 
-export async function initializePingService(logOptions = lanaOptions) {
+export async function initializePingService(logger = defaultLogger) {
   try {
     const [{ PingService, USER_TYPE }, { getConfig }] = await Promise.all([
       import('./ping.js'),
@@ -315,10 +361,7 @@ export async function initializePingService(logOptions = lanaOptions) {
     });
     await pingService.sendPingEvent({ appPath: 'unity-dc-frictionless', schema: {} });
   } catch (error) {
-    window.lana?.log(
-      `Error Code: Unknown, Status: 'Unknown', Message: Failed to send ping: ${error.message}`,
-      logOptions,
-    );
+    logger.error(`Error Code: Unknown, Status: 'Unknown', Message: Failed to send ping: ${error.message}`);
   }
 }
 
@@ -334,11 +377,11 @@ async function loadSvg(iconName) {
   }
 }
 
-export async function createSvgElement(iconName, logOptions = lanaOptions) {
+export async function createSvgElement(iconName, logger = defaultLogger) {
   if (svgCache.has(iconName)) return svgCache.get(iconName).cloneNode(true);
   const svgString = ICONS[iconName] || await loadSvg(iconName);
   if (!svgString) {
-    window.lana?.log(`Error Code: Unknown, Status: 'Unknown', Message: Icon not found: ${iconName}`, logOptions);
+    logger.error(`Error Code: Unknown, Status: 'Unknown', Message: Icon not found: ${iconName}`);
     return null;
   }
   const svgElement = new DOMParser().parseFromString(svgString, 'image/svg+xml').documentElement;
@@ -355,6 +398,53 @@ export function getAuthoredVerbIcon(element) {
   icon.setAttribute('src', svgLink.getAttribute('href'));
   icon.setAttribute('alt', '');
   return icon;
+}
+
+const LABEL_PREFIX = 'dc-block-row-';
+
+export function parseAuthoredContent(element, verb) {
+  const mph = window.mph || {};
+  const labeledCells = new Map();
+  const rows = [];
+  element.querySelectorAll(':scope > div').forEach((row) => {
+    const label = row.firstElementChild?.textContent?.trim() || '';
+    if (label.startsWith(LABEL_PREFIX)) {
+      labeledCells.set(label.slice(LABEL_PREFIX.length), row.children[1] || null);
+      row.remove();
+    } else {
+      rows.push(row);
+    }
+  });
+  const icon = getAuthoredVerbIcon(element);
+  rows.forEach((row) => row.remove());
+
+  const hasAuthoredCopy = rows.length > 2;
+  const copy = hasAuthoredCopy ? rows[1].textContent : (mph[`verb-widget-${verb}-description`] ?? '');
+  const mobileCopy = hasAuthoredCopy
+    ? rows[2].textContent
+    : (mph[`verb-widget-${verb}-mobile-description`] ?? copy);
+
+  return {
+    heading: rows[0]?.textContent ?? '',
+    copy,
+    mobileCopy,
+    icon,
+    cell: (key) => labeledCells.get(key) || null,
+    cellText: (key) => labeledCells.get(key)?.textContent?.trim() || '',
+  };
+}
+
+export function getCtaLabel(verb, limits) {
+  const mph = window.mph || {};
+  return mph[`verb-widget-cta-${limits?.uploadType}`] || mph['verb-widget-cta'] || 'Select a file';
+}
+
+const IOS_UNKNOWN_EXTS = ['.ai', '.psd', '.indd', '.form'];
+
+export function getAcceptValue(acceptedFiles) {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (isIOS && acceptedFiles?.some((ext) => IOS_UNKNOWN_EXTS.includes(ext))) return '*/*';
+  return acceptedFiles?.join(',');
 }
 
 export async function createWidgetFrame() {
@@ -375,10 +465,10 @@ export async function createWidgetFrame() {
   return { widget, widgetLeft, widgetRight };
 }
 
-export async function createWidgetHeader(logOptions = lanaOptions) {
+export async function createWidgetHeader(logger = defaultLogger) {
   const { createTag } = await loadMiloUtils();
   const widgetIcon = createTag('div', { class: 'acrobat-icon' });
-  const widgetIconSvg = await createSvgElement('WIDGET_ICON', logOptions);
+  const widgetIconSvg = await createSvgElement('WIDGET_ICON', logger);
   if (widgetIconSvg) {
     widgetIconSvg.classList.add('icon-verb');
     widgetIcon.appendChild(widgetIconSvg);
@@ -387,11 +477,11 @@ export async function createWidgetHeader(logOptions = lanaOptions) {
   return createTag('div', { class: 'verb-header' }, [widgetIcon, widgetTitle]);
 }
 
-export async function createCtaButton(label, logOptions = lanaOptions) {
+export async function createCtaButton(label, logger = defaultLogger) {
   const { createTag } = await loadMiloUtils();
   const button = createTag('button', { for: 'file-upload', class: 'verb-cta', tabindex: 0, 'aria-label': label });
   button.append(createTag('span', { class: 'verb-cta-label' }, label));
-  const uploadIconSvg = await createSvgElement('UPLOAD_ICON', logOptions);
+  const uploadIconSvg = await createSvgElement('UPLOAD_ICON', logger);
   if (uploadIconSvg) {
     uploadIconSvg.classList.add('upload-icon');
     button.prepend(uploadIconSvg);
@@ -399,22 +489,22 @@ export async function createCtaButton(label, logOptions = lanaOptions) {
   return button;
 }
 
-export async function createFileInput(accept, multiple) {
+export async function createFileInput(limits) {
   const { createTag } = await loadMiloUtils();
   return createTag('input', {
     type: 'file',
-    accept,
+    accept: getAcceptValue(limits.acceptedFiles),
     id: 'file-upload',
     class: 'hide',
     'aria-hidden': true,
-    ...(multiple && { multiple: '' }),
+    ...(limits.multipleFiles && { multiple: '' }),
   });
 }
 
-export async function createVerbImage(verb, authoredIcon, logOptions = lanaOptions) {
+export async function createVerbImage(verb, authoredIcon, logger = defaultLogger) {
   const { createTag } = await loadMiloUtils();
   const widgetImage = createTag('div', { class: 'verb-image' });
-  const verbImage = authoredIcon || await createSvgElement(verb, logOptions);
+  const verbImage = authoredIcon || await createSvgElement(verb, logger);
   if (verbImage) {
     verbImage.classList.add('icon-verb-image');
     if (!verbImage.getAttribute('alt')) {
@@ -425,13 +515,13 @@ export async function createVerbImage(verb, authoredIcon, logOptions = lanaOptio
   return widgetImage;
 }
 
-export async function createErrorToast(widget, logOptions = lanaOptions) {
+export async function createErrorToast(widget, logger = defaultLogger) {
   const { createTag } = await loadMiloUtils();
   const errorState = createTag('div', { class: 'error hide' });
   const errorText = createTag('p', { class: 'verb-errorText' });
   const errorIcon = createTag('div', { class: 'verb-errorIcon' });
   const closeButton = createTag('div', { class: 'verb-errorBtn', role: 'button', tabindex: '0', 'aria-label': 'Close error' });
-  const closeIconSvg = await createSvgElement('CLOSE_ICON', logOptions);
+  const closeIconSvg = await createSvgElement('CLOSE_ICON', logger);
   if (closeIconSvg) {
     closeIconSvg.classList.add('close-icon', 'error');
     closeButton.prepend(closeIconSvg);
@@ -470,7 +560,7 @@ export async function createErrorToast(widget, logOptions = lanaOptions) {
     }
   };
   const showError = (message) => {
-    widget.classList.remove('dragging');
+    setDraggingClass(widget, false);
     errorState.classList.add('verb-error');
     errorState.classList.remove('hide');
     errorText.textContent = message;
@@ -499,11 +589,13 @@ export async function createErrorToast(widget, logOptions = lanaOptions) {
   return { errorState, showError, hideError };
 }
 
-export async function createFooter({ genAI = false, logOptions = lanaOptions } = {}) {
+export async function createFooter(limits, logger = defaultLogger) {
   const { createTag, getConfig } = await loadMiloUtils();
+  const isMobile = isMobileDevice();
+  if (limits.mobileApp && isMobile) return createTag('div', { class: 'verb-footer' });
+
   const { locale } = getConfig();
   const mph = window.mph || {};
-  const isMobile = isMobileDevice();
   const isTablet = isTabletDevice();
 
   const iconSecurity = createTag('div', { class: 'security-icon' });
@@ -514,8 +606,8 @@ export async function createFooter({ genAI = false, logOptions = lanaOptions } =
     'aria-label': mph['verb-widget-tool-tip'] || 'Files security information',
     'data-tooltip': mph['verb-widget-tool-tip'] || '',
   });
-  const securityIconSvg = await createSvgElement('SECURITY_ICON', logOptions);
-  const infoIconSvg = await createSvgElement('INFO_ICON', logOptions);
+  const securityIconSvg = await createSvgElement('SECURITY_ICON', logger);
+  const infoIconSvg = await createSvgElement('INFO_ICON', logger);
   if (securityIconSvg) iconSecurity.appendChild(securityIconSvg);
   if (infoIconSvg) infoIcon.appendChild(infoIconSvg);
   if (isMobile) {
@@ -527,14 +619,14 @@ export async function createFooter({ genAI = false, logOptions = lanaOptions } =
   const legalLinks = [
     ['verb-widget-terms-of-use', mph['verb-widget-terms-of-use-url'] || `https://www.adobe.com${locale.prefix}/legal/terms.html`],
     ['verb-widget-privacy-policy', mph['verb-widget-privacy-policy-url'] || `https://www.adobe.com${locale.prefix}/privacy/policy.html`],
-    ...(genAI ? [['verb-widget-genai-guidelines', mph['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`]] : []),
+    ...(limits.genAI ? [['verb-widget-genai-guidelines', mph['verb-widget-genai-terms-url'] || `https://www.adobe.com${locale.prefix}/legal/licenses-terms/adobe-gen-ai-user-guidelines.html`]] : []),
   ];
   const legal = createTag('p', { class: 'verb-legal' }, `${mph['verb-widget-legal'] ?? ''} `);
   const legalTwo = createTag('p', { class: 'verb-legal verb-legal-two' }, `${mph['verb-widget-legal-2'] ?? ''} `);
   legalTwo.innerHTML = legalLinks.reduce((html, [key, url]) => {
     const text = mph[key];
     return text ? html.replace(text, `<a class="verb-legal-url" target="_blank" href="${url}">${text}</a>`) : html;
-  }, (genAI && mph['verb-widget-legal-2-ai']) || legalTwo.textContent);
+  }, (limits.genAI && mph['verb-widget-legal-2-ai']) || legalTwo.textContent);
   const legalWrapper = createTag('div', { class: 'verb-legal-wrapper' }, [legal, legalTwo]);
 
   const footer = createTag('div', { class: 'verb-footer' }, [iconSecurity, legalWrapper, infoIcon]);
@@ -543,6 +635,41 @@ export async function createFooter({ genAI = false, logOptions = lanaOptions } =
     footer.prepend(infoIcon);
   }
   return footer;
+}
+
+export async function renderVerbWidget(element, {
+  verb,
+  limits,
+  logger = defaultLogger,
+  getActions,
+}) {
+  const { createTag } = await loadMiloUtils();
+  const mph = window.mph || {};
+  const content = parseAuthoredContent(element, verb);
+  const isMobileOrTablet = isMobileDevice() || isTabletDevice();
+
+  const { widget, widgetLeft, widgetRight } = await createWidgetFrame();
+  const header = await createWidgetHeader(logger);
+  const heading = createTag('h1', { class: 'verb-heading' }, content.heading);
+  const copy = createTag('p', { class: 'verb-copy' }, isMobileOrTablet ? content.mobileCopy : content.copy);
+  if (limits.subCopy && !isMobileOrTablet) {
+    const subCopy = content.cellText('sub-copy') || mph[`verb-widget-${verb}-sub-description`];
+    copy.append(createTag('p', { class: 'verb-copy verb-sub-copy' }, subCopy));
+  }
+  const ctaButton = await createCtaButton(getCtaLabel(verb, limits), logger);
+  const fileInput = await createFileInput(limits);
+  const verbImage = await createVerbImage(verb, content.icon, logger);
+  const { errorState, showError, hideError } = await createErrorToast(widget, logger);
+
+  const parts = { content, widget, ctaButton, fileInput, isMobileOrTablet };
+  const actions = getActions?.(parts) ?? [ctaButton, fileInput];
+  widgetLeft.append(header, heading, copy, ...actions, errorState);
+  widgetRight.append(verbImage);
+
+  const footer = await createFooter(limits, logger);
+  element.append(widget, footer);
+
+  return { ...parts, errorState, showError, hideError, footer };
 }
 
 async function loadGoogleLogin() {
@@ -586,8 +713,288 @@ async function showUpSell(verb, element) {
   loadGoogleLogin();
 }
 
-export async function handleUpSell(verb, element, userAttempts, logOptions = lanaOptions) {
+export async function handleUpSell(verb, element, userAttempts, logger = defaultLogger) {
   if (window.adobeIMS?.isSignedInUser?.() || !isLimitExhausted(verb)) return;
   await showUpSell(verb, element);
-  fireUpsellAnalytics(verb, userAttempts, logOptions);
+  fireUpsellAnalytics(verb, userAttempts, logger);
+}
+
+export function handleSignedInUser({
+  element,
+  verb,
+  limits,
+  fileInput,
+}) {
+  const redirectSignedInUser = () => {
+    if (!window.adobeIMS?.isSignedInUser?.()) return;
+    element.classList.remove('upsell');
+    element.classList.add('signed-in');
+    if (limits.signedInAcceptedFiles) {
+      fileInput.accept = [...limits.acceptedFiles, ...limits.signedInAcceptedFiles];
+    }
+    redDir(verb);
+  };
+  redirectSignedInUser();
+  window.addEventListener('IMS:Ready', redirectSignedInUser);
+}
+
+export function revealWidget(element) {
+  const prerenderElement = document.querySelector('#prerender_verb-widget');
+  element.classList.add('ready');
+  element.parentNode.style.display = 'block';
+  requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
+}
+
+export function formatErrorLog(blockName, verb, {
+  code,
+  status,
+  message,
+  info,
+  accountType,
+}) {
+  const fields = [
+    ['Error Code', code],
+    ['Status', status],
+    ['Message', message],
+    ['Info', info],
+    ['Account Type', accountType],
+  ]
+    .filter(([, value]) => value !== undefined && value !== null && value !== '')
+    .map(([label, value]) => `${label}: ${value}`);
+  return `${blockName}: ${verb}; ${fields.join(', ')}`;
+}
+
+export function createUploadSession({
+  verb,
+  limits,
+  userAttempts,
+  widget,
+  showError,
+  logger = defaultLogger,
+}) {
+  const state = {
+    exitFlag: false,
+    isUploading: false,
+    tabClosureSent: false,
+    noOfFiles: null,
+    soloClicked: false,
+  };
+  const exitWatches = [];
+  const withMetadata = (data) => ({ ...data, userAttempts, noOfFiles: state.noOfFiles });
+  const track = (...args) => trackAnalyticsEvent(verb, ...args);
+
+  function sendTabClosure(event, metadata, workflowStep) {
+    if (state.exitFlag || state.tabClosureSent) return;
+    if (state.isUploading && workflowStep === 'preuploading') return;
+    state.tabClosureSent = true;
+    const uploadingStartTime = parseInt(getCookie('UTS_Uploading'), 10);
+    const duration = uploadingStartTime ? ((Date.now() - uploadingStartTime) / 1000).toFixed(1) : 'N/A';
+    window.analytics.verbAnalytics('job:browser-tab-closure', verb, metadata, false);
+    window.analytics.sendAnalyticsToSplunk('job:browser-tab-closure', verb, { ...metadata, workflowStep, uploadTime: duration }, getSplunkEndpoint(), true);
+    if (!state.isUploading) return;
+    event.preventDefault();
+    event.returnValue = true;
+  }
+
+  window.addEventListener('beforeunload', (event) => {
+    if (state.exitFlag) setRedirectCookie();
+    exitWatches.forEach(({ metadata, workflowStep }) => {
+      sendTabClosure(event, metadata, workflowStep);
+    });
+  });
+
+  const lifecycle = {
+    change(data, sendToSplunk) {
+      const metadata = withMetadata(data);
+      state.exitFlag = false;
+      track('choose-file:open', metadata, true, sendToSplunk);
+      exitWatches.push({ metadata, workflowStep: 'preuploading' });
+    },
+    drop(data, sendToSplunk) {
+      const metadata = withMetadata(data);
+      state.exitFlag = false;
+      FILES_DROPPED_EVENTS.forEach((eventName) => track(eventName, metadata, true, sendToSplunk));
+      setDraggingClass(widget, false);
+      exitWatches.push({ metadata, workflowStep: 'preuploading' });
+    },
+    cancel(data, sendToSplunk) {
+      if (state.exitFlag) return;
+      track('job:cancel', withMetadata(data), true, sendToSplunk);
+      state.exitFlag = true;
+    },
+    uploading(data, sendToSplunk) {
+      state.isUploading = true;
+      state.exitFlag = false;
+      prefetchTarget();
+      const metadata = withMetadata(data);
+      track('job:uploading', metadata, false, sendToSplunk);
+      if (limits.multipleFiles) track('job:multi-file-uploading', metadata, false, sendToSplunk);
+      setCookie('UTS_Uploading', Date.now());
+      exitWatches.push({ metadata, workflowStep: 'uploading' });
+    },
+    uploaded(data, sendToSplunk) {
+      state.exitFlag = true;
+      const uploadedAt = Date.now();
+      setCookie('UTS_Uploaded', uploadedAt);
+      const metadata = { ...data, uploadTime: uploadedTime(), userAttempts };
+      track('job:uploaded', metadata, false, sendToSplunk);
+      if (limits.multipleFiles) track('job:multi-file-uploaded', metadata, false, sendToSplunk);
+      setUser();
+      incrementVerbKey(`${verb}_attempts`);
+      return uploadedAt;
+    },
+    redirectUrl(data, sendToSplunk) {
+      if (data) initiatePrefetch(data.redirectUrl);
+      if (state.isUploading) prefetchTarget();
+      track('job:redirect-success', withMetadata(data), false, sendToSplunk);
+    },
+    chunk_uploaded(data, sendToSplunk) {
+      if (!sendToSplunk) return;
+      window.analytics.sendAnalyticsToSplunk('job:chunk-uploaded', verb, withMetadata(data), getSplunkEndpoint());
+    },
+  };
+
+  function reportError(detail = {}) {
+    const {
+      code,
+      message,
+      info,
+      metaData,
+      errorData,
+      sendToSplunk = true,
+    } = detail;
+    if (!code) return;
+    if (message) showError(message);
+    logger.error(formatErrorLog(logger.blockName, verb, detail));
+    if (code.includes('cookie_not_set')) return;
+    const key = Object.keys(errorAnalyticsMap).find((k) => code.includes(k));
+    if (key) {
+      const eventName = errorAnalyticsMap[key];
+      window.analytics.verbAnalytics(eventName, verb, eventName === 'error' ? { errorInfo: info } : {});
+    }
+    if (sendToSplunk) {
+      const splunkData = { ...metaData, errorData };
+      window.analytics.sendAnalyticsToSplunk(key, verb, splunkData, getSplunkEndpoint());
+    }
+    state.exitFlag = true;
+  }
+
+  return {
+    verb,
+    limits,
+    userAttempts,
+    logger,
+    state,
+    setFileCount: (count) => { state.noOfFiles = count; },
+    track: (event, data, sendToSplunk = true) => lifecycle[event]?.(data, sendToSplunk),
+    reportError,
+    redirect(url, data) {
+      track('job:redirect-success', withMetadata({ ...data, redirectUrl: url }), false);
+      window.location.href = url;
+    },
+  };
+}
+
+export function bindFilePicker({ widget, fileInput }, session, onFiles = () => {}) {
+  const { verb, userAttempts, state } = session;
+
+  widget.addEventListener('click', (e) => {
+    if (e.target.closest('.error, .demo-cta') || e.target.classList.contains('demo-button-wrapper')) return;
+    if (fileInput.isConnected) fileInput.click();
+  });
+
+  fileInput.addEventListener('click', () => {
+    if (state.soloClicked) {
+      state.soloClicked = false;
+      return;
+    }
+    FILE_PICKER_EVENTS.forEach((eventName) => {
+      window.analytics.verbAnalytics(eventName, verb, { userAttempts });
+    });
+  });
+
+  fileInput.addEventListener('change', ({ target: { files } }) => {
+    if (!files?.length) return;
+    session.setFileCount(files.length);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    onFiles(files, 'change');
+  });
+
+  fileInput.addEventListener('cancel', () => {
+    window.analytics.verbAnalytics('choose-file:close', verb, { userAttempts });
+  });
+
+  widget.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    setDraggingClass(widget, true);
+  });
+
+  widget.addEventListener('dragleave', () => setDraggingClass(widget, false));
+
+  widget.addEventListener('drop', (e) => {
+    e.preventDefault();
+    setDraggingClass(widget, false);
+    const files = e.dataTransfer?.files;
+    if (!files?.length) return;
+    session.setFileCount(files.length);
+    onFiles(files, 'drop');
+  });
+}
+
+function dispatchRedirectReady(limits, logger) {
+  const redirectReady = new CustomEvent('DCUnity:RedirectReady');
+  if (limits.noRedirectTimeout ?? true) {
+    window.dispatchEvent(redirectReady);
+    return;
+  }
+  setTimeout(() => {
+    window.dispatchEvent(redirectReady);
+    logger.warn('Adobe Analytics done callback failed to trigger, 3 second timeout dispatched event.');
+  }, 3000);
+}
+
+export function bindUnityEvents(element, session) {
+  element.addEventListener('unity:track-analytics', (e) => {
+    const { event, data, sendToSplunk } = e.detail || {};
+    if (!event) return;
+    if (event === 'uploaded') dispatchRedirectReady(session.limits, session.logger);
+    session.track(event, data, sendToSplunk ?? true);
+  });
+  element.addEventListener('unity:show-error-toast', (e) => session.reportError(e.detail));
+}
+
+function bindSoloUploadLinks({ verb, userAttempts, state }) {
+  document.querySelectorAll('a[href*="#upload"]').forEach((link) => {
+    const verbCtaClone = document.querySelector('.verb-cta')?.cloneNode(true);
+    if (!verbCtaClone) return;
+    const label = document.createElement('label');
+    Object.entries({
+      for: 'file-upload',
+      class: 'verb-cta verb-cta-solo',
+      tabindex: 0,
+      'daa-ll': verbCtaClone.textContent,
+      'aria-label': verbCtaClone.textContent,
+    }).forEach(([name, value]) => label.setAttribute(name, value));
+    label.innerHTML = verbCtaClone.innerHTML;
+    link.closest('div').append(label);
+    link.remove();
+    label.addEventListener('click', () => {
+      state.soloClicked = true;
+      SOLO_PICKER_EVENTS.forEach((eventName) => {
+        window.analytics.verbAnalytics(eventName, verb, { userAttempts });
+      });
+    });
+  });
+}
+
+export function startPageServices(element, session) {
+  reloadOnHistoryTraversal();
+  onDocumentReady(() => {
+    bindSoloUploadLinks(session);
+    initializePingService(session.logger);
+    if (!element.dataset.dcInjectedFromMarquee) {
+      const { verb, userAttempts } = session;
+      window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb, userAttempts } }));
+    }
+  });
 }

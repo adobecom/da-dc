@@ -81,7 +81,7 @@ describe('verb-widget-client-upload init', () => {
 
     expect(window.lana.log.calledOnce).to.be.true;
     expect(window.lana.log.firstCall.args).to.deep.equal([
-      'verb-widget-client-upload: image-to-pdf; Error Code: error_generic, Message: Unable to process the request., Diagnostic: file encryption and storage; QuotaExceededError',
+      'verb-widget-client-upload: image-to-pdf; Error Code: error_generic, Message: Unable to process the request., Info: file encryption and storage; QuotaExceededError',
       {
         sampleRate: 1,
         tags: 'DC_Milo,Project Unity (DC),verb-widget-client-upload',
