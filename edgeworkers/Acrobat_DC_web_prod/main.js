@@ -253,6 +253,7 @@ export async function responseProvider(request) {
         `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
         `</acrobat/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</acrobat/scripts/verbWidgetUtils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</acrobat/scripts/uploadLimits.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,

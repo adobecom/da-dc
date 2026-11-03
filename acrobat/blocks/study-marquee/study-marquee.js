@@ -23,6 +23,10 @@ import {
   initializePingService,
 } from '../../scripts/verbWidgetUtils.js';
 import { getHostEnv, hostRedDirLink, processMedia } from '../../scripts/verbMarqueeUtils.js';
+import {
+  MB100,
+  groupLimits,
+} from '../../scripts/uploadLimits.js';
 
 const miloLibs = setLibs('/libs');
 let createTag;
@@ -36,7 +40,6 @@ const STUDY_MARQUEE_ICONS = {
   WIDGET_ICON: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="31" viewBox="0 0 32 31" fill="none"><path d="M25.8211 0H5.67886C2.54251 0 0 2.45484 0 5.48304V24.9308C0 27.959 2.54251 30.4138 5.67886 30.4138H25.8211C28.9575 30.4138 31.5 27.959 31.5 24.9308V5.48304C31.5 2.45484 28.9575 0 25.8211 0Z" fill="#B30B00"/><path d="M25.7023 17.5726C24.1856 16.0519 20.044 16.6714 19.0523 16.784C17.594 15.4323 16.6023 13.799 16.2523 13.2358C16.7773 11.7151 17.1273 10.1944 17.1856 8.56106C17.1856 7.15301 16.6023 5.63232 14.969 5.63232C14.3856 5.63232 13.8606 5.97026 13.569 6.42083C12.869 7.60359 13.1606 9.96911 14.269 12.3909C13.6273 14.1369 13.044 15.8266 11.4106 18.8116C9.71898 19.4875 6.16064 21.0645 5.86898 22.7542C5.75231 23.2611 5.92731 23.768 6.33564 24.1622C6.74398 24.5001 7.26898 24.6691 7.79398 24.6691C9.95231 24.6691 12.0523 21.7967 13.5106 19.3749C14.7356 18.9806 16.6606 18.4174 18.5856 18.0795C20.8606 19.9944 22.844 20.276 23.894 20.276C25.294 20.276 25.819 19.7128 25.994 19.2059C26.2856 18.6427 26.1106 18.0231 25.7023 17.5726ZM24.244 18.53C24.1856 18.9243 23.6606 19.3185 22.7273 19.0932C21.619 18.8116 20.6273 18.3047 19.7523 17.6289C20.5106 17.5162 22.2023 17.3473 23.4273 17.5726C23.894 17.6852 24.3606 17.9668 24.244 18.53ZM14.5023 6.92773C14.619 6.75876 14.794 6.64612 14.969 6.64612C15.494 6.64612 15.6106 7.26566 15.6106 7.77255C15.5523 8.95531 15.319 10.1381 14.9106 11.2645C14.0356 9.01164 14.2106 7.43462 14.5023 6.92773ZM14.3856 17.8542C14.8523 16.953 15.494 15.376 15.7273 14.7001C16.2523 15.545 17.1273 16.5588 17.594 17.0093C17.594 17.0657 15.7856 17.4036 14.3856 17.8542ZM10.944 20.107C9.60231 22.2473 8.20231 23.599 7.44398 23.599C7.32731 23.599 7.21064 23.5427 7.09398 23.4864C6.91898 23.3737 6.86064 23.2047 6.91898 22.9795C7.09398 22.1909 8.61064 21.1208 10.944 20.107Z" fill="white"/></svg>',
 };
 
-const MB100 = 104857600;
 const STUDY_FILES = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.rtf', '.txt', '.text', '.vtt'];
 const STUDY_FILES_EXTENDED = [...STUDY_FILES, '.eml', '.msg', '.jpg', '.jpeg', '.png', '.tif', '.tiff'];
 const STUDY_GENAI = {
@@ -53,13 +56,12 @@ const STUDY_GENAI_SINGLE = {
   maxNumFiles: 1,
   genAI: true,
 };
-const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
 const SIGNED_IN_UPLOAD_VERBS = new Set(['gen-presentation-v2', 'interactive-report', 'stylize']);
 
 export const LIMITS = {
-  ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI),
-  ...group(['gen-presentation-v2', 'interactive-report', 'stylize'], { ...STUDY_GENAI_SINGLE, acceptedFiles: ['.pdf'] }),
+  ...groupLimits(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI),
+  ...groupLimits(['gen-presentation-v2', 'interactive-report', 'stylize'], { ...STUDY_GENAI_SINGLE, acceptedFiles: ['.pdf'] }),
 };
 
 const getCTA = (verb) => {

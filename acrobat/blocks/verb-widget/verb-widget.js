@@ -18,6 +18,17 @@ import {
   setupEarlyPrefetch,
   startPageServices,
 } from '../../scripts/verbWidgetUtils.js';
+import {
+  ALL_FILES,
+  GB2,
+  MB100,
+  MB250,
+  MB5,
+  MULTI_ALL,
+  PDF_ONLY,
+  SINGLE_PDF,
+  groupLimits,
+} from '../../scripts/uploadLimits.js';
 
 const logger = createLogger('verb-widget');
 
@@ -25,25 +36,18 @@ registerAnalyticsLoader(logger);
 
 const demoPath = 'blob/JTdCJTIyc291cmNlJTIyJTNBJTIyY2RuJTIyJTJDJTIyZmlsZVBhdGglMjIlM0ElMjIlMkZkYy1maWxlczItZHJvcGluJTJGZGVtby1maWxlcyUyRmVuLVVTJTJGY2hhdC1wZGYtZGVtby12NCUyRmNoYXQtcGRmLWRlbW8tdjQucGRmJTIyJTJDJTIyaXRlbU5hbWUlMjIlM0ElMjJBSSUyMEFzc2lzdGFudCUyMGRlbW8lMjBmaWxlLnBkZiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJjaGF0LXBkZi1kZW1vLXY0JTIyJTJDJTIyaXRlbVR5cGUlMjIlM0ElMjJhcHBsaWNhdGlvbiUyRnBkZiUyMiU3RA/?defaultRHPFeature=verb-qanda&x_api_client_id=ChatPDFTryDemoFile&x_api_client_location=chat_pdf&try-ai-demo=true&demo-mode=true&promoid=HHJ4X8CS&mv=product&mv2=acrobat-web';
 
-const MB100 = 104857600;
-const MB250 = 262144000;
-const PDF_ONLY = ['.pdf'];
-const ALL_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
 const STUDENT_FILES = ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt'];
 const SIGNED_IN_FILES = ['.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'];
 const COMMON_TO_PDF_FILES = ['.jpg', '.jpeg', '.png', '.heic', '.tif', '.tiff', '.bmp', '.gif', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text'];
 const CREATEPDF_FILES = [...COMMON_TO_PDF_FILES, '.pdf', '.psd', '.ai', '.indd'];
 
-const SINGLE_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, maxNumFiles: 1 };
 const MULTI_PDF = { maxFileSize: MB100, acceptedFiles: PDF_ONLY, multipleFiles: true };
-const MULTI_ALL = { maxFileSize: MB100, acceptedFiles: ALL_FILES, multipleFiles: true };
 const MULTI_COMMON_TO_PDF = {
   maxFileSize: MB100,
   acceptedFiles: COMMON_TO_PDF_FILES,
   multipleFiles: true,
 };
 const GENAI_MULTI = { ...MULTI_ALL, maxNumFiles: 100, uploadType: 'multifile-only', subCopy: true, genAI: true };
-const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; return acc; }, {});
 
 export const LIMITS = {
   fillsign: { ...SINGLE_PDF, mobileApp: true },
@@ -60,23 +64,23 @@ export const LIMITS = {
   'summarize-pdf': { maxFileSize: MB100, acceptedFiles: ALL_FILES, maxNumFiles: 1, subCopy: true, genAI: true },
   'split-pdf': { ...SINGLE_PDF, signedInAcceptedFiles: SIGNED_IN_FILES },
   'add-comment': { ...SINGLE_PDF },
-  'compress-pdf': { maxFileSize: 2147483648, acceptedFiles: ALL_FILES, multipleFiles: true },
+  'compress-pdf': { maxFileSize: GB2, acceptedFiles: ALL_FILES, multipleFiles: true },
   sendforsignature: {
-    maxFileSize: 5242880,
+    maxFileSize: MB5,
     acceptedFiles: PDF_ONLY,
     maxNumFiles: 1,
     mobileApp: true,
   },
-  ...group(['number-pages', 'crop-pages'], { ...SINGLE_PDF, level: 0 }),
-  ...group(['protect-pdf', 'delete-pages', 'insert-pdf', 'extract-pages', 'reorder-pages'], SINGLE_PDF),
-  ...group(['chat-pdf', 'pdf-ai'], GENAI_MULTI),
-  ...group(['combine-pdf', 'rotate-pages'], { ...MULTI_PDF, maxNumFiles: 100, uploadType: 'multifile-only' }),
-  ...group(['pdf-to-excel', 'pdf-to-image', 'pdf-to-png'], MULTI_PDF),
-  ...group(['pdf-to-word', 'pdf-to-ppt'], { maxFileSize: MB250, acceptedFiles: PDF_ONLY, multipleFiles: true }),
+  ...groupLimits(['number-pages', 'crop-pages'], { ...SINGLE_PDF, level: 0 }),
+  ...groupLimits(['protect-pdf', 'delete-pages', 'insert-pdf', 'extract-pages', 'reorder-pages'], SINGLE_PDF),
+  ...groupLimits(['chat-pdf', 'pdf-ai'], GENAI_MULTI),
+  ...groupLimits(['combine-pdf', 'rotate-pages'], { ...MULTI_PDF, maxNumFiles: 100, uploadType: 'multifile-only' }),
+  ...groupLimits(['pdf-to-excel', 'pdf-to-image', 'pdf-to-png'], MULTI_PDF),
+  ...groupLimits(['pdf-to-word', 'pdf-to-ppt'], { maxFileSize: MB250, acceptedFiles: PDF_ONLY, multipleFiles: true }),
   createpdf: { maxFileSize: MB100, acceptedFiles: CREATEPDF_FILES, multipleFiles: true },
-  ...group(['png-to-pdf', 'excel-to-pdf', 'ppt-to-pdf'], MULTI_COMMON_TO_PDF),
-  ...group(['word-to-pdf', 'jpg-to-pdf'], { ...MULTI_COMMON_TO_PDF, noRedirectTimeout: true }),
-  ...group(['image-to-pdf', 'bmp-to-pdf', 'gif-to-pdf', 'tiff-to-pdf'], MULTI_COMMON_TO_PDF),
+  ...groupLimits(['png-to-pdf', 'excel-to-pdf', 'ppt-to-pdf'], MULTI_COMMON_TO_PDF),
+  ...groupLimits(['word-to-pdf', 'jpg-to-pdf'], { ...MULTI_COMMON_TO_PDF, noRedirectTimeout: true }),
+  ...groupLimits(['image-to-pdf', 'bmp-to-pdf', 'gif-to-pdf', 'tiff-to-pdf'], MULTI_COMMON_TO_PDF),
   'psd-to-pdf': { maxFileSize: MB100, acceptedFiles: ['.psd'], multipleFiles: true },
   'ai-to-pdf': { maxFileSize: MB100, acceptedFiles: ['.ai'], multipleFiles: true },
   'indd-to-pdf': { maxFileSize: MB100, acceptedFiles: ['.indd'], multipleFiles: true },

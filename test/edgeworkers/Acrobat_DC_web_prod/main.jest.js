@@ -257,6 +257,7 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
       expect(append.mock.calls[2]).toEqual([`<style id="inline-verb-widget-client-upload-styles">${css}\n.shared { color: red; }</style>`]);
       expect(response.headers.Link).toContain('</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"');
       expect(response.headers.Link).toContain('</acrobat/scripts/verbWidgetUtils.js>;rel="preload";as="script";crossorigin="anonymous"');
+      expect(response.headers.Link).toContain('</acrobat/scripts/uploadLimits.js>;rel="preload";as="script";crossorigin="anonymous"');
     } finally {
       mockVerbWidgetStylesText.mockReturnValue(Promise.resolve('verb-widget-styles response text'));
     }

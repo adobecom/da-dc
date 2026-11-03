@@ -33,14 +33,9 @@ import {
   processMedia,
   getAuthoredSvgInfo,
 } from '../../scripts/verbMarqueeUtils.js';
+import { MULTI_ALL } from '../../scripts/uploadLimits.js';
 
-const MB100 = 104857600;
-const VERB_LIMITS = {
-  maxFileSize: MB100,
-  acceptedFiles: ['.pdf', '.doc', '.docx', '.xml', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.txt', '.text', '.ai', '.form', '.bmp', '.gif', '.indd', '.jpeg', '.jpg', '.png', '.psd', '.tif', '.tiff'],
-  multipleFiles: true,
-  noRedirectTimeout: true,
-};
+const VERB_LIMITS = { ...MULTI_ALL, noRedirectTimeout: true };
 
 export const LIMITS = {
   'jpg-to-pdf': VERB_LIMITS,

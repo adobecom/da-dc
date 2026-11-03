@@ -16,12 +16,12 @@ import {
   setupEarlyPrefetch,
   startPageServices,
 } from '../../scripts/verbWidgetUtils.js';
+import { MB25 } from '../../scripts/uploadLimits.js';
 
 const logger = createLogger('verb-widget-client-upload');
 
 registerAnalyticsLoader(logger);
 
-const MB25 = 26214400;
 const ACCEPTED_FILES = ['.jpg', '.jpeg', '.png'];
 
 export const LIMITS = { 'image-to-pdf': { maxFileSize: MB25, acceptedFiles: ACCEPTED_FILES, multipleFiles: false } };
