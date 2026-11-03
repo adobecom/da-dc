@@ -347,7 +347,7 @@ export async function fireUpsellAnalytics(verb, userAttempts, logger = defaultLo
   }
 }
 
-export async function initializePingService(logger = defaultLogger) {
+export async function initializePingService(logger = defaultLogger, env = getEnv()) {
   try {
     const [{ PingService, USER_TYPE }, { getConfig }] = await Promise.all([
       import('./ping.js'),
@@ -359,7 +359,7 @@ export async function initializePingService(logger = defaultLogger) {
     const pingService = new PingService({
       locale: getConfig().locale?.prefix.replace('/', '') || 'en-us',
       config: {
-        serverEnv: getEnv(),
+        serverEnv: env,
         appName: 'adobe_com',
         appVersion: '1.0',
         appReferrer: '',
@@ -848,7 +848,7 @@ export function createUploadSession({
       prefetchTarget();
       const metadata = withMetadata(data);
       track('job:uploading', metadata, false, sendToSplunk);
-      if (limits.multipleFiles) track('job:multi-file-uploading', metadata, false, sendToSplunk);
+      if (limits?.multipleFiles) track('job:multi-file-uploading', metadata, false, sendToSplunk);
       setCookie('UTS_Uploading', Date.now());
       exitWatches.push({ metadata, workflowStep: 'uploading' });
     },
@@ -858,7 +858,7 @@ export function createUploadSession({
       setCookie('UTS_Uploaded', uploadedAt);
       const metadata = { ...data, uploadTime: uploadedTime(), userAttempts };
       track('job:uploaded', metadata, false, sendToSplunk);
-      if (limits.multipleFiles) track('job:multi-file-uploaded', metadata, false, sendToSplunk);
+      if (limits?.multipleFiles) track('job:multi-file-uploaded', metadata, false, sendToSplunk);
       setUser();
       incrementVerbKey(`${verb}_attempts`);
       return uploadedAt;
