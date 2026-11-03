@@ -302,6 +302,9 @@ export async function responseProvider(request) {
         ];
       }
     }
+    if (clientUploadWidget || unityWorkflow || (promptUploadWorkflow && unityMarquee)) {
+      headerLink.push('</acrobat/scripts/tooltips.js>;rel="preload";as="script";crossorigin="anonymous";fetchpriority="low"');
+    }
     headerLink = headerLink.join();
 
     const headers = {
@@ -539,7 +542,8 @@ async function frictionlessResponseProvider(request) {
         `<${codeRoot}/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${miloBaseUrl}/libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
-        `<${isLocalePrefix ? `/${first}` : ''}${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`
+        `<${isLocalePrefix ? `/${first}` : ''}${contentRoot}/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,
+        `<${codeRoot}/scripts/tooltips.js>;rel="preload";as="script";crossorigin="anonymous";fetchpriority="low"`
       ];
     }
     headerLink = headerLink.join();

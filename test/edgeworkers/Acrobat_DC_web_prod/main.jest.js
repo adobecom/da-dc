@@ -15,6 +15,8 @@ import { HttpResponse404 } from "response-404";
 import { mockOnElement } from "html-rewriter";
 import { EdgeKV } from "../../../edgeworkers/Acrobat_DC_web_prod/edgekv.js";
 
+const TOOLTIPS_PRELOAD = '</acrobat/scripts/tooltips.js>;rel="preload";as="script";crossorigin="anonymous";fetchpriority="low"';
+
 
 describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
   let fetches;
@@ -185,8 +187,8 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     ];
 
     expect(response.status).toBe(200);
-    const commonLinks = baselineHeaders.Link.split(',').filter((link) => !link.includes('/acrobat/blocks/verb-widget/') && !link.includes('placeholders'));
-    expect(response.headers.Link).toBe([...commonLinks, ...unityLinks].join(','));
+    const commonLinks = baselineHeaders.Link.split(',').filter((link) => !link.includes('/acrobat/blocks/verb-widget/') && !link.includes('placeholders') && !link.includes('tooltips.js'));
+    expect(response.headers.Link).toBe([...commonLinks, ...unityLinks, TOOLTIPS_PRELOAD].join(','));
     expect(response.headers.Link).not.toContain('/acrobat/blocks/verb-widget/');
     expect(response.headers.Link).not.toContain('placeholders');
     expect({...response.headers, Link: baselineHeaders.Link}).toEqual(baselineHeaders);
@@ -268,6 +270,32 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
       expect(append.mock.calls).toEqual(baselineAppend.mock.calls);
     },
   );
+
+  it.each([
+    [['.unity.workflow-acrobat'], false],
+    [['.unity.workflow-acrobat', '.study-marquee'], false],
+    [['.unity.workflow-acrobat', '.verb-marquee'], false],
+    [['.verb-widget-client-upload'], false],
+    [['.unity.workflow-prompt-upload'], true],
+  ])('preloads tooltips.js at low priority for widgets with tooltips: %j unity-marquee=%s', async (blocks, hasUnityMarquee) => {
+    blocks.forEach((block) => authoredBlocks.add(block));
+    unityMarquee = hasUnityMarquee;
+    const response = await replaceResponseProvider(new Request({path: '/acrobat/online/pdf-to-ppt'}));
+    expect(response.status).toBe(200);
+    const links = response.headers.Link.split(',');
+    expect(links.filter((link) => link.includes('tooltips.js'))).toEqual([TOOLTIPS_PRELOAD]);
+  });
+
+  it.each([
+    [[], false],
+    [['.unity.workflow-prompt-upload'], false],
+  ])('does not preload tooltips.js for pages without tooltips: %j unity-marquee=%s', async (blocks, hasUnityMarquee) => {
+    blocks.forEach((block) => authoredBlocks.add(block));
+    unityMarquee = hasUnityMarquee;
+    const response = await replaceResponseProvider(new Request({path: '/acrobat/online/pdf-to-ppt'}));
+    expect(response.status).toBe(200);
+    expect(response.headers.Link).not.toContain('tooltips.js');
+  });
 
   it("responseProvider", async () => {
     let requestMock = new Request({path: '/acrobat/online/pdf-to-ppt'});
@@ -459,5 +487,23 @@ describe("frictionlessResponseProvider for acrobat.adobe.com", () => {
     const response = await replaceResponseProvider(requestMock);
     expect(response.status).toEqual(200);
     expect(fetches).toContain('https://acrobat.adobe.com/dc-shared/africa/heic-to-pdf');
+  });
+
+  it.each([true, false])('preloads /dc-shared/scripts/tooltips.js at low priority only for verb-widget pages: %s', async (hasWidget) => {
+    const originalOnElement = mockOnElement.getMockImplementation();
+    mockOnElement.mockImplementation((selector, handler) => {
+      if (selector === '.unity.workflow-acrobat') {
+        if (hasWidget) handler({getAttribute: () => 'unity workflow-acrobat'});
+        return;
+      }
+      originalOnElement(selector, handler);
+    });
+    const response = await replaceResponseProvider(new Request({path: '/heic-to-pdf', host: 'acrobat.adobe.com'}));
+    mockOnElement.mockImplementation(originalOnElement);
+    expect(response.status).toEqual(200);
+    const tooltipLinks = response.headers.Link.split(',').filter((link) => link.includes('tooltips.js'));
+    expect(tooltipLinks).toEqual(hasWidget
+      ? ['</dc-shared/scripts/tooltips.js>;rel="preload";as="script";crossorigin="anonymous";fetchpriority="low"']
+      : []);
   });
 });
