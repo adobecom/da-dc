@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
 import { delay } from '../../helpers/waitfor.js';
 
-const { default: init } = await import(
+const { default: init, initResumeFork, RESUME_FORK_MODAL_ID } = await import(
   '../../../acrobat/blocks/verb-marquee/verb-marquee.js'
 );
 
@@ -47,6 +47,19 @@ describe('verb-marquee block', () => {
     expect(document.querySelector('.verb-marquee .acrobat-icon svg')).to.exist;
     expect(document.querySelector('.verb-marquee .verb-marquee-cta')).to.exist;
     expect(document.querySelector('.verb-marquee .verb-marquee-dropzone')).to.exist;
+  });
+
+  it('opens the resume fork modal when Unity asks the block', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-marquee');
+    await init(block);
+    const onModalOpen = sinon.spy();
+    window.addEventListener('modal:open', onModalOpen);
+    block.dispatchEvent(new CustomEvent('unity:show-resume-fork'));
+    window.removeEventListener('modal:open', onModalOpen);
+    expect(onModalOpen.calledOnce).to.be.true;
+    expect(onModalOpen.firstCall.args[0].detail).to.deep.equal({ hash: `#${RESUME_FORK_MODAL_ID}` });
   });
 
   it('show error toast', async () => {
@@ -173,5 +186,67 @@ describe('verb-marquee block', () => {
 
     errorCloseBtn.click();
     expect(errorState.classList.contains('hide')).to.be.true;
+  });
+});
+
+describe('verb-marquee resume fork', () => {
+  let element;
+  let responses;
+  let modalOpens;
+  const onModalOpen = (e) => modalOpens.push(e.detail);
+  const select = (detail) => window.dispatchEvent(new CustomEvent('resume-upload-fork:select', { detail }));
+  const closeModal = (id) => window.dispatchEvent(new CustomEvent('milo:modal:closed', { detail: { id } }));
+
+  beforeEach(() => {
+    element = document.createElement('div');
+    const received = [];
+    responses = received;
+    modalOpens = [];
+    element.addEventListener('unity:resume-fork-response', (e) => received.push(e.detail));
+    window.addEventListener('modal:open', onModalOpen);
+    initResumeFork(element);
+  });
+
+  afterEach(() => {
+    window.removeEventListener('modal:open', onModalOpen);
+  });
+
+  it('opens the fork modal when Unity asks for it', () => {
+    element.dispatchEvent(new CustomEvent('unity:show-resume-fork'));
+    expect(modalOpens).to.deep.equal([{ hash: `#${RESUME_FORK_MODAL_ID}` }]);
+  });
+
+  it('forwards continue-fork with the chosen product to Unity', () => {
+    element.dispatchEvent(new CustomEvent('unity:show-resume-fork'));
+    select({ action: 'continue-fork', choice: 'refine' });
+    expect(responses).to.deep.equal([{ action: 'continue-fork', choice: 'refine' }]);
+  });
+
+  it('forwards cancel-fork to Unity', () => {
+    element.dispatchEvent(new CustomEvent('unity:show-resume-fork'));
+    select({ action: 'cancel-fork' });
+    expect(responses).to.deep.equal([{ action: 'cancel-fork' }]);
+  });
+
+  it('treats closing the fork modal without a choice as cancel-fork', () => {
+    element.dispatchEvent(new CustomEvent('unity:show-resume-fork'));
+    closeModal('some-other-modal');
+    expect(responses).to.deep.equal([]);
+    closeModal(RESUME_FORK_MODAL_ID);
+    expect(responses).to.deep.equal([{ action: 'cancel-fork' }]);
+  });
+
+  it('sends only one response per request', () => {
+    element.dispatchEvent(new CustomEvent('unity:show-resume-fork'));
+    select({ action: 'continue-fork', choice: 'sharpen' });
+    closeModal(RESUME_FORK_MODAL_ID);
+    select({ action: 'cancel-fork' });
+    expect(responses).to.deep.equal([{ action: 'continue-fork', choice: 'sharpen' }]);
+  });
+
+  it('ignores fork events when Unity has not asked', () => {
+    select({ action: 'continue-fork', choice: 'sharpen' });
+    closeModal(RESUME_FORK_MODAL_ID);
+    expect(responses).to.deep.equal([]);
   });
 });

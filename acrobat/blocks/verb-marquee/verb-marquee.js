@@ -17,6 +17,31 @@ export const LIMITS = {
   ...group(['word-to-pdf', 'jpg-to-pdf'], { ...MULTI_ALL, noRedirectTimeout: true }),
 };
 
+export const RESUME_FORK_MODAL_ID = 'resume-upload-fork';
+
+// Unity asks for the product-fork modal after validating an upload (A/B challenger only).
+// The resume-upload-fork block (authored in the modal fragment) reports the user's choice,
+// which is forwarded back to Unity. Closing the modal any other way counts as cancel.
+export function initResumeFork(element) {
+  let awaitingResponse = false;
+  const respond = (detail) => {
+    if (!awaitingResponse) return;
+    awaitingResponse = false;
+    element.dispatchEvent(new CustomEvent('unity:resume-fork-response', { detail }));
+  };
+  element.addEventListener('unity:show-resume-fork', () => {
+    awaitingResponse = true;
+    window.dispatchEvent(new CustomEvent('modal:open', { detail: { hash: `#${RESUME_FORK_MODAL_ID}` } }));
+  });
+  window.addEventListener('resume-upload-fork:select', (e) => {
+    const { action, choice } = e.detail || {};
+    respond(action === 'continue-fork' ? { action, choice } : { action: 'cancel-fork' });
+  });
+  window.addEventListener('milo:modal:closed', (e) => {
+    if (e.detail?.id === RESUME_FORK_MODAL_ID) respond({ action: 'cancel-fork' });
+  });
+}
+
 const miloLibs = setLibs('/libs');
 let createTag;
 let getConfig;
@@ -842,6 +867,7 @@ export default async function init(element) {
     });
   }
   runWhenDocumentIsReady(soloUpload);
+  initResumeFork(element);
   element.addEventListener('unity:track-analytics', (e) => {
     const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
     const { event, data } = e.detail || {};
