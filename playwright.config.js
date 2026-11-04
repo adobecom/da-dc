@@ -38,7 +38,7 @@ const config = {
   retries: process.env.CI ? 3 : 3,
   workers: process.env.CI ? 7 : 7,
   reporter: process.env.CI
-    ? [['github'], ['list'], ['./nala/utils/base-reporter.js']]
+    ? [['github'], ['list'], ['html', { outputFolder: 'test-html-results', open: 'never' }], ['./nala/utils/base-reporter.js']]
     : [['html', { outputFolder: 'test-html-results' }], ['list'], ['./nala/utils/base-reporter.js']],
   use: {
     actionTimeout: 60000,
