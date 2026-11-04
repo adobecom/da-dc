@@ -111,8 +111,10 @@ describe('verb-widget-client-upload hero image', () => {
     addSnapshot();
     const block = makeBlock();
     const authoredIcon = document.createElement('img');
-    authoredIcon.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22/%3E';
+    authoredIcon.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 240 120%22%3E%3C/svg%3E';
     authoredIcon.alt = 'Authored icon';
+    authoredIcon.width = 240;
+    authoredIcon.height = 120;
     block.querySelector(':scope > div > div').append(authoredIcon);
 
     await init(block);
@@ -121,6 +123,7 @@ describe('verb-widget-client-upload hero image', () => {
     expect(verbImage.classList.contains('generated')).to.be.false;
     expect(verbImage.childElementCount).to.equal(1);
     expect(verbImage.firstElementChild).to.equal(authoredIcon);
+    expect(authoredIcon.width / authoredIcon.height).to.equal(2);
     expect(authoredIcon.classList.contains('icon-verb-image')).to.be.true;
     expect(authoredIcon.getAttribute('alt')).to.equal(ALT);
     expect(window.fetch.calledWith(HERO_URL)).to.be.false;
