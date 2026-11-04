@@ -151,7 +151,7 @@
   min-height: var(--verb-widget-min-height);
 }
 
-.verb-widget.signed-in {
+.verb-widget.signed-in:has(> .verb-upsell-active) {
   min-height: 560px;
 }
 
@@ -220,7 +220,7 @@
 }
 
 .verb-widget.signed-in .verb-footer {
-  display: none;
+  visibility: hidden;
 }
 
 .verb-widget.signed-in .verb-upsell-active {
