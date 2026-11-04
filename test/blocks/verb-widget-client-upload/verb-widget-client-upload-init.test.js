@@ -1,7 +1,7 @@
 /* eslint-disable compat/compat */
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
-import { waitFor } from '../../helpers/waitfor.js';
+import { waitFor, waitForElement } from '../../helpers/waitfor.js';
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
 
 const { default: init } = await import(
@@ -151,6 +151,8 @@ describe('verb-widget-client-upload init', () => {
       expect(verbImg).to.exist;
       expect(verbImg.tagName).to.equal('IMG');
       expect(verbImg.getAttribute('src')).to.equal('/test-icon.png');
+      expect(verbImg.getAttribute('alt')).to.equal(VERB);
+      expect(block.querySelector('.verb-image').classList.contains('generated')).to.be.false;
     });
 
     it('uses an authored SVG link as the verb image', async () => {
@@ -164,6 +166,7 @@ describe('verb-widget-client-upload init', () => {
       expect(verbImg).to.exist;
       expect(verbImg.tagName).to.equal('IMG');
       expect(verbImg.getAttribute('src')).to.include('custom-icon.svg');
+      expect(block.querySelector('.verb-image').classList.contains('generated')).to.be.false;
     });
 
     it('falls back to built-in SVG icon when no authored icon is present', async () => {
@@ -172,6 +175,9 @@ describe('verb-widget-client-upload init', () => {
 
       const verbImage = block.querySelector('.verb-image');
       expect(verbImage).to.exist;
+      expect(verbImage.classList.contains('generated')).to.be.true;
+      const heroSvg = await waitForElement('.verb-image svg.icon-verb-image');
+      expect(heroSvg.getAttribute('alt')).to.equal(VERB);
       // built-in loads an SVG element (not an IMG tag)
       expect(verbImage.querySelector('svg, img')).to.exist;
     });
