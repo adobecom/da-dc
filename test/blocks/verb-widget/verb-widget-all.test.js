@@ -2,11 +2,12 @@
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
+import { waitForElement } from '../../helpers/waitfor.js';
+import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
 
 const { default: init } = await import(
   '../../../acrobat/blocks/verb-widget/verb-widget.js'
 );
-import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
 
 const verbs = [
   'pdf-to-word',
@@ -66,7 +67,7 @@ describe('verb-widget block', () => {
       const block = document.body.querySelector('.verb-widget');
       await init(block);
       expect(document.querySelector('.verb-widget .acrobat-icon svg')).to.exist;
-      expect(document.querySelector('.verb-widget .verb-image svg')).to.exist;
+      expect(await waitForElement('.verb-widget .verb-image svg')).to.exist;
       expect(document.querySelector('.verb-widget .security-icon svg')).to.exist;
       expect(document.querySelector('.verb-widget .info-icon svg')).to.exist;
     });
