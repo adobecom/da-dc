@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import PlansPage from './plans.page.js';
 import { features } from './plans.spec.js';
 import checkPageLinks from '../../../utils/link-checker.js';
+import MerchCards from '../../../libs/blocks/merch-card.js';
 
 let plans;
 
@@ -32,9 +33,7 @@ test.describe('Acrobat Plans', () => {
       await test.step('Verify merch cards in selected tab', async () => {
         const panel = plans.tabPanel(tabId);
         await expect(panel).toBeVisible();
-        const card = panel.locator('merch-card').filter({ visible: true }).first();
-        await card.scrollIntoViewIfNeeded({ timeout: 60000 });
-        await expect(card).toBeVisible();
+        await new MerchCards(page, panel).verifyVisibleCards();
       });
 
       await test.step('Verify visible checkout links are visible and enabled', async () => {

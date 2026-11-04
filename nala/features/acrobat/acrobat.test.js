@@ -2,6 +2,7 @@
 // import AcrobatPage from './acrobat.page.js';
 // import { features } from './acrobat.spec.js';
 // import checkPageLinks from '../../utils/link-checker.js';
+// import MerchCards from '../../libs/blocks/merch-card.js';
 
 // const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/get-acrobat-support';
 
@@ -106,8 +107,7 @@
 //         const tab = tabs.nth(i);
 //         await expect(tab).toBeVisible();
 //         await tab.click();
-//         const visibleCard = merchCardPlans.locator('merch-card').filter({ visible: true }).first();
-//         await expect(visibleCard).toBeVisible();
+//         await new MerchCards(page, merchCardPlans).verifyVisibleCards();
 //       }
 //     });
 

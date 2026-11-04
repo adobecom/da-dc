@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import GenerativeAiPdfPage from './generative-ai-pdf.page.js';
 import { features } from './generative-ai-pdf.spec.js';
 import checkPageLinks from '../../../utils/link-checker.js';
+import MerchCards from '../../../libs/blocks/merch-card.js';
 
 let gai;
 
@@ -66,8 +67,7 @@ test.describe('Acrobat Generative AI PDF', () => {
         const tab = tabs.nth(i);
         await expect(tab).toBeVisible();
         await tab.click();
-        const visibleCard = merchCardPlans.locator('merch-card').filter({ visible: true }).first();
-        await expect(visibleCard).toBeVisible();
+        await new MerchCards(page, merchCardPlans).verifyVisibleCards();
       }
     });
 
