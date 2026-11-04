@@ -403,6 +403,16 @@ export default async function init(element) {
     initializePingService();
     window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: VERB, userAttempts } }));
   });
+  const LABEL_PREFIX = 'dc-block-row-';
+  const authored = new Map();
+  element.querySelectorAll(':scope > div').forEach((rowEl) => {
+    const label = rowEl.firstElementChild?.textContent?.trim() || '';
+    if (label.startsWith(LABEL_PREFIX)) {
+      authored.set(label.slice(LABEL_PREFIX.length), rowEl.children[1] || null);
+      rowEl.remove();
+    }
+  });
+  const cellText = (key) => authored.get(key)?.textContent?.trim() || '';
   const children = element.querySelectorAll(':scope > div');
   const foreground = children[children.length - 1];
   foreground.classList.add('foreground', 'container');
@@ -450,14 +460,14 @@ export default async function init(element) {
   const headingEl = createTag('h1', { class: 'verb-marquee-heading' }, heading);
   const isMobileOrTabletViewport = window.innerWidth < 1200;
   const copy1Text = isMobileOrTabletViewport
-    ? (window.mph?.[`verb-marquee-${VERB}-mobile-copy`] || window.mph?.[`verb-marquee-${VERB}-copy`] || '')
-    : (window.mph?.[`verb-marquee-${VERB}-copy`] || '');
+    ? (cellText('mobile-copy') || window.mph?.[`verb-marquee-${VERB}-mobile-copy`] || cellText('copy') || window.mph?.[`verb-marquee-${VERB}-copy`] || '')
+    : (cellText('copy') || window.mph?.[`verb-marquee-${VERB}-copy`] || '');
   const subCopies = ['', '-2']
     .map((suffix) => {
       const subCopyText = isMobileOrTabletViewport
-        ? (window.mph?.[`verb-marquee-${VERB}-mobile-sub-copy${suffix}`]
-          || window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '')
-        : (window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '');
+        ? (cellText(`mobile-sub-copy${suffix}`) || window.mph?.[`verb-marquee-${VERB}-mobile-sub-copy${suffix}`]
+          || cellText(`sub-copy${suffix}`) || window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '')
+        : (cellText(`sub-copy${suffix}`) || window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '');
       if (!subCopyText) return null;
       const el = createTag('p', { class: 'verb-marquee-copy-sub' });
       const icon = createSvgElement('SUBCOPY_CHECK');
@@ -475,7 +485,7 @@ export default async function init(element) {
     class: 'verb-marquee-dropzone',
     id: 'drop-zone',
   });
-  const ctaButtonLabel = getCTA(VERB);
+  const ctaButtonLabel = cellText('upload-cta') || getCTA(VERB);
   const ctaButton = createTag('button', {
     class: 'verb-marquee-cta',
     type: 'button',
@@ -489,11 +499,11 @@ export default async function init(element) {
   }
   const ctaLabel = createTag('span', { class: 'verb-marquee-cta-label' }, ctaButtonLabel);
   ctaButton.appendChild(ctaLabel);
-  const dragText = createTag('p', { class: 'verb-marquee-drag' }, window.mph?.[`verb-widget-${VERB}-dragndrop-text`] || '');
+  const dragText = createTag('p', { class: 'verb-marquee-drag' }, cellText('dragndrop-text') || window.mph?.[`verb-widget-${VERB}-dragndrop-text`] || '');
   const fileLimitText = createTag('p', {
     class: 'verb-marquee-file-limit',
     id: 'file-upload-description',
-  }, window.mph?.[`verb-widget-${VERB}-file-limit`] || '');
+  }, cellText('file-limit') || window.mph?.[`verb-widget-${VERB}-file-limit`] || '');
 
   if (useFileUpload) {
     dropzone.append(ctaButton, dragText, fileLimitText);
@@ -589,9 +599,11 @@ export default async function init(element) {
     : (mph['verb-marquee-legal-2'] || mph['verb-widget-legal-2'] || '');
   const legalCombined = [legalPart1, legalPart2].filter(Boolean).join(' ').trim();
   const legalInitial = legalCombined || (mph['verb-marquee-legal-text'] || '');
-  const legalText = createTag('p', { class: 'verb-marquee-legal' }, legalInitial);
+  const authoredLegalEl = cellText('legal-text') ? authored.get('legal-text') : null;
+  const legalText = createTag('p', { class: 'verb-marquee-legal' }, authoredLegalEl ? '' : legalInitial);
+  if (authoredLegalEl) legalText.innerHTML = authoredLegalEl.innerHTML;
   const omitFooterForMobileStore = limits?.mobileApp && mobileOrTabletTouch;
-  if (!omitFooterForMobileStore && !(limits?.mobileApp && isMobile)) {
+  if (!authoredLegalEl && !omitFooterForMobileStore && !(limits?.mobileApp && isMobile)) {
     if (legalText.textContent) {
       const createLegalLink = (label, url) => `<a class="verb-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
       const legalLinks = [
@@ -608,7 +620,7 @@ export default async function init(element) {
       );
     }
   }
-  const tooltipContent = window.mph?.['verb-widget-tool-tip'] || '';
+  const tooltipContent = cellText('tool-tip') || window.mph?.['verb-widget-tool-tip'] || '';
   const infoIcon = createTag('button', {
     class: 'info-icon milo-tooltip top',
     type: 'button',
