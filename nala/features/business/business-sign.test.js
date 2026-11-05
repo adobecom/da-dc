@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import BusinessSignPage from './business-sign.page.js';
 import { features } from './business-sign.spec.js';
 import checkPageLinks from '../../utils/link-checker.js';
+import MerchCards from '../../libs/blocks/merch-card.js';
 
 let businessSign;
 
@@ -81,9 +82,7 @@ test.describe('Acrobat Business — Sign', () => {
     });
 
     await test.step('Verify merch cards container', async () => {
-      const merchCard = page.locator('merch-card').filter({ visible: true }).first();
-      await merchCard.scrollIntoViewIfNeeded();
-      await expect(merchCard).toBeVisible({ timeout: 60000 });
+      await new MerchCards(page).verifyVisibleCards();
     });
 
     await test.step('Verify footer', async () => {
