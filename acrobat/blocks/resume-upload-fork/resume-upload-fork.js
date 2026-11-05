@@ -1,12 +1,18 @@
 /* eslint-disable compat/compat */
-// Shared with da-dc: keep this block free of host-specific code so it can be copied verbatim.
-// Both repos export setLibs from scripts/utils.js.
+// Shared verbatim with da-dc: no host-specific code.
 import { setLibs } from '../../scripts/utils.js';
 
 export const SELECT_EVENT = 'resume-upload-fork:select';
 export const ACTIONS = { continue: 'continue-fork', cancel: 'cancel-fork' };
-// Choice values follow authoring order: card 1 is "sharpen", card 2 is "refine".
-export const CHOICES = ['sharpen', 'refine'];
+export const CHOICES = ['sharpen', 'refresh'];
+export const DISMISS = {
+  cancel: 'cancel',
+  close: 'close',
+  escape: 'escape',
+  outside: 'outside',
+  swipe: 'swipe',
+  other: 'other',
+};
 
 const MODAL_CLASS = 'resume-upload-fork-modal';
 const HEADING_SELECTOR = 'h1, h2, h3, h4, h5, h6';
@@ -44,8 +50,6 @@ function waitForAnimationEnd(target, timeoutMs) {
   });
 }
 
-// Ported from express/code/scripts/color-shared/utils/utilities.js (addSwipeToClose),
-// which is Express-only.
 function addSwipeToClose(dialog, scroller, onClose) {
   let startY = 0;
   let dragY = 0;
@@ -75,9 +79,54 @@ function addSwipeToClose(dialog, scroller, onClose) {
   dialog.addEventListener('touchcancel', onEnd, { passive: true });
 }
 
-function decorateModal(dialog, closeModal) {
+// Milo focuses the first focusable before dispatching milo:modal:loaded; refocus the container.
+function focusContainerOnOpen(dialog, getFirstFocusable) {
+  dialog.tabIndex = -1;
+  const onLoaded = (e) => {
+    if (e.detail?.id !== dialog.id) return;
+    window.removeEventListener('milo:modal:loaded', onLoaded);
+    dialog.focus({ preventScroll: true });
+  };
+  window.addEventListener('milo:modal:loaded', onLoaded);
+
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab' || e.target !== dialog) return;
+    const next = e.shiftKey ? dialog.querySelector('.dialog-close') : getFirstFocusable();
+    if (!next) return;
+    e.preventDefault();
+    next.focus();
+  });
+}
+
+// Each listener runs before Milo's handler, which closes the modal synchronously.
+function trackDismissMethod(dialog) {
+  let method;
+  const set = (value) => { method ||= value; };
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') set(DISMISS.escape);
+  });
+  dialog.addEventListener('click', (e) => {
+    if (e.target.closest('.dialog-close')) set(DISMISS.close);
+  }, true);
+  const onLoaded = (e) => {
+    if (e.detail?.id !== dialog.id) return;
+    window.removeEventListener('milo:modal:loaded', onLoaded);
+    const curtain = dialog.nextElementSibling;
+    if (!curtain?.classList.contains('modal-curtain')) return;
+    curtain.addEventListener('click', (ev) => {
+      if (ev.target === curtain) set(DISMISS.outside);
+    }, true);
+  };
+  window.addEventListener('milo:modal:loaded', onLoaded);
+  return { set, get: () => method || DISMISS.other };
+}
+
+function decorateModal(dialog, closeModal, { getFirstFocusable, onDismiss }) {
   dialog.classList.add(MODAL_CLASS);
+  focusContainerOnOpen(dialog, getFirstFocusable);
+  const dismissal = trackDismissMethod(dialog);
   dialog.closeCallback = async () => {
+    onDismiss(dismissal.get());
     if (matches(REDUCED_MOTION_QUERY)) return;
     dialog.classList.add('is-closing');
     const curtain = dialog.nextElementSibling;
@@ -85,7 +134,14 @@ function decorateModal(dialog, closeModal) {
     await waitForAnimationEnd(dialog, EXIT_ANIMATION_MS);
   };
   const scroller = dialog.querySelector(':scope > .fragment') || dialog;
-  addSwipeToClose(dialog, scroller, () => closeModal(dialog));
+  addSwipeToClose(dialog, scroller, () => {
+    dismissal.set(DISMISS.swipe);
+    const close = dialog.querySelector('.dialog-close');
+    if (!close) return closeModal(dialog);
+    // Mirrors Milo's Escape handling so click tracking records the exit method.
+    close.setAttribute('daa-ll', (close.getAttribute('daa-ll') || '').replace(/[^:]*$/, 'swipeClose'));
+    return close.click();
+  });
 }
 
 function buildCard(row, index, createTag) {
@@ -106,7 +162,6 @@ function buildCard(row, index, createTag) {
 
   const content = createTag('div', { class: 'resume-upload-fork-card-content' });
   content.append(...contentCell.childNodes);
-  // Title may be authored as any heading level, a paragraph, or bold text.
   const elements = [...content.children];
   const title = content.querySelector(HEADING_SELECTOR) || elements[0];
   const description = elements.find((elem) => elem !== title && elem.tagName === 'P');
@@ -164,9 +219,7 @@ function initRadioGroup(group, cards) {
   return () => cards.find((c) => c.getAttribute('aria-checked') === 'true');
 }
 
-// Authored links only carry an action hash; render them as buttons so they never navigate.
-// decorateButtons() resolves Milo authoring (#_button-fill), but the block owns the styling,
-// so con-button is not carried over.
+// decorateButtons() is only used to parse #_button-fill; the block owns button styling.
 function buildActions(row, createTag) {
   const actions = createTag('div', { class: 'resume-upload-fork-actions' });
   row.querySelectorAll('a').forEach((link) => {
@@ -218,18 +271,29 @@ export default async function decorate(el) {
   const body = createTag('div', { class: 'resume-upload-fork-body' }, [header, group]);
   el.replaceChildren(body, actions);
 
+  const dispatch = (detail) => {
+    el.dispatchEvent(new CustomEvent(SELECT_EVENT, { bubbles: true, composed: true, detail }));
+  };
+  let chosen = false;
+
   const dialog = el.closest('.dialog-modal');
-  if (dialog) decorateModal(dialog, closeModal);
+  if (dialog) {
+    decorateModal(dialog, closeModal, {
+      getFirstFocusable: () => getSelected() || actions.querySelector('button'),
+      onDismiss: (dismiss) => {
+        if (!chosen) dispatch({ action: ACTIONS.cancel, dismiss });
+      },
+    });
+  }
 
   actions.addEventListener('click', (e) => {
     const button = e.target.closest('button[data-action]');
     if (!button) return;
     const { action } = button.dataset;
-    const detail = action === ACTIONS.continue
+    chosen = true;
+    dispatch(action === ACTIONS.continue
       ? { action, choice: getSelected()?.dataset.choice }
-      : { action };
-    // TODO: fork click analytics (MWPW-211614; requirements pending).
-    el.dispatchEvent(new CustomEvent(SELECT_EVENT, { bubbles: true, composed: true, detail }));
+      : { action, dismiss: DISMISS.cancel });
     const openDialog = el.closest('.dialog-modal');
     if (openDialog) closeModal(openDialog);
   });

@@ -1,5 +1,5 @@
 /* eslint-disable compat/compat */
-import { readFile, setViewport } from '@web/test-runner-commands';
+import { readFile, setViewport, emulateMedia } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 
 window.isTestEnv = true;
@@ -79,7 +79,7 @@ describe('resume-upload-fork', () => {
     const group = block.querySelector('[role="radiogroup"]');
     expect(group.getAttribute('aria-labelledby')).to.equal(heading.id);
     const cards = [...group.querySelectorAll('[role="radio"]')];
-    expect(cards.map((c) => c.dataset.choice)).to.deep.equal(['sharpen', 'refine']);
+    expect(cards.map((c) => c.dataset.choice)).to.deep.equal(['sharpen', 'refresh']);
     expect(block.querySelector('.resume-upload-fork-actions')).to.exist;
   });
 
@@ -139,46 +139,46 @@ describe('resume-upload-fork', () => {
   it('selects the first card by default', async () => {
     const { block } = render();
     await decorate(block);
-    const [sharpen, refine] = block.querySelectorAll('[role="radio"]');
+    const [sharpen, refresh] = block.querySelectorAll('[role="radio"]');
     expect(sharpen.getAttribute('aria-checked')).to.equal('true');
     expect(sharpen.tabIndex).to.equal(0);
-    expect(refine.getAttribute('aria-checked')).to.equal('false');
-    expect(refine.tabIndex).to.equal(-1);
+    expect(refresh.getAttribute('aria-checked')).to.equal('false');
+    expect(refresh.tabIndex).to.equal(-1);
   });
 
   it('selects a card on click', async () => {
     const { block } = render();
     await decorate(block);
-    const [sharpen, refine] = block.querySelectorAll('[role="radio"]');
-    refine.click();
-    expect(refine.getAttribute('aria-checked')).to.equal('true');
+    const [sharpen, refresh] = block.querySelectorAll('[role="radio"]');
+    refresh.click();
+    expect(refresh.getAttribute('aria-checked')).to.equal('true');
     expect(sharpen.getAttribute('aria-checked')).to.equal('false');
   });
 
   it('moves the selection and focus with arrow keys and wraps', async () => {
     const { block } = render();
     await decorate(block);
-    const [sharpen, refine] = block.querySelectorAll('[role="radio"]');
+    const [sharpen, refresh] = block.querySelectorAll('[role="radio"]');
     key(sharpen, 'ArrowRight');
-    expect(refine.getAttribute('aria-checked')).to.equal('true');
-    expect(document.activeElement).to.equal(refine);
-    key(refine, 'ArrowDown');
+    expect(refresh.getAttribute('aria-checked')).to.equal('true');
+    expect(document.activeElement).to.equal(refresh);
+    key(refresh, 'ArrowDown');
     expect(sharpen.getAttribute('aria-checked')).to.equal('true');
     key(sharpen, 'ArrowUp');
-    expect(refine.getAttribute('aria-checked')).to.equal('true');
-    key(refine, 'ArrowLeft');
+    expect(refresh.getAttribute('aria-checked')).to.equal('true');
+    key(refresh, 'ArrowLeft');
     expect(sharpen.getAttribute('aria-checked')).to.equal('true');
   });
 
   it('selects the focused card with Space and ignores other keys', async () => {
     const { block } = render();
     await decorate(block);
-    const [sharpen, refine] = block.querySelectorAll('[role="radio"]');
-    refine.focus();
-    key(refine, 'Enter');
+    const [sharpen, refresh] = block.querySelectorAll('[role="radio"]');
+    refresh.focus();
+    key(refresh, 'Enter');
     expect(sharpen.getAttribute('aria-checked')).to.equal('true');
-    key(refine, ' ');
-    expect(refine.getAttribute('aria-checked')).to.equal('true');
+    key(refresh, ' ');
+    expect(refresh.getAttribute('aria-checked')).to.equal('true');
   });
 
   it('renders the authored links as non-navigating block buttons', async () => {
@@ -203,7 +203,7 @@ describe('resume-upload-fork', () => {
     block.querySelector('[data-action="continue-fork"]').click();
     expect(events).to.deep.equal([
       { action: 'continue-fork', choice: 'sharpen' },
-      { action: 'continue-fork', choice: 'refine' },
+      { action: 'continue-fork', choice: 'refresh' },
     ]);
   });
 
@@ -211,7 +211,7 @@ describe('resume-upload-fork', () => {
     const { block } = render();
     await decorate(block);
     block.querySelector('[data-action="cancel-fork"]').click();
-    expect(events).to.deep.equal([{ action: 'cancel-fork' }]);
+    expect(events).to.deep.equal([{ action: 'cancel-fork', dismiss: 'cancel' }]);
   });
 
   describe('in a Milo modal', () => {
@@ -223,6 +223,8 @@ describe('resume-upload-fork', () => {
     });
 
     it('closes the modal after a choice', async () => {
+      // CI's Linux Chrome can report reduced motion, which skips the exit animation.
+      await emulateMedia({ reducedMotion: 'no-preference' });
       const { block, dialog, curtain } = render(true);
       await decorate(block);
       const closed = new Promise((resolve) => {
@@ -236,6 +238,111 @@ describe('resume-upload-fork', () => {
       expect(detail.id).to.equal('resume-upload-fork');
       expect(dialog.isConnected).to.be.false;
       expect(curtain.isConnected).to.be.false;
+    });
+
+    it('closes without the exit animation when reduced motion is preferred', async () => {
+      await emulateMedia({ reducedMotion: 'reduce' });
+      const { block, dialog } = render(true);
+      await decorate(block);
+      const closed = new Promise((resolve) => {
+        window.addEventListener('milo:modal:closed', resolve, { once: true });
+      });
+      block.querySelector('[data-action="continue-fork"]').click();
+      expect(dialog.classList.contains('is-closing')).to.be.false;
+      await closed;
+      expect(dialog.isConnected).to.be.false;
+      await emulateMedia({ reducedMotion: 'no-preference' });
+    });
+
+    it('focuses the container on open, then Tab moves to the selected card', async () => {
+      const { block, dialog } = render(true);
+      await decorate(block);
+      const close = document.createElement('button');
+      close.className = 'dialog-close';
+      dialog.prepend(close);
+      const [, refresh] = block.querySelectorAll('.resume-upload-fork-card');
+      refresh.click();
+      refresh.focus();
+      window.dispatchEvent(new CustomEvent('milo:modal:loaded', { detail: { id: dialog.id } }));
+      expect(document.activeElement).to.equal(dialog);
+      expect(dialog.tabIndex).to.equal(-1);
+
+      key(dialog, 'Tab');
+      expect(document.activeElement).to.equal(refresh);
+
+      dialog.focus();
+      dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }));
+      expect(document.activeElement).to.equal(close);
+    });
+
+    it('ignores milo:modal:loaded for other modals', async () => {
+      const { block } = render(true);
+      await decorate(block);
+      const card = block.querySelector('.resume-upload-fork-card');
+      card.focus();
+      window.dispatchEvent(new CustomEvent('milo:modal:loaded', { detail: { id: 'other' } }));
+      expect(document.activeElement).to.equal(card);
+    });
+
+    it('reports how the modal was dismissed without a choice', async () => {
+      const dismissVia = async (trigger) => {
+        events = [];
+        const { block, dialog, curtain } = render(true);
+        await decorate(block);
+        const close = document.createElement('button');
+        close.className = 'dialog-close';
+        close.addEventListener('click', () => dialog.closeCallback());
+        dialog.prepend(close);
+        curtain.addEventListener('click', (e) => {
+          if (e.target === curtain) dialog.closeCallback();
+        });
+        const onEscape = (e) => e.key === 'Escape' && close.click();
+        document.addEventListener('keydown', onEscape);
+        window.dispatchEvent(new CustomEvent('milo:modal:loaded', { detail: { id: dialog.id } }));
+        trigger({ dialog, close, curtain });
+        document.removeEventListener('keydown', onEscape);
+        return events;
+      };
+      expect(await dismissVia(({ close }) => close.click()))
+        .to.deep.equal([{ action: 'cancel-fork', dismiss: 'close' }]);
+      expect(await dismissVia(({ dialog }) => key(dialog, 'Escape')))
+        .to.deep.equal([{ action: 'cancel-fork', dismiss: 'escape' }]);
+      expect(await dismissVia(({ curtain }) => curtain.click()))
+        .to.deep.equal([{ action: 'cancel-fork', dismiss: 'outside' }]);
+      expect(await dismissVia(({ dialog }) => dialog.closeCallback()))
+        .to.deep.equal([{ action: 'cancel-fork', dismiss: 'other' }]);
+    });
+
+    it('does not report a dismissal after a choice', async () => {
+      const { block } = render(true);
+      await decorate(block);
+      block.querySelector('[data-action="continue-fork"]').click();
+      expect(events).to.deep.equal([{ action: 'continue-fork', choice: 'sharpen' }]);
+    });
+
+    it('tags a mobile swipe close for click tracking', async () => {
+      await setViewport({ width: 375, height: 800 });
+      try {
+        const { block, dialog } = render(true);
+        await decorate(block);
+        const close = document.createElement('button');
+        close.className = 'dialog-close';
+        close.setAttribute('daa-ll', 'milo:modalClose:buttonClose');
+        let clickedLabel = null;
+        close.addEventListener('click', () => {
+          clickedLabel = close.getAttribute('daa-ll');
+          dialog.closeCallback();
+        });
+        dialog.prepend(close);
+        const touch = (type, clientY) => dialog.dispatchEvent(new TouchEvent(type, { touches: type === 'touchend' ? [] : [new Touch({ identifier: 1, target: dialog, clientY })] }));
+        touch('touchstart', 0);
+        touch('touchmove', 200);
+        touch('touchend');
+        expect(clickedLabel).to.equal('milo:modalClose:swipeClose');
+        expect(events).to.deep.equal([{ action: 'cancel-fork', dismiss: 'swipe' }]);
+      } finally {
+        await setViewport({ width: 800, height: 600 });
+      }
     });
 
     describe('swipe to close', () => {
@@ -253,6 +360,7 @@ describe('resume-upload-fork', () => {
       afterEach(() => setViewport({ width: 800, height: 600 }));
 
       it('closes the drawer after a long swipe down on mobile', async () => {
+        await emulateMedia({ reducedMotion: 'no-preference' });
         await setViewport({ width: 375, height: 800 });
         const { block, dialog } = render(true);
         await decorate(block);
@@ -267,7 +375,7 @@ describe('resume-upload-fork', () => {
         expect(dialog.classList.contains('is-dragging')).to.be.false;
         expect(dialog.classList.contains('is-closing')).to.be.true;
         expect((await closed).id).to.equal('resume-upload-fork');
-        expect(events).to.deep.equal([]);
+        expect(events).to.deep.equal([{ action: 'cancel-fork', dismiss: 'swipe' }]);
       });
 
       it('snaps the drawer back after a short or cancelled swipe', async () => {

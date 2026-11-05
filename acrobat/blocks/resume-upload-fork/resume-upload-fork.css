@@ -1,8 +1,4 @@
-/* Shared with da-dc: use literal values only, no tokens from site-level stylesheets. */
-
-/* Mobile first: base styles are the mobile drawer; 600px+ is the tablet modal; 1200px+ is desktop. */
-
-/* Adobe Clean Display fallback, matching express/code/styles/styles.css */
+/* Shared verbatim with da-dc: literal values only, no site-level tokens. */
 @font-face {
   font-family: 'Arial Bold Adjusted';
   font-weight: 900;
@@ -13,7 +9,6 @@
   src: local('Arial Bold'), local('Arial-BoldMT'), local('ArialBold');
 }
 
-/* ---------- Block ---------- */
 .resume-upload-fork {
   color: #292929;
   text-align: start;
@@ -24,7 +19,8 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 24px 16px 16px;
+  padding-block: 24px 16px;
+  padding-inline: 16px;
 }
 
 .resume-upload-fork-header {
@@ -143,7 +139,8 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  padding-block: 16px calc(16px + env(safe-area-inset-bottom));
+  padding-inline: 16px;
   background: #fff;
 }
 
@@ -155,7 +152,8 @@
   box-sizing: border-box;
   min-height: 40px;
   margin: 0;
-  padding: 9px 22px;
+  padding-block: 9px;
+  padding-inline: 22px;
   border: 2px solid #000;
   border-radius: 20px;
   background: transparent;
@@ -186,7 +184,6 @@
   outline-offset: 2px;
 }
 
-/* ---------- Milo modal overrides (scoped to this block's dialog): mobile drawer ---------- */
 .dialog-modal.resume-upload-fork-modal {
   --drawer-drag-y: 0;
 
@@ -196,8 +193,7 @@
   flex-direction: column;
   width: 100%;
   max-width: none;
-  /* stylelint-disable-next-line unit-no-unknown */
-  max-height: 95dvh;
+  max-height: 95%;
   margin: 0;
   overflow: hidden;
   border-radius: 16px 16px 0 0;
@@ -209,6 +205,10 @@
 
 .dialog-modal.resume-upload-fork-modal.is-dragging {
   transition: none;
+}
+
+.dialog-modal.resume-upload-fork-modal:focus {
+  outline: none;
 }
 
 .dialog-modal.resume-upload-fork-modal.is-closing {
@@ -241,8 +241,8 @@
 
 /* Visually hidden, not display:none: Milo's focus loop returns focus to the close button. */
 .dialog-modal.resume-upload-fork-modal button.dialog-close {
-  top: 0;
-  right: 0;
+  top: 8px;
+  right: 8px;
   left: auto;
   display: flex;
   align-items: center;
@@ -251,18 +251,21 @@
   height: 1px;
   overflow: hidden;
   border: 0;
-  background: #fff url('close.svg') center / 22px 22px no-repeat;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath fill='%23292929' fill-rule='evenodd' d='M12.7286 10.9998L17.9756 5.75287C18.453 5.27544 18.453 4.502 17.9756 4.02457C17.4982 3.54715 16.7247 3.54715 16.2473 4.02457L11.0003 9.27154L5.75336 4.02457C5.27593 3.54715 4.50248 3.54715 4.02506 4.02457C3.54764 4.502 3.54764 5.27544 4.02506 5.75287L9.27202 10.9998L4.02506 16.2468C3.54764 16.7242 3.54764 17.4977 4.02506 17.9751C4.26377 18.2138 4.57649 18.3332 4.88921 18.3332C5.20193 18.3332 5.51464 18.2138 5.75336 17.9751L11.0003 12.7281L16.2473 17.9751C16.486 18.2138 16.7987 18.3332 17.1114 18.3332C17.4241 18.3332 17.7369 18.2138 17.9756 17.9751C18.453 17.4977 18.453 16.7242 17.9756 16.2468L12.7286 10.9998Z'/%3E%3C/svg%3E") center / 22px 22px no-repeat;
   clip-path: inset(50%);
   white-space: nowrap;
   z-index: 2;
 }
 
-/* Replaces Milo's built-in icon with the Figma icon (close.svg, resolved relative to this file). */
 .dialog-modal.resume-upload-fork-modal button.dialog-close svg {
   display: none;
 }
 
 .dialog-modal.resume-upload-fork-modal button.dialog-close:focus-visible {
+  width: 40px;
+  height: 40px;
+  overflow: visible;
+  clip-path: none;
   outline: 2px solid #4b75ff;
   outline-offset: 2px;
 }
@@ -277,11 +280,11 @@
   animation: resume-upload-fork-curtain-out 200ms ease-in forwards;
 }
 
-/* ---------- Tablet: centered modal ---------- */
 @media (width >= 600px) {
   .resume-upload-fork-body {
     gap: 24px;
-    padding: 32px 32px 12px;
+    padding-block: 32px 12px;
+    padding-inline: 32px;
   }
 
   .resume-upload-fork-header {
@@ -298,8 +301,8 @@
 
   .resume-upload-fork-card-media {
     width: auto;
-    height: 126px;
     min-height: 0;
+    aspect-ratio: 276 / 162;
   }
 
   .resume-upload-fork-card-media.has-mobile-image .resume-upload-fork-image-desktop {
@@ -316,7 +319,8 @@
   }
 
   .resume-upload-fork-actions {
-    padding: 16px 32px 24px;
+    padding-block: 16px 24px;
+    padding-inline: 32px;
   }
 
   .resume-upload-fork .resume-upload-fork-button {
@@ -327,7 +331,6 @@
     content: none;
   }
 
-  /* Restores Milo's centered modal positioning. */
   .dialog-modal.resume-upload-fork-modal {
     top: 0;
     width: min(536px, 100% - 64px);
@@ -365,14 +368,9 @@
   }
 }
 
-/* ---------- Desktop ---------- */
 @media (width >= 1200px) {
   .resume-upload-fork-cards {
     gap: 24px;
-  }
-
-  .resume-upload-fork-card-media {
-    height: 144px;
   }
 
   .dialog-modal.resume-upload-fork-modal {

@@ -5,7 +5,12 @@ import sinon from 'sinon';
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
 import { delay } from '../../helpers/waitfor.js';
 
-const { default: init, initResumeFork, RESUME_FORK_MODAL_ID } = await import(
+const {
+  default: init,
+  initResumeFork,
+  flagResumeFork,
+  RESUME_FORK_MODAL_ID,
+} = await import(
   '../../../acrobat/blocks/verb-marquee/verb-marquee.js'
 );
 
@@ -54,12 +59,37 @@ describe('verb-marquee block', () => {
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.verb-marquee');
     await init(block);
+    const { default: decorateFork } = await import('../../../acrobat/blocks/resume-upload-fork/resume-upload-fork.js');
+    const forkHtml = await readFile({ path: '../resume-upload-fork/mocks/default.html' });
+    const fork = new DOMParser().parseFromString(forkHtml, 'text/html').querySelector('.resume-upload-fork');
+    document.body.append(fork);
+    await decorateFork(fork);
     const onModalOpen = sinon.spy();
+    const onResponse = sinon.spy();
+    const verbAnalytics = sinon.stub(window.analytics, 'verbAnalytics');
+    const splunk = sinon.stub(window.analytics, 'sendAnalyticsToSplunk');
     window.addEventListener('modal:open', onModalOpen);
+    block.addEventListener('unity:resume-fork-response', onResponse);
     block.dispatchEvent(new CustomEvent('unity:show-resume-fork'));
     window.removeEventListener('modal:open', onModalOpen);
     expect(onModalOpen.calledOnce).to.be.true;
     expect(onModalOpen.firstCall.args[0].detail).to.deep.equal({ hash: `#${RESUME_FORK_MODAL_ID}` });
+    window.dispatchEvent(new CustomEvent('milo:modal:loaded', { detail: { id: RESUME_FORK_MODAL_ID } }));
+    fork.querySelectorAll('[role="radio"]')[1].click();
+    fork.querySelector('[data-action="continue-fork"]').click();
+    window.dispatchEvent(new CustomEvent('milo:modal:closed', { detail: { id: RESUME_FORK_MODAL_ID } }));
+    expect(onResponse.calledOnce).to.be.true;
+    expect(onResponse.firstCall.args[0].detail).to.deep.equal({
+      action: 'continue-fork',
+      choice: 'refresh',
+    });
+    const expectedEvents = ['fork-modal:shown', 'fork-modal:continue-refresh'];
+    expect(verbAnalytics.getCalls().map((call) => call.args[0])).to.deep.equal(expectedEvents);
+    expect(splunk.getCalls().map((call) => call.args[0])).to.deep.equal(expectedEvents);
+    expect(verbAnalytics.firstCall.args[1]).to.equal('word-to-pdf');
+    expect(verbAnalytics.firstCall.args[2]).to.have.keys('userAttempts', 'noOfFiles');
+    expect(splunk.firstCall.args[2]).to.deep.equal(verbAnalytics.firstCall.args[2]);
+    expect(splunk.firstCall.args[3]).to.equal('https://unity-stage.adobe.io/api/v1/log');
   });
 
   it('show error toast', async () => {
@@ -193,21 +223,27 @@ describe('verb-marquee resume fork', () => {
   let element;
   let responses;
   let modalOpens;
+  let tracked;
+  let cleanup;
   const onModalOpen = (e) => modalOpens.push(e.detail);
   const select = (detail) => window.dispatchEvent(new CustomEvent('resume-upload-fork:select', { detail }));
   const closeModal = (id) => window.dispatchEvent(new CustomEvent('milo:modal:closed', { detail: { id } }));
+  const loadModal = (id) => window.dispatchEvent(new CustomEvent('milo:modal:loaded', { detail: { id } }));
+  const showFork = () => element.dispatchEvent(new CustomEvent('unity:show-resume-fork'));
 
   beforeEach(() => {
     element = document.createElement('div');
     const received = [];
     responses = received;
     modalOpens = [];
+    tracked = [];
     element.addEventListener('unity:resume-fork-response', (e) => received.push(e.detail));
     window.addEventListener('modal:open', onModalOpen);
-    initResumeFork(element);
+    cleanup = initResumeFork(element, (name) => tracked.push(name));
   });
 
   afterEach(() => {
+    cleanup();
     window.removeEventListener('modal:open', onModalOpen);
   });
 
@@ -218,8 +254,8 @@ describe('verb-marquee resume fork', () => {
 
   it('forwards continue-fork with the chosen product to Unity', () => {
     element.dispatchEvent(new CustomEvent('unity:show-resume-fork'));
-    select({ action: 'continue-fork', choice: 'refine' });
-    expect(responses).to.deep.equal([{ action: 'continue-fork', choice: 'refine' }]);
+    select({ action: 'continue-fork', choice: 'refresh' });
+    expect(responses).to.deep.equal([{ action: 'continue-fork', choice: 'refresh' }]);
   });
 
   it('forwards cancel-fork to Unity', () => {
@@ -248,5 +284,113 @@ describe('verb-marquee resume fork', () => {
     select({ action: 'continue-fork', choice: 'sharpen' });
     closeModal(RESUME_FORK_MODAL_ID);
     expect(responses).to.deep.equal([]);
+  });
+
+  it('stops listening after cleanup', () => {
+    cleanup();
+    element.dispatchEvent(new CustomEvent('unity:show-resume-fork'));
+    select({ action: 'continue-fork', choice: 'sharpen' });
+    expect(modalOpens).to.deep.equal([]);
+    expect(responses).to.deep.equal([]);
+  });
+
+  describe('analytics', () => {
+    it('tracks the modal being shown only for a requested fork modal', () => {
+      loadModal(RESUME_FORK_MODAL_ID);
+      showFork();
+      loadModal('some-other-modal');
+      loadModal(RESUME_FORK_MODAL_ID);
+      expect(tracked).to.deep.equal(['fork-modal:shown']);
+    });
+
+    ['sharpen', 'refresh'].forEach((choice) => {
+      it(`tracks continue on ${choice}`, () => {
+        showFork();
+        select({ action: 'continue-fork', choice });
+        closeModal(RESUME_FORK_MODAL_ID);
+        expect(tracked).to.deep.equal([`fork-modal:continue-${choice}`]);
+      });
+    });
+
+    it('tracks Cancel as a bounce', () => {
+      showFork();
+      select({ action: 'cancel-fork', dismiss: 'cancel' });
+      closeModal(RESUME_FORK_MODAL_ID);
+      expect(tracked).to.deep.equal(['fork-modal:bounce:cancel']);
+    });
+
+    it('tracks the exit method of a bounce without passing it to Unity', () => {
+      showFork();
+      select({ action: 'cancel-fork', dismiss: 'escape' });
+      expect(tracked).to.deep.equal(['fork-modal:bounce:escape']);
+      expect(responses).to.deep.equal([{ action: 'cancel-fork' }]);
+    });
+
+    it('tracks closing the modal with no exit method as a bounce', () => {
+      showFork();
+      closeModal(RESUME_FORK_MODAL_ID);
+      expect(tracked).to.deep.equal(['fork-modal:bounce:other']);
+    });
+
+    it('tracks nothing when Unity has not asked', () => {
+      select({ action: 'continue-fork', choice: 'sharpen' });
+      closeModal(RESUME_FORK_MODAL_ID);
+      expect(tracked).to.deep.equal([]);
+    });
+  });
+});
+
+describe('verb-marquee flagResumeFork', () => {
+  let element;
+  let meta;
+  let originalIms;
+  const resolvedIms = () => Promise.resolve();
+
+  const setSignedIn = (signedIn) => {
+    window.adobeIMS = { isSignedInUser: () => signedIn };
+  };
+
+  beforeEach(() => {
+    element = document.createElement('div');
+    originalIms = window.adobeIMS;
+    meta = document.createElement('meta');
+    meta.name = `-${RESUME_FORK_MODAL_ID}`;
+    meta.content = '/acrobat/fragments/resume-fork';
+    document.head.append(meta);
+  });
+
+  afterEach(() => {
+    meta.remove();
+    window.adobeIMS = originalIms;
+  });
+
+  it('flags logged-out users when the fork metadata is set', async () => {
+    setSignedIn(false);
+    await flagResumeFork(element, resolvedIms);
+    expect(element.dataset.showResumeFork).to.equal('true');
+  });
+
+  it('does not flag signed-in users', async () => {
+    setSignedIn(true);
+    await flagResumeFork(element, resolvedIms);
+    expect(element.hasAttribute('data-show-resume-fork')).to.be.false;
+  });
+
+  it('does not flag pages without the fork metadata', async () => {
+    meta.remove();
+    setSignedIn(false);
+    let imsRequested = false;
+    await flagResumeFork(element, () => {
+      imsRequested = true;
+      return Promise.resolve();
+    });
+    expect(element.hasAttribute('data-show-resume-fork')).to.be.false;
+    expect(imsRequested).to.be.false;
+  });
+
+  it('does not flag when IMS fails to load', async () => {
+    setSignedIn(false);
+    await flagResumeFork(element, () => Promise.reject(new Error('IMS timeout')));
+    expect(element.hasAttribute('data-show-resume-fork')).to.be.false;
   });
 });

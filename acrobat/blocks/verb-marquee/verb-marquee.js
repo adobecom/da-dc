@@ -1,6 +1,7 @@
 import { setLibs, isOldBrowser, loadPlaceholders, getEnv as getAppEnv } from '../../scripts/utils.js';
 import { localeMap } from '../unity/unity.js';
 
+const miloLibs = setLibs('/libs');
 const MB100 = 104857600;
 const MB20 = 20971520;
 const PDF_ONLY = ['.pdf'];
@@ -19,30 +20,53 @@ export const LIMITS = {
 
 export const RESUME_FORK_MODAL_ID = 'resume-upload-fork';
 
-// Unity asks for the product-fork modal after validating an upload (A/B challenger only).
-// The resume-upload-fork block (authored in the modal fragment) reports the user's choice,
-// which is forwarded back to Unity. Closing the modal any other way counts as cancel.
-export function initResumeFork(element) {
+// Keep in sync with SELECT_EVENT / ACTIONS in blocks/resume-upload-fork/resume-upload-fork.js
+const FORK_SELECT_EVENT = 'resume-upload-fork:select';
+const FORK_ACTIONS = { continue: 'continue-fork', cancel: 'cancel-fork' };
+
+// Closing the fork modal without choosing counts as cancel.
+export function initResumeFork(element, track = () => {}) {
+  const controller = new AbortController();
+  const { signal } = controller;
   let awaitingResponse = false;
-  const respond = (detail) => {
+  const respond = (detail, dismiss = 'other') => {
     if (!awaitingResponse) return;
     awaitingResponse = false;
+    track(detail.action === FORK_ACTIONS.continue
+      ? `fork-modal:continue-${detail.choice}`
+      : `fork-modal:bounce:${dismiss}`);
     element.dispatchEvent(new CustomEvent('unity:resume-fork-response', { detail }));
   };
   element.addEventListener('unity:show-resume-fork', () => {
     awaitingResponse = true;
     window.dispatchEvent(new CustomEvent('modal:open', { detail: { hash: `#${RESUME_FORK_MODAL_ID}` } }));
-  });
-  window.addEventListener('resume-upload-fork:select', (e) => {
-    const { action, choice } = e.detail || {};
-    respond(action === 'continue-fork' ? { action, choice } : { action: 'cancel-fork' });
-  });
+  }, { signal });
+  window.addEventListener(FORK_SELECT_EVENT, (e) => {
+    const { action, choice, dismiss } = e.detail || {};
+    if (action === FORK_ACTIONS.continue) respond({ action, choice });
+    else respond({ action: FORK_ACTIONS.cancel }, dismiss);
+  }, { signal });
+  window.addEventListener('milo:modal:loaded', (e) => {
+    if (awaitingResponse && e.detail?.id === RESUME_FORK_MODAL_ID) track('fork-modal:shown');
+  }, { signal });
   window.addEventListener('milo:modal:closed', (e) => {
-    if (e.detail?.id === RESUME_FORK_MODAL_ID) respond({ action: 'cancel-fork' });
-  });
+    if (e.detail?.id === RESUME_FORK_MODAL_ID) respond({ action: FORK_ACTIONS.cancel });
+  }, { signal });
+  return () => controller.abort();
 }
 
-const miloLibs = setLibs('/libs');
+// Unity reads data-show-resume-fork to decide whether to request the fork modal.
+export async function flagResumeFork(element, loadIms) {
+  const { getMetadata } = await import(`${miloLibs}/utils/utils.js`);
+  if (!getMetadata(`-${RESUME_FORK_MODAL_ID}`)) return;
+  try {
+    await loadIms();
+  } catch {
+    return;
+  }
+  if (!window.adobeIMS?.isSignedInUser()) element.dataset.showResumeFork = 'true';
+}
+
 let createTag;
 let getConfig;
 let loadStyle;
@@ -341,7 +365,8 @@ function getAuthoredSvgInfo(foregroundEl, headlineEl) {
 }
 
 export default async function init(element) {
-  ({ createTag, getConfig, loadStyle } = (await import(`${miloLibs}/utils/utils.js`)));
+  const miloUtils = await import(`${miloLibs}/utils/utils.js`);
+  ({ createTag, getConfig, loadStyle } = miloUtils);
   ({ decorateBlockBg } = (await import(`${miloLibs}/utils/decorate.js`)));
 
   element.classList.add('con-block');
@@ -867,7 +892,10 @@ export default async function init(element) {
     });
   }
   runWhenDocumentIsReady(soloUpload);
-  initResumeFork(element);
+  initResumeFork(element, (eventName) => (
+    handleAnalyticsEvent(eventName, mergeData({ userAttempts }))
+  ));
+  flagResumeFork(element, miloUtils.loadIms);
   element.addEventListener('unity:track-analytics', (e) => {
     const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
     const { event, data } = e.detail || {};
