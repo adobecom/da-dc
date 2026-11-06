@@ -9,7 +9,7 @@ window.fetch = jest.fn((url) => {
     status: 200,
     json: () => {
       if (url.includes('dc-shared/placeholders.json')) {
-        return Promise.resolve({ data: [{ key: 'phone-business', value: '800\u00A0915\u00A09430' }]});
+        return Promise.resolve({ data: [{ key: 'phone-business', value: '800\u00A0915\u00A09430' }] });
       }
       return Promise.resolve({ country: 'us' });
     },
@@ -18,9 +18,7 @@ window.fetch = jest.fn((url) => {
 });
 
 // Mocking sessionStorage
-global.sessionStorage = {
-  getItem: jest.fn(() => JSON.stringify({ country: 'us' })),
-};
+global.sessionStorage = { getItem: jest.fn(() => JSON.stringify({ country: 'us' })) };
 
 // Mocking window.location
 delete window.location;
@@ -64,7 +62,7 @@ describe('geoPhoneNumber', () => {
     const phoneLink = document.querySelector('.geo-pn3 a');
     expect(phoneLink.textContent).toEqual('800 915 9430');
     expect(phoneLink.href).toEqual('tel:800 915 9430');
-  })
+  });
 });
 
 describe('geoPhoneNumber - locale resolution and link repair', () => {
@@ -121,6 +119,8 @@ describe('geoPhoneNumber - locale resolution and link repair', () => {
     delete window.location;
     window.location = originalLocation;
   });
+
+  afterEach(() => jest.useRealTimers());
 
   beforeEach(() => {
     window.sessionStorage.clear();
@@ -225,10 +225,24 @@ describe('geoPhoneNumber - locale resolution and link repair', () => {
   });
 
   it('updates fragment links once numbers are ready', async () => {
-    document.body.innerHTML = '<div class="fragment"><a href="tel:phone business geo">phone business geo</a></div>';
+    document.body.innerHTML = '<div class="fragment"><a href="tel:phone business geo">0800 752 2580</a></div>';
     setLocation('/de/acrobat.html', '?akamaiLocale=ch');
     await geoPhoneNumber(locales);
     expect(sheetUrls()).toEqual(['/ch_de/dc-shared/placeholders.json']);
     expect(link().getAttribute('href')).toBe('tel: 0800 000890');
+  });
+
+  it('keeps links dialable and stops waiting when geo2 hangs', async () => {
+    jest.useFakeTimers();
+    const routes = mockFetch();
+    window.fetch = jest.fn((url) => (url.startsWith('https://geo2') ? new Promise(() => {}) : routes(url)));
+    setLocation('/de/acrobat.html');
+    const done = geoPhoneNumber(locales);
+    expect(link().getAttribute('href')).toBe('tel:08007522580');
+    expect(sheetUrls()).toEqual([]);
+    await jest.advanceTimersByTimeAsync(3000);
+    await done;
+    expect(sheetUrls()).toEqual(['/de/dc-shared/placeholders.json']);
+    expect(link().getAttribute('href')).toBe('tel:0800 752 2580');
   });
 });
