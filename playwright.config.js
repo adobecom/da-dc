@@ -36,7 +36,7 @@ const config = {
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 3 : 3,
-  workers: process.env.CI ? 7 : 7,
+  workers: process.env.CI && process.env.BROWSER === 'chromium' ? 3 : 7,
   reporter: process.env.CI
     ? [['github'], ['list'], ['html', { outputFolder: 'test-html-results', open: 'never' }], ['./nala/utils/base-reporter.js']]
     : [['html', { outputFolder: 'test-html-results' }], ['list'], ['./nala/utils/base-reporter.js']],
