@@ -1,4 +1,3 @@
-/* eslint-disable compat/compat */
 import { setLibs, getEnv, isOldBrowser, getLanaErrorName } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
