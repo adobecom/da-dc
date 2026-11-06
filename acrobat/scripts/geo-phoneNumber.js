@@ -1,5 +1,3 @@
-/* eslint-disable compat/compat */
-
 export default async function geoPhoneNumber() {
   const geoTwo = await fetch('https://geo2.adobe.com/json/');
   const urlParams = new URLSearchParams(window.location.search);

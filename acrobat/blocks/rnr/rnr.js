@@ -1,5 +1,4 @@
 /* eslint-disable func-names */
-/* eslint-disable compat/compat */
 /* eslint-disable max-len */
 import localeMap from '../../scripts/maps/localeMap.js';
 import { loadPlaceholders, setLibs } from '../../scripts/utils.js';
