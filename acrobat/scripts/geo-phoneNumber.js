@@ -47,7 +47,7 @@ function getCandidates(saved, locales, pagePrefix) {
 }
 
 const placeholderUrl = (prefix) => `${prefix ? `/${prefix}` : ''}/dc-shared/placeholders.json`;
-const fragKey = (link) => `phone-${link.href.split(' ')[1]}`;
+const fragKey = (link) => `phone-${(link.dataset.telPlaceholder || link.href).split(' ')[1]}`;
 
 function getNeededKeys() {
   const keys = [
@@ -89,17 +89,31 @@ function repairTelLinks() {
   document.querySelectorAll('a[href^="tel:"]').forEach((a) => {
     if (hasDigits(a.getAttribute('href'))) return;
     const number = a.textContent.replace(/[^\d+]/g, '');
-    if (/\d{5,}/.test(number)) a.href = `tel:${number}`;
+    if (!/\d{5,}/.test(number)) return;
+    a.dataset.telPlaceholder = a.getAttribute('href');
+    a.href = `tel:${number}`;
   });
+}
+
+const GEO_TIMEOUT_MS = 3000;
+
+function fetchGeo() {
+  let timer;
+  const timeout = new Promise((resolve) => {
+    timer = setTimeout(() => resolve({}), GEO_TIMEOUT_MS);
+  });
+  const geo = fetch('https://geo2.adobe.com/json/')
+    .then((resp) => resp.json())
+    .catch(() => ({}));
+  return Promise.race([geo, timeout]).finally(() => clearTimeout(timer));
 }
 
 export default async function geoPhoneNumber(locales) {
   const dcLocales = locales && typeof locales === 'object' ? locales : null;
+  repairTelLinks();
   try {
     const urlParams = new URLSearchParams(window.location.search);
-    const geoData = await fetch('https://geo2.adobe.com/json/')
-      .then((resp) => resp.json())
-      .catch(() => ({}));
+    const geoData = await fetchGeo();
 
     const saved = readSavedLocale('international')
     || urlParams.get('akamaiLocale')?.toLowerCase()
