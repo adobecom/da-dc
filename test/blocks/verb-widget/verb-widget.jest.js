@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+/* eslint-disable compat/compat */
 /* eslint-disable no-undef */
 import path from 'path';
 import fs from 'fs';
