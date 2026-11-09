@@ -9,15 +9,16 @@ const { default: init } = await import(
 );
 
 const VERB = 'tiff-to-pdf';
-const HERO_URL = `/acrobat/blocks/verb-widget/icons/${VERB}.svg`;
+const heroUrl = (verb) => `/acrobat/blocks/verb-widget/icons/${verb}.svg`;
+const HERO_URL = heroUrl(VERB);
 
-function makeBlock() {
+function makeBlock(verb = VERB) {
   const main = document.createElement('main');
   const section = document.createElement('div');
   section.style.display = 'none';
   const block = document.createElement('div');
-  block.className = `verb-widget ${VERB}`;
-  block.innerHTML = '<div><div><h1>TIFF to PDF</h1></div></div>';
+  block.className = `verb-widget ${verb}`;
+  block.innerHTML = '<div><div><h1>Convert to PDF</h1></div></div>';
   section.append(block);
   main.append(section);
   document.body.append(main);
@@ -55,12 +56,19 @@ describe('verb-widget hero image', () => {
     expect(window.fetch.calledWith(HERO_URL)).to.be.true;
     expect(block.querySelector('#drop-zone')).to.exist;
     expect(block.parentElement.style.display).to.equal('block');
-    const verbImage = block.querySelector('.verb-image');
-    expect(verbImage.classList.contains('generated')).to.be.true;
-    expect(verbImage.childElementCount).to.equal(0);
-    const { width, height } = verbImage.getBoundingClientRect();
+    expect(block.querySelector('.verb-image').childElementCount).to.equal(0);
+  });
+
+  it('keeps a non-square generated hero in proportion', async () => {
+    window.fetch.withArgs(heroUrl('png-to-pdf')).resolves(new Response('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 120" width="240" height="120"></svg>'));
+    const block = makeBlock('png-to-pdf');
+
+    await init(block);
+    await waitFor(() => block.querySelector('.verb-image svg'));
+
+    const { width, height } = block.querySelector('.verb-image').getBoundingClientRect();
     expect(width).to.be.above(0);
-    expect(height).to.be.closeTo(width, 0.5);
+    expect(height).to.be.closeTo(width / 2, 0.5);
   });
 
   it('shows the prerender snapshot hero right away, then swaps in the fetched SVG', async () => {

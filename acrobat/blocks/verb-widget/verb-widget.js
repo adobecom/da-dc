@@ -645,7 +645,6 @@ export default async function init(element) {
   if (authoredIcon) {
     fillVerbImage(authoredIcon);
   } else {
-    widgetImage.classList.add('generated');
     fillVerbImage(prerenderElement?.querySelector('.verb-image svg')?.cloneNode(true));
     createSvgElement(`${VERB}`).then(fillVerbImage);
   }
