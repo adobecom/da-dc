@@ -33,14 +33,9 @@ toRepoName=${repoParts[1]}
 prRepo=${prRepo:-$toRepoName}
 prOrg=${prOrg:-$toRepoOrg}
 
-# Handle PR Branch Live URL
-PR_BRANCH_LIVE_URL_GH="https://${FEATURE_BRANCH}--${prRepo}--${prOrg}.aem.live"
-
 # set pr branch url as env
-export PR_BRANCH_LIVE_URL_GH
 export PR_NUMBER
 
-echo "PR Branch live URL: $PR_BRANCH_LIVE_URL_GH"
 
 # Convert GitHub Tag(@) labels that can be grepped
 for label in ${labels}; do
@@ -67,7 +62,12 @@ echo "*******************************"
 # Navigate to the GitHub Action path and install dependencies
 cd "$GITHUB_ACTION_PATH" || exit
 npm ci
-npx playwright install --with-deps
+# Browser binaries come from the Actions cache when available; OS dependencies are always needed.
+if [[ "$PW_CACHE_HIT" == "true" ]]; then
+  npx playwright install-deps ${BROWSER:-}
+else
+  npx playwright install --with-deps ${BROWSER:-}
+fi
 
 # Build project flags — BROWSER env selects a single browser, otherwise all three run
 if [[ -n "$BROWSER" ]]; then

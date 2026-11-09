@@ -42,9 +42,12 @@ async function getGitHubPRBranchLiveUrl() {
   }
 
   try {
-    if (await isBranchURLValid(prBranchLiveUrl)) {
-      process.env.PR_BRANCH_LIVE_URL = prBranchLiveUrl;
+    // Do not fall back silently: an unreachable preview would make the run test main and report green.
+    if (!(await isBranchURLValid(prBranchLiveUrl))) {
+      console.error(`Error => PR branch test URL ${prBranchLiveUrl} is not reachable. Failing instead of testing main.`);
+      process.exit(1);
     }
+    process.env.PR_BRANCH_LIVE_URL = prBranchLiveUrl;
     console.info('GH Ref        : ', prReference);
     console.info('GH Head Ref   : ', prHeadReference);
     console.info('PR Repository : ', repository);

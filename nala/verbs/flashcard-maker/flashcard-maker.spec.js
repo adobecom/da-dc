@@ -9,10 +9,6 @@ module.exports = {
       data: {
         verbTitle: 'Adobe Acrobat',
         verbHeading: 'Flashcard maker',
-        sectionCounts: {
-          threeUp: 1,
-          twoUp: 2,
-        },
       },
       tags: '@flashcard-maker-test @smoke @regression @unity',
     },

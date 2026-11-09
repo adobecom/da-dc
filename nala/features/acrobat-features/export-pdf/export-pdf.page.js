@@ -1,20 +1,18 @@
-import BasePage from '../../../libs/basepage.js';
-
-export default class ExportPdfPage extends BasePage {
+export default class ExportPdfPage {
   constructor(page) {
-    super(page);
+    this.page = page;
 
-    this.heroMarquee = page.locator('div[class*="hero-marquee"]');
+    // Global nav, breadcrumbs and footer: structural selectors only (no copy or generated ids).
+    this.gnav = page.locator('header').first();
+    this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs');
+    this.footer = page.locator('footer').first();
 
-    /**
-     * Media + con-block promos that are not the hero marquee wrapper
-     * (`hero-marquee` must not appear on the same element).
-     */
-    this.mediaConBlocksOutsideHero = page.locator(
-      'div[class*="con-block"][class*="media"]:not([class*="hero-marquee"])',
-    );
+    this.heroMarquee = page.locator('.hero-marquee').first();
 
-    /** Aside strips with Reader + Chrome CTAs (expect 2 on Export PDF). */
+    /** Media promo blocks outside the hero marquee (exact `media` block class). */
+    this.mediaConBlocksOutsideHero = page.locator('div.media:not(.hero-marquee)');
+
+    /** Aside strips with Reader + Chrome CTAs. */
     this.asideBlocks = page.locator('div[class*="aside"]');
 
     this.editorialCards = page.locator('div.editorial-card');

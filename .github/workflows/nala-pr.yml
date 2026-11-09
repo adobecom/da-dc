@@ -20,7 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox, webkit]
+        # All browsers only for release (PR into main, or push to main). PRs into stage run Chromium only.
+        browser: ${{ fromJSON((github.base_ref == 'main' || github.ref_name == 'main') && '["chromium","firefox","webkit"]' || '["chromium"]') }}
         node-version: [20.x]
     steps:
       - name: Checkout repository
@@ -33,6 +34,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Cache Playwright browsers — ${{ matrix.browser }}
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ matrix.browser }}-${{ hashFiles('package-lock.json') }}
+
       - name: Set execute permission for pr.run.sh
         run: chmod +x ./nala/utils/pr.run.sh
 
@@ -40,6 +48,7 @@ jobs:
         run: ./nala/utils/pr.run.sh
         env:
           BROWSER: ${{ matrix.browser }}
+          PW_CACHE_HIT: ${{ steps.pw-cache.outputs.cache-hit }}
           labels: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
           branch: ${{ github.event.pull_request.head.ref }}
           repoName: ${{ github.repository }}
