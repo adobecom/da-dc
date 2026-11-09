@@ -82,7 +82,6 @@ test.describe('Unity Add Text to PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews block when present', async () => {
-      // Structure only: the review count is content, so it is checked as a number, not a value.
       if (await sections.hasRnr()) {
         await sections.rnr.scrollIntoViewIfNeeded();
         await expect(sections.rnr).toBeVisible();
@@ -112,7 +111,6 @@ test.describe('Unity Add Text to PDF test suite', () => {
         verbPage.dropZone.click(),
       ]);
       await fileChooser.setFiles(fixturePath);
-      // Unity hands off to acrobat.adobe.com; poll the final URL rather than one navigation commit.
       await expect(page).toHaveURL(/acrobat\.adobe/, { timeout: 60000 });
 
       const urlObj = new URL(page.url());

@@ -4,7 +4,6 @@
 const { execSync } = require('child_process');
 const { isBranchURLValid } = require('../libs/baseurl.js');
 
-// Dynamically load PROJECT, ORG, BASE_URLS
 let PROJECT; let ORG; let BASE_URLS; let
   getBranchUrl;
 try {
@@ -42,7 +41,6 @@ async function getGitHubPRBranchLiveUrl() {
   }
 
   try {
-    // Do not fall back silently: an unreachable preview would make the run test main and report green.
     if (!(await isBranchURLValid(prBranchLiveUrl))) {
       console.error(`Error => PR branch test URL ${prBranchLiveUrl} is not reachable. Failing instead of testing main.`);
       process.exit(1);

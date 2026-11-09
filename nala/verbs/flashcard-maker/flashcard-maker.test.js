@@ -97,7 +97,6 @@ test.describe('Unity Flashcard maker test suite', () => {
         flashcardMaker.dropZone.click(),
       ]);
       await fileChooser.setFiles(pdfFilePath);
-      // Unity hands off to acrobat.adobe.com; poll the final URL rather than one navigation commit.
       await expect(page).toHaveURL(/acrobat\.adobe/, { timeout: 60000 });
 
       const urlObj = new URL(page.url());

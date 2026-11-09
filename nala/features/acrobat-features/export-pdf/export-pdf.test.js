@@ -73,7 +73,6 @@ test.describe('Acrobat Features — Export PDF', () => {
       const merchCardPlans = page.locator('div[data-path*="/dc-shared/fragments/merch-cards/compare-acrobat-plans"]');
       const tabs = merchCardPlans.locator('button[id^="tab-compare-plans-"]');
 
-      // Scroll the first tab into view, then switch through each tab and verify merch cards render.
       await tabs.first().scrollIntoViewIfNeeded({ timeout: 30000 });
       const tabCount = await tabs.count();
       expect(tabCount).toBeGreaterThan(0);

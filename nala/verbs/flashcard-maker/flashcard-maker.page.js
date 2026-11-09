@@ -2,12 +2,10 @@ export default class FlashcardMakerPage {
   constructor(page) {
     this.page = page;
 
-    // Global nav, breadcrumbs and footer: structural selectors only (no copy or generated ids).
     this.gnav = page.locator('header').first();
     this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs');
     this.footer = page.locator('footer').first();
 
-    // Widget.
     this.root = page.locator('.unity-marquee.flashcard-maker').first();
     this.widget = this.root;
     this.dropZone = this.root.locator('.drop-zone.pu-add-sources');
@@ -20,7 +18,6 @@ export default class FlashcardMakerPage {
     this.ctaButton = this.root.locator('a.pu-cta');
     this.securityTooltip = this.root.locator('button.info-icon');
 
-    // Page sections, matched by block class or by the accordion's ARIA structure.
     this.editorialCards = page.locator('.editorial-card');
     this.carousels = page.locator('.carousel');
     this.faqSection = page.locator('.accordion-container, .accordion')

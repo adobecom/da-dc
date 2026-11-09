@@ -9,17 +9,14 @@ echo "GITHUB_REF: $GITHUB_REF"
 echo "GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
 
 if [[ "$GITHUB_REF" == refs/pull/* ]]; then
-  # extract PR number and branch name
   PR_NUMBER=$(echo "$GITHUB_REF" | awk -F'/' '{print $3}')
   FEATURE_BRANCH="$GITHUB_HEAD_REF"
 elif [[ "$GITHUB_REF" == refs/heads/* ]]; then
-  # extract branch name from GITHUB_REF
   FEATURE_BRANCH=$(echo "$GITHUB_REF" | awk -F'/' '{print $3}')
 else
   echo "Unknown reference format"
 fi
 
-# Replace "/" characters in the feature branch name with "-"
 FEATURE_BRANCH=$(echo "$FEATURE_BRANCH" | sed 's/\//-/g')
 
 echo "PR Number: ${PR_NUMBER:-"N/A"}"
@@ -33,11 +30,9 @@ toRepoName=${repoParts[1]}
 prRepo=${prRepo:-$toRepoName}
 prOrg=${prOrg:-$toRepoOrg}
 
-# set pr branch url as env
 export PR_NUMBER
 
 
-# Convert GitHub Tag(@) labels that can be grepped
 for label in ${labels}; do
   if [[ "$label" = \@* ]]; then
     label="${label:1}"
@@ -45,11 +40,8 @@ for label in ${labels}; do
   fi
 done
 
-# Remove the first pipe from tags if tags are not empty
 [[ ! -z "$TAGS" ]] && TAGS="${TAGS:1}" && TAGS="-g $TAGS"
 
-# Retrieve GitHub reporter parameter if not empty
-# Otherwise, use reporter settings in playwright.config.js
 REPORTER=$reporter
 [[ ! -z "$REPORTER" ]] && REPORTER="--reporter $REPORTER"
 
@@ -59,17 +51,14 @@ echo "Run Command : npx playwright test ${TAGS} ${EXCLUDE_TAGS} ${REPORTER}"
 echo -e "\n"
 echo "*******************************"
 
-# Navigate to the GitHub Action path and install dependencies
 cd "$GITHUB_ACTION_PATH" || exit
 npm ci
-# Browser binaries come from the Actions cache when available; OS dependencies are always needed.
 if [[ "$PW_CACHE_HIT" == "true" ]]; then
   npx playwright install-deps ${BROWSER:-}
 else
   npx playwright install --with-deps ${BROWSER:-}
 fi
 
-# Build project flags — BROWSER env selects a single browser, otherwise all three run
 if [[ -n "$BROWSER" ]]; then
   PROJECT_FLAGS="--project=da-dc-live-${BROWSER}"
 else
@@ -79,7 +68,6 @@ fi
 echo "*** Running tests on: ${BROWSER:-"all browsers"} ***"
 npx playwright test --config=./playwright.config.js ${TAGS} ${EXCLUDE_TAGS} ${PROJECT_FLAGS} ${REPORTER} || EXIT_STATUS=$?
 
-# Check if tests passed or failed
 if [ $EXIT_STATUS -ne 0 ]; then
   echo "Some tests failed. Exiting with error."
   exit $EXIT_STATUS

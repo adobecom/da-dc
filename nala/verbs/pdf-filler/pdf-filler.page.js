@@ -3,7 +3,6 @@ import ConverterPage from '../../libs/blocks/converter-page.js';
 
 export default class PdfFiller extends AcrobatWidget {
   constructor(page, nth = 0) {
-    // Widget class is the tool's Unity hook; it does not change with copy.
     super(page, '.verb-widget.fillsign.unity-enabled', nth);
 
     this.selectFilesButton = this.widget.locator('button.verb-cta');

@@ -96,7 +96,6 @@ test.describe('Unity Mind map test suite', () => {
         mindMap.dropZone.click(),
       ]);
       await fileChooser.setFiles(pdfFilePath);
-      // Unity hands off to acrobat.adobe.com; poll the final URL rather than one navigation commit.
       await expect(page).toHaveURL(/acrobat\.adobe/, { timeout: 60000 });
 
       const urlObj = new URL(page.url());
