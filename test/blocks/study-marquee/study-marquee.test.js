@@ -4,6 +4,7 @@ import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved
 import { delay } from '../../helpers/waitfor.js';
+import { hostRedDirLink } from '../../../acrobat/scripts/verbMarqueeUtils.js';
 
 const { default: init, LIMITS } = await import(
   '../../../acrobat/blocks/study-marquee/study-marquee.js'
@@ -1158,5 +1159,49 @@ describe('study-marquee block', () => {
     expect(legal.textContent).to.contain('By using this service');
     const links = legal.querySelectorAll('a.study-marquee-legal-url');
     expect(links.length).to.be.greaterThan(0);
+  });
+
+  it('redirects a signed-in user with an account type to the verb host link', async () => {
+    window.adobeIMS = {
+      isSignedInUser: () => true,
+      getAccountType: () => 'type1',
+    };
+    const destinations = [];
+    const onNavigate = (e) => {
+      destinations.push(e.destination.url);
+      e.preventDefault();
+    };
+    window.navigation.addEventListener('navigate', onNavigate);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    try {
+      await init(block);
+    } finally {
+      window.navigation.removeEventListener('navigate', onNavigate);
+    }
+    expect(destinations).to.deep.equal([hostRedDirLink('quiz-maker')]);
+  });
+
+  it('does not redirect a signed-in user without an account type', async () => {
+    window.adobeIMS = {
+      isSignedInUser: () => true,
+      getAccountType: () => '',
+    };
+    const destinations = [];
+    const onNavigate = (e) => {
+      destinations.push(e.destination.url);
+      e.preventDefault();
+    };
+    window.navigation.addEventListener('navigate', onNavigate);
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.study-marquee');
+    try {
+      await init(block);
+    } finally {
+      window.navigation.removeEventListener('navigate', onNavigate);
+    }
+    expect(destinations).to.be.empty;
   });
 });

@@ -62,6 +62,28 @@ describe('verb-widget block mobile tests', () => {
     expect(block).to.exist;
   });
 
+  it('tracks the app store button on iPhone for the sign widget', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-sign-pdf.html' });
+    Object.defineProperty(window.navigator, 'userAgent', {
+      value: USER_AGENTS.iPhone,
+      configurable: true,
+    });
+    window.browser = { ua: USER_AGENTS.iPhone };
+    setConfig({ ...getConfig(), locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-widget');
+    await init(block);
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+
+    const appButton = block.querySelector('.verb-mobile-cta');
+    const preventNavigation = (e) => e.preventDefault();
+    document.addEventListener('click', preventNavigation);
+    appButton.click();
+    document.removeEventListener('click', preventNavigation);
+
+    expect(block.querySelector('.verb-wrapper').classList.contains('mobile-app')).to.be.true;
+    expect(window.analytics.verbAnalytics.calledWith('goto-app:clicked', 'fillsign')).to.be.true;
+  });
+
   it('initializes correctly on Android with crop widget', async () => {
     document.body.innerHTML = await readFile({ path: './mocks/body-crop-pdf.html' });
 
