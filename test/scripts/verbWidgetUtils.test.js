@@ -6,6 +6,7 @@ import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs
 const {
   DC_ENV,
   FILE_PICKER_EVENTS,
+  SOLO_PICKER_EVENTS,
   bindFilePicker,
   bindUnityEvents,
   buildEarlyPrefetchUrl,
@@ -17,12 +18,14 @@ const {
   createUploadSession,
   createVerbImage,
   createWidgetFrame,
+  fireUpsellAnalytics,
   formatErrorLog,
   getAcceptValue,
   getAuthoredVerbIcon,
   getCookie,
   getCtaLabel,
   getSplunkEndpoint,
+  getStoreType,
   getVerbKey,
   handleSignedInUser,
   handleUpSell,
@@ -41,6 +44,7 @@ const {
   setDraggingClass,
   setUser,
   setupEarlyPrefetch,
+  startPageServices,
   trackAnalyticsEvent,
   uploadedTime,
 } = await import('../../acrobat/scripts/verbWidgetUtils.js');
@@ -184,6 +188,21 @@ describe('verbWidgetUtils', () => {
       registerAnalyticsLoader(createLogger('loader-b'));
       expect(addEventListener.withArgs('analyticsLoad').callCount).to.equal(2);
       expect(window.analytics).to.equal(existing);
+    });
+
+    it('does not report a failed analytics load when analyticsLoad fires twice', async function twiceLoaded() {
+      this.timeout(15000);
+      const wait = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
+      const fire = () => window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: 'compress-pdf', userAttempts: '1st' } }));
+      window.analytics = { verbAnalytics() {}, reviewAnalytics() {}, sendAnalyticsToSplunk() {} };
+      const stub = window.analytics.verbAnalytics;
+      registerAnalyticsLoader(createLogger('loader-twice'));
+      fire();
+      while (window.analytics.verbAnalytics === stub) await wait(100);
+      fire();
+      await wait(4000);
+      const messages = window.lana.log.getCalls().map((call) => call.args[0]);
+      expect(messages.filter((message) => message.includes('failed to initialize'))).to.deep.equal([]);
     });
 
     it('picks the splunk endpoint for an explicit env', () => {
@@ -486,6 +505,23 @@ describe('verbWidgetUtils', () => {
       expect(event.returnValue).to.be.true;
     });
 
+    it('warns on every close attempt while uploading but reports the closure once', () => {
+      session.track('uploading', {});
+      const attempts = [unload(), unload(), unload()];
+      attempts.forEach((event) => {
+        expect(event.preventDefault.calledOnce).to.be.true;
+        expect(event.returnValue).to.be.true;
+      });
+      expect(eventNames().filter((name) => name === 'job:browser-tab-closure')).to.have.lengthOf(1);
+    });
+
+    it('stops warning once the upload fails', () => {
+      session.track('uploading', {});
+      unload();
+      session.reportError({ code: 'error_generic', message: 'Oops' });
+      expect(unload().preventDefault.called).to.be.false;
+    });
+
     it('skips tab closure tracking after the upload finishes', () => {
       session.track('uploading', {});
       session.track('uploaded', {});
@@ -632,6 +668,147 @@ describe('verbWidgetUtils', () => {
       const callback = sinon.spy();
       onDocumentReady(callback);
       expect(callback.calledOnce).to.be.true;
+    });
+
+    it('waits for DOMContentLoaded while the document is loading', () => {
+      const callback = sinon.spy();
+      Object.defineProperty(document, 'readyState', { value: 'loading', configurable: true });
+      try {
+        onDocumentReady(callback);
+        expect(callback.called).to.be.false;
+        document.dispatchEvent(new Event('DOMContentLoaded'));
+        expect(callback.calledOnce).to.be.true;
+      } finally {
+        delete document.readyState;
+      }
+    });
+
+    it('detects the app store for the device', () => {
+      const original = window.browser;
+      const storeFor = (ua) => {
+        window.browser = { ua };
+        return getStoreType();
+      };
+      try {
+        expect(storeFor('Mozilla/5.0 (Linux; Android 13; Pixel)')).to.equal('google');
+        expect(storeFor(IPHONE_UA)).to.equal('apple');
+        expect(storeFor('Mozilla/5.0 (iPad; CPU OS 14_7_1 like Mac OS X)')).to.equal('apple');
+        expect(storeFor('Mozilla/5.0 (Windows NT 10.0; Win64; x64)')).to.equal('desktop');
+        const iPadOS = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15';
+        setUserAgent(iPadOS);
+        document.ontouchend = null;
+        expect(storeFor(iPadOS)).to.equal('apple');
+      } finally {
+        delete document.ontouchend;
+        window.browser = original;
+      }
+    });
+
+    it('fires upsell analytics when the LCP observer is unavailable', async () => {
+      const originalObserver = window.PerformanceObserver;
+      window.PerformanceObserver = class {
+        constructor() { throw new Error('unsupported'); }
+      };
+      window.adobeIMS = { isSignedInUser: () => false, getAccessToken: () => null };
+      window.alloy_getIdentity = Promise.resolve({ identity: { ECID: 'test-ecid' } });
+      // eslint-disable-next-line no-underscore-dangle
+      window._satellite = { track: sinon.spy() };
+      try {
+        await fireUpsellAnalytics('compress-pdf', '1st', logger);
+      } finally {
+        window.PerformanceObserver = originalObserver;
+      }
+      // eslint-disable-next-line no-underscore-dangle
+      const calls = window._satellite.track.getCalls();
+      const names = calls.map((c) => c.args[1]?.data?.web?.webInteraction?.name);
+      expect(names).to.include('acrobat:verb-compress-pdf:upsell:shown');
+      expect(window.lana.log.called).to.be.false;
+    });
+
+    it('logs a missing icon when the icon request fails', async () => {
+      sinon.stub(window, 'fetch').rejects(new TypeError('Failed to fetch'));
+      expect(await createSvgElement('unreachable-icon', logger)).to.be.null;
+      expect(window.lana.log.firstCall.args[0]).to.include('Icon not found: unreachable-icon');
+    });
+  });
+
+  describe('session events', () => {
+    const makeSession = (limits = {}) => createUploadSession({
+      verb: 'compress-pdf',
+      limits,
+      userAttempts: '1st',
+      widget: document.createElement('div'),
+      showError() {},
+      logger,
+    });
+
+    beforeEach(() => {
+      const addEventListener = window.addEventListener.bind(window);
+      sinon.stub(window, 'addEventListener').callsFake((type, listener, options) => {
+        if (type !== 'beforeunload') addEventListener(type, listener, options);
+      });
+    });
+
+    it('closes the error toast from its close button', async () => {
+      const widget = document.createElement('div');
+      const { errorState, showError } = await createErrorToast(widget);
+      document.body.append(widget, errorState);
+      showError('Click to close');
+      errorState.querySelector('.verb-errorBtn').click();
+      expect(errorState.classList.contains('hide')).to.be.true;
+    });
+
+    it('sends chunk uploads to splunk only when allowed', () => {
+      const session = makeSession();
+      session.track('chunk_uploaded', { chunkNumber: 1 }, false);
+      expect(window.analytics.sendAnalyticsToSplunk.called).to.be.false;
+      session.track('chunk_uploaded', { chunkNumber: 2 });
+      const [eventName, , metadata] = window.analytics.sendAnalyticsToSplunk.firstCall.args;
+      expect(eventName).to.equal('job:chunk-uploaded');
+      expect(metadata).to.include({ chunkNumber: 2 });
+    });
+
+    it('waits three seconds before redirect ready for verbs with a redirect timeout', () => {
+      const clock = sinon.useFakeTimers({ toFake: ['setTimeout'] });
+      const element = document.createElement('div');
+      const onReady = sinon.spy();
+      window.addEventListener('DCUnity:RedirectReady', onReady);
+      try {
+        bindUnityEvents(element, makeSession({ noRedirectTimeout: false }));
+        const detail = { event: 'uploaded', data: {} };
+        element.dispatchEvent(new CustomEvent('unity:track-analytics', { detail }));
+        expect(onReady.called).to.be.false;
+        clock.tick(3000);
+        expect(onReady.calledOnce).to.be.true;
+        expect(window.lana.log.firstCall.args[1].severity).to.equal('warning');
+      } finally {
+        window.removeEventListener('DCUnity:RedirectReady', onReady);
+        clock.restore();
+      }
+    });
+
+    it('turns #upload links into file picker labels with their own analytics', async () => {
+      const element = makeBlock(['<div><h1>Heading</h1></div>']);
+      element.dataset.dcInjectedFromMarquee = 'true';
+      const section = document.createElement('div');
+      section.innerHTML = '<div><a href="https://example.com/#upload">Upload</a></div>';
+      document.body.append(element, section);
+      const ui = await renderVerbWidget(element, { verb: 'compress-pdf', limits: { acceptedFiles: ['.pdf'] } });
+      ui.fileInput.addEventListener('click', (e) => e.preventDefault());
+      const session = makeSession();
+      bindFilePicker(ui, session);
+      startPageServices(element, session);
+
+      const label = section.querySelector('label.verb-cta-solo');
+      expect(label).to.exist;
+      expect(label.getAttribute('for')).to.equal('file-upload');
+      expect(section.querySelector('a[href*="#upload"]')).to.be.null;
+
+      label.click();
+      if (session.state.soloClicked) ui.fileInput.click();
+      const names = window.analytics.verbAnalytics.getCalls().map((c) => c.args[0]);
+      expect(names).to.deep.equal(SOLO_PICKER_EVENTS);
+      expect(session.state.soloClicked).to.be.false;
     });
   });
 });

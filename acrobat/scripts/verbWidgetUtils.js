@@ -300,16 +300,17 @@ export function trackAnalyticsEvent(
 }
 
 async function loadAnalytics(verb, userAttempts, logger) {
+  let loaded = {};
   try {
     const { default: verbAnalytics, reviewAnalytics, sendAnalyticsToSplunk } = await import('./alloy/verb-widget.js');
-    window.analytics.verbAnalytics = verbAnalytics;
-    window.analytics.reviewAnalytics = reviewAnalytics;
-    window.analytics.sendAnalyticsToSplunk = sendAnalyticsToSplunk;
+    loaded = { verbAnalytics, reviewAnalytics, sendAnalyticsToSplunk };
+    Object.assign(window.analytics, loaded);
     window.analytics.verbAnalytics('landing:shown', verb, { userAttempts });
     window.analytics.reviewAnalytics(verb);
   } catch (error) {
     logger.error(`Error Code: Unknown, Status: 'Unknown', Message: Analytics import failed: ${error.message} on ${verb}`);
   }
+  return loaded;
 }
 
 const analyticsLoaderBlocks = new Set();
@@ -325,12 +326,11 @@ export function registerAnalyticsLoader(logger = defaultLogger) {
   };
 
   window.addEventListener('analyticsLoad', async ({ detail }) => {
-    const stubs = { ...window.analytics };
     await waitForLcp();
-    await loadAnalytics(detail.verb, detail.userAttempts, logger);
-    const stillStubbed = ['verbAnalytics', 'reviewAnalytics', 'sendAnalyticsToSplunk']
-      .some((method) => window.analytics[method] === stubs[method]);
-    if (stillStubbed) {
+    const loaded = await loadAnalytics(detail.verb, detail.userAttempts, logger);
+    const notInstalled = ['verbAnalytics', 'reviewAnalytics', 'sendAnalyticsToSplunk']
+      .some((method) => !loaded[method] || window.analytics[method] !== loaded[method]);
+    if (notInstalled) {
       logger.error(`Analytics failed to initialize correctly: some methods remain no-ops on ${logger.blockName} block`);
     }
   });
@@ -803,7 +803,7 @@ export function createUploadSession({
     trackAnalyticsEvent(verb, eventName, metadata, documentUnloading, sendToSplunk, env)
   );
 
-  function sendTabClosure(event, metadata, workflowStep) {
+  function sendTabClosure(metadata, workflowStep) {
     if (state.exitFlag || state.tabClosureSent) return;
     if (state.isUploading && workflowStep === 'preuploading') return;
     state.tabClosureSent = true;
@@ -811,16 +811,14 @@ export function createUploadSession({
     const duration = uploadingStartTime ? ((Date.now() - uploadingStartTime) / 1000).toFixed(1) : 'N/A';
     window.analytics.verbAnalytics('job:browser-tab-closure', verb, metadata, false);
     window.analytics.sendAnalyticsToSplunk('job:browser-tab-closure', verb, { ...metadata, workflowStep, uploadTime: duration }, splunkEndpoint, true);
-    if (!state.isUploading) return;
-    event.preventDefault();
-    event.returnValue = true;
   }
 
   window.addEventListener('beforeunload', (event) => {
     if (state.exitFlag) setRedirectCookie();
-    exitWatches.forEach(({ metadata, workflowStep }) => {
-      sendTabClosure(event, metadata, workflowStep);
-    });
+    exitWatches.forEach(({ metadata, workflowStep }) => sendTabClosure(metadata, workflowStep));
+    if (!state.isUploading || state.exitFlag) return;
+    event.preventDefault();
+    event.returnValue = true;
   });
 
   const lifecycle = {

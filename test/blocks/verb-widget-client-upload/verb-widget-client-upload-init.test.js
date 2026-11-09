@@ -93,6 +93,84 @@ describe('verb-widget-client-upload init', () => {
     expect(block.querySelector('.error').classList.contains('hide')).to.be.false;
   });
 
+  it('warns on every close attempt while an image upload is in progress', async () => {
+    const unloadListeners = [];
+    const addEventListener = window.addEventListener.bind(window);
+    sinon.stub(window, 'addEventListener').callsFake((type, listener, options) => {
+      if (type === 'beforeunload') unloadListeners.push(listener);
+      else addEventListener(type, listener, options);
+    });
+    const block = makeBlock(['<h1>Image to PDF</h1>']);
+    await setup(block);
+    sinon.stub(crypto.subtle, 'encrypt').returns(new Promise(() => {}));
+    const input = block.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', {
+      configurable: true,
+      value: [new File(['image'], 'photo.jpg', { type: 'image/jpeg' })],
+    });
+    input.dispatchEvent(new Event('change'));
+    await waitFor(() => block.querySelector('.verb-cta').disabled);
+
+    const closeAttempt = () => {
+      const event = { preventDefault: sinon.spy(), returnValue: undefined };
+      unloadListeners.forEach((listener) => listener(event));
+      return event;
+    };
+    [closeAttempt(), closeAttempt()].forEach((event) => {
+      expect(event.preventDefault.calledOnce).to.be.true;
+      expect(event.returnValue).to.be.true;
+    });
+  });
+
+  it('redirects to the image-to-pdf page with the stored file id after a successful upload', async () => {
+    const addEventListener = window.addEventListener.bind(window);
+    sinon.stub(window, 'addEventListener').callsFake((type, listener, options) => {
+      if (type !== 'beforeunload') addEventListener(type, listener, options);
+    });
+    let destination;
+    const onNavigate = (e) => { destination = e.destination.url; e.preventDefault(); };
+    window.navigation.addEventListener('navigate', onNavigate);
+    try {
+      const block = makeBlock(['<h1>Image to PDF</h1>']);
+      await setup(block);
+      const input = block.querySelector('input[type="file"]');
+      Object.defineProperty(input, 'files', {
+        configurable: true,
+        value: [new File(['image'], 'photo.jpg', { type: 'image/jpeg' })],
+      });
+      input.dispatchEvent(new Event('change'));
+      await waitFor(() => destination);
+    } finally {
+      window.navigation.removeEventListener('navigate', onNavigate);
+    }
+    const url = new URL(destination);
+    expect(url.pathname).to.equal('/acrobat-online/image-to-pdf.html');
+    expect(url.searchParams.get('clientConvert')).to.equal('true');
+    expect(url.searchParams.get('fileId')).to.match(/^[0-9a-f-]{36}$/);
+    expect(url.searchParams.get('UTS_Uploaded')).to.match(/^\d+$/);
+    expect(url.searchParams.get('localeCode')).to.equal('en-US');
+  });
+
+  it('shows the validation error for an unsupported file type', async () => {
+    const block = makeBlock(['<h1>Image to PDF</h1>']);
+    await setup(block);
+    const input = block.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', {
+      configurable: true,
+      value: [new File(['gif'], 'anim.gif', { type: 'image/gif' })],
+    });
+    input.dispatchEvent(new Event('change'));
+
+    expect(block.querySelector('.error').classList.contains('hide')).to.be.false;
+    expect(block.querySelector('.verb-errorText').textContent)
+      .to.equal('This file is in a format not supported for conversion to PDF.');
+    const messages = window.lana.log.getCalls().map((call) => call.args[0]);
+    expect(messages.some((message) => message.startsWith(
+      'verb-widget-client-upload: image-to-pdf; Error Code: error_unsupported_type',
+    ))).to.be.true;
+    expect(block.querySelector('.verb-cta').disabled).to.be.false;
+  });
+
   it('initializes the upload UI without a failure log', async () => {
     const block = makeBlock(['<h1>Image to PDF</h1>']);
     await setup(block);
