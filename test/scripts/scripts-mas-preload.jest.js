@@ -36,12 +36,9 @@ async function loadScripts({ prefix = '', geoDetection, market, links, marketErr
     setConfig: jest.fn(),
     getConfig: jest.fn(() => ({ locale: { prefix }, miloLibs: '/libs' })),
     getMetadata: jest.fn((name) => (name === 'mas-geo-detection' ? geoDetection : undefined)),
+    getValidatedMarket,
     createTag: jest.fn(),
     loadIms: jest.fn().mockResolvedValue(),
-  }), { virtual: true });
-  jest.doMock('/libs/utils/market.js', () => ({
-    __esModule: true,
-    getValidatedMarket,
   }), { virtual: true });
   await import('../../acrobat/scripts/scripts.js');
   return { getValidatedMarket };
@@ -113,12 +110,9 @@ describe('M@S fragment preload', () => {
     expect(getValidatedMarket).toHaveBeenCalledTimes(1);
   });
 
-  it.each([
-    [undefined, 0],
-    ['on', 1],
-  ])('preloads market.js when geo detection is %s', async (geoDetection, count) => {
+  it.each([undefined, 'on'])('does not modulepreload market.js when geo detection is %s', async (geoDetection) => {
     await loadScripts({ geoDetection, market: 'fr' });
     await waitForPreloads(1);
-    expect(document.head.querySelectorAll('link[rel="modulepreload"][href="/libs/utils/market.js"]')).toHaveLength(count);
+    expect(document.head.querySelectorAll('link[rel="modulepreload"][href="/libs/utils/market.js"]')).toHaveLength(0);
   });
 });
