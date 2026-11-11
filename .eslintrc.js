@@ -83,6 +83,7 @@ module.exports = {
       rules: {
         'no-console': 0,
         'compat/compat': 'off',
+        'import/no-unresolved': ['error', { ignore: ['^https?://'] }],
       },
     },
     {

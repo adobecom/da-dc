@@ -1,7 +1,7 @@
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { waitFor } from '../../helpers/waitfor.js';
-import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
+import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/order
 
 const { default: init } = await import(
   '../../../acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.js'
