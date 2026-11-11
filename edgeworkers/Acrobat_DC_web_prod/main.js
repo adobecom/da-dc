@@ -322,7 +322,9 @@ export async function responseProvider(request) {
 
 async function frictionlessResponseProvider(request) {
   const secretCDNToken = request.getVariable('PMUSER_ADOBE_CDN_TOKEN');
-  const path = request.path.split('/');
+  // aem.live has no trailing-slash routes, so /tools/pdf-to-word/ must resolve as /tools/pdf-to-word.
+  const requestPath = request.path.replace(/(.)\/+$/, '$1');
+  const path = requestPath.split('/');
   const headers = {'X-Adobe-CDN-Token': secretCDNToken};
   const first = path[1];
   const last = path.splice(-1)[0].split('.')[0];
@@ -339,16 +341,16 @@ async function frictionlessResponseProvider(request) {
     'cz', 'de', 'dk', 'es', 'fi', 'fr', 'id_id', 'in_hi', 'it', 'jp', 'kr',
     'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'se', 'th_th', 'tr', 'tw',
   ]);
-  const isLocalePrefix = request.path.split('/').filter(Boolean).length > 1
+  const isLocalePrefix = requestPath.split('/').filter(Boolean).length > 1
     && ACROBAT_LOCALES.has(first);
 
   const fetchFrictionlessPage = async () => {
     // Setup: Fetch a stream containing HTML
     let docPath;
     if (isLocalePrefix) {
-      docPath = `${origin}${request.path.replace(`/${first}/`, `/${first}/dc-shared/`)}`;
+      docPath = `${origin}${requestPath.replace(`/${first}/`, `/${first}/dc-shared/`)}`;
     } else {
-      docPath = `${origin}/dc-shared${request.path}`;
+      docPath = `${origin}/dc-shared${requestPath}`;
     }
 
     const htmlResponse = await httpRequest(docPath, { headers });
