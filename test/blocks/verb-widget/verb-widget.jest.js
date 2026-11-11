@@ -1,13 +1,12 @@
 /**
  * @jest-environment jsdom
  */
-/* eslint-disable compat/compat */
 /* eslint-disable no-undef */
 import path from 'path';
 import fs from 'fs';
 import { userEvent } from '@testing-library/user-event';
 import { delay } from '../../helpers/waitfor.js';
-//import init from '../../../acrobat/blocks/acom-widget/acom-widget.js';
+// import init from '../../../acrobat/blocks/acom-widget/acom-widget.js';
 
 const mockfetch = jest.fn(() => Promise.resolve({
   json: () => Promise.resolve({

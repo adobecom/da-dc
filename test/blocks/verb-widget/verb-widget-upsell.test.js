@@ -1,12 +1,11 @@
-/* eslint-disable compat/compat */
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
+import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved
 
 const { default: init } = await import(
   '../../../acrobat/blocks/verb-widget/verb-widget.js'
 );
-import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
 
 describe('verb-widget block', () => {
   let placeholders;

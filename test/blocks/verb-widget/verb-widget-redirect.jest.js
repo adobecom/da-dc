@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-/* eslint-disable compat/compat */
 /* eslint-disable no-undef */
 import path from 'path';
 import fs from 'fs';
@@ -58,7 +57,7 @@ describe('acom-widget block', () => {
     delete window.location;
     window.location = new URL('https://localhost/acrobat/online/ai-chat-pdf.html?redirect=off');
 
-    const blockModule = await import('../../../acrobat/blocks/acom-widget/acom-widget.js');
+    const blockModule = await import('../../../acrobat/blocks/acom-widget/acom-widget.js'); // eslint-disable-line import/no-unresolved
 
     const block = document.querySelector('.acom-widget');
     await blockModule.default(block);
