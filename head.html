@@ -1,3 +1,44 @@
+<!-- MWPW-214935 reproduction only, do not merge: preload manifest loader for /drafts/ilyas/acrobat/plans?mepButton=off&parallel-sections=1 (adobecom/perf-tools prelink/head.html) -->
+<script>
+  // Prelink manifest loader (adobecom/perf-tools prelink/head.html). The page <dir>/<name> has its preload links in
+  // <dir>/preloads/<name>.json (a DA sheet: rel, href, as, crossorigin, fetchpriority). The fetch starts while the HTML
+  // is parsed, so no separate prelink tag is needed.
+  // Valid rows become link elements in the head; a missing or invalid manifest, or any error, leaves the page unchanged.
+  (() => {
+    try {
+      const { origin, hostname, pathname } = window.location;
+      const page = pathname.replace(/\.html$/, '');
+      const slash = page.lastIndexOf('/');
+      const manifest = `${page.slice(0, slash + 1)}preloads/${page.slice(slash + 1) || 'index'}.json`;
+      const AS = ['script', 'style', 'font', 'image', 'fetch'];
+      const PRIORITY = ['high', 'low', 'auto'];
+      const allowedHost = (h) => h === hostname || /^[a-z0-9-]+--[a-z0-9-]+--adobecom\.aem\.live$/.test(h)
+        || h.endsWith('.adobe.com') || h === 'use.typekit.net' || h === 'p.typekit.net';
+      fetch(manifest).then((res) => (res.ok ? res.json() : null)).then((sheet) => {
+        const rows = sheet && sheet[':type'] === 'sheet' && Array.isArray(sheet.data) ? sheet.data : [];
+        const present = new Set([...document.querySelectorAll('link[href]')].map((l) => l.href));
+        rows.forEach((row) => {
+          const rel = row && String(row.rel);
+          if (rel !== 'preload' && rel !== 'modulepreload') return;
+          let url;
+          try { url = new URL(String(row.href), origin); } catch (e) { return; }
+          if (url.protocol !== 'https:' || !allowedHost(url.hostname) || present.has(url.href)) return;
+          if (rel === 'preload' && !AS.includes(row.as)) return;
+          const link = document.createElement('link');
+          link.rel = rel;
+          if (rel === 'preload') link.as = row.as;
+          if (row.crossorigin === 'anonymous') link.crossOrigin = 'anonymous';
+          if (PRIORITY.includes(row.fetchpriority)) link.setAttribute('fetchpriority', row.fetchpriority);
+          // Stylesheet preloads use //host/path: site loaders skip a stylesheet when any link[href="<its URL>"]
+          // exists, whether they load it by path or by absolute URL; this form never equals either string.
+          link.setAttribute('href', row.as === 'style' ? `//${url.host}${url.pathname}${url.search}` : url.href);
+          present.add(url.href);
+          document.head.append(link);
+        });
+      }).catch(() => {});
+    } catch (e) { /* never break the page */ }
+  })();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="head-loaded" content="false" />
 <link rel="preconnect" href="https://acrobat.adobe.com" crossorigin>
