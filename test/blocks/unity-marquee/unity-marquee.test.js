@@ -11,6 +11,7 @@ const { default: init } = await import(
 describe('unity-marquee block', () => {
   let xhr;
   let placeholders;
+  let rafCallbacks;
 
   beforeEach(async () => {
     sinon.stub(window, 'fetch');
@@ -32,6 +33,11 @@ describe('unity-marquee block', () => {
     document.body.innerHTML = await readFile({ path: './mocks/body-quiz-maker.html' });
     window.adobeIMS = { isSignedInUser: () => false };
     window.lana = { log: sinon.spy() };
+    rafCallbacks = [];
+    sinon.stub(window, 'requestAnimationFrame').callsFake((callback) => {
+      rafCallbacks.push(callback);
+      return rafCallbacks.length;
+    });
   });
 
   afterEach(() => {
@@ -342,17 +348,12 @@ describe('unity-marquee block', () => {
     const prerender = document.createElement('div');
     prerender.id = 'prerender_verb-widget';
     document.body.appendChild(prerender);
-    const frames = [];
-    sinon.stub(window, 'requestAnimationFrame').callsFake((callback) => {
-      frames.push(callback);
-      return frames.length;
-    });
     const conf = getConfig();
     setConfig({ ...conf, locale: { prefix: '' } });
     const block = document.body.querySelector('.unity-marquee');
     await init(block);
     sinon.stub(block, 'getBoundingClientRect').returns({ width: 100, height: 100 });
-    return { block, prerender, frames };
+    return { block, prerender, frames: rafCallbacks };
   }
 
   it('removes prerender after two frames when the block is visible', async () => {
