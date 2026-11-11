@@ -91,6 +91,7 @@ module.exports = {
         'tools/**/*.js',
       ],
       rules: {
+        'no-console': 0,
         'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
         'import/no-unresolved': ['error', { ignore: ['^https?://'] }],
       },

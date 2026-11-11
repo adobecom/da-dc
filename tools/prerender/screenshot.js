@@ -1,5 +1,4 @@
 /* eslint-disable import/extensions */
-/* eslint-disable no-console */
 const { chromium } = require('playwright');
 const path = require('path');
 const yargs = require('yargs/yargs');
