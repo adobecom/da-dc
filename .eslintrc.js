@@ -90,7 +90,10 @@ module.exports = {
       files: [
         'tools/**/*.js',
       ],
-      rules: { 'import/no-extraneous-dependencies': ['error', { devDependencies: true }] },
+      rules: {
+        'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+        'import/no-unresolved': ['error', { ignore: ['^https?://'] }],
+      },
     },
     {
       files: [

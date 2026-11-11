@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 import DA_SDK from 'https://da.live/nx/utils/sdk.js';
 import { getAemRepo, getTags, getRootTags } from './tag-utils.js';
 import './tag-browser.js';
