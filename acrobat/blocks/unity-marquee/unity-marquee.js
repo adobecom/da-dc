@@ -57,7 +57,6 @@ export default async function init(element) {
       prerenderElement.remove();
     } else if (prerenderFrames < MAX_PRERENDER_FRAMES) {
       prerenderFrames += 1;
-      /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
       requestAnimationFrame(removePrerender);
     } else {
       logger.error(`Error Code: Unknown, Status: 'Unknown', Message: unity-marquee never became visible; prerender retained on ${element.classList[1]}`);
@@ -199,7 +198,6 @@ export default async function init(element) {
   container.appendChild(row);
   foreground.innerHTML = '';
   foreground.append(container);
-  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
   requestAnimationFrame(() => requestAnimationFrame(removePrerender));
 
   async function checkSignedInUser() {

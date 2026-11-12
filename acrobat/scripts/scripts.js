@@ -24,7 +24,6 @@ document.querySelectorAll('a').forEach((p, idx) => {
 const setLibs = (prodLibs, location = window.location) => {
   const { hostname, search } = location;
   if (!['.aem.', '.hlx.', '.stage.', 'local', '.da.'].some((i) => hostname.includes(i))) return prodLibs;
-  // eslint-disable-next-line compat/compat
   const branch = new URLSearchParams(search).get('milolibs') || 'main';
   if (!/^[a-zA-Z0-9_-]+$/.test(branch)) throw new Error('Invalid branch name.');
   if (branch === 'main' && hostname === 'www.stage.adobe.com') return '/libs';
@@ -160,21 +159,21 @@ const LIBS = '/libs';
 
 const locales = {
   // Americas
-  ar: { ietf: 'es-AR', tk: 'oln4yqj.css' },
+  ar: { ietf: 'es-AR', tk: 'oln4yqj.css', base: 'es' },
   br: { ietf: 'pt-BR', tk: 'inq1xob.css' },
   ca: { ietf: 'en-CA', tk: 'pps7abe.css', base: '' },
   ca_fr: { ietf: 'fr-CA', tk: 'vrk5vyv.css', base: 'fr' },
-  cl: { ietf: 'es-CL', tk: 'oln4yqj.css' },
-  co: { ietf: 'es-CO', tk: 'oln4yqj.css' },
+  cl: { ietf: 'es-CL', tk: 'oln4yqj.css', base: 'es' },
+  co: { ietf: 'es-CO', tk: 'oln4yqj.css', base: 'es' },
   la: { ietf: 'es', tk: 'oln4yqj.css' },
-  mx: { ietf: 'es-MX', tk: 'oln4yqj.css' },
-  pe: { ietf: 'es-PE', tk: 'oln4yqj.css' },
+  mx: { ietf: 'es-MX', tk: 'oln4yqj.css', base: 'es' },
+  pe: { ietf: 'es-PE', tk: 'oln4yqj.css', base: 'es' },
   '': { ietf: 'en-US', tk: 'hah7vzn.css' },
   // EMEA
   africa: { ietf: 'en', tk: 'pps7abe.css', base: '' },
   be_fr: { ietf: 'fr-BE', tk: 'vrk5vyv.css', base: 'fr' },
   be_en: { ietf: 'en-BE', tk: 'pps7abe.css', base: '' },
-  be_nl: { ietf: 'nl-BE', tk: 'cya6bri.css' },
+  be_nl: { ietf: 'nl-BE', tk: 'cya6bri.css', base: 'nl' },
   cy_en: { ietf: 'en-CY', tk: 'pps7abe.css' },
   dk: { ietf: 'da-DK', tk: 'aaz7dvd.css' },
   de: { ietf: 'de-DE', tk: 'vin7zsi.css' },
@@ -187,7 +186,7 @@ const locales = {
   it: { ietf: 'it-IT', tk: 'bbf5pok.css' },
   lv: { ietf: 'lv-LV', tk: 'aaz7dvd.css' },
   lt: { ietf: 'lt-LT', tk: 'aaz7dvd.css' },
-  lu_de: { ietf: 'de-LU', tk: 'vin7zsi.css' },
+  lu_de: { ietf: 'de-LU', tk: 'vin7zsi.css', base: 'de' },
   lu_en: { ietf: 'en-LU', tk: 'pps7abe.css', base: '' },
   lu_fr: { ietf: 'fr-LU', tk: 'vrk5vyv.css', base: 'fr' },
   hu: { ietf: 'hu-HU', tk: 'aaz7dvd.css' },
@@ -199,17 +198,17 @@ const locales = {
   pt: { ietf: 'pt-PT', tk: 'inq1xob.css' },
   ro: { ietf: 'ro-RO', tk: 'qxw8hzm.css' },
   sa_en: { ietf: 'en-SA', tk: 'pps7abe.css', base: '' },
-  ch_de: { ietf: 'de-CH', tk: 'vin7zsi.css' },
+  ch_de: { ietf: 'de-CH', tk: 'vin7zsi.css', base: 'de' },
   si: { ietf: 'sl-SI', tk: 'aaz7dvd.css' },
   sk: { ietf: 'sk-SK', tk: 'aaz7dvd.css' },
   ch_fr: { ietf: 'fr-CH', tk: 'vrk5vyv.css', base: 'fr' },
   fi: { ietf: 'fi-FI', tk: 'aaz7dvd.css' },
   se: { ietf: 'sv-SE', tk: 'fpk1pcd.css' },
-  ch_it: { ietf: 'it-CH', tk: 'bbf5pok.css' },
+  ch_it: { ietf: 'it-CH', tk: 'bbf5pok.css', base: 'it' },
   tr: { ietf: 'tr-TR', tk: 'aaz7dvd.css' },
   ae_en: { ietf: 'en', tk: 'pps7abe.css', dir: 'ltr', base: '' },
   uk: { ietf: 'en-GB', tk: 'pps7abe.css' },
-  at: { ietf: 'de-AT', tk: 'vin7zsi.css' },
+  at: { ietf: 'de-AT', tk: 'vin7zsi.css', base: 'de' },
   cz: { ietf: 'cs-CZ', tk: 'aaz7dvd.css' },
   bg: { ietf: 'bg-BG', tk: 'aaz7dvd.css' },
   ru: { ietf: 'ru-RU', tk: 'aaz7dvd.css' },
@@ -243,10 +242,10 @@ const locales = {
   // geo expansion MWPW-124903
   za: { ietf: 'en-ZA', tk: 'pps7abe.css', base: '' }, // South Africa (GB English)
   ng: { ietf: 'en-NG', tk: 'pps7abe.css', base: '' }, // Nigeria (GB English)
-  cr: { ietf: 'es-CR', tk: 'oln4yqj.css' }, // Costa Rica (Spanish Latin America)
-  ec: { ietf: 'es-EC', tk: 'oln4yqj.css' }, // Ecuador (Spanish Latin America)
-  pr: { ietf: 'es-PR', tk: 'oln4yqj.css' }, // Puerto Rico (Spanish Latin America)
-  gt: { ietf: 'es-GT', tk: 'oln4yqj.css' }, // Guatemala (Spanish Latin America)
+  cr: { ietf: 'es-CR', tk: 'oln4yqj.css', base: 'es' }, // Costa Rica (Spanish Latin America)
+  ec: { ietf: 'es-EC', tk: 'oln4yqj.css', base: 'es' }, // Ecuador (Spanish Latin America)
+  pr: { ietf: 'es-PR', tk: 'oln4yqj.css', base: 'es' }, // Puerto Rico (Spanish Latin America)
+  gt: { ietf: 'es-GT', tk: 'oln4yqj.css', base: 'es' }, // Guatemala (Spanish Latin America)
   eg_ar: { ietf: 'ar-EG', tk: 'dis2dpj.css', dir: 'rtl' }, // Egypt (Arabic)
   kw_ar: { ietf: 'ar-KW', tk: 'dis2dpj.css', dir: 'rtl' }, // Kuwait (Arabic)
   qa_ar: { ietf: 'ar-QA', tk: 'dis2dpj.css', dir: 'rtl' }, // Quatar (Arabic)
@@ -401,13 +400,11 @@ if (IMS_GUEST) {
 const { ietf, prefix } = getLocale(locales);
 
 function replaceDotMedia(area = document) {
-  // eslint-disable-next-line compat/compat
   const currUrl = new URL(window.location);
   const pathSeg = currUrl.pathname.split('/').length;
   if ((prefix === '' && pathSeg >= 3) || (prefix !== '' && pathSeg >= 4)) return;
   const resetAttributeBase = (tag, attr) => {
     area.querySelectorAll(`${tag}[${attr}^="./media_"]`).forEach((el) => {
-      // eslint-disable-next-line compat/compat
       el[attr] = `${new URL(`${CONFIG.contentRoot}${el.getAttribute(attr).substring(1)}`, window.location).href}`;
     });
   };
@@ -417,18 +414,32 @@ function replaceDotMedia(area = document) {
 
 replaceDotMedia(document);
 
-// Default to loading the first image as eager.
 (async function loadLCPImage() {
-  const blocks = '.marquee,.hero-marquee,.study-marquee,.unity-marquee';
-  const marquee = document.querySelector(blocks); // first marquee only
-  if (marquee) {
-    if (window?.browser?.isMobile) {
-      marquee.querySelectorAll('img')[0]?.setAttribute('loading', 'eager');
-    } else {
-      marquee.querySelectorAll('img')[1]?.setAttribute('loading', 'eager');
-      marquee.querySelectorAll('img')[2]?.setAttribute('loading', 'eager');
-    }
+  const blocks = '.marquee, .hero-marquee, .study-marquee, .unity-marquee, .verb-marquee';
+  const marquee = document.querySelector('main')?.querySelector(blocks);
+  const text = marquee?.querySelector('h1, h2, h3, h4, h5, h6')?.closest('div');
+  if (!text) return;
+  const eagerLoad = (img) => {
+    img?.setAttribute('fetchpriority', 'high');
+    img?.setAttribute('loading', 'eager');
+  };
+
+  let viewport = 'mobile';
+  if (window.matchMedia('(min-width: 600px)').matches) viewport = 'tablet';
+  if (window.matchMedia('(min-width: 1200px)').matches) viewport = 'desktop';
+
+  const background = marquee.firstElementChild;
+  if (background !== text.parentElement) {
+    const [mobile, tablet = mobile, desktop = tablet] = background.children;
+    const cell = { mobile, tablet, desktop }[viewport];
+    eagerLoad(cell?.querySelector('img'));
   }
+
+  const mediaBelowText = viewport !== 'desktop'
+    && marquee.matches('.study-marquee, .unity-marquee, .verb-marquee');
+  if (mediaBelowText || marquee.classList.contains(`media-hidden-${viewport}`)) return;
+  const media = text.nextElementSibling || text.previousElementSibling;
+  eagerLoad(media?.querySelector('img'));
 }());
 
 const MAS_FRAGMENT_API = 'https://www.adobe.com/mas/io/fragment';
@@ -539,7 +550,6 @@ let masMarketPromise;
 function getMasMarket(miloLibs) {
   masMarketPromise ??= (async () => {
     const { getMetadata } = await import(`${miloLibs}/utils/utils.js`);
-    // eslint-disable-next-line compat/compat
     const flag = new URLSearchParams(window.location.search).get('mas-geo-detection') ?? getMetadata('mas-geo-detection');
     if (!['on', 'true'].includes(flag?.toLowerCase())) return undefined;
     const { getValidatedMarket } = await import(`${miloLibs}/utils/market.js`);
@@ -551,13 +561,11 @@ function getMasMarket(miloLibs) {
 async function preloadMasFragment(a, config) {
   let url;
   try {
-    // eslint-disable-next-line compat/compat
     url = new URL(a.href);
   } catch {
     return;
   }
   if (url.hostname !== 'mas.adobe.com' || !url.pathname.endsWith('/studio.html')) return;
-  // eslint-disable-next-line compat/compat
   const params = new URLSearchParams(url.hash.replace(/^#/, ''));
   const fragment = params.get('fragment') || params.get('query');
   const mask = params.get('mask');
@@ -654,7 +662,6 @@ async function loadPage() {
   // Setup Milo
   const miloLibs = setLibs(LIBS);
 
-  // eslint-disable-next-line compat/compat
   const masGeoDetection = new URLSearchParams(window.location.search).get('mas-geo-detection')
     ?? getCustomMetadata('mas-geo-detection');
   if (['on', 'true'].includes(masGeoDetection?.toLowerCase())) {
@@ -692,7 +699,6 @@ async function loadPage() {
 
   // Render M@S CTAs without waiting for IMS; upgrade and download CTAs swap in once it is ready.
   document.addEventListener('wcms:commerce:ready', ({ detail: service }) => {
-    // eslint-disable-next-line compat/compat
     const modules = Promise.all([
       import(`${miloLibs}/blocks/merch/merch.js`),
       import('./checkoutAction.js'),

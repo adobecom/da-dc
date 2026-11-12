@@ -1,4 +1,3 @@
-/* eslint-disable compat/compat */
 import { getLanaErrorName } from '../../scripts/utils.js';
 import {
   DC_ENV,

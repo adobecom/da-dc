@@ -9,7 +9,6 @@ const run = (getCheckoutAction, options, el) => resolveCheckoutAction(
   getCheckoutAction,
   offers,
   options,
-  // eslint-disable-next-line compat/compat
   new Promise(() => {}),
   el,
 );

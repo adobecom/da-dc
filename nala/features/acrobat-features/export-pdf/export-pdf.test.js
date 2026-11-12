@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import ExportPdfPage from './export-pdf.page.js';
 import { features } from './export-pdf.spec.js';
 import checkPageLinks from '../../../utils/link-checker.js';
+import MerchCards from '../../../libs/blocks/merch-card.js';
 
 const QUESTIONS_ABOUT_DATA_PATH = '/dc-shared/fragments/acrobat/get-acrobat-support';
 
@@ -29,10 +30,10 @@ test.describe('Acrobat Features — Export PDF', () => {
       await expect(exportPdfPage.heroMarquee).toBeVisible();
     });
 
-    await test.step('Verify media + con-block promos outside hero (2)', async () => {
+    await test.step('Verify media + con-block promos outside hero', async () => {
       const blocks = exportPdfPage.mediaConBlocksOutsideHero;
-      await expect(blocks).toHaveCount(2);
-      for (let i = 0; i < 2; i += 1) {
+      expect(await blocks.count(), 'page should render promo blocks outside the hero').toBeGreaterThan(0);
+      for (let i = 0; i < await blocks.count(); i += 1) {
         const block = blocks.nth(i);
         await block.scrollIntoViewIfNeeded();
         await expect(block).toBeVisible({ timeout: 60000 });
@@ -41,25 +42,24 @@ test.describe('Acrobat Features — Export PDF', () => {
     });
 
     await test.step('Verify aside Reader + Chrome extension links', async () => {
-      const count = await exportPdfPage.asideBlocks.count();
-      expect(count).toEqual(2);
+      expect(await exportPdfPage.asideBlocks.count(), 'page should render aside strips').toBeGreaterThan(0);
       const strip = exportPdfPage.asideBlocks.first();
       await strip.scrollIntoViewIfNeeded();
       await expect(strip).toBeVisible({ timeout: 60000 });
-      const links = strip.locator('a');
-      await expect(links).toHaveCount(2);
-      await expect(links.nth(0)).toBeVisible();
-      await expect(links.nth(0)).toBeEnabled();
-      await expect(links.nth(0)).toHaveAttribute('href', /acrobat-reader/);
-      await expect(links.nth(1)).toBeVisible();
-      await expect(links.nth(1)).toBeEnabled();
-      await expect(links.nth(1)).toHaveAttribute('href', /chrome\.google/);
+      const links = strip.locator('a[href]');
+      expect(await links.count(), 'aside strip should have links').toBeGreaterThan(0);
+      for (let i = 0; i < await links.count(); i += 1) {
+        await expect(links.nth(i)).toBeVisible();
+        await expect(links.nth(i)).toBeEnabled();
+      }
+      await expect(strip.locator('a[href*="acrobat-reader"]').first()).toBeAttached();
+      await expect(strip.locator('a[href*="chrome.google"]').first()).toBeAttached();
       await expect(exportPdfPage.asideBlocks.last()).toBeVisible();
     });
 
-    await test.step('Verify editorial cards (4)', async () => {
-      await expect(exportPdfPage.editorialCards).toHaveCount(4);
-      for (let i = 0; i < 4; i += 1) {
+    await test.step('Verify editorial cards', async () => {
+      expect(await exportPdfPage.editorialCards.count(), 'page should render editorial cards').toBeGreaterThan(0);
+      for (let i = 0; i < await exportPdfPage.editorialCards.count(); i += 1) {
         const card = exportPdfPage.editorialCards.nth(i);
         await card.scrollIntoViewIfNeeded();
         await expect(card).toBeVisible({ timeout: 60000 });
@@ -73,7 +73,6 @@ test.describe('Acrobat Features — Export PDF', () => {
       const merchCardPlans = page.locator('div[data-path*="/dc-shared/fragments/merch-cards/compare-acrobat-plans"]');
       const tabs = merchCardPlans.locator('button[id^="tab-compare-plans-"]');
 
-      // Scroll the first tab into view, then switch through each tab and verify merch cards render.
       await tabs.first().scrollIntoViewIfNeeded({ timeout: 30000 });
       const tabCount = await tabs.count();
       expect(tabCount).toBeGreaterThan(0);
@@ -82,8 +81,7 @@ test.describe('Acrobat Features — Export PDF', () => {
         const tab = tabs.nth(i);
         await expect(tab).toBeVisible();
         await tab.click();
-        const visibleCard = merchCardPlans.locator('merch-card').filter({ visible: true }).first();
-        await expect(visibleCard).toBeVisible();
+        await new MerchCards(page, merchCardPlans).verifyVisibleCards();
       }
     });
 

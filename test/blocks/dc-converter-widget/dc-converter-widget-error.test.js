@@ -1,4 +1,3 @@
-/* eslint-disable compat/compat */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable object-curly-newline */
 import { readFile } from '@web/test-runner-commands';

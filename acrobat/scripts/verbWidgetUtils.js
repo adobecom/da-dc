@@ -1,4 +1,3 @@
-/* eslint-disable compat/compat */
 import { getEnv, isOldBrowser, setLibs } from './utils.js';
 import { localeMap } from '../blocks/unity/unity.js';
 import verbRedirMap from './maps/verbRedirMap.js';

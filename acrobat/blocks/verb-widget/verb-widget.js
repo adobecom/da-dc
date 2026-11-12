@@ -1,4 +1,3 @@
-/* eslint-disable compat/compat */
 import { getEnv } from '../../scripts/utils.js';
 import {
   bindFilePicker,

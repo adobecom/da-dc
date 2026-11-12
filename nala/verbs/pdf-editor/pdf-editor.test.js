@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './pdf-editor.spec.js';
 import PdfEditor from './pdf-editor.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-pdf-editor.pdf');
@@ -101,9 +102,7 @@ test.describe('Unity PDF Editor test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await pdfEditor.rnrSection.scrollIntoViewIfNeeded();
-      await expect(pdfEditor.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(pdfEditor.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, pdfEditor.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

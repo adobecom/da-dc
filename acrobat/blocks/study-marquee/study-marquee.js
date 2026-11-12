@@ -572,7 +572,6 @@ export default async function init(element) {
   window.prefetchTargetUrl = null;
   element.parentNode.style.display = 'block';
 
-  // eslint-disable-next-line compat/compat
   requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
 
   reloadOnHistoryTraversal();

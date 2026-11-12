@@ -1,5 +1,4 @@
 /* eslint-disable no-promise-executor-return */
-/* eslint-disable compat/compat */
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import { delay } from '../../helpers/waitfor.js';

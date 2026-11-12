@@ -1,4 +1,3 @@
-/* eslint-disable compat/compat */
 import { readFile } from '@web/test-runner-commands';
 import sinon from 'sinon';
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
