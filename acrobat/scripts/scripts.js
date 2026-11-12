@@ -549,10 +549,10 @@ let masMarketPromise;
 
 function getMasMarket(miloLibs) {
   masMarketPromise ??= (async () => {
-    const { getMetadata } = await import(`${miloLibs}/utils/utils.js`);
+    const { getMetadata, getValidatedMarket } = await import(`${miloLibs}/utils/utils.js`);
+    // eslint-disable-next-line compat/compat
     const flag = new URLSearchParams(window.location.search).get('mas-geo-detection') ?? getMetadata('mas-geo-detection');
     if (!['on', 'true'].includes(flag?.toLowerCase())) return undefined;
-    const { getValidatedMarket } = await import(`${miloLibs}/utils/market.js`);
     return (await getValidatedMarket())?.toUpperCase();
   })().catch(() => undefined);
   return masMarketPromise;
@@ -661,12 +661,6 @@ async function loadPage() {
 
   // Setup Milo
   const miloLibs = setLibs(LIBS);
-
-  const masGeoDetection = new URLSearchParams(window.location.search).get('mas-geo-detection')
-    ?? getCustomMetadata('mas-geo-detection');
-  if (['on', 'true'].includes(masGeoDetection?.toLowerCase())) {
-    loadLink(`${miloLibs}/utils/market.js`, { rel: 'modulepreload' });
-  }
 
   // Milo and site styles
   if (!document.getElementById('inline-milo-styles')) {
