@@ -179,7 +179,8 @@ export async function responseProvider(request) {
       el.append(`<style id="inline-milo-styles">${miloStyles}</style>`);
       el.append(`<style id="inline-dc-styles">${dcStyles}</style>`);
       if (clientUploadWidget) {
-        el.append(`<style id="inline-verb-widget-client-upload-styles">${verbWidgetClientUploadStyles}</style>`);
+        const clientUploadStyles = `${verbWidgetStyles}\n${verbWidgetClientUploadStyles.replace(/@import[^;]*;\s*/g, '')}`;
+        el.append(`<style id="inline-verb-widget-client-upload-styles">${clientUploadStyles}</style>`);
         el.append(`<style>#prerender_verb-widget { position: absolute; top: ${prerenderTop}; left: 0; width: 100%; z-index: -1; pointer-events: auto; }</style></head>`);
       } else if (inlineUnityMarquee) {
         el.append(`<style id="inline-unity-shared-styles">${unitySharedStyles}</style>`);
@@ -249,7 +250,10 @@ export async function responseProvider(request) {
       headerLink = [...headerLink,
         `</acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</acrobat/blocks/verb-widget-client-upload/verb-widget-client-upload.css>;rel="preload";as="style"`,
+        `</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"`,
         `</acrobat/scripts/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</acrobat/scripts/verbWidgetUtils.js>;rel="preload";as="script";crossorigin="anonymous"`,
+        `</acrobat/scripts/uploadLimits.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</libs/utils/utils.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `</libs/features/placeholders.js>;rel="preload";as="script";crossorigin="anonymous"`,
         `<${first === 'acrobat' ? '' : `/${first}`}/dc-shared/placeholders.json>;rel="preload";as="fetch";crossorigin="anonymous"`,

@@ -10,7 +10,7 @@ import { HttpResponseWidget } from "response-widget";
 import { HttpResponseScripts } from "response-scripts";
 import { HttpResponseStyles } from "response-styles";
 import { HttpResponseMiloStyles } from "response-milo-styles";
-import { HttpResponseVerbWidgetStyles } from "response-verb-widget-styles";
+import { HttpResponseVerbWidgetStyles, mock_HttpResponse_text as mockVerbWidgetStylesText } from "response-verb-widget-styles";
 import { HttpResponse404 } from "response-404";
 import { mockOnElement } from "html-rewriter";
 import { EdgeKV } from "../../../edgeworkers/Acrobat_DC_web_prod/edgekv.js";
@@ -244,6 +244,23 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     mockOnElement.mock.calls.find(([selector]) => selector === 'head')[1]({append});
     expect(append.mock.calls).toHaveLength(workflow ? 4 : 2);
     expect(append.mock.calls.some(([css]) => css.includes('inline-unity-'))).toBe(false);
+  });
+
+  it('inlines the shared verb-widget styles for the client upload widget', async () => {
+    const css = "@import url('/acrobat/blocks/verb-widget/verb-widget.css');\n.shared { color: red; }";
+    mockVerbWidgetStylesText.mockReturnValue(Promise.resolve(css));
+    try {
+      authoredBlocks.add('.verb-widget-client-upload');
+      const response = await replaceResponseProvider(new Request({path: '/acrobat/online/image-to-pdf'}));
+      const append = jest.fn();
+      mockOnElement.mock.calls.find(([selected]) => selected === 'head')[1]({append});
+      expect(append.mock.calls[2]).toEqual([`<style id="inline-verb-widget-client-upload-styles">${css}\n.shared { color: red; }</style>`]);
+      expect(response.headers.Link).toContain('</acrobat/blocks/verb-widget/verb-widget.css>;rel="preload";as="style"');
+      expect(response.headers.Link).toContain('</acrobat/scripts/verbWidgetUtils.js>;rel="preload";as="script";crossorigin="anonymous"');
+      expect(response.headers.Link).toContain('</acrobat/scripts/uploadLimits.js>;rel="preload";as="script";crossorigin="anonymous"');
+    } finally {
+      mockVerbWidgetStylesText.mockReturnValue(Promise.resolve('verb-widget-styles response text'));
+    }
   });
 
   it.each(['.verb-widget-client-upload', '.study-marquee', '.verb-marquee'])(

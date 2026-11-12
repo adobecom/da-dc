@@ -1,5 +1,5 @@
 const verbRedirMap = {
-  'createpdf': 'createpdf',
+  createpdf: 'createpdf',
   'crop-pages': 'crop',
   'delete-pages': 'deletepages',
   'extract-pages': 'extract',
@@ -8,11 +8,24 @@ const verbRedirMap = {
   'add-comment': 'addcomment',
   'pdf-to-image': 'pdftoimage',
   'reorder-pages': 'reorderpages',
-  'sendforsignature': 'sendforsignature',
+  sendforsignature: 'sendforsignature',
   'rotate-pages': 'rotatepages',
-  'fillsign': 'fillsign',
+  fillsign: 'fillsign',
   'split-pdf': 'split',
   'insert-pdf': 'insert',
   'compress-pdf': 'compress',
+  'png-to-pdf': 'jpgtopdf',
+  'image-to-pdf': 'jpgtopdf',
+  'bmp-to-pdf': 'jpgtopdf',
+  'gif-to-pdf': 'jpgtopdf',
+  'tiff-to-pdf': 'jpgtopdf',
+  'indd-to-pdf': 'createpdf',
+  'psd-to-pdf': 'createpdf',
+  'ai-to-pdf': 'createpdf',
+  'number-pages': 'number',
+  'ocr-pdf': 'ocr',
+  'chat-pdf': 'chat',
+  'chat-pdf-student': 'study',
 };
+
 export default verbRedirMap;

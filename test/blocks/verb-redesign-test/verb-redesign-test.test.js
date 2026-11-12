@@ -3,6 +3,7 @@ import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { delay } from '../../helpers/waitfor.js';
+import { SOLO_PICKER_EVENTS } from '../../../acrobat/scripts/verbWidgetUtils.js';
 import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js'; // eslint-disable-line import/no-unresolved, import/order
 
 const { default: init, LIMITS } = await import(
@@ -251,5 +252,105 @@ describe('verb-redesign-test block', () => {
     const block = document.body.querySelector('.verb-redesign-test');
     await init(block);
     expect(document.querySelector('.verb-redesign-test .vm2-heading')).to.exist;
+  });
+
+  it('toggles the dragging class on dragover and dragleave', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-redesign-test');
+    await init(block);
+
+    const dropzone = block.querySelector('.vm2-dropzone');
+    block.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true }));
+    expect(dropzone.classList.contains('dragging')).to.be.true;
+    expect(block.classList.contains('dragging-block')).to.be.true;
+
+    block.dispatchEvent(new DragEvent('dragleave', { bubbles: true, cancelable: true, relatedTarget: dropzone }));
+    expect(dropzone.classList.contains('dragging')).to.be.true;
+
+    block.dispatchEvent(new DragEvent('dragleave', { bubbles: true, cancelable: true, relatedTarget: null }));
+    expect(dropzone.classList.contains('dragging')).to.be.false;
+    expect(block.classList.contains('dragging-block')).to.be.false;
+  });
+
+  it('fires solo picker analytics when the solo upload label is clicked', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-redesign-test');
+    const soloWrapper = document.createElement('div');
+    soloWrapper.innerHTML = '<a href="#upload">Upload</a>';
+    document.body.append(soloWrapper);
+    await init(block);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+    const fileInput = block.querySelector('#file-upload');
+    fileInput.addEventListener('click', (e) => e.preventDefault());
+    const label = soloWrapper.querySelector('label.vm2-cta-solo');
+    expect(label).to.exist;
+    expect(soloWrapper.querySelector('a[href*="#upload"]')).to.not.exist;
+
+    label.click();
+
+    expect(window.analytics.verbAnalytics.callCount).to.equal(SOLO_PICKER_EVENTS.length);
+    SOLO_PICKER_EVENTS.forEach((evt) => {
+      expect(window.analytics.verbAnalytics.calledWith(evt, 'word-to-pdf', sinon.match.has('userAttempts'))).to.be.true;
+    });
+  });
+
+  it('logs to lana and removes the injected verb-widget when its init fails', async () => {
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-redesign-test');
+    block.classList.replace('word-to-pdf', 'unknown-to-pdf');
+    document.cookie = 's_ta_cr_p_c=1; path=/';
+    try {
+      await init(block);
+    } finally {
+      document.cookie = 's_ta_cr_p_c=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    }
+
+    expect(window.lana.log.calledWith(
+      sinon.match(/verb-widget init from verb-redesign-test failed/),
+      sinon.match({ tags: sinon.match(/verb-redesign-test/), severity: 'error' }),
+    )).to.be.true;
+    expect(block.querySelector('.verb-widget')).to.not.exist;
+    expect(block.querySelector('#file-upload')).to.not.exist;
+  });
+
+  it('sends tab-closure analytics from the registered upload listener on beforeunload', async () => {
+    const unloadListeners = [];
+    sinon.stub(window, 'addEventListener').callsFake(function addListener(type, listener, ...rest) {
+      if (type === 'beforeunload') {
+        unloadListeners.push(listener);
+        return undefined;
+      }
+      return window.addEventListener.wrappedMethod.call(this, type, listener, ...rest);
+    });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    const block = document.body.querySelector('.verb-redesign-test');
+    await init(block);
+    await delay(100);
+
+    window.analytics = { verbAnalytics: sinon.spy(), sendAnalyticsToSplunk: sinon.spy() };
+    const initListenerCount = unloadListeners.length;
+    dispatchTrack(block, 'uploading', { sendToSplunk: false });
+    expect(unloadListeners.length).to.equal(initListenerCount + 1);
+    window.analytics.verbAnalytics.resetHistory();
+    window.analytics.sendAnalyticsToSplunk.resetHistory();
+
+    const fakeEvent = { preventDefault: sinon.spy(), returnValue: undefined };
+    unloadListeners[unloadListeners.length - 1](fakeEvent);
+
+    expect(window.analytics.verbAnalytics.calledWith('job:browser-tab-closure', 'word-to-pdf')).to.be.true;
+    expect(window.analytics.sendAnalyticsToSplunk.calledWith(
+      'job:browser-tab-closure',
+      'word-to-pdf',
+      sinon.match({ workflowStep: 'uploading', uploadTime: sinon.match.string }),
+      sinon.match.string,
+      true,
+    )).to.be.true;
+    expect(fakeEvent.preventDefault.calledOnce).to.be.true;
+    expect(fakeEvent.returnValue).to.be.true;
   });
 });
