@@ -482,4 +482,18 @@ describe("frictionlessResponseProvider for acrobat.adobe.com", () => {
     expect(response.status).toEqual(200);
     expect(fetches).toContain('https://acrobat.adobe.com/fr/dc-shared/tools/pdf-to-word');
   });
+
+  it("acrobat.adobe.com/tools/pdf-to-word// → /dc-shared/tools/pdf-to-word (repeated trailing slashes)", async () => {
+    const requestMock = new Request({path: '/tools/pdf-to-word//', host: 'acrobat.adobe.com'});
+    const response = await replaceResponseProvider(requestMock);
+    expect(response.status).toEqual(200);
+    expect(fetches).toContain('https://acrobat.adobe.com/dc-shared/tools/pdf-to-word');
+  });
+
+  it("acrobat.adobe.com/fr/tools/pdf-to-word// → /fr/dc-shared/tools/pdf-to-word (locale + repeated trailing slashes)", async () => {
+    const requestMock = new Request({path: '/fr/tools/pdf-to-word//', host: 'acrobat.adobe.com'});
+    const response = await replaceResponseProvider(requestMock);
+    expect(response.status).toEqual(200);
+    expect(fetches).toContain('https://acrobat.adobe.com/fr/dc-shared/tools/pdf-to-word');
+  });
 });
