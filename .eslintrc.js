@@ -80,7 +80,21 @@ module.exports = {
       files: [
         'test/**/*.js',
       ],
-      rules: { 'no-console': 0 },
+      rules: {
+        'no-console': 0,
+        'compat/compat': 'off',
+        'import/no-unresolved': ['error', { ignore: ['^https?://'] }],
+      },
+    },
+    {
+      files: [
+        'tools/**/*.js',
+      ],
+      rules: {
+        'no-console': 0,
+        'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+        'import/no-unresolved': ['error', { ignore: ['^https?://'] }],
+      },
     },
     {
       files: [

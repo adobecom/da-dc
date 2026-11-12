@@ -1,6 +1,4 @@
 /* eslint-disable import/extensions */
-/* eslint-disable no-console */
-// eslint-disable-next-line import/no-extraneous-dependencies
 const { chromium } = require('playwright');
 const EdgeGrid = require('akamai-edgegrid');
 const fs = require('fs').promises;
