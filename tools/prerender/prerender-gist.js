@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable compat/compat */
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const path = require('path');

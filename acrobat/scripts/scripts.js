@@ -24,7 +24,6 @@ document.querySelectorAll('a').forEach((p, idx) => {
 const setLibs = (prodLibs, location = window.location) => {
   const { hostname, search } = location;
   if (!['.aem.', '.hlx.', '.stage.', 'local', '.da.'].some((i) => hostname.includes(i))) return prodLibs;
-  // eslint-disable-next-line compat/compat
   const branch = new URLSearchParams(search).get('milolibs') || 'main';
   if (!/^[a-zA-Z0-9_-]+$/.test(branch)) throw new Error('Invalid branch name.');
   if (branch === 'main' && hostname === 'www.stage.adobe.com') return '/libs';
@@ -401,13 +400,11 @@ if (IMS_GUEST) {
 const { ietf, prefix } = getLocale(locales);
 
 function replaceDotMedia(area = document) {
-  // eslint-disable-next-line compat/compat
   const currUrl = new URL(window.location);
   const pathSeg = currUrl.pathname.split('/').length;
   if ((prefix === '' && pathSeg >= 3) || (prefix !== '' && pathSeg >= 4)) return;
   const resetAttributeBase = (tag, attr) => {
     area.querySelectorAll(`${tag}[${attr}^="./media_"]`).forEach((el) => {
-      // eslint-disable-next-line compat/compat
       el[attr] = `${new URL(`${CONFIG.contentRoot}${el.getAttribute(attr).substring(1)}`, window.location).href}`;
     });
   };
@@ -553,7 +550,6 @@ let masMarketPromise;
 function getMasMarket(miloLibs) {
   masMarketPromise ??= (async () => {
     const { getMetadata } = await import(`${miloLibs}/utils/utils.js`);
-    // eslint-disable-next-line compat/compat
     const flag = new URLSearchParams(window.location.search).get('mas-geo-detection') ?? getMetadata('mas-geo-detection');
     if (!['on', 'true'].includes(flag?.toLowerCase())) return undefined;
     const { getValidatedMarket } = await import(`${miloLibs}/utils/market.js`);
@@ -565,13 +561,11 @@ function getMasMarket(miloLibs) {
 async function preloadMasFragment(a, config) {
   let url;
   try {
-    // eslint-disable-next-line compat/compat
     url = new URL(a.href);
   } catch {
     return;
   }
   if (url.hostname !== 'mas.adobe.com' || !url.pathname.endsWith('/studio.html')) return;
-  // eslint-disable-next-line compat/compat
   const params = new URLSearchParams(url.hash.replace(/^#/, ''));
   const fragment = params.get('fragment') || params.get('query');
   const mask = params.get('mask');
@@ -668,7 +662,6 @@ async function loadPage() {
   // Setup Milo
   const miloLibs = setLibs(LIBS);
 
-  // eslint-disable-next-line compat/compat
   const masGeoDetection = new URLSearchParams(window.location.search).get('mas-geo-detection')
     ?? getCustomMetadata('mas-geo-detection');
   if (['on', 'true'].includes(masGeoDetection?.toLowerCase())) {
@@ -706,7 +699,6 @@ async function loadPage() {
 
   // Render M@S CTAs without waiting for IMS; upgrade and download CTAs swap in once it is ready.
   document.addEventListener('wcms:commerce:ready', ({ detail: service }) => {
-    // eslint-disable-next-line compat/compat
     const modules = Promise.all([
       import(`${miloLibs}/blocks/merch/merch.js`),
       import('./checkoutAction.js'),

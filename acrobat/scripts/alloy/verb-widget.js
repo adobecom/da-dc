@@ -1,7 +1,6 @@
 import { getLanaErrorName } from '../utils.js';
 
 const params = new Proxy(
-  // eslint-disable-next-line compat/compat
   new URLSearchParams(window.location.search),
   { get: (searchParams, prop) => searchParams.get(prop) },
 );
@@ -121,7 +120,7 @@ function createPayloadForSplunk(metaData) {
   };
 }
 
-// eslint-disable-next-line max-len, compat/compat
+// eslint-disable-next-line max-len
 export function sendAnalyticsToSplunk(eventName, verb, metaData, splunkEndpoint, sendBeacon = false) {
   const logFailure = (message) => {
     window.lana?.log(`Alloy verb-widget: ${verb}; eventName: ${eventName}; ${message}`, {
@@ -136,7 +135,6 @@ export function sendAnalyticsToSplunk(eventName, verb, metaData, splunkEndpoint,
     const payloadString = JSON.stringify(eventDataPayload);
     if (sendBeacon && navigator.sendBeacon
       && navigator.sendBeacon(splunkEndpoint, payloadString)) return;
-    // eslint-disable-next-line compat/compat
     fetch(splunkEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
