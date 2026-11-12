@@ -1,12 +1,11 @@
-/* eslint-disable compat/compat */
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
+import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
 
 const { default: init } = await import(
   '../../../acrobat/blocks/verb-widget/verb-widget.js'
 );
-import { getConfig, setConfig } from 'https://main--milo--adobecom.aem.live/libs/utils/utils.js';
 
 describe('verb-widget block', () => {
   let xhr;
@@ -25,9 +24,7 @@ describe('verb-widget block', () => {
     });
     xhr = sinon.useFakeXMLHttpRequest();
 
-    window.lana = {
-      log: sinon.stub(),
-    }
+    window.lana = { log: sinon.stub() };
     const placeholdersText = await readFile({ path: './mocks/placeholders.json' });
     placeholders = JSON.parse(placeholdersText);
 
