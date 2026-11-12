@@ -150,6 +150,13 @@ describe('geoPhoneNumber - locale resolution and link repair', () => {
     expect(sheetUrls()).toEqual(['/de/dc-shared/placeholders.json']);
   });
 
+  it('reads a JSON string region value', async () => {
+    window.sessionStorage.setItem('international', '"DE"');
+    setLocation('/fr/acrobat.html');
+    await geoPhoneNumber(locales);
+    expect(sheetUrls()).toEqual(['/de/dc-shared/placeholders.json']);
+  });
+
   it('uses the language site the visitor picked', async () => {
     window.sessionStorage.setItem('international', 'ch_it');
     setLocation('/de/acrobat.html');
@@ -278,6 +285,24 @@ describe('geoPhoneNumber - locale resolution and link repair', () => {
     await geoPhoneNumber(locales);
     expect(document.querySelector('a').getAttribute('href')).toBe('tel:+18005551234');
     expect(document.querySelector('.b').getAttribute('href')).toBe('tel:phone business geo');
+  });
+
+  it('repairs a geo-pn link whose href cannot be decoded', async () => {
+    window.fetch = mockFetch({}, {});
+    document.body.innerHTML = '<a class="geo-pn1 geo-pn" href="tel:%zz">0800 752 2580</a>';
+    setLocation('/de/acrobat.html', '?akamaiLocale=zz');
+    await geoPhoneNumber(locales);
+    expect(link().getAttribute('href')).toBe('tel:08007522580');
+  });
+
+  it('updates the number on links that start with an icon', async () => {
+    document.body.innerHTML = '<a class="geo-pn1 geo-pn" number-type="phone-business" href="tel:phone business geo"><span class="icon"></span>old</a>'
+      + '<a class="geo-pn2 geo-pn" number-type="phone-business" href="tel:phone business geo"><span class="icon"></span><span>old</span></a>';
+    setLocation('/de/acrobat.html', '?akamaiLocale=de');
+    await geoPhoneNumber(locales);
+    const [textAfterIcon, elementAfterIcon] = document.querySelectorAll('a');
+    expect(textAfterIcon.innerHTML).toBe('<span class="icon"></span>0800 752 2580');
+    expect(elementAfterIcon.innerHTML).toBe('0800 752 2580');
   });
 
   it('updates fragment links once numbers are ready', async () => {
