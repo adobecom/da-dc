@@ -1,8 +1,7 @@
-/* eslint-disable compat/compat */
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
-import { waitForElement, delay } from '../../helpers/waitfor.js';
+import { delay } from '../../helpers/waitfor.js';
 
 describe('prompt-cards view all feature', () => {
   before(async () => {
@@ -14,7 +13,7 @@ describe('prompt-cards view all feature', () => {
     document.body.innerHTML = await readFile({ path: './mocks/body-json-more-less.html' });
     await import('../../../acrobat/scripts/scripts.js');
     await delay(500);
-    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await new Promise((resolve) => { requestAnimationFrame(resolve); });
   });
 
   after(() => {

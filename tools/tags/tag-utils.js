@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 import { DA_ORIGIN } from 'https://da.live/nx/public/utils/constants.js';
 
 const cache = new Map();
