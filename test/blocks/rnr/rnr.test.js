@@ -1,4 +1,3 @@
-/* eslint-disable compat/compat */
 import sinon from 'sinon';
 import { readFile, sendKeys } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';

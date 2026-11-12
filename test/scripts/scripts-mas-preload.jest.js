@@ -3,7 +3,6 @@
  * @jest-environment-options {"url": "https://www.adobe.com/acrobat/online/compress-pdf"}
  */
 /* eslint-disable no-undef */
-/* eslint-disable compat/compat */
 
 const MAS_LINK = (hash) => `<a href="https://mas.adobe.com/studio.html#${hash}">card</a>`;
 

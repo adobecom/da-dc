@@ -1,6 +1,5 @@
 /* eslint-disable chai-friendly/no-unused-expressions */
 /* eslint-disable camelcase */
-/* eslint-disable compat/compat */
 /* eslint-disable no-underscore-dangle */
 import { setLibs, getEnv, getLanaErrorName } from '../../scripts/utils.js';
 

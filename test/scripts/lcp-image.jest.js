@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 /* eslint-env jest */
-/* eslint-disable compat/compat, global-require */
+/* eslint-disable global-require */
 
 jest.mock('https://main--milo--adobecom.aem.live/libs/utils/utils.js', () => ({
   loadArea: jest.fn(() => new Promise(() => {})),

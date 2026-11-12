@@ -3,7 +3,6 @@
  * @jest-environment-options {"url": "https://www.adobe.com/acrobat/plans.html"}
  */
 /* eslint-disable no-undef */
-/* eslint-disable compat/compat */
 
 // Separate file: scripts.js self-invokes loadPage() once per module registry,
 // so each DOM scenario needs its own.
