@@ -1,7 +1,9 @@
 /**
  * @jest-environment jsdom
  */
-import geoPhoneNumber from '../../acrobat/scripts/geo-phoneNumber';
+/* eslint-env jest */
+/* eslint-disable compat/compat */
+import geoPhoneNumber from '../../acrobat/scripts/geo-phoneNumber.js';
 
 // Mocking fetch API
 window.fetch = jest.fn((url) => {
@@ -34,9 +36,9 @@ describe('geoPhoneNumber', () => {
     fetch.mockClear();
   });
 
-  it('should call fetch with the correct URL', async () => {
+  it('should skip geo2 when a saved region choice decides the country', async () => {
     await geoPhoneNumber();
-    expect(fetch).toHaveBeenCalledWith('https://geo2.adobe.com/json/');
+    expect(fetch).not.toHaveBeenCalledWith('https://geo2.adobe.com/json/', expect.anything());
   });
 
   it('should get the correct locale', async () => {
@@ -78,6 +80,8 @@ describe('geoPhoneNumber - locale resolution and link repair', () => {
     ch_de: { ietf: 'de-CH' },
     ch_fr: { ietf: 'fr-CH' },
     ch_it: { ietf: 'it-CH' },
+    ca: { ietf: 'en-CA' },
+    ca_fr: { ietf: 'fr-CA' },
   };
   const sheets = {
     '/de/dc-shared/placeholders.json': '0800 752 2580',
@@ -89,6 +93,8 @@ describe('geoPhoneNumber - locale resolution and link repair', () => {
     '/ch_de/dc-shared/placeholders.json': '0800 000890',
     '/ch_fr/dc-shared/placeholders.json': null,
     '/ch_it/dc-shared/placeholders.json': '+44 203 4672 707',
+    '/ca/dc-shared/placeholders.json': '800-915-9430',
+    '/ca_fr/dc-shared/placeholders.json': '800-915-9431',
   };
   const brokenLink = '<a class="geo-pn1 geo-pn" number-type="phone-business" href="tel:phone business geo">0800 752 2580</a>';
   let originalFetch;
@@ -199,6 +205,44 @@ describe('geoPhoneNumber - locale resolution and link repair', () => {
     expect(sheetUrls()).toEqual(['/uk/dc-shared/placeholders.json']);
   });
 
+  it('does not call geo2 when akamaiLocale decides the country', async () => {
+    setLocation('/de/acrobat.html', '?akamaiLocale=ch');
+    await geoPhoneNumber(locales);
+    expect(window.fetch.mock.calls.some(([u]) => u.startsWith('https://geo2'))).toBe(false);
+  });
+
+  it('tries the exact saved locale before the country site', async () => {
+    window.sessionStorage.setItem('international', 'ca_fr');
+    setLocation('/acrobat.html');
+    await geoPhoneNumber(locales);
+    expect(sheetUrls()).toEqual(['/ca_fr/dc-shared/placeholders.json']);
+    expect(link().textContent).toBe('800-915-9431');
+  });
+
+  it('keeps LU pinned to lu_en when lu_de was saved', async () => {
+    window.sessionStorage.setItem('international', 'lu_de');
+    setLocation('/de/acrobat.html');
+    await geoPhoneNumber(locales);
+    expect(sheetUrls()).toEqual(['/lu_en/dc-shared/placeholders.json']);
+  });
+
+  it('never requests an unsafe prefix when no locale list is passed', async () => {
+    setLocation('/de/acrobat.html', '?akamaiLocale=//evil.com');
+    await geoPhoneNumber();
+    expect(sheetUrls().some((u) => u.includes('evil'))).toBe(false);
+  });
+
+  it('moves on to the next site when a sheet returns bad JSON', async () => {
+    const routes = mockFetch();
+    window.fetch = jest.fn(async (url) => (url === '/ch_fr/dc-shared/placeholders.json'
+      ? { status: 200, json: async () => { throw new SyntaxError('bad json'); } }
+      : routes(url)));
+    setLocation('/fr/acrobat.html', '?akamaiLocale=ch');
+    await geoPhoneNumber(locales);
+    expect(sheetUrls()).toEqual(['/ch_fr/dc-shared/placeholders.json', '/ch_de/dc-shared/placeholders.json']);
+    expect(link().textContent).toBe('0800 000890');
+  });
+
   it('repairs the link from the visible number when no sheet loads', async () => {
     window.fetch = mockFetch({}, {});
     setLocation('/de/acrobat.html', '?akamaiLocale=zz');
@@ -213,6 +257,18 @@ describe('geoPhoneNumber - locale resolution and link repair', () => {
     await geoPhoneNumber(locales);
     expect(link().getAttribute('href')).toBe('tel:08007522580');
     expect(window.lana.log).toHaveBeenCalledWith(expect.stringContaining('HTTP error'), expect.any(Object));
+  });
+
+  it('only repairs placeholder links and strips stray plus signs', async () => {
+    window.fetch = mockFetch({}, {});
+    document.body.innerHTML = '<a class="a" href="tel:support">Call 24/7, 1-800 555 0100</a>'
+      + '<a class="b" href="tel:phone business geo">+1 800+555 0100</a>'
+      + '<a class="c" href="tel:phone business geo">Open 9-5, 365 days</a>';
+    setLocation('/de/acrobat.html', '?akamaiLocale=zz');
+    await geoPhoneNumber(locales);
+    expect(document.querySelector('.a').getAttribute('href')).toBe('tel:support');
+    expect(document.querySelector('.b').getAttribute('href')).toBe('tel:+18005550100');
+    expect(document.querySelector('.c').getAttribute('href')).toBe('tel:phone business geo');
   });
 
   it('leaves links alone when they already dial or show no number', async () => {
@@ -235,13 +291,21 @@ describe('geoPhoneNumber - locale resolution and link repair', () => {
   it('keeps links dialable and stops waiting when geo2 hangs', async () => {
     jest.useFakeTimers();
     const routes = mockFetch();
-    window.fetch = jest.fn((url) => (url.startsWith('https://geo2') ? new Promise(() => {}) : routes(url)));
+    let geoSignal;
+    window.fetch = jest.fn((url, opts) => {
+      if (!url.startsWith('https://geo2')) return routes(url);
+      geoSignal = opts.signal;
+      return new Promise((resolve, reject) => {
+        opts.signal.addEventListener('abort', () => reject(new Error('aborted')));
+      });
+    });
     setLocation('/de/acrobat.html');
     const done = geoPhoneNumber(locales);
     expect(link().getAttribute('href')).toBe('tel:08007522580');
     expect(sheetUrls()).toEqual([]);
     await jest.advanceTimersByTimeAsync(3000);
     await done;
+    expect(geoSignal.aborted).toBe(true);
     expect(sheetUrls()).toEqual(['/de/dc-shared/placeholders.json']);
     expect(link().getAttribute('href')).toBe('tel:0800 752 2580');
   });

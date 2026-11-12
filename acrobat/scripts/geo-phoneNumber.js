@@ -5,6 +5,8 @@ const COUNTRY_ALIASES = { gb: 'uk' };
 const PREFERRED_LOCALE = { lu: 'lu_en' };
 
 const hasKey = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
+const SAFE_PREFIX = /^[a-z_]{2,8}$/;
+const isSafePrefix = (prefix) => prefix === '' || SAFE_PREFIX.test(prefix);
 
 function readSavedLocale(key) {
   const value = sessionStorage.getItem(key);
@@ -33,17 +35,18 @@ function getCandidates(saved, locales, pagePrefix) {
   const country = hasKey(COUNTRY_ALIASES, rawCountry) ? COUNTRY_ALIASES[rawCountry] : rawCountry;
   const candidates = [];
   if (country) {
-    const lang = savedLang || getPageLang(locales, pagePrefix);
+    const pageLang = getPageLang(locales, pagePrefix);
     candidates.push(
-      country === 'us' ? '' : country,
       hasKey(PREFERRED_LOCALE, country) ? PREFERRED_LOCALE[country] : undefined,
-      lang ? `${country}_${lang}` : undefined,
+      savedLang ? `${country}_${savedLang}` : undefined,
+      country === 'us' ? '' : country,
+      pageLang ? `${country}_${pageLang}` : undefined,
       ...Object.keys(locales || {}).filter((key) => key.startsWith(`${country}_`)),
     );
   }
   candidates.push(pagePrefix);
   return [...new Set(candidates)]
-    .filter((c) => c !== undefined && (!locales || hasKey(locales, c)));
+    .filter((c) => c !== undefined && isSafePrefix(c) && (!locales || hasKey(locales, c)));
 }
 
 const placeholderUrl = (prefix) => `${prefix ? `/${prefix}` : ''}/dc-shared/placeholders.json`;
@@ -61,35 +64,46 @@ async function loadNumbers(candidates, neededKeys) {
   let fallback;
   let status;
   for (const prefix of candidates) {
-    const resp = await fetch(placeholderUrl(prefix)).catch(() => ({ status: 'error' }));
-    status = resp.status;
-    if (resp.status === 200) {
-      const json = await resp.json();
-      const data = (json.data || []).map((val) => ({
-        ...val,
-        value: (val.value || '').replace(/\u00A0/g, ' '),
-      }));
-      if (data.some((val) => val.value && neededKeys.includes(val.key))) return { data };
-      fallback ||= { data };
+    try {
+      const resp = await fetch(placeholderUrl(prefix));
+      status = resp.status;
+      if (resp.status === 200) {
+        const json = await resp.json();
+        const data = (json.data || []).map((val) => ({
+          ...val,
+          value: (val.value || '').replace(/\u00A0/g, ' '),
+        }));
+        if (data.some((val) => val.value && neededKeys.includes(val.key))) return { data };
+        fallback ||= { data };
+      }
+    } catch {
+      status = 'error';
     }
   }
   return fallback || { status };
 }
 
-function hasDigits(href) {
+function decodeHref(href) {
   try {
-    return /\d/.test(decodeURIComponent(href));
+    return decodeURIComponent(href);
   } catch {
-    return /\d/.test(href);
+    return href;
   }
 }
+
+// Milo leaves a missing key as "tel:phone business geo", or the raw token if not yet replaced.
+const isPlaceholderHref = (href) => /^tel:\s*(phone\b|\{\{)/i.test(href);
 
 // Unresolved placeholder links: dial the number the visitor can see.
 function repairTelLinks() {
   document.querySelectorAll('a[href^="tel:"]').forEach((a) => {
-    if (hasDigits(a.getAttribute('href'))) return;
-    const number = a.textContent.replace(/[^\d+]/g, '');
-    if (!/\d{5,}/.test(number)) return;
+    const href = decodeHref(a.getAttribute('href'));
+    if (/\d/.test(href)) return;
+    if (!isPlaceholderHref(href) && !/geo-pn/.test(a.className)) return;
+    const text = a.textContent.trim();
+    if (!/^\+?[\d\s().+-]+$/.test(text)) return;
+    const number = text.replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
+    if (!/^\+?\d{5,}$/.test(number)) return;
     a.dataset.telPlaceholder = a.getAttribute('href');
     a.href = `tel:${number}`;
   });
@@ -98,14 +112,12 @@ function repairTelLinks() {
 const GEO_TIMEOUT_MS = 3000;
 
 function fetchGeo() {
-  let timer;
-  const timeout = new Promise((resolve) => {
-    timer = setTimeout(() => resolve({}), GEO_TIMEOUT_MS);
-  });
-  const geo = fetch('https://geo2.adobe.com/json/')
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), GEO_TIMEOUT_MS);
+  return fetch('https://geo2.adobe.com/json/', { signal: controller.signal })
     .then((resp) => resp.json())
-    .catch(() => ({}));
-  return Promise.race([geo, timeout]).finally(() => clearTimeout(timer));
+    .catch(() => ({}))
+    .finally(() => clearTimeout(timer));
 }
 
 export default async function geoPhoneNumber(locales) {
@@ -113,13 +125,14 @@ export default async function geoPhoneNumber(locales) {
   repairTelLinks();
   try {
     const urlParams = new URLSearchParams(window.location.search);
-    const geoData = await fetchGeo();
-
-    const saved = readSavedLocale('international')
-    || urlParams.get('akamaiLocale')?.toLowerCase()
-    || geoData?.country?.toLowerCase()
-    || readSavedLocale('feds_location')
-    || '';
+    let saved = readSavedLocale('international')
+      || urlParams.get('akamaiLocale')?.toLowerCase();
+    if (!saved) {
+      const geoData = await fetchGeo();
+      saved = geoData?.country?.toLowerCase()
+        || readSavedLocale('feds_location')
+        || '';
+    }
 
     const updatePhoneNumber = (visNum, i) => {
       const phoneNumberEle = document.querySelector(`.${i}`);
@@ -141,7 +154,7 @@ export default async function geoPhoneNumber(locales) {
     const { data, status } = await loadNumbers(candidates, getNeededKeys());
     if (!data) {
       window.lana?.log(
-        `Geo Phone: phone placeholder request failed; HTTP ${status ?? 'none'}; country ${/^[a-z_]{2,8}$/.test(saved) ? saved : 'unknown'}`,
+        `Geo Phone: phone placeholder request failed; HTTP ${status ?? 'none'}; country ${SAFE_PREFIX.test(saved) ? saved : 'unknown'}`,
         { severity: 'error', tags: 'DC_Milo,geo-phone' },
       );
       return;
