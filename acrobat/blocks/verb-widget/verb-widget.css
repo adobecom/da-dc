@@ -192,7 +192,7 @@
 .verb-image img {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 
 .security-icon {
@@ -826,4 +826,3 @@ html[dir="rtl"] .verb-cta .upload-icon {
     max-width: 180px;
   }
 }
-
