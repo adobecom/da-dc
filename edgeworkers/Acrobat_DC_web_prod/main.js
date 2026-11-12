@@ -323,7 +323,7 @@ export async function responseProvider(request) {
 async function frictionlessResponseProvider(request) {
   const secretCDNToken = request.getVariable('PMUSER_ADOBE_CDN_TOKEN');
   // aem.live has no trailing-slash routes, so /tools/pdf-to-word/ must resolve as /tools/pdf-to-word.
-  const requestPath = request.path.replace(/(.)\/+$/, '$1');
+  const requestPath = request.path.replace(/\/+$/, '');
   const path = requestPath.split('/');
   const headers = {'X-Adobe-CDN-Token': secretCDNToken};
   const first = path[1];
