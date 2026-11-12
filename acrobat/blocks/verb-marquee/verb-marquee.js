@@ -457,7 +457,7 @@ export default async function init(element) {
     header.append(iconWrapper, title);
   }
   const headingEl = createTag('h1', { class: 'verb-marquee-heading' }, heading);
-  const isMobileOrTabletViewport = window.innerWidth < 1200;
+  const isMobileOrTabletViewport = !window.matchMedia('(min-width: 1200px)').matches;
   const copy1Text = isMobileOrTabletViewport
     ? (cellText('mobile-copy') || window.mph?.[`verb-marquee-${VERB}-mobile-copy`] || cellText('copy') || window.mph?.[`verb-marquee-${VERB}-copy`] || '')
     : (cellText('copy') || window.mph?.[`verb-marquee-${VERB}-copy`] || '');
