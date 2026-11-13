@@ -236,7 +236,7 @@ describe('geoPhoneNumber - locale resolution and link repair', () => {
   describe('when the pinned lu_en sheet fails', () => {
     const luFallthrough = async () => {
       document.body.innerHTML = '<a class="geo-pn1 geo-pn" number-type="phone-business" href="tel:phone business geo">800 27340</a>';
-      setLocation('/lu_de/acrobat/acrobat-pro.html', '?akamaiLocale=lu');
+      setLocation('/lu_en/acrobat/acrobat-pro.html', '?akamaiLocale=lu');
       await geoPhoneNumber(locales);
       expect(sheetUrls()).toEqual(['/lu_en/dc-shared/placeholders.json']);
       expect(link().textContent).toBe('800 27340');
