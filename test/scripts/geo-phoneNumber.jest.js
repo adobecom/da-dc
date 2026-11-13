@@ -233,6 +233,33 @@ describe('geoPhoneNumber - locale resolution and link repair', () => {
     expect(sheetUrls()).toEqual(['/lu_en/dc-shared/placeholders.json']);
   });
 
+  describe('when the pinned lu_en sheet fails', () => {
+    const luFallthrough = async () => {
+      document.body.innerHTML = '<a class="geo-pn1 geo-pn" number-type="phone-business" href="tel:phone business geo">800 27340</a>';
+      setLocation('/lu_de/acrobat/acrobat-pro.html', '?akamaiLocale=lu');
+      await geoPhoneNumber(locales);
+      expect(sheetUrls()).toEqual(['/lu_en/dc-shared/placeholders.json']);
+      expect(link().textContent).toBe('800 27340');
+      expect(link().getAttribute('href')).toBe('tel:80027340');
+      expect(window.lana.log).toHaveBeenCalled();
+    };
+
+    it('keeps the authored number on a 404 instead of using lu_de', async () => {
+      const { '/lu_en/dc-shared/placeholders.json': _, ...routes } = sheets;
+      window.fetch = mockFetch({}, routes);
+      await luFallthrough();
+    });
+
+    it('keeps the authored number on a network error instead of using lu_de', async () => {
+      const routes = mockFetch();
+      window.fetch = jest.fn(async (url) => {
+        if (url === '/lu_en/dc-shared/placeholders.json') throw new Error('offline');
+        return routes(url);
+      });
+      await luFallthrough();
+    });
+  });
+
   it('never requests an unsafe prefix when no locale list is passed', async () => {
     setLocation('/de/acrobat.html', '?akamaiLocale=//evil.com');
     await geoPhoneNumber();

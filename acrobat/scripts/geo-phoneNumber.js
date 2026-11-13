@@ -33,11 +33,12 @@ function getPageLang(locales, pagePrefix) {
 function getCandidates(saved, locales, pagePrefix) {
   const [rawCountry, savedLang] = saved.split('_');
   const country = hasKey(COUNTRY_ALIASES, rawCountry) ? COUNTRY_ALIASES[rawCountry] : rawCountry;
+  const usable = (c) => c !== undefined && isSafePrefix(c) && (!locales || hasKey(locales, c));
+  if (hasKey(PREFERRED_LOCALE, country)) return [PREFERRED_LOCALE[country]].filter(usable);
   const candidates = [];
   if (country) {
     const pageLang = getPageLang(locales, pagePrefix);
     candidates.push(
-      hasKey(PREFERRED_LOCALE, country) ? PREFERRED_LOCALE[country] : undefined,
       savedLang ? `${country}_${savedLang}` : undefined,
       country === 'us' ? '' : country,
       pageLang ? `${country}_${pageLang}` : undefined,
@@ -45,8 +46,7 @@ function getCandidates(saved, locales, pagePrefix) {
     );
   }
   candidates.push(pagePrefix);
-  return [...new Set(candidates)]
-    .filter((c) => c !== undefined && isSafePrefix(c) && (!locales || hasKey(locales, c)));
+  return [...new Set(candidates)].filter(usable);
 }
 
 const placeholderUrl = (prefix) => `${prefix ? `/${prefix}` : ''}/dc-shared/placeholders.json`;
