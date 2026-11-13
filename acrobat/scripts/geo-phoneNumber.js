@@ -1,5 +1,3 @@
-/* eslint-disable compat/compat */
-
 const COUNTRY_ALIASES = { gb: 'uk' };
 // Language sites in these countries carry different numbers; pin the right one.
 const PREFERRED_LOCALE = { lu: 'lu_en' };

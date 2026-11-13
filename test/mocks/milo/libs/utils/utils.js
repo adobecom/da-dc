@@ -251,6 +251,8 @@ export function getMetadata(name, doc = document) {
   return meta && meta.content;
 }
 
+export const getValidatedMarket = async () => undefined;
+
 const handleEntitlements = (() => {
   const { martech } = Object.fromEntries(PAGE_URL.searchParams);
   if (martech === 'off') return () => { };

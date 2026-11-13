@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable compat/compat */
 import { setLibs, getEnv, isOldBrowser } from '../../scripts/utils.js';
 import { localeMap } from '../unity/unity.js';
 

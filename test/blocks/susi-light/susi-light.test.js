@@ -1,4 +1,3 @@
-/* eslint-disable compat/compat */
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { setLibs } from '../../../acrobat/scripts/utils.js';
