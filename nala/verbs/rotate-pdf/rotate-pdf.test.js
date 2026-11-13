@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './rotate-pdf.spec.js';
 import RotatePdf from './rotate-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-rotate-pdf.pdf');
@@ -89,9 +90,7 @@ test.describe('Unity Rotate PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await rotatePdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(rotatePdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(rotatePdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, rotatePdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

@@ -2,7 +2,6 @@
  * @jest-environment jsdom
  */
 /* eslint-env jest */
-/* eslint-disable compat/compat */
 import geoPhoneNumber from '../../acrobat/scripts/geo-phoneNumber.js';
 
 describe('Geo Phone placeholder failure logs', () => {

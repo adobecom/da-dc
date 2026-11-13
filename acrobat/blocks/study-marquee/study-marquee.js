@@ -197,7 +197,6 @@ async function loadAnalyticsAfterLCP(analyticsData) {
 }
 
 window.addEventListener('analyticsLoad', async ({ detail }) => {
-  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
   const delay = (ms) => new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
@@ -380,7 +379,7 @@ export default async function init(element) {
   }
   header.append(iconWrapper, title);
   const headingEl = createTag('h1', { class: 'study-marquee-heading' }, heading);
-  const isMobileOrTablet = window.innerWidth < 1200;
+  const isMobileOrTablet = !window.matchMedia('(min-width: 1200px)').matches;
   const copy1Text = isMobileOrTablet
     ? (cellText('mobile-copy') || window.mph?.[`study-marquee-${VERB}-mobile-copy`] || cellText('copy') || window.mph?.[`study-marquee-${VERB}-copy`] || '')
     : (cellText('copy') || window.mph?.[`study-marquee-${VERB}-copy`] || '');
@@ -813,7 +812,6 @@ export default async function init(element) {
   window.prefetchTargetUrl = null;
   element.parentNode.style.display = 'block';
 
-  // eslint-disable-next-line compat/compat
   requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
 
   window.addEventListener('pageshow', (event) => {

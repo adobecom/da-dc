@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './request-signature.spec.js';
 import RequestSignature from './request-signature.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-request-signature-pdf.pdf');
@@ -89,9 +90,7 @@ test.describe('Unity Request Signature test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await requestSignature.rnrSection.scrollIntoViewIfNeeded();
-      await expect(requestSignature.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(requestSignature.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, requestSignature.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

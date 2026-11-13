@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './sign-pdf.spec.js';
 import SignPdf from './sign-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-sign-pdf.pdf');
@@ -89,9 +90,7 @@ test.describe('Unity Sign PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await signPdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(signPdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(signPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, signPdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {
