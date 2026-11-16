@@ -22,7 +22,6 @@ describe('Geo Phone placeholder failure logs', () => {
     window.lana = { log: jest.fn() };
     sessionStorage.setItem('international', JSON.stringify({ country: 'us' }));
     document.body.innerHTML = '<a class="geo-pn-business" number-type="phone-business" href="tel:000">000</a>';
-    window.fetch.mockResolvedValueOnce({ json: async () => ({ country: 'us' }) });
   });
 
   afterEach(() => {
@@ -43,7 +42,7 @@ describe('Geo Phone placeholder failure logs', () => {
 
     expect(window.lana.log).toHaveBeenCalledTimes(1);
     expect(window.lana.log).toHaveBeenCalledWith(
-      'Geo Phone: phone placeholder request failed; HTTP 404',
+      'Geo Phone: phone placeholder request failed; HTTP 404; country us',
       { severity: 'error', tags: 'DC_Milo,geo-phone' },
     );
     expect(document.querySelector('a').getAttribute('href')).toBe('tel:000');
