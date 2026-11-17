@@ -188,3 +188,10 @@
 
   flagMeta.content = 'true';
 </script>
+<script>
+  if (document.querySelector('meta[name="personalization-v2"]')) {
+    import(`${setLibs('/libs')}/martech/helpers.js`)
+      .then(({ startEarlyTargetInteraction }) => startEarlyTargetInteraction())
+      .catch(() => {});
+  }
+</script>
