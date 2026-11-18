@@ -33,6 +33,7 @@ const localeMap = {
   mt: 'en-mt',
   mena_en: 'en-mena',
   mena_ar: 'ar-mena',
+  ara: 'ar-mena',
   nl: 'nl-nl',
   no: 'nb-no',
   at: 'de-at',
