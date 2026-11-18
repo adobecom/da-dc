@@ -414,19 +414,54 @@ function replaceDotMedia(area = document) {
 
 replaceDotMedia(document);
 
+function getViewportLCPImage(lcpImg, activeViewportIndex) {
+  const VIEWPORTS = ['mobile', 'tablet', 'desktop'];
+  const vpDelimiterIndex = (row) => {
+    if (row.children.length !== 1) return -1;
+    const label = row.children[0].textContent.trim().toLowerCase().split(/[ (]/)[0];
+    return VIEWPORTS.indexOf(label.replace('-viewport', ''));
+  };
+  const lcpBlock = lcpImg?.closest('main > div > div');
+  if (!lcpBlock) return lcpImg;
+
+  const rows = [...lcpBlock.children];
+  const hasViewportRows = rows.some((row) => vpDelimiterIndex(row) !== -1);
+  if (activeViewportIndex === 0 || !hasViewportRows) return lcpImg;
+
+  const viewportSections = VIEWPORTS.map(() => []);
+  let currentViewport = -1;
+  rows.forEach((row) => {
+    const delimiterIndex = vpDelimiterIndex(row);
+    if (delimiterIndex !== -1) currentViewport = delimiterIndex;
+    else if (currentViewport !== -1) viewportSections[currentViewport].push(row);
+  });
+
+  const lcpRowIndex = viewportSections[0].findIndex((row) => row.querySelector('img'));
+  if (lcpRowIndex === -1) return lcpImg;
+  const viewportLCPs = viewportSections.map((section) => section[lcpRowIndex]?.querySelector('img'));
+  return viewportLCPs.slice(0, activeViewportIndex + 1).reverse().find(Boolean) ?? lcpImg;
+}
+
 (async function loadLCPImage() {
-  const blocks = '.marquee, .hero-marquee, .study-marquee, .unity-marquee, .verb-marquee';
-  const marquee = document.querySelector('main')?.querySelector(blocks);
-  const text = marquee?.querySelector('h1, h2, h3, h4, h5, h6')?.closest('div');
-  if (!text) return;
   const eagerLoad = (img) => {
     img?.setAttribute('fetchpriority', 'high');
     img?.setAttribute('loading', 'eager');
   };
 
-  let viewport = 'mobile';
-  if (window.matchMedia('(min-width: 600px)').matches) viewport = 'tablet';
-  if (window.matchMedia('(min-width: 1200px)').matches) viewport = 'desktop';
+  const getViewport = () => {
+    if (window.matchMedia('(min-width: 1200px)').matches) return 'desktop';
+    return window.matchMedia('(min-width: 600px)').matches ? 'tablet' : 'mobile';
+  };
+
+  const blocks = '.marquee, .hero-marquee, .study-marquee, .unity-marquee, .verb-marquee';
+  const marquee = document.querySelector('main')?.querySelector(blocks);
+  const text = marquee?.querySelector('h1, h2, h3, h4, h5, h6')?.closest('div');
+  if (!text) {
+    const firstImg = document.querySelector('main img');
+    if (firstImg) eagerLoad(getViewportLCPImage(firstImg, ['mobile', 'tablet', 'desktop'].indexOf(getViewport())));
+    return;
+  }
+  const viewport = getViewport();
 
   const background = marquee.firstElementChild;
   if (background !== text.parentElement) {
