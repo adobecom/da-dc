@@ -356,6 +356,17 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     });
   });
 
+  it("does not modify the cache key for acrobat.adobe.com", () => {
+    const requestMock = new Request({path: '/online/pdf-to-ppt', host: 'acrobat.adobe.com'});
+    requestMock.cacheKey.includeVariable.mockClear();
+    requestMock.setVariable.mockClear();
+
+    onClientRequest(requestMock);
+
+    expect(requestMock.setVariable).toBeCalledWith('PMUSER_DEVICETYPE', 'Desktop');
+    expect(requestMock.cacheKey.includeVariable).not.toBeCalled();
+  });
+
   it("onClientReqest", async () => {
     let requestMock = new Request({path: '/acrobat/online/pdf-to-ppt'});
 

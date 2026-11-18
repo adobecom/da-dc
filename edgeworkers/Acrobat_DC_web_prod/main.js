@@ -575,5 +575,7 @@ export function onClientRequest (request) {
   } else if (isIPadOS || isTablet) {
     request.setVariable('PMUSER_DEVICETYPE', 'Tablet');
   }
-  request.cacheKey.includeVariable('PMUSER_DEVICETYPE');
+  if (request.host !== 'acrobat.adobe.com') {
+    request.cacheKey.includeVariable('PMUSER_DEVICETYPE');
+  }
 }
