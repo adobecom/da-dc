@@ -3,7 +3,6 @@
  */
 /* eslint-disable no-undef */
 /* eslint-disable global-require */
-/* eslint-disable compat/compat */
 /* eslint-disable no-underscore-dangle */
 
 import { delay } from '../helpers/waitfor.js';

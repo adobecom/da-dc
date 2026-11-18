@@ -138,6 +138,23 @@ The old `/acrobat/pricing`, `/acrobat/pricing/business`, and `/acrobat/pricing/s
 
 ---
 
+## `rnr/`
+
+Ratings and reviews (RnR) block. The shared helper is `nala/libs/blocks/rnr.js`. The verb tests in `nala/verbs/` use `verifySmoke()` from this helper (except `jpg-to-pdf`, which does not use the `div.rnr` block).
+
+| File | URL | Coverage |
+|------|-----|----------|
+| `rnr.spec.js` | `/acrobat/online/compress-pdf`, `/fr/acrobat/online/compress-pdf` | `@rnr-en`, `@rnr-fr`, `@rnr`, `@regression`. |
+| `rnr.test.js` | **Live ratings data** (EN) | Ratings call returns 200 for this verb; summary (average and votes) matches the ratings data; star labels; SEO rating data (JSON-LD) when the page has a product name; block fits in the viewport; accessibility scan of the block. |
+| | **Star hover and comments** (EN) | Stars fill on hover and reset (desktop only); comments box opens after a star click; 500 character limit and counter; submit enabled only with text; no review sent before submit. |
+| | **Submit and locked state** (EN) | Review request body (rating, text, locale); thank-you message replaces the form; after reload the stars are locked at the given rating; another verb page stays unlocked. The review call is faked, so no real review is sent. |
+| | **Keyboard** (EN) | Arrow keys move between stars; Escape removes the focus style; Enter selects a star. Desktop only. |
+| | **Localized labels** (FR) | French labels show; review request uses locale `fr-FR`. |
+| | **Ratings service error** (`@rnr-negative`) | Faked failed ratings call: block stays usable, no SEO rating data, no block errors. |
+| | **Submit service error** (`@rnr-negative`) | Faked failed review call: thank-you message still shows. |
+
+---
+
 ## How to extend
 
 1. Add or edit a row in the feature’s `*.spec.js` (`path`, `name`, `tags`).
@@ -163,3 +180,4 @@ The old `/acrobat/pricing`, `/acrobat/pricing/business`, and `/acrobat/pricing/s
 | `pdf-reader` | `/acrobat/pdf-reader` |
 | `pdf-solution` | `/acrobat/complete-pdf-solution` (+ `?ttid=edit-pdf`) |
 | `pricing` | `/acrobat/pricing`, `.../students`, `.../compare-versions`, `.../business` |
+| `rnr` | `/acrobat/online/compress-pdf`, `/fr/acrobat/online/compress-pdf` |

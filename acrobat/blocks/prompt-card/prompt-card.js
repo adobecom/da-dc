@@ -1,5 +1,4 @@
 /* eslint-disable prefer-template */
-/* eslint-disable compat/compat */
 import { setLibs } from '../../scripts/utils.js';
 
 const miloLibs = setLibs('/libs');

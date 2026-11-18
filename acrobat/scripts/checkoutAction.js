@@ -1,4 +1,3 @@
-/* eslint-disable compat/compat */
 const IMS_POLL_INTERVAL = 250;
 const IMS_POLL_ATTEMPTS = 120;
 

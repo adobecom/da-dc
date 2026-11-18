@@ -3,7 +3,6 @@
  * @jest-environment-options {"url": "https://www.adobe.com/acrobat/online/compress-pdf.html"}
  */
 /* eslint-disable no-undef */
-/* eslint-disable compat/compat */
 
 // The fast-track path strips the block's class and sets an id, so the IMS check
 // must still match. Separate file: scripts.js self-invokes loadPage() on import.

@@ -33,10 +33,6 @@ jobs:
                     } \
               }"
 
-      - name: Trigger Jenkins Job
-        run: |
-          curl -X POST 'https://dcx.ci.corp.adobe.com/job/DC%20Release%20-%20Run%20Nala/buildWithParameters?token=${{ secrets.JNK_JOB_TOKEN }}&branch=stage' \
-              -u '${{ secrets.JNK_USER }}:${{ secrets.JNK_API_TOKEN }}'
 
   run-prod-tests:
     if: ${{ github.event.inputs.miloBranch == 'main' }}
@@ -55,56 +51,6 @@ jobs:
                     } \
               }"
 
-      - name: Trigger Jenkins Job
-        run: |
-          curl -X POST 'https://dcx.ci.corp.adobe.com/job/DC%20Release%20-%20Run%20Nala/buildWithParameters?token=${{ secrets.JNK_JOB_TOKEN }}&branch=main' \
-              -u '${{ secrets.JNK_USER }}:${{ secrets.JNK_API_TOKEN }}'
-
-  run-prod-tests-gha:
-    if: ${{ github.event.inputs.miloBranch == 'main' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        include:
-          - os: ubuntu-latest
-            browser: firefox
-          - os: windows-latest
-            browser: chromium
-          - os: macos-latest
-            browser: webkit          
-    name: Smoke Test
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.testCodeBranch }}
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules
-          key: modules-${{ hashFiles('package-lock.json') }}-${{ runner.os }}
-
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: npm ci --ignore-scripts
-
-      - name: Install browsers
-        run: npx playwright install --with-deps ${{ matrix.browser }}
-
-      - name: Run the tests
-        run: npx run test/e2e -t "@smoke and (not (@analytics or @extension-installed))" -h -p prod -b ${{ matrix.browser }} --bypassBotDetection
-        env:
-          USER_AGENT_SUFFIX: "${{ secrets.USER_AGENT_SUFFIX }}"
-
-      - name: Save test logs
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: reports
-          path: reports/
 
   run-integration-tests:
     name: Integration Tests

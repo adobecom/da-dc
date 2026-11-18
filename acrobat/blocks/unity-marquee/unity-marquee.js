@@ -23,7 +23,6 @@ const GENAI_VERBS = new Set(['quiz-maker', 'flashcard-maker', 'mindmap-maker']);
 const MAX_PRERENDER_FRAMES = 600;
 
 function waitForLCP(timeout = 3000) {
-  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
   return new Promise((resolve) => {
     if (!window.PerformanceObserver) { setTimeout(resolve, timeout); return; }
     const obs = new PerformanceObserver((list) => {
@@ -186,7 +185,6 @@ export default async function init(element) {
       prerenderElement.remove();
     } else if (prerenderFrames < MAX_PRERENDER_FRAMES) {
       prerenderFrames += 1;
-      /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
       requestAnimationFrame(removePrerender);
     } else {
       window.lana?.log(
@@ -274,7 +272,7 @@ export default async function init(element) {
 
   const cellText = (key) => authored.get(key)?.textContent?.trim() || '';
   const cellHTML = (key) => authored.get(key)?.innerHTML?.trim() || '';
-  const isMobileOrTablet = window.innerWidth < 1200;
+  const isMobileOrTablet = !window.matchMedia('(min-width: 1200px)').matches;
   const authoredCopy = isMobileOrTablet
     ? (cellText('mobile-copy') || cellText('desktop-copy'))
     : cellText('desktop-copy');
@@ -370,7 +368,6 @@ export default async function init(element) {
   container.appendChild(row);
   foreground.innerHTML = '';
   foreground.append(container);
-  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
   requestAnimationFrame(() => requestAnimationFrame(removePrerender));
 
   async function checkSignedInUser() {

@@ -14,7 +14,6 @@ function getOsi(el) {
   if (el.dataset.wcsOsi) return el.dataset.wcsOsi;
   try {
     const { href } = el.href;
-    // eslint-disable-next-line compat/compat
     const url = new URL(href);
     return url.searchParams.get('osi');
   } catch (e) {
@@ -23,7 +22,6 @@ function getOsi(el) {
 }
 
 function waitForPlaceholderResolved(el) {
-  // eslint-disable-next-line compat/compat
   return new Promise((resolve) => {
     if (el.classList.contains('placeholder-resolved')) {
       resolve();

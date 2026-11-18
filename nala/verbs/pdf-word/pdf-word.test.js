@@ -2,6 +2,7 @@
 // import { expect, test } from '@playwright/test';
 // import { features } from './pdf-word.spec.js';
 // import PdfToWord from './pdf-word.page.js';
+// import Rnr from '../../libs/blocks/rnr.js';
 // import checkPageLinks from '../../utils/link-checker.js';
 
 // const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-pdf-word.pdf');
@@ -78,9 +79,7 @@
 //     });
 
 //     await test.step('Verify ratings and reviews (RnR) block', async () => {
-//       await pdfToWord.rnrSection.scrollIntoViewIfNeeded();
-//       await expect(pdfToWord.rnrSection).toBeVisible({ timeout: 60000 });
-//       await expect(pdfToWord.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+//       await new Rnr(page, pdfToWord.rnrSection).verifySmoke();
 //     });
 
 //     await test.step('Verify columns section has 31 links', async () => {

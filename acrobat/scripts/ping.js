@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-/* eslint-disable compat/compat */
 /** ***********************************************************************
 * ADOBE CONFIDENTIAL
 * ___________________

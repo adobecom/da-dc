@@ -1,6 +1,7 @@
 import { setLibs, isOldBrowser, loadPlaceholders, getEnv as getAppEnv } from '../../scripts/utils.js';
 import { localeMap } from '../unity/unity.js';
 
+const miloLibs = setLibs('/libs');
 const MB100 = 104857600;
 const MB20 = 20971520;
 const PDF_ONLY = ['.pdf'];
@@ -17,7 +18,55 @@ export const LIMITS = {
   ...group(['word-to-pdf', 'jpg-to-pdf'], { ...MULTI_ALL, noRedirectTimeout: true }),
 };
 
-const miloLibs = setLibs('/libs');
+export const RESUME_FORK_MODAL_ID = 'resume-upload-fork';
+
+// Keep in sync with SELECT_EVENT / ACTIONS in blocks/resume-upload-fork/resume-upload-fork.js
+const FORK_SELECT_EVENT = 'resume-upload-fork:select';
+const FORK_ACTIONS = { continue: 'continue-fork', cancel: 'cancel-fork' };
+
+// Closing the fork modal without choosing counts as cancel.
+export function initResumeFork(element, track = () => {}) {
+  const controller = new AbortController();
+  const { signal } = controller;
+  let awaitingResponse = false;
+  const respond = (detail, dismiss = 'other') => {
+    if (!awaitingResponse) return;
+    awaitingResponse = false;
+    track(detail.action === FORK_ACTIONS.continue
+      ? `fork-modal:continue-${detail.choice}`
+      : `fork-modal:bounce:${dismiss}`);
+    element.dispatchEvent(new CustomEvent('unity:resume-fork-response', { detail }));
+  };
+  element.addEventListener('unity:show-resume-fork', () => {
+    awaitingResponse = true;
+    window.dispatchEvent(new CustomEvent('modal:open', { detail: { hash: `#${RESUME_FORK_MODAL_ID}` } }));
+  }, { signal });
+  window.addEventListener(FORK_SELECT_EVENT, (e) => {
+    const { action, choice, dismiss } = e.detail || {};
+    if (action === FORK_ACTIONS.continue) respond({ action, choice });
+    else respond({ action: FORK_ACTIONS.cancel }, dismiss);
+  }, { signal });
+  window.addEventListener('milo:modal:loaded', (e) => {
+    if (awaitingResponse && e.detail?.id === RESUME_FORK_MODAL_ID) track('fork-modal:shown');
+  }, { signal });
+  window.addEventListener('milo:modal:closed', (e) => {
+    if (e.detail?.id === RESUME_FORK_MODAL_ID) respond({ action: FORK_ACTIONS.cancel });
+  }, { signal });
+  return () => controller.abort();
+}
+
+// Unity reads data-show-resume-fork to decide whether to request the fork modal.
+export async function flagResumeFork(element, loadIms) {
+  const { getMetadata } = await import(`${miloLibs}/utils/utils.js`);
+  if (!getMetadata(`-${RESUME_FORK_MODAL_ID}`)) return;
+  try {
+    await loadIms();
+  } catch {
+    return;
+  }
+  if (!window.adobeIMS?.isSignedInUser()) element.dataset.showResumeFork = 'true';
+}
+
 let createTag;
 let getConfig;
 let loadStyle;
@@ -240,7 +289,6 @@ async function loadAnalyticsAfterLCP(analyticsData) {
 }
 
 window.addEventListener('analyticsLoad', async ({ detail }) => {
-  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
   const delay = (ms) => new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
@@ -316,7 +364,8 @@ function getAuthoredSvgInfo(foregroundEl, headlineEl) {
 }
 
 export default async function init(element) {
-  ({ createTag, getConfig, loadStyle } = (await import(`${miloLibs}/utils/utils.js`)));
+  const miloUtils = await import(`${miloLibs}/utils/utils.js`);
+  ({ createTag, getConfig, loadStyle } = miloUtils);
   ({ decorateBlockBg } = (await import(`${miloLibs}/utils/decorate.js`)));
 
   element.classList.add('con-block');
@@ -403,6 +452,16 @@ export default async function init(element) {
     initializePingService();
     window.dispatchEvent(new CustomEvent('analyticsLoad', { detail: { verb: VERB, userAttempts } }));
   });
+  const LABEL_PREFIX = 'dc-block-row-';
+  const authored = new Map();
+  element.querySelectorAll(':scope > div').forEach((rowEl) => {
+    const label = rowEl.firstElementChild?.textContent?.trim() || '';
+    if (label.startsWith(LABEL_PREFIX)) {
+      authored.set(label.slice(LABEL_PREFIX.length), rowEl.children[1] || null);
+      rowEl.remove();
+    }
+  });
+  const cellText = (key) => authored.get(key)?.textContent?.trim() || '';
   const children = element.querySelectorAll(':scope > div');
   const foreground = children[children.length - 1];
   foreground.classList.add('foreground', 'container');
@@ -448,16 +507,16 @@ export default async function init(element) {
     header.append(iconWrapper, title);
   }
   const headingEl = createTag('h1', { class: 'verb-marquee-heading' }, heading);
-  const isMobileOrTabletViewport = window.innerWidth < 1200;
+  const isMobileOrTabletViewport = !window.matchMedia('(min-width: 1200px)').matches;
   const copy1Text = isMobileOrTabletViewport
-    ? (window.mph?.[`verb-marquee-${VERB}-mobile-copy`] || window.mph?.[`verb-marquee-${VERB}-copy`] || '')
-    : (window.mph?.[`verb-marquee-${VERB}-copy`] || '');
+    ? (cellText('mobile-copy') || window.mph?.[`verb-marquee-${VERB}-mobile-copy`] || cellText('copy') || window.mph?.[`verb-marquee-${VERB}-copy`] || '')
+    : (cellText('copy') || window.mph?.[`verb-marquee-${VERB}-copy`] || '');
   const subCopies = ['', '-2']
     .map((suffix) => {
       const subCopyText = isMobileOrTabletViewport
-        ? (window.mph?.[`verb-marquee-${VERB}-mobile-sub-copy${suffix}`]
-          || window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '')
-        : (window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '');
+        ? (cellText(`mobile-sub-copy${suffix}`) || window.mph?.[`verb-marquee-${VERB}-mobile-sub-copy${suffix}`]
+          || cellText(`sub-copy${suffix}`) || window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '')
+        : (cellText(`sub-copy${suffix}`) || window.mph?.[`verb-marquee-${VERB}-sub-copy${suffix}`] || '');
       if (!subCopyText) return null;
       const el = createTag('p', { class: 'verb-marquee-copy-sub' });
       const icon = createSvgElement('SUBCOPY_CHECK');
@@ -475,7 +534,7 @@ export default async function init(element) {
     class: 'verb-marquee-dropzone',
     id: 'drop-zone',
   });
-  const ctaButtonLabel = getCTA(VERB);
+  const ctaButtonLabel = cellText('upload-cta') || getCTA(VERB);
   const ctaButton = createTag('button', {
     class: 'verb-marquee-cta',
     type: 'button',
@@ -489,11 +548,11 @@ export default async function init(element) {
   }
   const ctaLabel = createTag('span', { class: 'verb-marquee-cta-label' }, ctaButtonLabel);
   ctaButton.appendChild(ctaLabel);
-  const dragText = createTag('p', { class: 'verb-marquee-drag' }, window.mph?.[`verb-widget-${VERB}-dragndrop-text`] || '');
+  const dragText = createTag('p', { class: 'verb-marquee-drag' }, cellText('dragndrop-text') || window.mph?.[`verb-widget-${VERB}-dragndrop-text`] || '');
   const fileLimitText = createTag('p', {
     class: 'verb-marquee-file-limit',
     id: 'file-upload-description',
-  }, window.mph?.[`verb-widget-${VERB}-file-limit`] || '');
+  }, cellText('file-limit') || window.mph?.[`verb-widget-${VERB}-file-limit`] || '');
 
   if (useFileUpload) {
     dropzone.append(ctaButton, dragText, fileLimitText);
@@ -589,9 +648,11 @@ export default async function init(element) {
     : (mph['verb-marquee-legal-2'] || mph['verb-widget-legal-2'] || '');
   const legalCombined = [legalPart1, legalPart2].filter(Boolean).join(' ').trim();
   const legalInitial = legalCombined || (mph['verb-marquee-legal-text'] || '');
-  const legalText = createTag('p', { class: 'verb-marquee-legal' }, legalInitial);
+  const authoredLegalEl = cellText('legal-text') ? authored.get('legal-text') : null;
+  const legalText = createTag('p', { class: 'verb-marquee-legal' }, authoredLegalEl ? '' : legalInitial);
+  if (authoredLegalEl) legalText.innerHTML = authoredLegalEl.innerHTML;
   const omitFooterForMobileStore = limits?.mobileApp && mobileOrTabletTouch;
-  if (!omitFooterForMobileStore && !(limits?.mobileApp && isMobile)) {
+  if (!authoredLegalEl && !omitFooterForMobileStore && !(limits?.mobileApp && isMobile)) {
     if (legalText.textContent) {
       const createLegalLink = (label, url) => `<a class="verb-marquee-legal-url" target="_blank" href="${url}">${label}</a>`;
       const legalLinks = [
@@ -608,7 +669,7 @@ export default async function init(element) {
       );
     }
   }
-  const tooltipContent = window.mph?.['verb-widget-tool-tip'] || '';
+  const tooltipContent = cellText('tool-tip') || window.mph?.['verb-widget-tool-tip'] || '';
   const infoIcon = createTag('button', {
     class: 'info-icon milo-tooltip top',
     type: 'button',
@@ -842,6 +903,10 @@ export default async function init(element) {
     });
   }
   runWhenDocumentIsReady(soloUpload);
+  initResumeFork(element, (eventName) => (
+    handleAnalyticsEvent(eventName, mergeData({ userAttempts }))
+  ));
+  flagResumeFork(element, miloUtils.loadIms);
   element.addEventListener('unity:track-analytics', (e) => {
     const cookieExp = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
     const { event, data } = e.detail || {};
@@ -1002,7 +1067,6 @@ export default async function init(element) {
   element.parentNode.style.display = 'block';
 
   const prerenderElement = document.querySelector('#prerender_verb-widget');
-  // eslint-disable-next-line compat/compat
   requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
 
   window.addEventListener('pageshow', (event) => {

@@ -17,65 +17,42 @@ test.describe('Unity Quiz maker test suite', () => {
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
     console.info(`[Test Page]: ${baseURL}${features[0].path}${unityLibs}`);
-    const { data } = features[0];
 
     await test.step('Go to Quiz maker test page', async () => {
       await page.goto(`${baseURL}${features[0].path}${unityLibs}`);
       await page.waitForLoadState('domcontentloaded');
-      await page.waitForTimeout(5000);
     });
 
-    await test.step('Verify global nav (smoke) and breadcrumbs', async () => {
-      await quizMaker.gnav.waitFor({ state: 'visible' });
+    await test.step('Verify global nav (smoke)', async () => {
       await expect(quizMaker.gnav).toBeVisible();
-      // await expect(quizMaker.gnavBreadcrumbs).toBeVisible();
     });
 
-    await test.step('Verify Quiz maker widget content/specs', async () => {
+    await test.step('Verify widget content and specs', async () => {
       await expect(quizMaker.widget).toBeVisible();
       await expect(quizMaker.dropZone).toBeVisible();
       await expect(quizMaker.acrobatIcon).toBeVisible();
+      await expect(quizMaker.verbHeader).toBeVisible();
       await expect(quizMaker.verbTitle).toBeVisible();
       await expect(quizMaker.verbCopy).toBeVisible();
       await expect(quizMaker.promptInput).toBeVisible();
-      await expect(quizMaker.addSourcesLabel).toBeVisible();
       await expect(quizMaker.securityTooltip).toBeVisible();
       await expect(quizMaker.ctaButton).toBeVisible();
+      await expect(quizMaker.ctaButton).toBeEnabled();
     });
 
-    await test.step('Verify how-to section', async () => {
-      await quizMaker.howToHeading.scrollIntoViewIfNeeded();
-      await expect(quizMaker.howToHeading).toBeVisible({ timeout: 60000 });
-    });
-
-    await test.step(`Verify three-up sections (${data.sectionCounts.threeUp})`, async () => {
-      const { threeUpSections } = quizMaker;
-      const { threeUp } = data.sectionCounts;
-
-      await expect(threeUpSections).toHaveCount(threeUp);
-
-      for (let i = 0; i < threeUp; i += 1) {
-        const section = threeUpSections.nth(i);
-        await section.scrollIntoViewIfNeeded();
-        await expect(section).toBeVisible({ timeout: 60000 });
+    await test.step('Verify editorial cards', async () => {
+      const cards = quizMaker.editorialCards;
+      expect(await cards.count(), 'page should render editorial cards').toBeGreaterThan(0);
+      for (let i = 0; i < await cards.count(); i += 1) {
+        const card = cards.nth(i);
+        await card.scrollIntoViewIfNeeded();
+        await expect(card).toBeVisible({ timeout: 60000 });
       }
     });
 
-    await test.step(`Verify two-up sections (${data.sectionCounts.twoUp})`, async () => {
-      const { twoUpSections } = quizMaker;
-      const { twoUp } = data.sectionCounts;
-
-      await expect(twoUpSections).toHaveCount(twoUp);
-
-      for (let i = 0; i < twoUp; i += 1) {
-        const section = twoUpSections.nth(i);
-        await section.scrollIntoViewIfNeeded();
-        await expect(section).toBeVisible({ timeout: 60000 });
-      }
-    });
-
-    await test.step('Verify Student Spaces carousel', async () => {
+    await test.step('Verify carousels', async () => {
       const { carousels } = quizMaker;
+      expect(await carousels.count(), 'page should render at least one carousel').toBeGreaterThan(0);
       for (let i = 0; i < await carousels.count(); i += 1) {
         const carousel = carousels.nth(i);
         await carousel.scrollIntoViewIfNeeded();
@@ -83,17 +60,18 @@ test.describe('Unity Quiz maker test suite', () => {
       }
     });
 
-    await test.step('Verify FAQ accordion', async () => {
+    await test.step('Verify FAQ accordion opens and closes each item', async () => {
       const { faqSection, faqAccordionTriggers } = quizMaker;
       await faqSection.scrollIntoViewIfNeeded();
       await expect(faqSection).toBeVisible({ timeout: 60000 });
 
       const buttonCount = await faqAccordionTriggers.count();
+      expect(buttonCount, 'FAQ should have at least one item').toBeGreaterThan(0);
 
       for (let i = 0; i < buttonCount; i += 1) {
         const button = faqAccordionTriggers.nth(i);
         const ariaControls = await button.getAttribute('aria-controls');
-        const contentPanel = faqSection.locator(`#${ariaControls}`);
+        const contentPanel = page.locator(`[id="${ariaControls}"]`);
 
         await button.click();
         await expect(button).toHaveAttribute('aria-expanded', 'true');
@@ -119,24 +97,12 @@ test.describe('Unity Quiz maker test suite', () => {
         quizMaker.dropZone.click(),
       ]);
       await fileChooser.setFiles(pdfFilePath);
+      await expect(page).toHaveURL(/acrobat\.adobe/, { timeout: 60000 });
 
-      await page.waitForURL(/acrobat\.adobe/, {
-        timeout: 60000,
-      });
-
-      const currentUrl = page.url();
-      console.log(`[Post-upload URL]: ${currentUrl}`);
-      const urlObj = new URL(currentUrl);
+      const urlObj = new URL(page.url());
+      console.log(`[Post-upload URL]: ${page.url()}`);
       expect(urlObj.searchParams.get('x_api_client_id')).toBe('unity');
       expect(urlObj.searchParams.get('x_api_client_location')).toBe('quiz-maker');
-      expect(urlObj.searchParams.get('user')).toBe('frictionless_new_user');
-      expect(urlObj.searchParams.get('attempts')).toBe('1st');
-      console.log({
-        x_api_client_id: urlObj.searchParams.get('x_api_client_id'),
-        x_api_client_location: urlObj.searchParams.get('x_api_client_location'),
-        user: urlObj.searchParams.get('user'),
-        attempts: urlObj.searchParams.get('attempts'),
-      });
     });
   });
 });

@@ -1,4 +1,3 @@
-/* eslint-disable compat/compat */
 import { expect } from '@esm-bundle/chai';
 import * as sinon from 'sinon';
 

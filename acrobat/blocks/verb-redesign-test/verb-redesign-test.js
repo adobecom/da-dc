@@ -190,7 +190,6 @@ async function loadAnalyticsAfterLCP({ verb, userAttempts }) {
 }
 
 window.addEventListener('analyticsLoad', async ({ detail }) => {
-  /* eslint-disable-next-line compat/compat -- Opera Mini not a target */
   const delay = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
   const {
     verbAnalytics: stubVerb,
@@ -844,7 +843,6 @@ export default async function init(element) {
 
   element.parentNode.style.display = 'block';
 
-  // eslint-disable-next-line compat/compat
   requestAnimationFrame(() => requestAnimationFrame(() => prerenderElement?.remove()));
 
   window.addEventListener('pageshow', (event) => {

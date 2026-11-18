@@ -3,7 +3,6 @@
  * @jest-environment-options {"url": "https://www.adobe.com/acrobat/plans.html"}
  */
 /* eslint-disable no-undef */
-/* eslint-disable compat/compat */
 
 const mockLoadArea = jest.fn();
 const mockGetCheckoutAction = jest.fn().mockResolvedValue(undefined);

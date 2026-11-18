@@ -1,15 +1,15 @@
-import BasePage from '../../../libs/basepage.js';
-
-export default class ModifyPdfsPage extends BasePage {
+export default class ModifyPdfsPage {
   constructor(page) {
-    super(page);
+    this.page = page;
 
-    this.heroMarquee = page.locator('div[class*="hero-marquee"]');
+    this.gnav = page.locator('header').first();
+    this.gnavBreadcrumbs = page.locator('.feds-breadcrumbs');
+    this.footer = page.locator('footer').first();
 
-    /** Media + con-block promos (expect 4). */
-    this.mediaConBlocks = page.locator('div[class*="con-block"][class*="media"]');
+    this.heroMarquee = page.locator('.hero-marquee').first();
 
-    /** Aside strip with Reader + Chrome extension CTAs (aside1-desktop fragment). */
+    this.mediaConBlocks = page.locator('div.media');
+
     this.asideBlocks = page.locator('div[class*="aside"]');
 
     this.editorialCards = page.locator('div.editorial-card');

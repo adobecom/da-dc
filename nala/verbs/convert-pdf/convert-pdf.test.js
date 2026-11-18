@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './convert-pdf.spec.js';
 import ConvertPdf from './convert-pdf.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-convert-pdf.pdf');
@@ -90,9 +91,7 @@ test.describe('Unity Convert PDF test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await convertPdf.rnrSection.scrollIntoViewIfNeeded();
-      await expect(convertPdf.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(convertPdf.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, convertPdf.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

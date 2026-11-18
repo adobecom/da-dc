@@ -51,7 +51,6 @@ describe('Merch Card AI Checkbox', () => {
     expect(nonAiCTA.dataset.quantity).to.equal('2');
 
     nonAiCTA.dataset.quantity = 124;
-    // eslint-disable-next-line compat/compat
     await new Promise((resolve) => { setTimeout(() => resolve(), 50); });
 
     expect(aiCTA.dataset.quantity).to.equal('124,124');

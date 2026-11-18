@@ -2,6 +2,7 @@ import path from 'path';
 import { expect, test } from '@playwright/test';
 import { features } from './pdf-to-excel.spec.js';
 import PdfToExcel from './pdf-to-excel.page.js';
+import Rnr from '../../libs/blocks/rnr.js';
 import checkPageLinks from '../../utils/link-checker.js';
 
 const pdfFilePath = path.resolve(__dirname, '../../assets/1-PDF-pdf-excel.pdf');
@@ -89,9 +90,7 @@ test.describe('Unity PDF to Excel test suite', () => {
     });
 
     await test.step('Verify ratings and reviews (RnR) block', async () => {
-      await pdfToExcel.rnrSection.scrollIntoViewIfNeeded();
-      await expect(pdfToExcel.rnrSection).toBeVisible({ timeout: 60000 });
-      await expect(pdfToExcel.rnrSection.locator('.rnr-container')).toBeVisible({ timeout: 60000 });
+      await new Rnr(page, pdfToExcel.rnrSection).verifySmoke();
     });
 
     await test.step('Verify columns section has 31 links', async () => {

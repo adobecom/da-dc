@@ -25,8 +25,3 @@ jobs:
                       \"dcbranch\":\"${{ github.head_ref || github.ref_name }}\" \
                     } \
               }"
-
-      - name: Trigger Jenkins Job
-        run: |
-          curl -X POST 'https://dcx.ci.corp.adobe.com/job/DC%20Release%20-%20Run%20Nala/buildWithParameters?token=${{ secrets.JNK_JOB_TOKEN }}&branch=${{ github.head_ref || github.ref_name }}' \
-              -u '${{ secrets.JNK_USER }}:${{ secrets.JNK_API_TOKEN }}'

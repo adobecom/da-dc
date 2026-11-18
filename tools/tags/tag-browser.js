@@ -1,4 +1,4 @@
-/* eslint-disable no-underscore-dangle, import/no-unresolved */
+/* eslint-disable no-underscore-dangle */
 import { LitElement, html, nothing } from 'https://da.live/nx/deps/lit/lit-core.min.js';
 import getStyle from 'https://da.live/nx/utils/styles.js';
 

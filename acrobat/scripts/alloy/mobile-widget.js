@@ -1,5 +1,4 @@
 const params = new Proxy(
-  // eslint-disable-next-line compat/compat
   new URLSearchParams(window.location.search),
   { get: (searchParams, prop) => searchParams.get(prop) },
 );
