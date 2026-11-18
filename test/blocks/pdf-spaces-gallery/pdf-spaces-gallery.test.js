@@ -263,6 +263,43 @@ describe('pdf-spaces-gallery coverage extras', () => {
     expect(result).to.equal(null);
   });
 
+  it('getImsToken falls back to a guest token when refresh keeps failing', async () => {
+    const clock = sinon.useFakeTimers();
+    window.lana = { log: () => {} };
+    let guest = null;
+    const purge = sinon.spy();
+    const getGuestToken = sinon.spy(async () => { guest = { token: 'guest' }; });
+    window.adobeIMS = {
+      getAccessToken: () => guest,
+      refreshToken: () => Promise.reject(new Error('invalid_credentials')),
+      tokenService: { purge, getGuestToken },
+    };
+    const p = testables.getImsToken();
+    await clock.tickAsync(2100);
+    const result = await p;
+    clock.restore();
+    expect(result).to.equal('guest');
+    expect(purge.calledOnce).to.be.true;
+    expect(getGuestToken.calledOnce).to.be.true;
+  });
+
+  it('getImsToken returns null when the guest fallback fails', async () => {
+    const clock = sinon.useFakeTimers();
+    const log = sinon.spy();
+    window.lana = { log };
+    window.adobeIMS = {
+      getAccessToken: () => null,
+      refreshToken: () => Promise.reject(new Error('x')),
+      tokenService: { getGuestToken: async () => { throw new Error('nope'); } },
+    };
+    const p = testables.getImsToken();
+    await clock.tickAsync(2100);
+    const result = await p;
+    clock.restore();
+    expect(result).to.equal(null);
+    expect(log.calledWithMatch('guest token fallback failed')).to.be.true;
+  });
+
   it('fetchCuratedSpaces waits for IMS and fails when it never loads', async () => {
     const clock = sinon.useFakeTimers();
     delete window.adobeIMS;

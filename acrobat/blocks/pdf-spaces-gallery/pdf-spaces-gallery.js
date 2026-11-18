@@ -42,6 +42,26 @@ const attemptTokenRefresh = async () => {
   return refreshResult;
 };
 
+// A stale user session cannot refresh (invalid_credentials); drop it and mint a guest token.
+// imslib has no public API for this, so it uses the internal tokenService.
+const getGuestFallbackToken = async () => {
+  try {
+    const ims = window.adobeIMS;
+    if (!ims?.tokenService?.getGuestToken) return null;
+    ims.tokenService.purge?.();
+    await ims.tokenService.getGuestToken({}, {
+      enableGuestAccounts: true,
+      enableGuestTokenForceRefresh: true,
+      enableGuestBotDetection: true,
+      guestBotDetectionProvider: 'bfp',
+    });
+    return ims.getAccessToken()?.token || null;
+  } catch (e) {
+    window.lana?.log(`PDF Spaces: guest token fallback failed — ${e?.message}`, lanaOptions);
+    return null;
+  }
+};
+
 const getImsToken = async () => {
   const RETRY_WAIT = 2000;
   try {
@@ -53,7 +73,7 @@ const getImsToken = async () => {
       await new Promise((r) => { setTimeout(r, RETRY_WAIT); });
       const retry = await attemptTokenRefresh();
       if (!retry.error) return retry.token?.token;
-      return null;
+      return getGuestFallbackToken();
     }
     return accessToken?.token;
   } catch (error) {
