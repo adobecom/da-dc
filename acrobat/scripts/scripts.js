@@ -253,7 +253,7 @@ const locales = {
   kw_en: { ietf: 'en-KW', tk: 'pps7abe.css', base: '' }, // Kuwait (GB English)
   qa_en: { ietf: 'en-QA', tk: 'pps7abe.css', base: '' }, // Qatar (GB English)
   gr_el: { ietf: 'el-GR', tk: 'fnx0rsr.css', base: 'el' }, // Greece (Greek)
-  el: { ietf: 'el', tk: 'aaz7dvd.css' },
+  el: { ietf: 'el', tk: 'fnx0rsr.css' },
   vn_vi: { ietf: 'vi-VN', tk: 'jii8bki.css' },
   vn_en: { ietf: 'en-VN', tk: 'pps7abe.css', base: '' },
   // Lingo Phase 5 base sites
