@@ -233,8 +233,8 @@ const locales = {
   in_hi: { ietf: 'hi-IN', tk: 'aaa8deh.css' },
   th_th: { ietf: 'th-TH', tk: 'lqo2bst.css' },
   cn: { ietf: 'zh-CN', tk: 'puu3xkp' },
-  hk_zh: { ietf: 'zh-HK', tk: 'jay0ecd' },
-  tw: { ietf: 'zh-TW', tk: 'jay0ecd' },
+  hk_zh: { ietf: 'zh-HK', tk: 'jay0ecd', base: 'zh-hant' },
+  tw: { ietf: 'zh-TW', tk: 'jay0ecd', base: 'zh-hant' },
   jp: { ietf: 'ja-JP', tk: 'dvg6awq' },
   kr: { ietf: 'ko-KR', tk: 'qjs5sfm' },
   // Langstore Support.
@@ -258,6 +258,7 @@ const locales = {
   vn_en: { ietf: 'en-VN', tk: 'pps7abe.css', base: '' },
   // Lingo Phase 5 base sites
   ara: { ietf: 'ar', tk: 'dis2dpj.css', dir: 'rtl' },
+  'zh-hant': { ietf: 'zh-Hant', tk: 'jay0ecd' },
 };
 
 // Add any config options.

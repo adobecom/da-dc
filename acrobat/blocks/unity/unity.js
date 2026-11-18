@@ -59,6 +59,7 @@ export const localeMap = {
   nz: 'en-gb',
   hk_zh: 'zh-tw',
   tw: 'zh-tw',
+  'zh-hant': 'zh-tw',
   jp: 'ja-jp',
   kr: 'ko-kr',
   ae_en: 'en-us',

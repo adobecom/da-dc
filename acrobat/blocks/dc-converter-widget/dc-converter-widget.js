@@ -59,6 +59,7 @@ const localeMap = {
   nz: 'en-nz',
   hk_zh: 'zh-hant-hk',
   tw: 'zh-hant-tw',
+  'zh-hant': 'zh-hant-tw',
   jp: 'ja-jp',
   kr: 'ko-kr',
   ae_en: 'en-ae',

@@ -32,6 +32,7 @@ const localeMap = {
   zh_hk: 'zh-TW',
   hk_zh: 'zh-hant-hk',
   tw: 'zh-hant-tw',
+  'zh-hant': 'zh-hant-tw',
   kr: 'ko-KR',
   cz: 'cs-CZ',
   pl: 'pl-PL',
