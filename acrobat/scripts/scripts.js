@@ -10,6 +10,15 @@
  * governing permissions and limitations under the License.
  */
 
+// Added by head.html only on opted-in pages.
+const lcpPreloadsUrl = document.getElementById('c2-lcp-preloads')?.href;
+const lcpPreloads = lcpPreloadsUrl
+  ? fetch(lcpPreloadsUrl).then((resp) => {
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    return resp.json();
+  }).then(({ data }) => (Array.isArray(data) ? data : []))
+  : Promise.resolve([]);
+
 const pattern = /{{phone-\S\w*\S\w*}}/g;
 document.querySelectorAll('a').forEach((p, idx) => {
   if (pattern.exec(p.innerHTML)) {
@@ -121,7 +130,11 @@ if (hostname.endsWith('.ing')) {
 }
 
 function loadLink(href, { as, callback, crossorigin, rel, fetchpriority } = {}) {
-  let link = document.head.querySelector(`link[href="${href}"]`);
+  // A stylesheet preload must not count as the stylesheet (as in Milo's loadLink).
+  const selector = rel === 'stylesheet'
+    ? `link[href="${href}"][rel="stylesheet"]`
+    : `link[href="${href}"]`;
+  let link = document.head.querySelector(selector);
   if (!link) {
     link = document.createElement('link');
     link.setAttribute('rel', rel);
@@ -156,6 +169,28 @@ const STYLES = '/acrobat/styles/styles.css';
 
 // Use '/libs' if your live site maps '/libs' to milo's origin.
 const LIBS = '/libs';
+
+const LCP_PRELOAD_RELS = ['preload', 'modulepreload', 'preconnect'];
+
+function addLcpPreloads(rows = [], libs = setLibs(LIBS)) {
+  rows.forEach(({ rel, href, as, crossorigin, priority }) => {
+    if (!LCP_PRELOAD_RELS.includes(rel) || !href) return;
+    let url;
+    try {
+      const resolved = new URL(href.replace('{libs}', libs), window.location.href);
+      // Absolute, so href-based "already loaded" checks don't mistake a preload for the file.
+      // Preconnects use the bare origin, as Milo's warmTypekit() does, so they aren't duplicated.
+      url = rel === 'preconnect' ? resolved.origin : resolved.href;
+    } catch {
+      return;
+    }
+    loadLink(url, { rel, as, crossorigin, fetchpriority: priority });
+  });
+}
+
+lcpPreloads.then((rows) => addLcpPreloads(rows)).catch((e) => {
+  window.lana?.log(`LCP preloads failed: ${e.message}`, { tags: 'DC_Milo,lcp-preloads', errorType: 'i' });
+});
 
 const locales = {
   // Americas
