@@ -60,6 +60,45 @@
   const unityLibs = getUnityLibs();
   const localePrefix =  extractLocalePrefix();
 
+  // Adds the LCP preload hints listed in the federal sheet on opted-in C2 pages.
+  (() => {
+    const getMeta = (name) => document.head.querySelector(`meta[name="${name}"]`)?.content;
+    if (getMeta('foundation') !== 'c2') return;
+    if (getMeta('preload-c2-resources') !== 'on') return;
+    // Same root/path rules as Milo's getFederatedContentRoot()/getFederatedUrl(), which aren't loaded yet.
+    const { origin } = window.location;
+    const cdnOrigins = ['https://www.adobe.com', 'https://business.adobe.com', 'https://blog.adobe.com',
+      'https://milo.adobe.com', 'https://news.adobe.com', 'graybox.adobe.com'];
+    const originNoStage = origin.replace('.stage', '');
+    let federalRoot = cdnOrigins.some((o) => (o.startsWith('https://') ? originNoStage === o : originNoStage.endsWith(o)))
+      ? origin : 'https://www.adobe.com';
+    if (origin.includes('localhost') || origin.includes('.aem.')) {
+      federalRoot = `https://main--federal--adobecom.aem.${origin.endsWith('.live') ? 'live' : 'page'}`;
+    }
+    let path = '/federal/preloads/c2-preloads-default.json';
+    try {
+      const { pathname, search } = new URL(getMeta('preload-c2-source'), origin);
+      if (pathname.startsWith('/federal/')) path = `${pathname}${search}`;
+    } catch { /* use the default sheet */ }
+    const rels = ['preload', 'modulepreload', 'preconnect'];
+    fetch(`${federalRoot}${path}`)
+      .then((resp) => (resp.ok ? resp.json() : {}))
+      .then(({ data }) => (Array.isArray(data) ? data : []).forEach(({ rel, href, as, crossorigin, priority }) => {
+        if (!rels.includes(rel) || !href) return;
+        let url;
+        try {
+          const resolved = new URL(href.replace('{libs}', miloLibs), window.location.href);
+          // Absolute, so href-based "already loaded" checks don't mistake a preload for the file.
+          // Preconnects use the bare origin, as Milo's warmTypekit() does, so they aren't duplicated.
+          url = rel === 'preconnect' ? resolved.origin : resolved.href;
+        } catch {
+          return;
+        }
+        loadLink(url, { rel, as, crossorigin, fetchpriority: priority });
+      }))
+      .catch(() => {});
+  })();
+
 
   const preloads = document.querySelector('meta[name="preloads"]')?.content?.split(',').map(x => x.trim().replace('$MILOLIBS', miloLibs).replace('$UNITYLIBS', unityLibs).replace('$LOCALEPREFIX', localePrefix)) || [];
   preloads.forEach((link) => {
