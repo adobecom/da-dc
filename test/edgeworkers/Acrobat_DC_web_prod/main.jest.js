@@ -356,8 +356,8 @@ describe("EdgeWorker that consumes an HTML document and rewrites it", () => {
     });
   });
 
-  it("does not modify the cache key for acrobat.adobe.com", () => {
-    const requestMock = new Request({path: '/online/pdf-to-ppt', host: 'acrobat.adobe.com'});
+  it.each(['acrobat.adobe.com', 'stage.acrobat.adobe.com'])("does not modify the cache key for %s", (host) => {
+    const requestMock = new Request({path: '/online/pdf-to-ppt', host});
     requestMock.cacheKey.includeVariable.mockClear();
     requestMock.setVariable.mockClear();
 
