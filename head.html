@@ -60,6 +60,30 @@
   const unityLibs = getUnityLibs();
   const localePrefix =  extractLocalePrefix();
 
+  // acrobat/scripts/scripts.js fetches this link's href; crossorigin must match for the preload to be reused.
+  (() => {
+    const getMeta = (name) => document.head.querySelector(`meta[name="${name}"]`)?.content;
+    if (getMeta('foundation') !== 'c2') return;
+    if (getMeta('preload-c2-resources') !== 'on') return;
+    // Same root/path rules as Milo's getFederatedContentRoot()/getFederatedUrl(), which aren't loaded yet.
+    const { origin } = window.location;
+    const cdnOrigins = ['https://www.adobe.com', 'https://business.adobe.com', 'https://blog.adobe.com',
+      'https://milo.adobe.com', 'https://news.adobe.com', 'graybox.adobe.com'];
+    const originNoStage = origin.replace('.stage', '');
+    let federalRoot = cdnOrigins.some((o) => (o.startsWith('https://') ? originNoStage === o : originNoStage.endsWith(o)))
+      ? origin : 'https://www.adobe.com';
+    if (origin.includes('localhost') || origin.includes('.aem.')) {
+      federalRoot = `https://main--federal--adobecom.aem.${origin.endsWith('.live') ? 'live' : 'page'}`;
+    }
+    let path = '/federal/preloads/c2-preloads-default.json';
+    try {
+      const { pathname, search } = new URL(getMeta('preload-c2-source'), origin);
+      if (pathname.startsWith('/federal/')) path = `${pathname}${search}`;
+    } catch { /* use the default sheet */ }
+    const sheet = `${federalRoot}${path}`;
+    loadLink(sheet, { rel: 'preload', as: 'fetch', crossorigin: 'anonymous' }).id = 'c2-lcp-preloads';
+  })();
+
 
   const preloads = document.querySelector('meta[name="preloads"]')?.content?.split(',').map(x => x.trim().replace('$MILOLIBS', miloLibs).replace('$UNITYLIBS', unityLibs).replace('$LOCALEPREFIX', localePrefix)) || [];
   preloads.forEach((link) => {
