@@ -59,6 +59,7 @@ export const LOCALE_REDIRECT_MAP = {
   th_th: 'th_th',
   tr: 'tr',
   tw: 'tw',
+  'zh-hant': 'tw',
 };
 
 const DC_ENV = ['www.adobe.com', 'sign.ing', 'edit.ing'].includes(window.location.hostname) ? 'prod' : 'stage';

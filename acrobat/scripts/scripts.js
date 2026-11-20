@@ -249,9 +249,9 @@ const locales = {
   ru: { ietf: 'ru-RU', tk: 'aaz7dvd.css' },
   ua: { ietf: 'uk-UA', tk: 'aaz7dvd.css' },
   il_he: { ietf: 'he', tk: 'nle2tdz.css', dir: 'rtl' },
-  ae_ar: { ietf: 'ar-AE', tk: 'dis2dpj.css', dir: 'rtl' },
+  ae_ar: { ietf: 'ar-AE', tk: 'dis2dpj.css', dir: 'rtl', base: 'ara' },
   mena_ar: { ietf: 'ar', tk: 'dis2dpj.css', dir: 'rtl' },
-  sa_ar: { ietf: 'ar-SA', tk: 'dis2dpj.css', dir: 'rtl' },
+  sa_ar: { ietf: 'ar-SA', tk: 'dis2dpj.css', dir: 'rtl', base: 'ara' },
   // Asia Pacific
   au: { ietf: 'en-AU', tk: 'pps7abe.css' },
   hk_en: { ietf: 'en-HK', tk: 'pps7abe.css', base: '' },
@@ -268,8 +268,8 @@ const locales = {
   in_hi: { ietf: 'hi-IN', tk: 'aaa8deh.css' },
   th_th: { ietf: 'th-TH', tk: 'lqo2bst.css' },
   cn: { ietf: 'zh-CN', tk: 'puu3xkp' },
-  hk_zh: { ietf: 'zh-HK', tk: 'jay0ecd' },
-  tw: { ietf: 'zh-TW', tk: 'jay0ecd' },
+  hk_zh: { ietf: 'zh-HK', tk: 'jay0ecd', base: 'zh-hant' },
+  tw: { ietf: 'zh-TW', tk: 'jay0ecd', base: 'zh-hant' },
   jp: { ietf: 'ja-JP', tk: 'dvg6awq' },
   kr: { ietf: 'ko-KR', tk: 'qjs5sfm' },
   // Langstore Support.
@@ -281,16 +281,19 @@ const locales = {
   ec: { ietf: 'es-EC', tk: 'oln4yqj.css', base: 'es' }, // Ecuador (Spanish Latin America)
   pr: { ietf: 'es-PR', tk: 'oln4yqj.css', base: 'es' }, // Puerto Rico (Spanish Latin America)
   gt: { ietf: 'es-GT', tk: 'oln4yqj.css', base: 'es' }, // Guatemala (Spanish Latin America)
-  eg_ar: { ietf: 'ar-EG', tk: 'dis2dpj.css', dir: 'rtl' }, // Egypt (Arabic)
-  kw_ar: { ietf: 'ar-KW', tk: 'dis2dpj.css', dir: 'rtl' }, // Kuwait (Arabic)
-  qa_ar: { ietf: 'ar-QA', tk: 'dis2dpj.css', dir: 'rtl' }, // Quatar (Arabic)
+  eg_ar: { ietf: 'ar-EG', tk: 'dis2dpj.css', dir: 'rtl', base: 'ara' }, // Egypt (Arabic)
+  kw_ar: { ietf: 'ar-KW', tk: 'dis2dpj.css', dir: 'rtl', base: 'ara' }, // Kuwait (Arabic)
+  qa_ar: { ietf: 'ar-QA', tk: 'dis2dpj.css', dir: 'rtl', base: 'ara' }, // Quatar (Arabic)
   eg_en: { ietf: 'en-EG', tk: 'pps7abe.css', base: '' }, // Egypt (GB English)
   kw_en: { ietf: 'en-KW', tk: 'pps7abe.css', base: '' }, // Kuwait (GB English)
   qa_en: { ietf: 'en-QA', tk: 'pps7abe.css', base: '' }, // Qatar (GB English)
-  gr_el: { ietf: 'el-GR', tk: 'fnx0rsr.css' }, // Greece (Greek)
-  el: { ietf: 'el', tk: 'aaz7dvd.css' },
+  gr_el: { ietf: 'el-GR', tk: 'fnx0rsr.css', base: 'el' }, // Greece (Greek)
+  el: { ietf: 'el', tk: 'fnx0rsr.css' },
   vn_vi: { ietf: 'vi-VN', tk: 'jii8bki.css' },
   vn_en: { ietf: 'en-VN', tk: 'pps7abe.css', base: '' },
+  // Lingo Phase 5 base sites
+  ara: { ietf: 'ar', tk: 'dis2dpj.css', dir: 'rtl' },
+  'zh-hant': { ietf: 'zh-Hant', tk: 'jay0ecd' },
 };
 
 // Add any config options.
@@ -544,6 +547,7 @@ const MAS_GEO_MAP = {
   id_id: 'ID_id',
   nz: 'NZ_en',
   sa_ar: 'SA_ar',
+  ara: 'SA_ar',
   sa_en: 'SA_en',
   sg: 'SG_en',
   cn: 'CN_zh',
