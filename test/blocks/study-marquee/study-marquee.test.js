@@ -53,6 +53,11 @@ describe('study-marquee block', () => {
     expect(LIMITS['mindmap-maker'].genAI).to.be.true;
   });
 
+  it('exports LIMITS for cheat-sheet with the same config as mindmap-maker', () => {
+    expect(LIMITS).to.have.property('cheat-sheet');
+    expect(LIMITS['cheat-sheet']).to.deep.equal(LIMITS['mindmap-maker']);
+  });
+
   it('exports LIMITS for gen-presentation-v2, interactive-report, and stylize as single-file PDF-only verbs', () => {
     ['gen-presentation-v2', 'interactive-report', 'stylize'].forEach((verb) => {
       expect(LIMITS).to.have.property(verb);
@@ -185,6 +190,19 @@ describe('study-marquee block', () => {
     await init(block);
     expect(block.classList.contains('mindmap-maker')).to.be.true;
     expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
+  });
+
+  it('init cheat-sheet block', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-cheat-sheet.html' });
+    const block = document.body.querySelector('.study-marquee');
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    await init(block);
+    expect(block.classList.contains('cheat-sheet')).to.be.true;
+    expect(document.querySelector('.study-marquee .study-marquee-dropzone')).to.exist;
+    const input = document.querySelector('.study-marquee #file-upload');
+    expect(input.getAttribute('accept')).to.equal(LIMITS['cheat-sheet'].acceptedFiles.join(','));
+    expect(input.hasAttribute('multiple')).to.be.true;
   });
 
   it('delays redirect by 3 seconds and logs a warning on uploaded for all verbs', async () => {
