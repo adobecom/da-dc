@@ -42,7 +42,7 @@ const group = (verbs, config) => verbs.reduce((acc, v) => { acc[v] = config; ret
 const SIGNED_IN_UPLOAD_VERBS = new Set(['gen-presentation-v2', 'interactive-report', 'stylize']);
 
 export const LIMITS = {
-  ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker'], STUDY_GENAI),
+  ...group(['quiz-maker', 'flashcard-maker', 'mindmap-maker', 'cheat-sheet'], STUDY_GENAI),
   ...group(['gen-presentation-v2', 'interactive-report', 'stylize'], { ...STUDY_GENAI_SINGLE, acceptedFiles: ['.pdf'] }),
 };
 
