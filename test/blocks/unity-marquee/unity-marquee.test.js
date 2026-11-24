@@ -315,6 +315,21 @@ describe('unity-marquee block', () => {
     expect(hrefs.some((h) => h.includes('gen-ai'))).to.be.true;
   });
 
+  it('study-guide is a genai verb and includes the genai-guidelines legal link', async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body-study-guide.html' });
+    const conf = getConfig();
+    setConfig({ ...conf, locale: { prefix: '' } });
+    window.mph['study-marquee-legal-text'] = 'You agree to the Terms of Use, Privacy Policy and Gen AI Guidelines.';
+    window.mph['verb-widget-genai-guidelines'] = 'Gen AI Guidelines';
+    window.mph['verb-widget-genai-terms-url'] = 'https://www.adobe.com/legal/licenses-terms/adobe-gen-ai-user-guidelines.html';
+    const block = document.body.querySelector('.unity-marquee');
+    await init(block);
+    expect(block.classList.contains('study-guide')).to.be.true;
+    const links = block.querySelectorAll('.unity-marquee-legal a.unity-marquee-legal-url');
+    expect(links.length).to.equal(3);
+    expect(Array.from(links).some((a) => a.getAttribute('href').includes('gen-ai'))).to.be.true;
+  });
+
   it('non-genai verb has only 2 legal links', async () => {
     document.body.innerHTML = await readFile({ path: './mocks/body-compress-pdf.html' });
     const conf = getConfig();
